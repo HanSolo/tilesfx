@@ -1,0 +1,111 @@
+/*
+ * Copyright (c) 2016 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package eu.hansolo.tilesfx.skins;
+
+import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.Helper;
+import javafx.geometry.Insets;
+import javafx.geometry.Side;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.text.Text;
+
+
+/**
+ * Created by hansolo on 19.12.16.
+ */
+public class LineChartTileSkin extends TileSkin {
+    private Text                      titleText;
+    private LineChart<String, Number> chart;
+    private CategoryAxis              xAxis;
+    private NumberAxis                yAxis;
+
+
+    // ******************** Constructors **************************************
+    public LineChartTileSkin(final Tile TILE) {
+        super(TILE);
+    }
+
+    // ******************** Initialization ************************************
+    @Override protected void initGraphics() {
+        super.initGraphics();
+
+        titleText = new Text();
+        titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+
+        xAxis = new CategoryAxis();
+        yAxis = new NumberAxis();
+
+        chart = new LineChart<>(xAxis, yAxis);
+        chart.getData().addAll(getSkinnable().getSeries());
+        chart.setLegendSide(Side.TOP);
+        chart.setVerticalZeroLineVisible(false);
+        chart.setCreateSymbols(false);
+
+        getPane().getChildren().addAll(titleText, chart);
+    }
+
+    @Override protected void registerListeners() {
+        super.registerListeners();
+
+    }
+
+
+    // ******************** Methods *******************************************
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+
+        if ("VISIBILITY".equals(EVENT_TYPE)) {
+
+        }
+    };
+
+
+    // ******************** Resizing ******************************************
+    @Override protected void resizeDynamicText() {
+    };
+    @Override protected void resizeStaticText() {
+        double maxWidth = size * 0.9;
+        double fontSize = size * 0.06;
+
+        titleText.setFont(Fonts.latoRegular(fontSize));
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
+        titleText.relocate(size * 0.05, size * 0.05);
+    };
+
+    @Override protected void resize() {
+        super.resize();
+
+        chart.setMinSize(size * 0.9, size * 0.9);
+        chart.setPrefSize(size * 0.9, size * 0.9);
+        chart.setMaxSize(size * 0.9, size * 0.9);
+        chart.setPadding(new Insets(titleText.getLayoutBounds().getHeight() + size * 0.05, 0, 0, 0));
+        chart.relocate(size * 0.05, size * 0.05);
+    };
+
+    @Override protected void redraw() {
+        super.redraw();
+        titleText.setText(getSkinnable().getTitle());
+
+        resizeStaticText();
+
+        titleText.setFill(getSkinnable().getTitleColor());
+    };
+}

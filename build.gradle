@@ -1,0 +1,135 @@
+import java.text.SimpleDateFormat
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:3.0.0'
+    }
+}
+
+// Medusa main build file
+plugins {
+    id 'idea'
+    id 'java'
+    id 'maven-publish'
+    id 'net.nemerosa.versioning' version '1.6.0'
+    id 'com.jfrog.bintray' version '1.6'
+}
+
+apply plugin: 'biz.aQute.bnd.builder'
+
+description = 'TilesFX is a JavaFX 8 library containing tiles for dashboards'
+
+Date buildTimeAndDate = new Date()
+ext {
+    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+}
+
+jar {
+    manifest {
+        attributes(
+                'Built-By': System.properties['user.name'],
+                'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
+                'Build-Date': project.buildDate,
+                'Build-Time': project.buildTime,
+                'Build-Revision': versioning.info.commit,
+                'Specification-Title': project.name,
+                'Specification-Version': project.version,
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Bundle-Name': project.name,
+                'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
+                'Bundle-Description': description,
+                'Bundle-SymbolicName': 'eu.hansolo.tilesfx',
+                'Export-Package': 'eu.hansolo.tilesfx,eu.hansolo.tilesfx.events,eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.fonts,eu.hansolo.tilesfx.tools'
+        )
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+// create one jar for the javadoc
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// create one jar for the source files
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+def pomConfig = {
+    name 'tilesfx'
+    // Description won't be used when creating the pom file automatically.
+    // So I've added it manually in the pom.withXml{} section in the publishing task
+    //description 'Medusa is a JavaFX 8 library containing gauges and clocks'
+    url 'https://github.com/HanSolo/TilesFX/wiki'
+    inceptionYear '2016'
+    licenses {
+        license([:]) {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+    scm {
+        url 'scm:git@github.com:HanSolo/tilesfx.git'
+        connection 'scm:git@github.com:HanSolo/tilesfx.git'
+        developerConnection 'scm:git@github.com:HanSolo/tilesfx.git'
+    }
+    developers {
+        developer {
+            id 'HanSolo'
+            name 'Gerrit Grunwald'
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom.withXml {
+                asNode().children().last() + pomConfig
+                asNode().appendNode('description', description)
+            }
+        }
+    }
+}
+
+if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
+if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
+
+bintray {
+    user = project.bintrayUsername
+    key = project.bintrayApiKey
+    publications = ['mavenCustom']
+    pkg {
+        repo                  = 'Medusa'
+        userOrg               = 'hansolo'
+        name                  = project.name
+        desc                  = description
+        licenses              = ['Apache-2.0']
+        labels                = ['javafx']
+        websiteUrl            = 'https://github.com/HanSolo/tilesfx/wiki'
+        issueTrackerUrl       = 'https://github.com/HanSolo/tilesfx/issues'
+        vcsUrl                = 'git@github.com:HanSolo/tilesfx.git'
+        publicDownloadNumbers = true
+    }
+}

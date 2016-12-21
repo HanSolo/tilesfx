@@ -1,0 +1,122 @@
+/*
+ * Copyright (c) 2016 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.tile {
+    -BACKGROUND   : rgb(42, 42, 42);
+    -FOREGROUND   : rgb(223, 223, 223);
+    -GRAY         : rgb(139,144,146);
+    -RED          : rgb(229, 80, 76);
+    -GREEN        : rgb(143, 198, 94);
+    -BLUE         : rgb(55, 179, 252);
+    -ORANGE       : rgb(237, 162, 57);
+    -YELLOW_ORANGE: rgb(229, 198, 76);
+    -YELLOW       : rgb(229, 229, 76);
+    -MAGENTA      : rgb(198, 75, 232);
+
+}
+
+.tile .chart {
+    -fx-padding: 10px;
+}
+
+.tile .chart-content {
+    -fx-padding: 0px;
+}
+
+.tile .chart-title {
+    -fx-text-fill: #eeeeee;
+    -fx-font-size: 14px;
+    -fx-alignment: center-left;
+}
+
+.tile .axis-label {
+    -fx-text-fill: #eeeeee;
+}
+
+.tile .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.tile .chart-vertical-grid-lines {
+    -fx-stroke: #2a2a2a;
+    -fx-stroke-dash-array: null;
+}
+
+.tile .chart-horizontal-grid-lines {
+    -fx-stroke: #454545;
+    -fx-stroke-dash-array: null;
+}
+.tile .chart-vertical-zero-line {
+    -fx-stroke: transparent;
+}
+
+.tile .chart-alternative-row-fill {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0;
+}
+
+.tile .chart-legend {
+    -fx-background-color:  transparent;
+    -fx-padding: 5px;
+}
+
+.tile .chart-legend-item-symbol{
+    -fx-background-radius: 1em;
+}
+
+.tile .chart-legend-item{
+    -fx-text-fill: #eeeeee;
+    -fx-alignment: center-right;
+}
+
+.tile .axis {
+    AXIS_COLOR: #454545;
+    -fx-tick-label-fill: #eeeeee;
+}
+.tile .axis:left {
+    -fx-border-color: transparent transparent transparent transparent;
+}
+.tile .axis:left > .axis-label {
+    -fx-padding: 0 0 4px 0;
+}
+.tile .axis:bottom > .axis-label {
+    -fx-padding: 4px 0 0 0;
+}
+.tile .axis-tick-mark {
+    -fx-stroke: transparent;
+    -fx-stroke-width: 1;
+}
+.tile .axis-minor-tick-mark {
+    -fx-stroke: transparent;
+}
+
+.tile .chart-series-line {
+    -fx-stroke-width: 2px;
+    -fx-effect: null;
+}
+
+.tile .chart-line-symbol {
+    -visibility: hidden;
+}
+
+.tile .default-color0.chart-series-line { -fx-stroke: -BLUE; }
+.tile .default-color1.chart-series-line { -fx-stroke: -ORANGE; }
+.tile .default-color2.chart-series-line { -fx-stroke: -MAGENTA; }
+
+.tile .default-color0.chart-line-symbol { -fx-background-color: -BLUE; }
+.tile .default-color1.chart-line-symbol { -fx-background-color: -ORANGE; }
+.tile .default-color2.chart-line-symbol { -fx-background-color: -MAGENTA; }

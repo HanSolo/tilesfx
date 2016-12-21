@@ -75,8 +75,8 @@ def pomConfig = {
     name 'tilesfx'
     // Description won't be used when creating the pom file automatically.
     // So I've added it manually in the pom.withXml{} section in the publishing task
-    //description 'Medusa is a JavaFX 8 library containing gauges and clocks'
-    url 'https://github.com/HanSolo/TilesFX/wiki'
+    //description 'TilesFX is a library containing tiles for dashboards'
+    url 'https://github.com/HanSolo/tilesfx/wiki'
     inceptionYear '2016'
     licenses {
         license([:]) {
@@ -121,7 +121,7 @@ bintray {
     key = project.bintrayApiKey
     publications = ['mavenCustom']
     pkg {
-        repo                  = 'Medusa'
+        repo                  = 'tilesfx'
         userOrg               = 'hansolo'
         name                  = project.name
         desc                  = description

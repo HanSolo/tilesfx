@@ -112,17 +112,6 @@ public class WorldMapTileSkin extends TileSkin {
         }
     }
 
-    private Properties readProperties(final String FILE_NAME) {
-        final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();
-        final Properties  PROPERTIES = new Properties();
-        try(InputStream resourceStream = LOADER.getResourceAsStream(FILE_NAME)) {
-            PROPERTIES.load(resourceStream);
-        } catch (IOException exception) {
-            System.out.println(exception);
-        }
-        return PROPERTIES;
-    }
-
 
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
@@ -163,8 +152,6 @@ public class WorldMapTileSkin extends TileSkin {
 
             double worldMapHeight = height * 0.8;
             double worldMapWidth  = worldMapHeight / 0.65906838;
-
-            System.out.println(worldMapWidth + ", " + worldMapHeight);
 
             worldPane.setCache(true);
             worldPane.setCacheHint(CacheHint.SCALE);

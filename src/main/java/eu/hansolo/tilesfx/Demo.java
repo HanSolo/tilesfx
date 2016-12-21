@@ -199,9 +199,9 @@ public class Demo extends Application {
                     gaugeTile.setValue(RND.nextDouble() * gaugeTile.getRange() * 1.5 + gaugeTile.getMinValue());
                     sparkLineTile.setValue(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
                     highLowTile.setValue(RND.nextDouble() * 10);
-                    sliderTile.setValue(RND.nextDouble() * sliderTile.getRange() + sliderTile.getMinValue());
-                    plusMinusTile.setValue(RND.nextDouble() * plusMinusTile.getRange() + plusMinusTile.getMinValue());
-                    switchTile.setSelected(RND.nextBoolean());
+                    //sliderTile.setValue(RND.nextDouble() * sliderTile.getRange() + sliderTile.getMinValue());
+                    //plusMinusTile.setValue(RND.nextDouble() * plusMinusTile.getRange() + plusMinusTile.getMinValue());
+                    //switchTile.setSelected(RND.nextBoolean());
                     series1.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
                     series2.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
                     lastTimerCall = now;

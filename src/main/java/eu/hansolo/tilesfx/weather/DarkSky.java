@@ -23,6 +23,9 @@ import java.util.TimeZone;
  * Created by hansolo on 27.10.16.
  */
 public class DarkSky {
+
+    // YOU CAN GET A DARK SKY API KEY AT: https://darksky.net/dev/
+
     public enum Language {
         ARABIC("ar"),
         AZERBAIJANI("az"),

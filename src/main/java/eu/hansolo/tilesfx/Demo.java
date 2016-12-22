@@ -105,7 +105,7 @@ public class Demo extends Application {
         timeSection.setOnTimeSectionEntered(e -> System.out.println("Section ACTIVE"));
         timeSection.setOnTimeSectionLeft(e -> System.out.println("Section INACTIVE"));
 
-        // Weather
+        // Weather (You can get a DarkSky API key here: https://darksky.net/dev/ )
         DarkSky darkSky = new DarkSky("YOUR_DARK_SKY_API_KEY", Unit.CA, Language.ENGLISH, 51.911858, 7.632815);
 
         // Creating Tiles

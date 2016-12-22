@@ -96,7 +96,7 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class Tile extends Control {
-    enum SkinType { //AREA_CHART, BAR_CHART, LEADER_BOARD,
+    public enum SkinType { //AREA_CHART, BAR_CHART, LEADER_BOARD,
                     LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                     PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
                     TIMER_CONTROL, TEXT, WEATHER }

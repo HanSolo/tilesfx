@@ -24,6 +24,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,14 +34,14 @@ import java.time.format.DateTimeFormatter;
  * Created by hansolo on 19.12.16.
  */
 public class ClockTileSkin extends TileSkin {
-    private static final DateTimeFormatter TIME_FORMATER         = DateTimeFormatter.ofPattern("HH:mm");
-    private static final DateTimeFormatter DATE_FORMATER         = DateTimeFormatter.ofPattern("dd MMM YYYY");
-    private static final DateTimeFormatter DAY_OF_WEEK_FORMATTER = DateTimeFormatter.ofPattern("EEEE");
-    private              Text              title;
-    private              Rectangle         timeRect;
-    private              Text              timeText;
-    private              Text              dayOfWeekText;
-    private              Text              dateText;
+    private DateTimeFormatter timeFormatter;
+    private DateTimeFormatter dateFormatter;
+    private DateTimeFormatter dayOfWeekFormatter;
+    private Text              title;
+    private Rectangle         timeRect;
+    private Text              timeText;
+    private Text              dayOfWeekText;
+    private Text              dateText;
 
 
     // ******************** Constructors **************************************
@@ -53,18 +54,24 @@ public class ClockTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
+        timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", getSkinnable().getLocale());
+        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", getSkinnable().getLocale());
+        dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", getSkinnable().getLocale());
+
+        System.out.println(dayOfWeekFormatter.format(LocalDateTime.now()));
+
         title = new Text("");
         title.setTextOrigin(VPos.TOP);
         Helper.enableNode(title, !getSkinnable().getTitle().isEmpty());
 
         timeRect = new Rectangle();
 
-        timeText = new Text(TIME_FORMATER.format(getSkinnable().getTime()));
+        timeText = new Text(timeFormatter.format(getSkinnable().getTime()));
         timeText.setTextOrigin(VPos.CENTER);
 
-        dateText = new Text(DATE_FORMATER.format(getSkinnable().getTime()));
+        dateText = new Text(dateFormatter.format(getSkinnable().getTime()));
 
-        dayOfWeekText = new Text(DAY_OF_WEEK_FORMATTER.format(getSkinnable().getTime()));
+        dayOfWeekText = new Text(dayOfWeekFormatter.format(getSkinnable().getTime()));
 
         getPane().getChildren().addAll(title, timeRect, timeText, dateText, dayOfWeekText);
     }
@@ -86,14 +93,14 @@ public class ClockTileSkin extends TileSkin {
     };
 
     public void updateTime(final ZonedDateTime TIME) {
-        timeText.setText(TIME_FORMATER.format(getSkinnable().getTime()));
+        timeText.setText(timeFormatter.format(getSkinnable().getTime()));
         timeText.setX((size - timeText.getLayoutBounds().getWidth()) * 0.5);
         timeText.setY(size * 0.4);
 
-        dayOfWeekText.setText(DAY_OF_WEEK_FORMATTER.format(TIME));
+        dayOfWeekText.setText(dayOfWeekFormatter.format(TIME));
         dayOfWeekText.setX(size * 0.05);
 
-        dateText.setText(DATE_FORMATER.format(TIME));
+        dateText.setText(dateFormatter.format(TIME));
         dateText.setX(size * 0.05);
     }
 
@@ -112,7 +119,7 @@ public class ClockTileSkin extends TileSkin {
         maxWidth = size * 0.9;
         fontSize = size * 0.3;
         timeText.setFont(Fonts.latoRegular(fontSize));
-        timeText.setText(TIME_FORMATER.format(getSkinnable().getTime()));
+        timeText.setText(timeFormatter.format(getSkinnable().getTime()));
         Helper.adjustTextSize(timeText, maxWidth, fontSize);
         timeText.setX((size - timeText.getLayoutBounds().getWidth()) * 0.5);
         timeText.setY(size * 0.4);
@@ -142,6 +149,10 @@ public class ClockTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
+
+        timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", getSkinnable().getLocale());
+        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", getSkinnable().getLocale());
+        dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", getSkinnable().getLocale());
 
         ZonedDateTime time = getSkinnable().getTime();
 

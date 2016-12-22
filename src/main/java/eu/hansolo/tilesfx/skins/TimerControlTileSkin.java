@@ -55,7 +55,7 @@ import java.util.Map;
  */
 public class TimerControlTileSkin extends TileSkin {
     private static final double                CLOCK_SCALE_FACTOR = 0.75;
-    private static final DateTimeFormatter     DATE_FORMATER      = DateTimeFormatter.ofPattern("EE d");
+    private              DateTimeFormatter     dateFormatter;
     private              double                clockSize;
     private              Pane                  sectionsPane;
     private              Path                  minuteTickMarks;
@@ -87,6 +87,8 @@ public class TimerControlTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        dateFormatter = DateTimeFormatter.ofPattern("EE d", getSkinnable().getLocale());
 
         sectionMap   = new HashMap<>(getSkinnable().getTimeSections().size());
         for (TimeSection section : getSkinnable().getTimeSections()) { sectionMap.put(section, new Arc()); }
@@ -311,7 +313,7 @@ public class TimerControlTileSkin extends TileSkin {
         amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(size * 0.4);
 
-        dateText.setText(DATE_FORMATER.format(TIME).toUpperCase());
+        dateText.setText(dateFormatter.format(TIME).toUpperCase());
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.setX((size - dateText.getLayoutBounds().getWidth()) * 0.5);
         dateText.setY(size * 0.65);
@@ -414,6 +416,9 @@ public class TimerControlTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
+
+        dateFormatter = DateTimeFormatter.ofPattern("EE d", getSkinnable().getLocale());
+
         shadowGroupHour.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
         shadowGroupMinute.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
         shadowGroupSecond.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);

@@ -33,6 +33,7 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 
 import java.time.LocalTime;
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -123,6 +124,7 @@ public class Demo extends Application {
                                .text("TEST")
                                .textVisible(true)
                                .dateVisible(true)
+                               .locale(Locale.US)
                                .running(true)
                                .build();
 

@@ -112,7 +112,7 @@ public class Demo extends Application {
         percentageTile = TileBuilder.create()
                                     .skinType(SkinType.PERCENTAGE)
                                     .title("Percentage Tile")
-                                    .unit("%")
+                                    .unit("\u0025")
                                     .maxValue(60)
                                     .build();
 
@@ -146,7 +146,7 @@ public class Demo extends Application {
         highLowTile = TileBuilder.create()
                                  .skinType(SkinType.HIGH_LOW)
                                  .title("HighLow Tile")
-                                 .unit("%")
+                                 .unit("\u0025")
                                  .referenceValue(6.7)
                                  .value(8.2)
                                  .build();
@@ -175,13 +175,13 @@ public class Demo extends Application {
                                    .maxValue(30)
                                    .minValue(0)
                                    .title("PlusMinus Tile")
-                                   .unit("°C")
+                                   .unit("\u00B0C")
                                    .build();
 
         sliderTile = TileBuilder.create()
                                 .skinType(SkinType.SLIDER)
                                 .title("Slider Tile")
-                                .unit("°C")
+                                .unit("\u00B0C")
                                 .barBackgroundColor(Tile.FOREGROUND)
                                 .build();
 

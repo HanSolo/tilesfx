@@ -17,6 +17,9 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
+import eu.hansolo.tilesfx.weather.DarkSky;
+import eu.hansolo.tilesfx.weather.DarkSky.Language;
+import eu.hansolo.tilesfx.weather.DarkSky.Unit;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -52,6 +55,7 @@ public class Demo extends Application {
     private Tile           sliderTile;
     private Tile           switchTile;
     private Tile           worldTile;
+    private Tile           weatherTile;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -100,6 +104,9 @@ public class Demo extends Application {
         TimeSection timeSection = new TimeSection(LocalTime.now().plusSeconds(20), LocalTime.now().plusHours(1), Tile.GRAY, Tile.RED);
         timeSection.setOnTimeSectionEntered(e -> System.out.println("Section ACTIVE"));
         timeSection.setOnTimeSectionLeft(e -> System.out.println("Section INACTIVE"));
+
+        // Weather
+        DarkSky darkSky = new DarkSky("YOUR_DARK_SKY_API_KEY", Unit.CA, Language.ENGLISH, 51.911858, 7.632815);
 
         // Creating Tiles
         percentageTile = TileBuilder.create()
@@ -191,6 +198,13 @@ public class Demo extends Application {
                                .textVisible(true)
                                .build();
 
+        // Update the weather information by calling weatherTile.updateWeather()
+        weatherTile = TileBuilder.create()
+                                 .skinType(SkinType.WEATHER)
+                                 .title("YOUR CITY NAME")
+                                 .darkSky(darkSky)
+                                 .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -213,7 +227,7 @@ public class Demo extends Application {
     @Override public void start(Stage stage) {
         FlowPane pane = new FlowPane(percentageTile, clockTile, gaugeTile, sparkLineTile,
                                      lineChartTile, highLowTile, timerControlTile, textTile,
-                                     plusMinusTile, sliderTile, switchTile, worldTile);
+                                     plusMinusTile, sliderTile, switchTile, worldTile);// , weatherTile);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));

@@ -20,6 +20,7 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
+import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -544,6 +545,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B darkSky(final DarkSky DARK_SKY) {
+        properties.put("darkSky", new SimpleObjectProperty(DARK_SKY));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -667,6 +673,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setCheckSectionsForValue(true);
                     break;
                 case TEXT:
+                    break;
+                case WEATHER:
                     break;
             }
         } else {
@@ -915,6 +923,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setIncrement(((DoubleProperty) properties.get(key)).get());
             } else if ("activeColor".equals(key)) {
                 CONTROL.setActiveColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("darkSky".equals(key)) {
+                CONTROL.setDarkSky(((ObjectProperty<DarkSky>) properties.get(key)).get());
             }
         }
         return CONTROL;

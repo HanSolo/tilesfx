@@ -37,12 +37,16 @@ import eu.hansolo.tilesfx.skins.SwitchTileSkin;
 import eu.hansolo.tilesfx.skins.TextTileSkin;
 import eu.hansolo.tilesfx.skins.TileSkin;
 import eu.hansolo.tilesfx.skins.TimerControlTileSkin;
+import eu.hansolo.tilesfx.skins.WeatherTileSkin;
 import eu.hansolo.tilesfx.skins.WorldMapTileSkin;
 import eu.hansolo.tilesfx.tools.Data;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.SectionComparator;
 import eu.hansolo.tilesfx.tools.TimeSectionComparator;
+import eu.hansolo.tilesfx.weather.DarkSky;
+import eu.hansolo.tilesfx.weather.DarkSky.Language;
+import eu.hansolo.tilesfx.weather.DarkSky.Unit;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -95,7 +99,7 @@ public class Tile extends Control {
     enum SkinType { //AREA_CHART, BAR_CHART, LEADER_BOARD,
                     LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                     PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                    TIMER_CONTROL, TEXT }
+                    TIMER_CONTROL, TEXT, WEATHER }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -321,6 +325,7 @@ public class Tile extends Control {
     private              BooleanProperty               alarmsVisible;
     private              ObservableList<Alarm>         alarms;
     private              List<Alarm>                   alarmsToRemove;
+    private              DarkSky                       darkSky;
 
     private volatile ScheduledFuture<?>               periodicTickTask;
     private static   ScheduledExecutorService         periodicTickExecutorService;
@@ -3448,6 +3453,19 @@ public class Tile extends Control {
         return countryPaths;
     }
 
+    public DarkSky getDarkSky() { return darkSky; }
+    public void setDarkSky(final DarkSky DARK_SKY) { darkSky = DARK_SKY; }
+
+    public void updateWeather() {
+        if (null == darkSky) return;
+        if (darkSky.update()) {
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            System.out.println("Wrong or missing DarkSky API key");
+            throw new IllegalArgumentException("Do you use a valid DarkSKY API key?");
+        }
+    }
+
     private Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();
         final Properties  PROPERTIES = new Properties();
@@ -3634,6 +3652,7 @@ public class Tile extends Control {
             case WORLDMAP     : return new WorldMapTileSkin(Tile.this);
             case TIMER_CONTROL: return new TimerControlTileSkin(Tile.this);
             case TEXT         : return new TextTileSkin(Tile.this);
+            case WEATHER      : return new WeatherTileSkin(Tile.this);
             default           : return new TileSkin(Tile.this);
         }
     }
@@ -3692,6 +3711,9 @@ public class Tile extends Control {
                 super.setSkin(new TimerControlTileSkin(Tile.this));
                 break;
             case TEXT         : super.setSkin(new TextTileSkin(Tile.this)); break;
+            case WEATHER      :
+                super.setSkin(new WeatherTileSkin(Tile.this));
+                break;
             default           : super.setSkin(new TileSkin(Tile.this)); break;
         }
     }

@@ -28,6 +28,10 @@ ext {
     buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
 }
 
+dependencies {
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+}
+
 jar {
     manifest {
         attributes(
@@ -51,6 +55,7 @@ jar {
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 // create one jar for the javadoc
@@ -118,7 +123,7 @@ if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
 
 bintray {
     user = project.bintrayUsername
-    key = project.bintrayApiKey
+    key  = project.bintrayApiKey
     publications = ['mavenCustom']
     pkg {
         repo                  = 'tilesfx'

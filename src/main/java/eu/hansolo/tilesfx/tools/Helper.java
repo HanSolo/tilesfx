@@ -188,4 +188,20 @@ public class Helper {
         NODE.setScaleX(TARGET_WIDTH / NODE.getLayoutBounds().getWidth());
         NODE.setScaleY(TARGET_HEIGHT / NODE.getLayoutBounds().getHeight());
     }
+
+    public static String normalize(final String TEXT) {
+        String normalized = TEXT.replaceAll("\u00fc", "ue")
+                                .replaceAll("\u00f6", "oe")
+                                .replaceAll("\u00e4", "ae")
+                                .replaceAll("\u00df", "ss");
+
+        normalized = normalized.replaceAll("\u00dc(?=[a-z\u00fc\u00f6\u00e4\u00df ])", "Ue")
+                               .replaceAll("\u00d6(?=[a-z\u00fc\u00f6\u00e4\u00df ])", "Oe")
+                               .replaceAll("\u00c4(?=[a-z\u00fc\u00f6\u00e4\u00df ])", "Ae");
+
+        normalized = normalized.replaceAll("\u00dc", "UE")
+                               .replaceAll("\u00d6", "OE")
+                               .replaceAll("\u00c4", "AE");
+        return normalized;
+    }
 }

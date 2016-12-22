@@ -74,17 +74,18 @@ public class GaugeTileSkin extends TileSkin {
     // ******************** Constructors **************************************
     public GaugeTileSkin(final Tile TILE) {
         super(TILE);
-
-        if (TILE.isAutoScale()) TILE.calcAutoScale();
-        oldValue          = TILE.getValue();
-        sectionMap        = new HashMap<>(sections.size());
-        for(Section section : sections) { sectionMap.put(section, new Arc()); }
+        handleCurrentValue(getSkinnable().getValue());
     }
 
 
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
+        oldValue          = getSkinnable().getValue();
+        sectionMap        = new HashMap<>(sections.size());
+        for(Section section : sections) { sectionMap.put(section, new Arc()); }
 
         barColor       = getSkinnable().getBarColor();
         thresholdColor = getSkinnable().getThresholdColor();

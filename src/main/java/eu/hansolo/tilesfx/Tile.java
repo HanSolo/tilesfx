@@ -3443,13 +3443,15 @@ public class Tile extends Control {
 
     public Map<String, List<CountryPath>> getCountryPaths() {
         if (null == countryProperties) { countryProperties = readProperties(COUNTRY_PROPERTIES); }
-        Map<String, List<CountryPath>> countryPaths = new HashMap<>();
-        countryProperties.forEach((key, value) -> {
-            String            name     = key.toString();
-            List<CountryPath> pathList = new ArrayList<>();
-            for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
-            countryPaths.put(name, pathList);
-        });
+        if (null == countryPaths) {
+            countryPaths = new HashMap<>();
+            countryProperties.forEach((key, value) -> {
+                String            name     = key.toString();
+                List<CountryPath> pathList = new ArrayList<>();
+                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+                countryPaths.put(name, pathList);
+            });
+        }
         return countryPaths;
     }
 

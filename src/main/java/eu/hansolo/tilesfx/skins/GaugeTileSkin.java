@@ -151,7 +151,7 @@ public class GaugeTileSkin extends TileSkin {
         maxValueText.setFill(getSkinnable().getTitleColor());
 
         thresholdRect = new Rectangle();
-        thresholdRect.setFill(sectionsVisible ? getSkinnable().getBackgroundColor() : getSkinnable().getThresholdColor());
+        thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getValue() > getSkinnable().getThreshold() ? getSkinnable().getThresholdColor() : Tile.GRAY);
         Helper.enableNode(thresholdRect, getSkinnable().isThresholdVisible());
 
         thresholdText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
@@ -197,7 +197,7 @@ public class GaugeTileSkin extends TileSkin {
         needleRotate.setAngle(targetAngle);
         needleRectRotate.setAngle(targetAngle);
         valueText.setText(String.format(locale, formatString, VALUE));
-        thresholdRect.setFill(VALUE > threshold ? thresholdColor : Tile.GRAY);
+        thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getValue() > getSkinnable().getThreshold() ? getSkinnable().getThresholdColor() : Tile.GRAY);
         resizeDynamicText();
         highlightSections(VALUE);
     }
@@ -393,7 +393,8 @@ public class GaugeTileSkin extends TileSkin {
             valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, size * 0.15);
         }
 
-        if (sectionsVisible) {
+        thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundColor());
+        if (!sectionsVisible) {
             fontSize = size * 0.08;
             thresholdText.setFont(Fonts.latoRegular(fontSize));
             thresholdText.setTextOrigin(VPos.CENTER);

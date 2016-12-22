@@ -39,11 +39,13 @@ public class WeatherTileSkin extends TileSkin {
     private WeatherSymbol weatherSymbol;
     private Text          summaryText;
     private DarkSky       darkSky;
+    private long          lastUpdate;
 
 
     // ******************** Constructors **************************************
     public WeatherTileSkin(final Tile TILE) {
         super(TILE);
+        lastUpdate = System.currentTimeMillis();
     }
 
 
@@ -72,6 +74,7 @@ public class WeatherTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
+        getSkinnable().setOnTimeEvent(e -> automaticUpdate(System.currentTimeMillis()));
     }
 
 
@@ -85,6 +88,13 @@ public class WeatherTileSkin extends TileSkin {
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
         }
     };
+
+    private void automaticUpdate(final long NOW) {
+        if ((NOW - lastUpdate) > 900_000) {
+            getSkinnable().updateWeather();
+            lastUpdate = NOW;
+        }
+    }
 
 
     // ******************** Resizing ******************************************

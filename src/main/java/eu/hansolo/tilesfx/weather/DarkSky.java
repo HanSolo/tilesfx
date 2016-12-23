@@ -152,6 +152,7 @@ public class DarkSky {
     private              Language          language;
     private              double            latitude;
     private              double            longitude;
+    private              String            city;
     private              TimeZone          timeZone;
 
 
@@ -173,6 +174,7 @@ public class DarkSky {
         latitude   = LATITUDE;
         longitude  = LONGITUDE;
         timeZone   = TimeZone.getDefault();
+        city       = "";
     }
 
 
@@ -200,6 +202,8 @@ public class DarkSky {
 
     public TimeZone getTimeZone() { return timeZone; }
 
+    public String getCity() { return city; }
+
     public boolean update() {
         return update(latitude, longitude, unit, language);
     }
@@ -210,7 +214,6 @@ public class DarkSky {
         StringBuilder response = new StringBuilder();
         try {
             forecast.clear();
-
             final String             URL_STRING = createUrl(LATITUDE, LONGITUDE, UNIT, LANGUAGE, Exclude.HOURLY, Exclude.MINUTELY, Exclude.FLAGS);
             final HttpsURLConnection CONNECTION = (HttpsURLConnection) new URL(URL_STRING).openConnection();
             final BufferedReader     IN         = new BufferedReader(new InputStreamReader(CONNECTION.getInputStream()));
@@ -219,9 +222,7 @@ public class DarkSky {
                 response.append(inputLine).append("\n");
             }
             IN.close();
-
-            parseJsonData(response.toString());
-
+            parseDarkSkyJsonData(response.toString());
             return true;
         } catch (IOException ex) {
             // Wrong or missing DarkDky API key System.out.println("DarkSky: " + ex + "\nDo you use a valid DarkSky API key?");
@@ -229,12 +230,46 @@ public class DarkSky {
         }
     }
 
-    public boolean updateWithJsonData(final String JSON_STRING) {
-        parseJsonData(JSON_STRING);
-        return true;
+    /**
+     * Remotely update the DarkSky object with custom data (not for public use).
+     * If you would like to update the DarkSky object with the official DarkSky
+     * data in JSON format please use the updateWithDarkSkyJsonData() method.
+     * @param JSON_DATA
+     */
+    public void updateWithCustomJsonString(final String JSON_DATA) {
+        Object     obj          = JSONValue.parse(JSON_DATA);
+        JSONObject jsonObj      = (JSONObject) obj;
+
+        JSONObject todayJson    = (JSONObject) jsonObj.get("today");
+        JSONObject locationJson = (JSONObject) jsonObj.get("location");
+        JSONArray  forecastJson = (JSONArray) jsonObj.get("forecast");
+
+        city      = locationJson.get("city").toString();
+        latitude  = Double.parseDouble(locationJson.getOrDefault("latitude", 0).toString());
+        longitude = Double.parseDouble(locationJson.getOrDefault("longitude", 0).toString());
+        timeZone  = TimeZone.getTimeZone(locationJson.get("timezone").toString().replace("\\", ""));
+
+        // Update today data
+        setDataPoint(today, todayJson, timeZone);
+
+        // Update forecast data
+        for (int i = 1 ; i < forecastJson.size() ; i++) {
+            JSONObject day       = (JSONObject) forecastJson.get(i);
+            DataPoint  dataPoint = new DataPoint();
+            setDataPoint(dataPoint, day, timeZone);
+            forecast.add(dataPoint);
+        }
     }
 
-    private void parseJsonData(final String JSON_DATA) {
+    /**
+     * Remotely update the DarkSky object with JSON data from DarkSky
+     * @param JSON_DATA
+     */
+    public void updateWithDarkSkyJsonData(final String JSON_DATA) {
+        parseDarkSkyJsonData(JSON_DATA);
+    }
+
+    private void parseDarkSkyJsonData(final String JSON_DATA) {
         Object     obj     = JSONValue.parse(JSON_DATA);
         JSONObject jsonObj = (JSONObject) obj;
 

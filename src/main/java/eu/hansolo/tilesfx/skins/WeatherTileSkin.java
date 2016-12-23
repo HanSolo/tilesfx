@@ -45,7 +45,7 @@ public class WeatherTileSkin extends TileSkin {
     // ******************** Constructors **************************************
     public WeatherTileSkin(final Tile TILE) {
         super(TILE);
-        lastUpdate = System.currentTimeMillis();
+        lastUpdate = 0;
     }
 
 
@@ -54,7 +54,6 @@ public class WeatherTileSkin extends TileSkin {
         super.initGraphics();
 
         darkSky = getSkinnable().getDarkSky();
-        getSkinnable().updateWeather();
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());

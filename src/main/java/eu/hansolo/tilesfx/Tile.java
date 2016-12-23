@@ -25,28 +25,13 @@ import eu.hansolo.tilesfx.events.TimeEvent;
 import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.skins.ClockTileSkin;
-import eu.hansolo.tilesfx.skins.GaugeTileSkin;
-import eu.hansolo.tilesfx.skins.HighLowTileSkin;
-import eu.hansolo.tilesfx.skins.LineChartTileSkin;
-import eu.hansolo.tilesfx.skins.PercentageTileSkin;
-import eu.hansolo.tilesfx.skins.PlusMinusTileSkin;
-import eu.hansolo.tilesfx.skins.SliderTileSkin;
-import eu.hansolo.tilesfx.skins.SparkLineTileSkin;
-import eu.hansolo.tilesfx.skins.SwitchTileSkin;
-import eu.hansolo.tilesfx.skins.TextTileSkin;
-import eu.hansolo.tilesfx.skins.TileSkin;
-import eu.hansolo.tilesfx.skins.TimerControlTileSkin;
-import eu.hansolo.tilesfx.skins.WeatherTileSkin;
-import eu.hansolo.tilesfx.skins.WorldMapTileSkin;
+import eu.hansolo.tilesfx.skins.*;
 import eu.hansolo.tilesfx.tools.Data;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.SectionComparator;
 import eu.hansolo.tilesfx.tools.TimeSectionComparator;
 import eu.hansolo.tilesfx.weather.DarkSky;
-import eu.hansolo.tilesfx.weather.DarkSky.Language;
-import eu.hansolo.tilesfx.weather.DarkSky.Unit;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -99,7 +84,7 @@ public class Tile extends Control {
     public enum SkinType { //AREA_CHART, BAR_CHART, LEADER_BOARD,
                     LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                     PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                    TIMER_CONTROL, TEXT, WEATHER }
+                    TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -166,6 +151,15 @@ public class Tile extends Control {
     private              ObservableList<Series<String, Number>> series;
     private              Properties                             countryProperties;
     private              Map<String, List<CountryPath>>         countryPaths;
+    private              ObjectProperty<ZonedDateTime>          time;
+    private              LongProperty                           currentTime;
+    private              ZoneId                                 zoneId;
+    private              int                                    updateInterval;
+    private              ObservableList<TimeSection>            timeSections;
+    private              String                                 _text;
+    private              StringProperty                         text;
+    private              LocalTime                              _duration;
+    private              ObjectProperty<LocalTime>              duration;
 
     // UI related
     private              SkinType                      skinType;
@@ -276,15 +270,6 @@ public class Tile extends Control {
     private              Timeline                      timeline;
     private              Instant                       lastCall;
     private              boolean                       withinSpeedLimit;
-
-    // Clock specific
-    private              ObjectProperty<ZonedDateTime> time;
-    private              LongProperty                  currentTime;
-    private              ZoneId                        zoneId;
-    private              int                           updateInterval;
-    private              ObservableList<TimeSection>   timeSections;
-    private              String                        _text;
-    private              StringProperty                text;
     private              boolean                       _discreteSeconds;
     private              BooleanProperty               discreteSeconds;
     private              boolean                       _discreteMinutes;
@@ -437,6 +422,7 @@ public class Tile extends Control {
         _text                               = "";
         _averagingEnabled                   = false;
         _averagingPeriod                    = 10;
+        _duration                           = LocalTime.of(1, 0);
         movingAverage                       = new MovingAverage(_averagingPeriod);
         sections                            = FXCollections.observableArrayList();
         series                              = FXCollections.observableArrayList();
@@ -993,6 +979,34 @@ public class Tile extends Control {
      * @return the moving average over the given duration
      */
     public double getTimeBasedAverageOf(final java.time.Duration DURATION) { return movingAverage.getTimeBasedAverageOf(DURATION); }
+
+    /**
+     * Returns a duration that will be used in the TimeTileSkin
+     * @return a duration that will be used in the TimeTileSkin
+     */
+    public LocalTime getDuration() { return null == duration ? _duration : duration.get(); }
+    /**
+     * Defines a duration that is used in the TimeTileSkin
+     * @param DURATION
+     */
+    public void setDuration(final LocalTime DURATION) {
+        if (null == duration) {
+            _duration = DURATION;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            duration.set(DURATION);
+        }
+    }
+    public ObjectProperty<LocalTime> durationProperty() {
+        if (null == duration) {
+            duration = new ObjectPropertyBase<LocalTime>(_duration) {
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "duration"; }
+            };
+            _duration = null;
+        }
+        return duration;
+    }
 
     /**
      * Returns an observable list of Section objects. The sections
@@ -3653,8 +3667,10 @@ public class Tile extends Control {
             case SWITCH       : return new SwitchTileSkin(Tile.this);
             case WORLDMAP     : return new WorldMapTileSkin(Tile.this);
             case TIMER_CONTROL: return new TimerControlTileSkin(Tile.this);
+            case NUMBER       : return new NumberTileSkin(Tile.this);
             case TEXT         : return new TextTileSkin(Tile.this);
             case WEATHER      : return new WeatherTileSkin(Tile.this);
+            case TIME         : return new TimeTileSkin(Tile.this);
             default           : return new TileSkin(Tile.this);
         }
     }
@@ -3667,9 +3683,13 @@ public class Tile extends Control {
         switch (SKIN_TYPE) {
             //case AREA_CHART   : super.setSkin(new AreaChartTileSkin(Tile.this)); break;
             //case BAR_CHART    : super.setSkin(new BarChartTileSkin(Tile.this)); break;
-            case LINE_CHART   : super.setSkin(new LineChartTileSkin(Tile.this)); break;
-            case CLOCK        : super.setSkin(new ClockTileSkin(Tile.this)); break;
-            case GAUGE        :
+            case LINE_CHART:
+                super.setSkin(new LineChartTileSkin(Tile.this));
+                break;
+            case CLOCK:
+                super.setSkin(new ClockTileSkin(Tile.this));
+                break;
+            case GAUGE:
                 setAnimated(true);
                 setTickLabelDecimals(0);
                 setBarColor(FOREGROUND);
@@ -3677,32 +3697,36 @@ public class Tile extends Control {
                 setThresholdVisible(true);
                 super.setSkin(new GaugeTileSkin(Tile.this));
                 break;
-            case HIGH_LOW     :
+            case HIGH_LOW:
                 setMaxValue(Double.MAX_VALUE);
                 setDecimals(2);
                 setTickLabelDecimals(1);
                 super.setSkin(new HighLowTileSkin(Tile.this));
                 break;
             //case LEADER_BOARD : super.setSkin(new LeaderBoardTileSkin(Tile.this)); break;
-            case PERCENTAGE   :
+            case PERCENTAGE:
                 setAnimated(true);
                 setThresholdColor(GRAY);
                 setTickLabelDecimals(0);
                 super.setSkin(new PercentageTileSkin(Tile.this));
                 break;
-            case PLUS_MINUS   : super.setSkin(new PlusMinusTileSkin(Tile.this)); break;
-            case SLIDER       : super.setSkin(new SliderTileSkin(Tile.this)); break;
-            case SPARK_LINE   :
+            case PLUS_MINUS:
+                super.setSkin(new PlusMinusTileSkin(Tile.this));
+                break;
+            case SLIDER:
+                super.setSkin(new SliderTileSkin(Tile.this));
+                break;
+            case SPARK_LINE:
                 setAnimated(false);
                 setAveragingEnabled(true);
                 setAveragingPeriod(10);
                 super.setSkin(new SparkLineTileSkin(Tile.this));
                 break;
-            case SWITCH       :
+            case SWITCH:
                 setTextVisible(true);
                 super.setSkin(new SwitchTileSkin(Tile.this));
                 break;
-            case WORLDMAP     :
+            case WORLDMAP:
                 setPrefSize(380, 250);
                 super.setSkin(new WorldMapTileSkin(Tile.this));
                 break;
@@ -3712,11 +3736,20 @@ public class Tile extends Control {
                 setCheckSectionsForValue(true);
                 super.setSkin(new TimerControlTileSkin(Tile.this));
                 break;
-            case TEXT         : super.setSkin(new TextTileSkin(Tile.this)); break;
-            case WEATHER      :
+            case NUMBER:
+                super.setSkin(new NumberTileSkin(Tile.this));
+                break;
+            case TEXT:
+                setTextVisible(true);
+                super.setSkin(new TextTileSkin(Tile.this));
+                break;
+            case WEATHER:
                 super.setSkin(new WeatherTileSkin(Tile.this));
                 break;
-            default           : super.setSkin(new TileSkin(Tile.this)); break;
+            case TIME:
+                super.setSkin(new TimeTileSkin(Tile.this));
+                break;
+            default: super.setSkin(new TileSkin(Tile.this)); break;
         }
     }
 }

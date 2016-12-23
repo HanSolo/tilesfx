@@ -51,12 +51,14 @@ public class Demo extends Application {
     private Tile           lineChartTile;
     private Tile           highLowTile;
     private Tile           timerControlTile;
+    private Tile           numberTile;
     private Tile           textTile;
     private Tile           plusMinusTile;
     private Tile           sliderTile;
     private Tile           switchTile;
     private Tile           worldTile;
     private Tile           weatherTile;
+    private Tile           timeTile;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -165,11 +167,19 @@ public class Demo extends Application {
                                       .running(true)
                                       .build();
 
+        numberTile = TileBuilder.create()
+                                .skinType(SkinType.NUMBER)
+                                .title("Number Tile")
+                                .value(13)
+                                .text("Things")
+                                .textVisible(true)
+                                .build();
+
         textTile = TileBuilder.create()
                               .skinType(SkinType.TEXT)
                               .title("Text Tile")
-                              .value(35)
-                              .unit("Tickets")
+                              .text("May the force be with you\n...always")
+                              .textVisible(true)
                               .build();
 
         plusMinusTile = TileBuilder.create()
@@ -207,6 +217,14 @@ public class Demo extends Application {
                                  .darkSky(darkSky)
                                  .build();
 
+        timeTile = TileBuilder.create()
+                              .skinType(SkinType.TIME)
+                              .title("Time Tile")
+                              .duration(LocalTime.of(1, 22))
+                              .text("Average reply time")
+                              .textVisible(true)
+                              .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -228,8 +246,8 @@ public class Demo extends Application {
 
     @Override public void start(Stage stage) {
         FlowPane pane = new FlowPane(percentageTile, clockTile, gaugeTile, sparkLineTile,
-                                     lineChartTile, highLowTile, timerControlTile, textTile,
-                                     plusMinusTile, sliderTile, switchTile, worldTile);// , weatherTile);
+                                     lineChartTile, highLowTile, timerControlTile, numberTile, textTile,
+                                     plusMinusTile, sliderTile, switchTile, worldTile, timeTile);// , weatherTile);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));

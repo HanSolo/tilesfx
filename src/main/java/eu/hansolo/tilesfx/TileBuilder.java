@@ -43,6 +43,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.text.NumberFormat;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -117,6 +118,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B unit(final String UNIT) {
         properties.put("unit", new SimpleStringProperty(UNIT));
+        return (B)this;
+    }
+
+    public final B duration(final LocalTime DURATION) {
+        properties.put("duration", new SimpleObjectProperty(DURATION));
         return (B)this;
     }
 
@@ -672,9 +678,14 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setHighlightSections(true);
                     CONTROL.setCheckSectionsForValue(true);
                     break;
+                case NUMBER:
+                    break;
                 case TEXT:
+                    CONTROL.setTextVisible(true);
                     break;
                 case WEATHER:
+                    break;
+                case TIME:
                     break;
             }
         } else {
@@ -925,6 +936,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setActiveColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("darkSky".equals(key)) {
                 CONTROL.setDarkSky(((ObjectProperty<DarkSky>) properties.get(key)).get());
+            } else if ("duration".equals(key)) {
+                CONTROL.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
             }
         }
         return CONTROL;

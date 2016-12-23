@@ -19,16 +19,18 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.text.Text;
 
 
 /**
- * Created by hansolo on 20.12.16.
+ * Created by hansolo on 23.12.16.
  */
 public class TextTileSkin extends TileSkin {
-    private Text titleText;
-    private Text valueText;
-    private Text unitText;
+    private Text  titleText;
+    private Label text;
 
 
     // ******************** Constructors **************************************
@@ -45,20 +47,19 @@ public class TextTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        text = new Label(getSkinnable().getText());
+        text.setAlignment(Pos.TOP_LEFT);
+        text.setWrapText(true);
+        text.setTextOverrun(OverrunStyle.WORD_ELLIPSIS);
+        text.setTextFill(getSkinnable().getTextColor());
+        text.setPrefSize(PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.795);
+        Helper.enableNode(text, getSkinnable().isTextVisible());
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-
-        getPane().getChildren().addAll(titleText, valueText, unitText);
+        getPane().getChildren().addAll(titleText, text);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-
     }
 
 
@@ -68,24 +69,15 @@ public class TextTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(text, getSkinnable().isTextVisible());
         }
-    };
-
-    @Override protected void handleCurrentValue(final double VALUE) {
-        valueText.setText(String.format(locale, formatString, VALUE));
-        resizeDynamicText();
     };
 
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = size * 0.9;
-        double fontSize = size * 0.24;
-        valueText.setFont(Fonts.latoRegular(fontSize));
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
+        double fontSize = size * 0.10;
+        text.setFont(Fonts.latoRegular(fontSize));
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
@@ -94,27 +86,24 @@ public class TextTileSkin extends TileSkin {
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
-
-        maxWidth = size * 0.9;
-        fontSize = size * 0.1;
-        unitText.setFont(Fonts.latoRegular(fontSize));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.42);
     };
 
     @Override protected void resize() {
         super.resize();
+
+        text.setPrefSize(size * 0.9, size * 0.795);
+        text.relocate(size * 0.05, size * 0.15);
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
-        unitText.setText(getSkinnable().getUnit());
+        text.setText(getSkinnable().getText());
 
+        resizeDynamicText();
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
+        text.setTextFill(getSkinnable().getTextColor());
     };
 }

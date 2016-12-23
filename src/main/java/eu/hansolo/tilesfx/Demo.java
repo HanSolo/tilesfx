@@ -59,6 +59,7 @@ public class Demo extends Application {
     private Tile           worldTile;
     private Tile           weatherTile;
     private Tile           timeTile;
+    private Tile           barChartTile;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -110,6 +111,12 @@ public class Demo extends Application {
 
         // Weather (You can get a DarkSky API key here: https://darksky.net/dev/ )
         DarkSky darkSky = new DarkSky("YOUR_DARK_SKY_API_KEY", Unit.CA, Language.ENGLISH, 51.911858, 7.632815);
+
+        // BarChart Data
+        BarChartSegment segment1 = new BarChartSegment("Gerrit", 47, Tile.BLUE);
+        BarChartSegment segment2 = new BarChartSegment("Sandra", 43, Tile.RED);
+        BarChartSegment segment3 = new BarChartSegment("Lilli", 12, Tile.GREEN);
+        BarChartSegment segment4 = new BarChartSegment("Anton", 8, Tile.ORANGE);
 
         // Creating Tiles
         percentageTile = TileBuilder.create()
@@ -225,10 +232,17 @@ public class Demo extends Application {
                               .textVisible(true)
                               .build();
 
+        barChartTile = TileBuilder.create()
+                                  .skinType(SkinType.BAR_CHART)
+                                  .title("BarChart Tile")
+                                  .barChartData(segment1, segment2, segment3, segment4)
+                                  .decimals(0)
+                                  .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
-                if (now > lastTimerCall + 3_000_000_000l) {
+                if (now > lastTimerCall + 5_000_000_000l) {
                     percentageTile.setValue(RND.nextDouble() * percentageTile.getRange() * 1.5 + percentageTile.getMinValue());
                     gaugeTile.setValue(RND.nextDouble() * gaugeTile.getRange() * 1.5 + gaugeTile.getMinValue());
                     sparkLineTile.setValue(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
@@ -238,6 +252,10 @@ public class Demo extends Application {
                     //switchTile.setSelected(RND.nextBoolean());
                     series1.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
                     series2.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
+                    segment1.setValue(RND.nextDouble() * 80);
+                    segment2.setValue(RND.nextDouble() * 80);
+                    segment3.setValue(RND.nextDouble() * 80);
+                    segment4.setValue(RND.nextDouble() * 80);
                     lastTimerCall = now;
                 }
             }
@@ -247,11 +265,11 @@ public class Demo extends Application {
     @Override public void start(Stage stage) {
         FlowPane pane = new FlowPane(percentageTile, clockTile, gaugeTile, sparkLineTile,
                                      lineChartTile, highLowTile, timerControlTile, numberTile, textTile,
-                                     plusMinusTile, sliderTile, switchTile, worldTile, timeTile);// , weatherTile);
+                                     plusMinusTile, sliderTile, switchTile, worldTile, timeTile, barChartTile);// , weatherTile);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));
-        pane.setPrefSize(1310, 790);
+        pane.setPrefSize(1570, 790);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);

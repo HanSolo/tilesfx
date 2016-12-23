@@ -40,6 +40,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
@@ -61,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -81,8 +83,8 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class Tile extends Control {
-    public enum SkinType { //AREA_CHART, BAR_CHART, LEADER_BOARD,
-                    LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
+    public enum SkinType { //AREA_CHART, LEADER_BOARD,
+                    BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                     PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
                     TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME }
 
@@ -109,6 +111,7 @@ public class Tile extends Control {
     private        final TileEvent   VISIBILITY_EVENT      = new TileEvent(Tile.this, EventType.VISIBILITY);
     private        final TileEvent   SECTION_EVENT         = new TileEvent(Tile.this, EventType.SECTION);
     private        final TileEvent   SERIES_EVENT          = new TileEvent(Tile.this, EventType.SERIES);
+    private        final TileEvent   DATA_EVENT            = new TileEvent(Tile.this, EventType.DATA);
     private        final TileEvent   ALERT_EVENT           = new TileEvent(Tile.this, EventType.ALERT);
     private        final TileEvent   VALUE_EVENT           = new TileEvent(Tile.this, EventType.VALUE);
     private        final TileEvent   FINISHED_EVENT        = new TileEvent(Tile.this, EventType.FINISHED);
@@ -156,10 +159,11 @@ public class Tile extends Control {
     private              ZoneId                                 zoneId;
     private              int                                    updateInterval;
     private              ObservableList<TimeSection>            timeSections;
-    private              String                                 _text;
+    private              String                                _text;
     private              StringProperty                         text;
     private              LocalTime                              _duration;
     private              ObjectProperty<LocalTime>              duration;
+    private              ObservableList<BarChartSegment>        barChartData;
 
     // UI related
     private              SkinType                      skinType;
@@ -429,6 +433,7 @@ public class Tile extends Control {
         timeSections                        = FXCollections.observableArrayList();
         alarms                              = FXCollections.observableArrayList();
         alarmsToRemove                      = new ArrayList<>();
+        barChartData                        = FXCollections.observableArrayList();
 
         _startFromZero                      = false;
         _returnToZero                       = false;
@@ -1093,7 +1098,28 @@ public class Tile extends Control {
         series.clear();
         fireTileEvent(SERIES_EVENT);
     }
-    
+
+    public ObservableList<BarChartSegment> getBarChartData() { return barChartData; }
+    public void setBarChartData(final List<BarChartSegment> DATA) {
+        barChartData.setAll(DATA);
+        fireTileEvent(DATA_EVENT);
+    }
+    public void setBarChartData(final BarChartSegment... DATA) { setBarChartData(Arrays.asList(DATA)); }
+    public void addBarChartData(final BarChartSegment DATA) {
+        if (null == DATA) return;
+        barChartData.add(DATA);
+        fireTileEvent(DATA_EVENT);
+    }
+    public void removeBarChartData(final BarChartSegment DATA) {
+        if (null == DATA) return;
+        barChartData.remove(DATA);
+        fireTileEvent(DATA_EVENT);
+    }
+    public void clearBarChartData() {
+        barChartData.clear();
+        fireTileEvent(DATA_EVENT);
+    }
+
 
     // ******************** UI related methods ********************************
     /**
@@ -3654,7 +3680,7 @@ public class Tile extends Control {
     @Override protected Skin createDefaultSkin() {
         switch (skinType) {
             //case AREA_CHART   : return new AreaChartTileSkin(Tile.this);
-            //case BAR_CHART    : return new BarChartTileSkin(Tile.this);
+            case BAR_CHART    : return new BarChartTileSkin(Tile.this);
             case LINE_CHART   : return new LineChartTileSkin(Tile.this);
             case CLOCK        : return new ClockTileSkin(Tile.this);
             case GAUGE        : return new GaugeTileSkin(Tile.this);
@@ -3682,7 +3708,9 @@ public class Tile extends Control {
         skinType = SKIN_TYPE;
         switch (SKIN_TYPE) {
             //case AREA_CHART   : super.setSkin(new AreaChartTileSkin(Tile.this)); break;
-            //case BAR_CHART    : super.setSkin(new BarChartTileSkin(Tile.this)); break;
+            case BAR_CHART:
+                super.setSkin(new BarChartTileSkin(Tile.this));
+                break;
             case LINE_CHART:
                 super.setSkin(new LineChartTileSkin(Tile.this));
                 break;

@@ -296,6 +296,17 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B barChartData(final BarChartSegment... DATA) {
+        properties.put("barDataArray", new SimpleObjectProperty<>(DATA));
+        return (B)this;
+    }
+
+    public final B barChartData(final List<BarChartSegment> DATA) {
+        properties.put("barDataList", new SimpleObjectProperty<>(DATA));
+        return (B)this;
+    }
+
+
     public final B titleColor(final Color COLOR) {
         properties.put("titleColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -635,7 +646,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
             CONTROL = new Tile(skinType);
             switch(skinType) {
                 //case AREA_CHART: break;
-                //case BAR_CHART: break;
+                case BAR_CHART:
+                    break;
                 case LINE_CHART:
                     break;
                 case CLOCK:
@@ -731,6 +743,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
         if (properties.keySet().contains("seriesList")) {
             CONTROL.setSeries(((ObjectProperty<List<Series<String, Number>>>) properties.get("seriesList")).get());
+        }
+
+        if (properties.keySet().contains("barDataArray")) {
+            CONTROL.setBarChartData(((ObjectProperty<BarChartSegment[]>) properties.get("barDataArray")).get());
+        }
+        if(properties.keySet().contains("barDataList")) {
+            CONTROL.setBarChartData(((ObjectProperty<List<BarChartSegment>>) properties.get("barDataList")).get());
         }
 
         for (String key : properties.keySet()) {

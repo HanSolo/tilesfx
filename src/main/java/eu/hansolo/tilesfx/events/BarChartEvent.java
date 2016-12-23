@@ -16,20 +16,18 @@
 
 package eu.hansolo.tilesfx.events;
 
-import java.util.EventObject;
+import javafx.beans.NamedArg;
+import javafx.event.Event;
+import javafx.event.EventType;
 
 
 /**
- * Created by hansolo on 19.12.16.
+ * Created by hansolo on 23.12.16.
  */
-public class TileEvent extends EventObject {
-    public enum EventType { RECALC, REDRAW, RESIZE, VISIBILITY, SECTION, ALERT, VALUE, THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN, FINISHED, SERIES, DATA };
-    public final EventType eventType;
+public class BarChartEvent extends Event {
+    public static EventType<BarChartEvent> UPDATE = new EventType<>(ANY, "UPDATE");
 
-
-    // ******************** Constructors **************************************
-    public TileEvent(final Object SRC, final EventType EVENT_TYPE) {
-        super(SRC);
-        eventType = EVENT_TYPE;
+    public BarChartEvent(@NamedArg("eventType") final EventType<? extends Event> TYPE) {
+        super(TYPE);
     }
 }

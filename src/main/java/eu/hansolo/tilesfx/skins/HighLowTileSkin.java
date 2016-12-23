@@ -171,6 +171,7 @@ public class HighLowTileSkin extends TileSkin {
         titleText.relocate(size * 0.05, size * 0.05);
 
         maxWidth = size * 0.15;
+        fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
@@ -200,6 +201,7 @@ public class HighLowTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
         referenceText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getReferenceValue()));
+        unitText.setText(" " + getSkinnable().getUnit());
 
         resizeStaticText();
 

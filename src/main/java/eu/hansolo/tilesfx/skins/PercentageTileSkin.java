@@ -166,9 +166,10 @@ public class PercentageTileSkin extends TileSkin {
         titleText.relocate(size * 0.05, size * 0.05);
 
         maxWidth = size * 0.15;
+        fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.3275);
+        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
 
         maxWidth = size * 0.45;
         fontSize = size * 0.18;

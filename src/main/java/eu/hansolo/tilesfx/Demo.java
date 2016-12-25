@@ -29,6 +29,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
@@ -146,6 +147,10 @@ public class Demo extends Application {
         sparkLineTile = TileBuilder.create()
                                    .skinType(SkinType.SPARK_LINE)
                                    .title("SparkLine Tile")
+                                   .gradientStops(new Stop(0, Tile.GREEN),
+                                                  new Stop(0.5, Tile.YELLOW),
+                                                  new Stop(1.0, Tile.RED))
+                                   .strokeWithGradient(true)
                                    .build();
 
         lineChartTile = TileBuilder.create()

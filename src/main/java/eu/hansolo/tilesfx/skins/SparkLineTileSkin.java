@@ -18,9 +18,13 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.geometry.VPos;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.Line;
@@ -59,6 +63,8 @@ public class SparkLineTileSkin extends TileSkin {
     private Circle            dot;
     private Rectangle         stdDeviationArea;
     private Line              averageLine;
+    private LinearGradient    gradient;
+    private GradientLookup    gradientLookup;
     private double            low;
     private double            high;
     private double            stdDeviation;
@@ -78,6 +84,7 @@ public class SparkLineTileSkin extends TileSkin {
 
         if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
 
+        gradientLookup = new GradientLookup(getSkinnable().getGradientStops());
         low            = getSkinnable().getMaxValue();
         high           = getSkinnable().getMinValue();
         stdDeviation   = 0;
@@ -219,6 +226,12 @@ public class SparkLineTileSkin extends TileSkin {
 
             dot.setCenterX(maxX);
             dot.setCenterY(end.getY());
+
+            if (getSkinnable().isStrokeWithGradient()) {
+                setupGradient();
+                dot.setFill(gradient);
+                sparkLine.setStroke(gradient);
+            }
         }
 
         double average = getSkinnable().getAverage();
@@ -248,6 +261,14 @@ public class SparkLineTileSkin extends TileSkin {
             dataList.add(VALUE);
         }
         stdDeviation = Statistics.getStdDev(dataList);
+    }
+
+    private void setupGradient() {
+        double loFactor = low / getSkinnable().getRange();
+        double hiFactor = high / getSkinnable().getRange();
+        Stop   loStop   = new Stop(loFactor, gradientLookup.getColorAt(loFactor));
+        Stop   hiStop   = new Stop(hiFactor, gradientLookup.getColorAt(hiFactor));
+        gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, loStop, hiStop);
     }
 
 
@@ -403,6 +424,8 @@ public class SparkLineTileSkin extends TileSkin {
         sparkLine.setStrokeWidth(size * 0.01);
         dot.setRadius(size * 0.014);
 
+        if (getSkinnable().isStrokeWithGradient()) { setupGradient(); }
+
         resizeStaticText();
         resizeDynamicText();
     };
@@ -418,8 +441,8 @@ public class SparkLineTileSkin extends TileSkin {
         highText.setFill(getSkinnable().getValueColor());
         lowText.setFill(getSkinnable().getValueColor());
         subTitleText.setFill(getSkinnable().getSubTitleColor());
-        sparkLine.setStroke(getSkinnable().getBarColor());
+        sparkLine.setStroke(getSkinnable().isStrokeWithGradient() ? gradient : getSkinnable().getBarColor());
         stdDeviationArea.setFill(Helper.getTranslucentColorFrom(Tile.FOREGROUND, 0.1));
-        dot.setFill(getSkinnable().getBarColor());
+        dot.setFill(getSkinnable().isStrokeWithGradient() ? gradient : getSkinnable().getBarColor());
     };
 }

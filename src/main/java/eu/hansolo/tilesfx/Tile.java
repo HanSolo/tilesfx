@@ -48,6 +48,7 @@ import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
@@ -154,12 +155,13 @@ public class Tile extends Control {
     private              ObservableList<Series<String, Number>> series;
     private              Properties                             countryProperties;
     private              Map<String, List<CountryPath>>         countryPaths;
+    private              List<Stop>                             gradientStops;
     private              ObjectProperty<ZonedDateTime>          time;
     private              LongProperty                           currentTime;
     private              ZoneId                                 zoneId;
     private              int                                    updateInterval;
     private              ObservableList<TimeSection>            timeSections;
-    private              String                                _text;
+    private              String                                 _text;
     private              StringProperty                         text;
     private              LocalTime                              _duration;
     private              ObjectProperty<LocalTime>              duration;
@@ -314,10 +316,12 @@ public class Tile extends Control {
     private              BooleanProperty               alarmsVisible;
     private              ObservableList<Alarm>         alarms;
     private              List<Alarm>                   alarmsToRemove;
+    private              boolean                       _strokeWithGradient;
+    private              BooleanProperty               strokeWithGradient;
     private              DarkSky                       darkSky;
 
-    private volatile ScheduledFuture<?>               periodicTickTask;
-    private static   ScheduledExecutorService         periodicTickExecutorService;
+    private volatile ScheduledFuture<?>                periodicTickTask;
+    private static   ScheduledExecutorService          periodicTickExecutorService;
 
 
 
@@ -434,6 +438,7 @@ public class Tile extends Control {
         alarms                              = FXCollections.observableArrayList();
         alarmsToRemove                      = new ArrayList<>();
         barChartData                        = FXCollections.observableArrayList();
+        gradientStops                       = new ArrayList<>(4);
 
         _startFromZero                      = false;
         _returnToZero                       = false;
@@ -1118,6 +1123,16 @@ public class Tile extends Control {
     public void clearBarChartData() {
         barChartData.clear();
         fireTileEvent(DATA_EVENT);
+    }
+
+    public List<Stop> getGradientStops() { return gradientStops; }
+    public void setGradientStops(final Stop... STOPS) {
+        setGradientStops(Arrays.asList(STOPS));
+    }
+    public void setGradientStops(final List<Stop> STOPS) {
+        gradientStops.clear();
+        gradientStops.addAll(STOPS);
+        fireTileEvent(REDRAW_EVENT);
     }
 
 
@@ -3481,6 +3496,10 @@ public class Tile extends Control {
         return customFont;
     }
 
+    /**
+     * Returns a list of path elements that define the countries
+     * @return a list of path elements that define the countries
+     */
     public Map<String, List<CountryPath>> getCountryPaths() {
         if (null == countryProperties) { countryProperties = readProperties(COUNTRY_PROPERTIES); }
         if (null == countryPaths) {
@@ -3493,6 +3512,36 @@ public class Tile extends Control {
             });
         }
         return countryPaths;
+    }
+
+    /**
+     * Returns true if a gradient defined by gradientStops will be
+     * used to stroke the line in the SparklineTileSkin.
+     * @return true if a gradient defined by gradientStops will be used to stroke the line in the SparklineTileSkin
+     */
+    public boolean isStrokeWithGradient() { return null == strokeWithGradient ? _strokeWithGradient : strokeWithGradient.get(); }
+    /**
+     * Defines the usage of a gradient defined by gradientStops to stroke the line
+     * in the SparklineTileSkin
+     * @param STROKE_WITH_GRADIENT
+     */
+    public void setStrokeWithGradient(final boolean STROKE_WITH_GRADIENT) {
+        if (null == strokeWithGradient) {
+            _strokeWithGradient = STROKE_WITH_GRADIENT;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            strokeWithGradient.set(STROKE_WITH_GRADIENT);
+        }
+    }
+    public BooleanProperty strokeWithGradientProperty() {
+        if (null == strokeWithGradient) {
+            strokeWithGradient = new BooleanPropertyBase(_strokeWithGradient) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "strokeWithGradient"; }
+            };
+        }
+        return  strokeWithGradient;
     }
 
     public DarkSky getDarkSky() { return darkSky; }

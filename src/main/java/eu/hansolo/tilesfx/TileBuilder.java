@@ -40,6 +40,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 
 import java.text.NumberFormat;
@@ -567,6 +568,20 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B gradientStops(final Stop... STOPS) {
+        properties.put("gradientStopsArray", new SimpleObjectProperty(STOPS));
+        return (B)this;
+    }
+    public final B gradientStops(final List<Stop> STOPS) {
+        properties.put("gradientStopsList", new SimpleObjectProperty(STOPS));
+        return (B)this;
+    }
+
+    public final B strokeWithGradient(final boolean STROKE_WITH_GRADIENT) {
+        properties.put("strokeWithGradient", new SimpleBooleanProperty(STROKE_WITH_GRADIENT));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -750,6 +765,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
         if(properties.keySet().contains("barDataList")) {
             CONTROL.setBarChartData(((ObjectProperty<List<BarChartSegment>>) properties.get("barDataList")).get());
+        }
+
+        if (properties.keySet().contains("gradientStopsArray")) {
+            CONTROL.setGradientStops(((ObjectProperty<Stop[]>) properties.get("gradientStopsArray")).get());
+        }
+        if (properties.keySet().contains("gradientStopsList")) {
+            CONTROL.setGradientStops(((ObjectProperty<List<Stop>>) properties.get("gradientStopsList")).get());
         }
 
         for (String key : properties.keySet()) {
@@ -957,6 +979,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setDarkSky(((ObjectProperty<DarkSky>) properties.get(key)).get());
             } else if ("duration".equals(key)) {
                 CONTROL.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
+            } else if ("strokeWithGradient".equals(key)) {
+                CONTROL.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

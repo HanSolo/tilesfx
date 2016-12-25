@@ -264,8 +264,8 @@ public class SparkLineTileSkin extends TileSkin {
     }
 
     private void setupGradient() {
-        double loFactor = low / getSkinnable().getRange();
-        double hiFactor = high / getSkinnable().getRange();
+        double loFactor = (low - minValue) / getSkinnable().getRange();
+        double hiFactor = (high - minValue) / getSkinnable().getRange();
         Stop   loStop   = new Stop(loFactor, gradientLookup.getColorAt(loFactor));
         Stop   hiStop   = new Stop(hiFactor, gradientLookup.getColorAt(hiFactor));
         gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, loStop, hiStop);

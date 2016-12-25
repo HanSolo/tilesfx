@@ -112,6 +112,7 @@ public class Demo extends Application {
 
         // Weather (You can get a DarkSky API key here: https://darksky.net/dev/ )
         DarkSky darkSky = new DarkSky("YOUR_DARK_SKY_API_KEY", Unit.CA, Language.ENGLISH, 51.911858, 7.632815);
+        //darkSky.update();
 
         // BarChart Data
         BarChartSegment segment1 = new BarChartSegment("Gerrit", 47, Tile.BLUE);

@@ -358,7 +358,7 @@ public class TimerControlTileSkin extends TileSkin {
         double center = size * 0.5;
 
         sectionsPane.setMinSize(clockSize, clockSize);
-        sectionsPane.relocate((width - clockSize) * 0.5, (height - clockSize) * 0.5);
+        sectionsPane.relocate((size - clockSize) * 0.5, (size - clockSize) * 0.5);
 
         dropShadow.setRadius(0.008 * size);
         dropShadow.setOffsetY(0.008 * size);

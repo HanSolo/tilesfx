@@ -267,6 +267,7 @@ public class TimerControlTileSkin extends TileSkin {
                 arc.setType(ArcType.OPEN);
                 arc.setStrokeWidth(clockSize * 0.04);
                 arc.setStrokeLineCap(StrokeLineCap.BUTT);
+                arc.setFill(null);
 
                 if (highlightSections) {
                     arc.setStroke(section.contains(time.toLocalTime()) ? section.getHighlightColor() : section.getColor());

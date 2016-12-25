@@ -99,7 +99,7 @@ public class TimerControlTileSkin extends TileSkin {
 
         sectionsPane = new Pane();
         sectionsPane.getChildren().addAll(sectionMap.values());
-        Helper.enableNode(sectionsPane, getSkinnable().isSecondsVisible());
+        Helper.enableNode(sectionsPane, getSkinnable().getSectionsVisible());
 
         minuteTickMarks = new Path();
         minuteTickMarks.setFillRule(FillRule.EVEN_ODD);
@@ -185,7 +185,7 @@ public class TimerControlTileSkin extends TileSkin {
             Helper.enableNode(text, getSkinnable().isTextVisible());
             Helper.enableNode(dateText, getSkinnable().isDateVisible());
             Helper.enableNode(second, getSkinnable().isSecondsVisible());
-            Helper.enableNode(sectionsPane, getSkinnable().isSecondsVisible());
+            Helper.enableNode(sectionsPane, getSkinnable().getSectionsVisible());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sectionMap.clear();
             for (TimeSection section : getSkinnable().getTimeSections()) { sectionMap.put(section, new Arc()); }

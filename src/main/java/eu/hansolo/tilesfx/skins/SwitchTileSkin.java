@@ -153,7 +153,7 @@ public class SwitchTileSkin extends TileSkin {
         thumb.setRadius(size * 0.09);
         thumb.setCenterX(size * 0.3875);
         thumb.setCenterY(size * 0.5);
-        moveThumb();
+        thumb.setLayoutX(getSkinnable().isSelected() ? size * 0.225 : 0);
     };
 
     @Override protected void redraw() {

@@ -22,12 +22,17 @@ import eu.hansolo.tilesfx.weather.DarkSky.Language;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.VPos;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
@@ -61,6 +66,7 @@ public class Demo extends Application {
     private Tile           weatherTile;
     private Tile           timeTile;
     private Tile           barChartTile;
+    private Tile           customTile;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -245,6 +251,12 @@ public class Demo extends Application {
                                   .decimals(0)
                                   .build();
 
+        customTile = TileBuilder.create()
+                                .skinType(SkinType.CUSTOM)
+                                .title("Custom Tile")
+                                .graphic(new Button("Click Me"))
+                                .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -269,11 +281,15 @@ public class Demo extends Application {
     }
 
     @Override public void start(Stage stage) {
-        FlowPane pane = new FlowPane(percentageTile, clockTile, gaugeTile, sparkLineTile,
+        FlowPane pane = new FlowPane(Orientation.HORIZONTAL, 10, 10,
+                                     percentageTile, clockTile, gaugeTile, sparkLineTile,
                                      lineChartTile, highLowTile, timerControlTile, numberTile, textTile,
-                                     plusMinusTile, sliderTile, switchTile, worldTile, timeTile, barChartTile);// , weatherTile);
-        pane.setHgap(10);
-        pane.setVgap(10);
+                                     plusMinusTile, sliderTile, switchTile, worldTile, timeTile,
+                                     barChartTile, customTile);// , weatherTile);
+
+        pane.setColumnHalignment(HPos.CENTER);
+        pane.setRowValignment(VPos.CENTER);
+        pane.setCenterShape(true);
         pane.setPadding(new Insets(10));
         pane.setPrefSize(1570, 790);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));

@@ -38,6 +38,7 @@ import javafx.beans.property.StringProperty;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
@@ -568,6 +569,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B graphic(final Node GRAPHIC) {
+        properties.put("graphic", new SimpleObjectProperty(GRAPHIC));
+        return (B)this;
+    }
+
     public final B gradientStops(final Stop... STOPS) {
         properties.put("gradientStopsArray", new SimpleObjectProperty(STOPS));
         return (B)this;
@@ -713,6 +719,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case WEATHER:
                     break;
                 case TIME:
+                    break;
+                case CUSTOM:
                     break;
             }
         } else {
@@ -981,6 +989,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
             } else if ("strokeWithGradient".equals(key)) {
                 CONTROL.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
+            } else if ("graphic".equals(key)) {
+                CONTROL.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
             }
         }
         return CONTROL;

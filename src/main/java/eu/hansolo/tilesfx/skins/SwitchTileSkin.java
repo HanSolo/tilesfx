@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.SwitchEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.FillTransition;
@@ -32,11 +33,13 @@ import javafx.util.Duration;
  * Created by hansolo on 19.12.16.
  */
 public class SwitchTileSkin extends TileSkin {
-    private Text      titleText;
-    private Text      text;
-    private Rectangle switchBorder;
-    private Rectangle switchBackground;
-    private Circle    thumb;
+    private static final SwitchEvent SWITCH_PRESSED  = new SwitchEvent(SwitchEvent.SWITCH_PRESSED);
+    private static final SwitchEvent SWITCH_RELEASED = new SwitchEvent(SwitchEvent.SWITCH_RELEASED);
+    private              Text        titleText;
+    private              Text        text;
+    private              Rectangle   switchBorder;
+    private              Rectangle   switchBackground;
+    private              Circle      thumb;
 
 
     // ******************** Constructors **************************************
@@ -71,7 +74,11 @@ public class SwitchTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        switchBorder.setOnMousePressed(e -> getSkinnable().setSelected(!getSkinnable().isSelected()));
+        switchBorder.setOnMousePressed(e -> {
+            getSkinnable().setSelected(!getSkinnable().isSelected());
+            getSkinnable().fireEvent(SWITCH_PRESSED);
+        });
+        switchBorder.setOnMouseReleased(e -> getSkinnable().fireEvent(SWITCH_RELEASED));
         getSkinnable().selectedProperty().addListener(e -> moveThumb());
     }
 

@@ -18,6 +18,7 @@ package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
+import eu.hansolo.tilesfx.events.SwitchEvent;
 import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.events.TileEventListener;
@@ -41,12 +42,14 @@ import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
@@ -3674,7 +3677,7 @@ public class Tile extends Control {
         if (oldTime.getMinute() != now.getMinute()) fireTimeEvent(new TimeEvent(Tile.this, now, TimeEventType.MINUTE));
         if (oldTime.getHour() != now.getHour()) fireTimeEvent(new TimeEvent(Tile.this, now, TimeEventType.HOUR));
     }); }
-    
+
     
     // ******************** Scheduled tasks ***********************************
     private synchronized static void enableTickExecutorService() {
@@ -3745,6 +3748,13 @@ public class Tile extends Control {
         int listSize = timeEventListenerList.size();
         for (int i = 0 ; i < listSize ; i++) { timeEventListenerList.get(i).onTimeEvent(EVENT); }
     }
+
+
+    public void setOnSwitchPressed(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.SWITCH_PRESSED, HANDLER); }
+    public void removeOnSwitchPressed(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.SWITCH_PRESSED, HANDLER); }
+
+    public void setOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
+    public void removeOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
 
 
     // ******************** Style related *************************************

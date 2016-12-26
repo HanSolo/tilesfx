@@ -22,12 +22,14 @@ import eu.hansolo.tilesfx.weather.DarkSky.Language;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -221,6 +223,9 @@ public class Demo extends Application {
                                 .title("Switch Tile")
                                 .text("Whatever text")
                                 .build();
+
+        switchTile.setOnSwitchPressed(e -> System.out.println("Switch pressed"));
+        switchTile.setOnSwitchReleased(e -> System.out.println("Switch released"));
 
         worldTile = TileBuilder.create()
                                .skinType(SkinType.WORLDMAP)

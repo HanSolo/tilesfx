@@ -146,6 +146,7 @@ public class SwitchTileSkin extends TileSkin {
         thumb.setRadius(size * 0.09);
         thumb.setCenterX(size * 0.3875);
         thumb.setCenterY(size * 0.5);
+        moveThumb();
     };
 
     @Override protected void redraw() {

@@ -40,10 +40,10 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -63,7 +63,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -87,7 +86,7 @@ public class Tile extends Control {
     public enum SkinType { //AREA_CHART, LEADER_BOARD,
                     BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                     PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                    TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME }
+                    TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -166,6 +165,7 @@ public class Tile extends Control {
     private              LocalTime                              _duration;
     private              ObjectProperty<LocalTime>              duration;
     private              ObservableList<BarChartSegment>        barChartData;
+    private              ObjectProperty<Node>                   graphic;
 
     // UI related
     private              SkinType                      skinType;
@@ -1135,8 +1135,30 @@ public class Tile extends Control {
         fireTileEvent(REDRAW_EVENT);
     }
 
+    /**
+     * Returns an optional node that can be used in combination with the
+     * CustomTileSkin
+     * @return an optional node that can be used in combination with the CustomTileSkin
+     */
+    public Node getGraphic() { return null == graphic ? null : graphic.get(); }
+    /**
+     * Defines an optional node that can be used in combination with the
+     * CustomTileSkin.
+     * @param GRAPHIC
+     */
+    public void setGraphic(final Node GRAPHIC) { graphicProperty().set(GRAPHIC); }
+    public ObjectProperty<Node> graphicProperty() {
+        if (null == graphic) {
+            graphic = new ObjectPropertyBase<Node>() {
+                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "graphic"; }
+            };
+        }
+        return graphic;
+    }
 
-    // ******************** UI related methods ********************************
+
     /**
      * A convenient method to set the color of foreground elements like
      * title, subTitle, unit, value, tickLabel and tickMark to the given
@@ -3746,6 +3768,7 @@ public class Tile extends Control {
             case TEXT         : return new TextTileSkin(Tile.this);
             case WEATHER      : return new WeatherTileSkin(Tile.this);
             case TIME         : return new TimeTileSkin(Tile.this);
+            case CUSTOM       : return new CustomTileSkin(Tile.this);
             default           : return new TileSkin(Tile.this);
         }
     }
@@ -3825,6 +3848,9 @@ public class Tile extends Control {
                 break;
             case TIME:
                 super.setSkin(new TimeTileSkin(Tile.this));
+                break;
+            case CUSTOM:
+                super.setSkin(new CustomTileSkin(Tile.this));
                 break;
             default: super.setSkin(new TileSkin(Tile.this)); break;
         }

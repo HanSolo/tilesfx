@@ -3577,7 +3577,7 @@ public class Tile extends Control {
         if (darkSky.update()) {
             fireTileEvent(REDRAW_EVENT);
         } else {
-            System.out.println("Wrong or missing DarkSky API key");
+            //System.out.println("Wrong or missing DarkSky API key");
             throw new IllegalArgumentException("Do you use a valid DarkSKY API key?");
         }
     }
@@ -3588,7 +3588,7 @@ public class Tile extends Control {
         try(InputStream resourceStream = LOADER.getResourceAsStream(FILE_NAME)) {
             PROPERTIES.load(resourceStream);
         } catch (IOException exception) {
-            System.out.println(exception);
+            exception.printStackTrace();
         }
         return PROPERTIES;
     }

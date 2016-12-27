@@ -26,6 +26,7 @@ import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.HashMap;
 
@@ -81,6 +82,11 @@ public class TimeSectionBuilder<B extends TimeSectionBuilder<B>> {
         return (B)this;
     }
 
+    public final B days(final DayOfWeek... DAYS) {
+        properties.put("daysArray", new SimpleObjectProperty(DAYS));
+        return (B)this;
+    }
+
     public final B onTimeSectionEntered(final EventHandler<TimeSectionEvent> HANDLER) {
         properties.put("onTimeSectionEntered", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
@@ -93,6 +99,11 @@ public class TimeSectionBuilder<B extends TimeSectionBuilder<B>> {
 
     public final TimeSection build() {
         final TimeSection SECTION = new TimeSection();
+
+        if (properties.containsKey("daysArray")) {
+            SECTION.setDays(((ObjectProperty<DayOfWeek[]>) properties.get("daysArray")).get());
+        }
+
         for (String key : properties.keySet()) {
             if ("start".equals(key)) {
                 SECTION.setStart(((ObjectProperty<LocalTime>) properties.get(key)).get());

@@ -40,6 +40,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -242,6 +243,7 @@ public class TimerControlTileSkin extends TileSkin {
     private void drawTimeSections() {
         if (sectionMap.isEmpty()) return;
         ZonedDateTime     time              = getSkinnable().getTime();
+        DayOfWeek         day               = time.getDayOfWeek();
         boolean           isAM              = time.get(ChronoField.AMPM_OF_DAY) == 0;
         double            offset            = 90;
         double            angleStep         = 360.0 / 60.0;
@@ -252,6 +254,8 @@ public class TimerControlTileSkin extends TileSkin {
             boolean     isStartAM = start.get(ChronoField.AMPM_OF_DAY) == 0;
             boolean     isStopAM  = stop.get(ChronoField.AMPM_OF_DAY) == 0;
             boolean     draw      = isAM ? (isStartAM || isStopAM) : (!isStartAM || !isStopAM);
+            if (!section.getDays().contains(day)) { draw = false; }
+            if (!section.isActive()) { draw = false; }
             if (draw) {
                 double sectionStartAngle = (start.getHour() % 12 * 5.0 + start.getMinute() / 12.0 + start.getSecond() / 300.0) * angleStep + 180;
                 double sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5.0 + (stop.getMinute() - start.getMinute()) / 12.0 + (stop.getSecond() - start.getSecond()) / 300.0) * angleStep;

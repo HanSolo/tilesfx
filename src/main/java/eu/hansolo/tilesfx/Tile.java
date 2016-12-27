@@ -49,7 +49,6 @@ import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
@@ -89,7 +88,7 @@ public class Tile extends Control {
     public enum SkinType { //AREA_CHART, LEADER_BOARD,
                     BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                     PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                    TIMER_CONTROL, NUMBER, TEXT, WEATHER, BIG_WEATHER, TIME, CUSTOM }
+                    TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -3670,7 +3669,7 @@ public class Tile extends Control {
         if (isAlarmsEnabled()) checkAlarms(now);
         if (getCheckSectionsForValue()) {
             int listSize = timeSections.size();
-            for (int i = 0 ; i < listSize ; i++) { timeSections.get(i).checkForValue(LocalTime.from(now)); }
+            for (int i = 0 ; i < listSize ; i++) { timeSections.get(i).checkForTimeAndDate(now); }
         }
 
         if (timeEventListenerList.isEmpty()) return;
@@ -3779,7 +3778,6 @@ public class Tile extends Control {
             case NUMBER       : return new NumberTileSkin(Tile.this);
             case TEXT         : return new TextTileSkin(Tile.this);
             case WEATHER      : return new WeatherTileSkin(Tile.this);
-            case BIG_WEATHER  : return new BigWeatherTileSkin(Tile.this);
             case TIME         : return new TimeTileSkin(Tile.this);
             case CUSTOM       : return new CustomTileSkin(Tile.this);
             default           : return new TileSkin(Tile.this);
@@ -3858,9 +3856,6 @@ public class Tile extends Control {
                 break;
             case WEATHER:
                 super.setSkin(new WeatherTileSkin(Tile.this));
-                break;
-            case BIG_WEATHER:
-                super.setSkin(new BigWeatherTileSkin(Tile.this));
                 break;
             case TIME:
                 super.setSkin(new TimeTileSkin(Tile.this));

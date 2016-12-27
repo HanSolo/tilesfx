@@ -30,7 +30,14 @@ import javafx.event.EventType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -56,6 +63,7 @@ public class TimeSection implements Comparable<TimeSection> {
     private LocalTime                 checkedValue;
     private boolean                   _active;
     private BooleanProperty           active;
+    private Set<DayOfWeek>            days;
 
 
     // ******************** Constructors **************************************
@@ -66,30 +74,30 @@ public class TimeSection implements Comparable<TimeSection> {
      * value enters or leaves the defined region.
      */
     public TimeSection() {
-        this(LocalTime.now(), LocalTime.now(), "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT);
+        this(LocalTime.now(), LocalTime.now(), "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP) {
-        this(START, STOP, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT);
+        this(START, STOP, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final Color COLOR) {
-        this(START, STOP, "", null, COLOR, COLOR, Color.TRANSPARENT);
+        this(START, STOP, "", null, COLOR, COLOR, Color.TRANSPARENT, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final Color COLOR, final Color HIGHLIGHT_COLOR) {
-        this(START, STOP, "", null, COLOR, HIGHLIGHT_COLOR, Color.TRANSPARENT);
+        this(START, STOP, "", null, COLOR, HIGHLIGHT_COLOR, Color.TRANSPARENT, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final Image ICON, final Color COLOR) {
-        this(START, STOP, "", ICON, COLOR, COLOR, Color.WHITE);
+        this(START, STOP, "", ICON, COLOR, COLOR, Color.WHITE, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Color COLOR) {
-        this(START, STOP, TEXT, null, COLOR, COLOR, Color.WHITE);
+        this(START, STOP, TEXT, null, COLOR, COLOR, Color.WHITE, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Color COLOR, final Color TEXT_COLOR) {
-        this(START, STOP, TEXT, null, COLOR, COLOR, TEXT_COLOR);
+        this(START, STOP, TEXT, null, COLOR, COLOR, TEXT_COLOR, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Image ICON, final Color COLOR, final Color TEXT_COLOR) {
-        this(START, STOP, TEXT, ICON, COLOR, COLOR, TEXT_COLOR);
+        this(START, STOP, TEXT, ICON, COLOR, COLOR, TEXT_COLOR, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
-    public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Image ICON, final Color COLOR, final Color HIGHLIGHT_COLOR, final Color TEXT_COLOR) {
+    public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Image ICON, final Color COLOR, final Color HIGHLIGHT_COLOR, final Color TEXT_COLOR, final boolean ACTIVE, final DayOfWeek... DAYS) {
         _start          = START;
         _stop           = STOP;
         _text           = TEXT;
@@ -98,7 +106,9 @@ public class TimeSection implements Comparable<TimeSection> {
         _highlightColor = HIGHLIGHT_COLOR;
         _textColor      = TEXT_COLOR;
         checkedValue    = LocalTime.MIN;
-        _active         = false;
+        _active         = ACTIVE;
+        days            = new HashSet<>(8);
+        days.addAll(Arrays.asList(DAYS));
     }
 
 
@@ -254,7 +264,7 @@ public class TimeSection implements Comparable<TimeSection> {
     }
 
     public boolean isActive() { return null == active ? _active : active.get(); }
-    private void setActive(final boolean ACTIVE) {
+    public void setActive(final boolean ACTIVE) {
         if (null == active) {
             _active = ACTIVE;
         } else {
@@ -271,6 +281,21 @@ public class TimeSection implements Comparable<TimeSection> {
         return active;
     }
 
+    public Set<DayOfWeek> getDays() { return days; }
+    public List<DayOfWeek> getDaysAsList() { return new ArrayList<>(days); }
+    public void setDays(final DayOfWeek... DAYS) {
+        days.clear();
+        for(DayOfWeek day : DAYS) { days.add(day); }
+    }
+    public void setDays(final Set<DayOfWeek> DAYS) {
+        days.clear();
+        days.addAll(DAYS);
+    }
+    public void addDay(final DayOfWeek DAY) { days.add(DAY); }
+    public void removeDay(final DayOfWeek DAY) { days.remove(DAY); }
+    public void clearDays() { days.clear(); }
+
+
     /**
      * Returns true if the given time is within the range between
      * section.getStart() and section.getStop()
@@ -284,23 +309,37 @@ public class TimeSection implements Comparable<TimeSection> {
     /**
      * Checks if the section contains the given time and fires an event
      * in case the value "entered" or "left" the section. With this one
-     * can react if a time "enters"/"leaves" a specific region in a gauge.
+     * can react if a time "enters"/"leaves" a section.
      * This can be useful to control things like switching lights on if
      * the time enters the region and switching it of again when the time
      * left the region.
+     * When calling this method the days won't be taken into account but
+     * only the time!!!
+     * If the TimeSection is not active no event will be fired.
      * @param VALUE
      */
-    public void checkForValue(final LocalTime VALUE) {
+    public void checkForTime(final LocalTime VALUE) {
+        if (!isActive()) return;
         boolean wasInSection = contains(checkedValue);
         boolean isInSection  = contains(VALUE);
         if (!wasInSection && isInSection) {
-            setActive(true);
             fireTimeSectionEvent(ENTERED_EVENT);
         } else if (wasInSection && !isInSection) {
-            setActive(false);
             fireTimeSectionEvent(LEFT_EVENT);
         }
         checkedValue = VALUE;
+    }
+    public void checkForTimeAndDay(final LocalTime VALUE, final DayOfWeek DAY) {
+        if (days.contains(DAY)) { checkForTime(VALUE); }
+    }
+    /**
+     * Checks if the section days contains the day of week of the given ZonedDateTime
+     * object and if the section contains the time itself. With this one can react if
+     * a time "enters"/"leaves" a section.
+     * @param DATE_TIME
+     */
+    public void checkForTimeAndDate(final ZonedDateTime DATE_TIME) {
+        if (days.contains(DATE_TIME.getDayOfWeek())) { checkForTime(DATE_TIME.toLocalTime()); }
     }
 
     public boolean equals(final TimeSection SECTION) {

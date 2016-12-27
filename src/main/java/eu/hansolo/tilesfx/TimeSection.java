@@ -16,7 +16,10 @@
 
 package eu.hansolo.tilesfx;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -51,6 +54,8 @@ public class TimeSection implements Comparable<TimeSection> {
     private Color                     _textColor;
     private ObjectProperty<Color>     textColor;
     private LocalTime                 checkedValue;
+    private boolean                   _active;
+    private BooleanProperty           active;
 
 
     // ******************** Constructors **************************************
@@ -93,6 +98,7 @@ public class TimeSection implements Comparable<TimeSection> {
         _highlightColor = HIGHLIGHT_COLOR;
         _textColor      = TEXT_COLOR;
         checkedValue    = LocalTime.MIN;
+        _active         = false;
     }
 
 
@@ -247,6 +253,24 @@ public class TimeSection implements Comparable<TimeSection> {
         return textColor;
     }
 
+    public boolean isActive() { return null == active ? _active : active.get(); }
+    private void setActive(final boolean ACTIVE) {
+        if (null == active) {
+            _active = ACTIVE;
+        } else {
+            active.set(ACTIVE);
+        }
+    }
+    public ReadOnlyBooleanProperty activeProperty() {
+        if (null == active) {
+            active = new BooleanPropertyBase(_active) {
+                @Override public Object getBean() { return TimeSection.this; }
+                @Override public String getName() { return "active"; }
+            };
+        }
+        return active;
+    }
+
     /**
      * Returns true if the given time is within the range between
      * section.getStart() and section.getStop()
@@ -270,8 +294,10 @@ public class TimeSection implements Comparable<TimeSection> {
         boolean wasInSection = contains(checkedValue);
         boolean isInSection  = contains(VALUE);
         if (!wasInSection && isInSection) {
+            setActive(true);
             fireTimeSectionEvent(ENTERED_EVENT);
         } else if (wasInSection && !isInSection) {
+            setActive(false);
             fireTimeSectionEvent(LEFT_EVENT);
         }
         checkedValue = VALUE;

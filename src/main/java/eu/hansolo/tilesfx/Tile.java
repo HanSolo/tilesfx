@@ -3569,7 +3569,10 @@ public class Tile extends Control {
     }
 
     public DarkSky getDarkSky() { return darkSky; }
-    public void setDarkSky(final DarkSky DARK_SKY) { darkSky = DARK_SKY; }
+    public void setDarkSky(final DarkSky DARK_SKY) {
+        darkSky = DARK_SKY;
+        fireTileEvent(REDRAW_EVENT);
+    }
 
     public void updateWeather() {
         if (null == darkSky) return;

@@ -125,7 +125,7 @@ public class Helper {
         }
     }
 
-    public static DateTimeFormatter getDateFormat(final Locale LOCALE) {
+    public static final DateTimeFormatter getDateFormat(final Locale LOCALE) {
         if (Locale.US == LOCALE) {
             return DateTimeFormatter.ofPattern("MM/dd/YYYY");
         } else if (Locale.CHINA == LOCALE) {
@@ -134,11 +134,11 @@ public class Helper {
             return DateTimeFormatter.ofPattern("dd.MM.YYYY");
         }
     }
-    public static DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {
+    public static final DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {
         return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(LOCALE);
     }
 
-    public static void enableNode(final Node NODE, final boolean ENABLE) {
+    public static final void enableNode(final Node NODE, final boolean ENABLE) {
         NODE.setManaged(ENABLE);
         NODE.setVisible(ENABLE);
     }
@@ -161,11 +161,11 @@ public class Helper {
         task = null;
     }
 
-    public static boolean isMonochrome(final Color COLOR) {
+    public static final boolean isMonochrome(final Color COLOR) {
         return Double.compare(COLOR.getRed(), COLOR.getGreen()) == 0 && Double.compare(COLOR.getGreen(), COLOR.getBlue()) == 0;
     }
 
-    public static double colorDistance(final Color COLOR_1, final Color COLOR_2) {
+    public static final double colorDistance(final Color COLOR_1, final Color COLOR_2) {
         final double DELTA_R = (COLOR_2.getRed() - COLOR_1.getRed());
         final double DELTA_G = (COLOR_2.getGreen() - COLOR_1.getGreen());
         final double DELTA_B = (COLOR_2.getBlue() - COLOR_1.getBlue());
@@ -173,23 +173,23 @@ public class Helper {
         return Math.sqrt(DELTA_R * DELTA_R + DELTA_G * DELTA_G + DELTA_B * DELTA_B);
     }
 
-    public static boolean isBright(final Color COLOR) { return !isDark(COLOR); }
-    public static boolean isDark(final Color COLOR) {
+    public static final boolean isBright(final Color COLOR) { return !isDark(COLOR); }
+    public static final boolean isDark(final Color COLOR) {
         final double DISTANCE_TO_WHITE = colorDistance(COLOR, Color.WHITE);
         final double DISTANCE_TO_BLACK = colorDistance(COLOR, Color.BLACK);
         return DISTANCE_TO_BLACK < DISTANCE_TO_WHITE;
     }
 
-    public static Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
+    public static final Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
         return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0.0, 1.0, FACTOR));
     }
 
-    public static void scaleNodeTo(final Node NODE, final double TARGET_WIDTH, final double TARGET_HEIGHT) {
+    public static final void scaleNodeTo(final Node NODE, final double TARGET_WIDTH, final double TARGET_HEIGHT) {
         NODE.setScaleX(TARGET_WIDTH / NODE.getLayoutBounds().getWidth());
         NODE.setScaleY(TARGET_HEIGHT / NODE.getLayoutBounds().getHeight());
     }
 
-    public static String normalize(final String TEXT) {
+    public static final String normalize(final String TEXT) {
         String normalized = TEXT.replaceAll("\u00fc", "ue")
                                 .replaceAll("\u00f6", "oe")
                                 .replaceAll("\u00e4", "ae")

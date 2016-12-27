@@ -58,8 +58,6 @@ public class ClockTileSkin extends TileSkin {
         dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", getSkinnable().getLocale());
         dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", getSkinnable().getLocale());
 
-        System.out.println(dayOfWeekFormatter.format(LocalDateTime.now()));
-
         title = new Text("");
         title.setTextOrigin(VPos.TOP);
         Helper.enableNode(title, !getSkinnable().getTitle().isEmpty());

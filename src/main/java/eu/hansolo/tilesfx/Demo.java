@@ -40,6 +40,7 @@ import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Random;
@@ -114,7 +115,14 @@ public class Demo extends Application {
         }
 
         // TimeControl Data
-        TimeSection timeSection = new TimeSection(LocalTime.now().plusSeconds(20), LocalTime.now().plusHours(1), Tile.GRAY, Tile.RED);
+        TimeSection timeSection = TimeSectionBuilder.create()
+                                        .start(LocalTime.now().plusSeconds(20))
+                                        .stop(LocalTime.now().plusHours(1))
+                                        //.days(DayOfWeek.MONDAY, DayOfWeek.FRIDAY)
+                                        .color(Tile.GRAY)
+                                        .highlightColor(Tile.RED)
+                                        .build();
+
         timeSection.setOnTimeSectionEntered(e -> System.out.println("Section ACTIVE"));
         timeSection.setOnTimeSectionLeft(e -> System.out.println("Section INACTIVE"));
 

@@ -180,8 +180,10 @@ public class DarkSky {
 
     // ******************** Methods *******************************************
     public DataPoint getToday() { return today; }
+    public void setToday(final DataPoint TODAY) { today = TODAY; }
 
     public List<DataPoint> getForecast() { return forecast; }
+    public void setForecast(final List<DataPoint> FORECAST) { forecast = FORECAST; }
 
     public Unit getUnit() { return unit; }
     public void setUnit(final Unit UNIT) { unit = UNIT; }
@@ -201,8 +203,10 @@ public class DarkSky {
     }
 
     public TimeZone getTimeZone() { return timeZone; }
+    public void setTimeZone(final TimeZone TIME_ZONE) { timeZone = TIME_ZONE; }
 
     public String getCity() { return city; }
+    public void setCity(final String CITY) { city = CITY; }
 
     public boolean update() {
         return update(latitude, longitude, unit, language);
@@ -227,37 +231,6 @@ public class DarkSky {
         } catch (IOException ex) {
             // Wrong or missing DarkDky API key System.out.println("DarkSky: " + ex + "\nDo you use a valid DarkSky API key?");
             return false;
-        }
-    }
-
-    /**
-     * Remotely update the DarkSky object with custom data (not for public use).
-     * If you would like to update the DarkSky object with the official DarkSky
-     * data in JSON format please use the updateWithDarkSkyJsonData() method.
-     * @param JSON_DATA
-     */
-    public void updateWithCustomJsonString(final String JSON_DATA) {
-        Object     obj          = JSONValue.parse(JSON_DATA);
-        JSONObject jsonObj      = (JSONObject) obj;
-
-        JSONObject todayJson    = (JSONObject) jsonObj.get("today");
-        JSONObject locationJson = (JSONObject) jsonObj.get("location");
-        JSONArray  forecastJson = (JSONArray) jsonObj.get("forecast");
-
-        city      = locationJson.get("city").toString();
-        latitude  = Double.parseDouble(locationJson.getOrDefault("latitude", 0).toString());
-        longitude = Double.parseDouble(locationJson.getOrDefault("longitude", 0).toString());
-        timeZone  = TimeZone.getTimeZone(locationJson.get("timezone").toString().replace("\\", ""));
-
-        // Update today data
-        setDataPoint(today, todayJson, timeZone);
-
-        // Update forecast data
-        for (int i = 1 ; i < forecastJson.size() ; i++) {
-            JSONObject day       = (JSONObject) forecastJson.get(i);
-            DataPoint  dataPoint = new DataPoint();
-            setDataPoint(dataPoint, day, timeZone);
-            forecast.add(dataPoint);
         }
     }
 

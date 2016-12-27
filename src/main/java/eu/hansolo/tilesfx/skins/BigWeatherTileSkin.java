@@ -109,7 +109,7 @@ public class BigWeatherTileSkin extends TileSkin {
         if (unitText.isVisible()) {
             valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.1825);
         } else {
-            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.1825);
+            valueText.relocate(size * 0.9754902 - valueText.getLayoutBounds().getWidth(), size * 0.1825);
         }
 
         maxWidth = size * 0.9;
@@ -130,7 +130,7 @@ public class BigWeatherTileSkin extends TileSkin {
         fontSize = size * 0.1;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.42);
+        unitText.relocate(size * 0.9754902 - unitText.getLayoutBounds().getWidth(), size * 0.42);
     };
 
     @Override protected void resize() {

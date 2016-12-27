@@ -327,7 +327,6 @@ public class Tile extends Control {
     private static   ScheduledExecutorService          periodicTickExecutorService;
 
 
-
     // ******************** Constructors **************************************
     public Tile() {
         this(SkinType.GAUGE, ZonedDateTime.now());

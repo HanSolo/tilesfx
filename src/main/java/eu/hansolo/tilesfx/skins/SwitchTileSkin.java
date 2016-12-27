@@ -21,7 +21,10 @@ import eu.hansolo.tilesfx.events.SwitchEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.FillTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
+import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -40,6 +43,7 @@ public class SwitchTileSkin extends TileSkin {
     private              Rectangle   switchBorder;
     private              Rectangle   switchBackground;
     private              Circle      thumb;
+    private              Timeline    timeline;
 
 
     // ******************** Constructors **************************************
@@ -51,6 +55,8 @@ public class SwitchTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        timeline = new Timeline();
 
         titleText = new Text();
         titleText.setFill(getSkinnable().getTitleColor());
@@ -94,27 +100,22 @@ public class SwitchTileSkin extends TileSkin {
     };
 
     private void moveThumb() {
+        KeyValue thumbLeftX                 = new KeyValue(thumb.centerXProperty(), size * 0.3875);
+        KeyValue thumbRightX                = new KeyValue(thumb.centerXProperty(), size * 0.6125);
+        KeyValue switchBackgroundLeftColor  = new KeyValue(switchBackground.fillProperty(), getSkinnable().getBackgroundColor());
+        KeyValue switchBackgroundRightColor = new KeyValue(switchBackground.fillProperty(), getSkinnable().getActiveColor());
         if (getSkinnable().isSelected()) {
-            // move thumb to the right
-            TranslateTransition moveThumb = new TranslateTransition(Duration.millis(200), thumb);
-            moveThumb.setFromX(0);
-            moveThumb.setToX(size * 0.225);
-            FillTransition fillSwitch = new FillTransition(Duration.millis(200), switchBackground);
-            fillSwitch.setFromValue(getSkinnable().getBackgroundColor());
-            fillSwitch.setToValue(getSkinnable().getActiveColor());
-            ParallelTransition parallelTransition = new ParallelTransition(moveThumb, fillSwitch);
-            parallelTransition.play();
+            // move thumb from left to the right
+            KeyFrame kf0 = new KeyFrame(Duration.ZERO, thumbLeftX, switchBackgroundLeftColor);
+            KeyFrame kf1 = new KeyFrame(Duration.millis(200), thumbRightX, switchBackgroundRightColor);
+            timeline.getKeyFrames().setAll(kf0, kf1);
         } else {
-            // move thumb to the left
-            TranslateTransition moveThumb = new TranslateTransition(Duration.millis(200), thumb);
-            moveThumb.setFromX(size * 0.225);
-            moveThumb.setToX(0);
-            FillTransition fillSwitch = new FillTransition(Duration.millis(200), switchBackground);
-            fillSwitch.setFromValue(getSkinnable().getActiveColor());
-            fillSwitch.setToValue(getSkinnable().getBackgroundColor());
-            ParallelTransition parallelTransition = new ParallelTransition(moveThumb, fillSwitch);
-            parallelTransition.play();
+            // move thumb from right to the left
+            KeyFrame kf0 = new KeyFrame(Duration.ZERO, thumbRightX, switchBackgroundRightColor);
+            KeyFrame kf1 = new KeyFrame(Duration.millis(200), thumbLeftX, switchBackgroundLeftColor);
+            timeline.getKeyFrames().setAll(kf0, kf1);
         }
+        timeline.play();
     }
 
 
@@ -151,9 +152,8 @@ public class SwitchTileSkin extends TileSkin {
         switchBackground.relocate((size - switchBackground.getWidth()) * 0.5, (size - switchBackground.getHeight()) * 0.5);
 
         thumb.setRadius(size * 0.09);
-        thumb.setCenterX(size * 0.3875);
+        thumb.setCenterX(getSkinnable().isSelected() ? size * 0.6125 : size * 0.3875);
         thumb.setCenterY(size * 0.5);
-        thumb.setLayoutX(getSkinnable().isSelected() ? size * 0.225 : 0);
     };
 
     @Override protected void redraw() {

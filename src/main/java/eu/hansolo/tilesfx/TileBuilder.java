@@ -718,6 +718,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case WEATHER:
                     break;
+                //case BIG_WEATHER: break;
                 case TIME:
                     break;
                 case CUSTOM:

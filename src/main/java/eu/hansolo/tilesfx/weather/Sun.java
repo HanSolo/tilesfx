@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -53,6 +56,9 @@ public class Sun {
      * @return an array of ZonedDateTime objects for sunrise and sunset in UTC.
      */
     public static ZonedDateTime[] getSunriseSunsetAt(final double LATITUDE, final double LONGITUDE) {
+        return getSunriseSunsetAt(LATITUDE, LONGITUDE, ZoneId.systemDefault());
+    }
+    public static ZonedDateTime[] getSunriseSunsetAt(final double LATITUDE, final double LONGITUDE, final ZoneId ZONE_ID) {
         StringBuilder response = new StringBuilder();
         try {
             final String URL_STRING = new StringBuilder(SUNRISE_SUNSET_URL).append("lat=").append(LATITUDE)
@@ -66,30 +72,31 @@ public class Sun {
                 response.append(inputLine).append("\n");
             }
             IN.close();
-            return parseJsonData(response.toString());
+            return parseJsonData(response.toString(), ZONE_ID);
         } catch (IOException ex) {
             return null;
         }
     }
 
-    private static ZonedDateTime[] parseJsonData(final String JSON_DATA) {
+    private static ZonedDateTime[] parseJsonData(final String JSON_DATA, final ZoneId ZONE_ID) {
         Object     obj     = JSONValue.parse(JSON_DATA);
         JSONObject jsonObj = (JSONObject) obj;
 
         // Results
         JSONObject results = (JSONObject) jsonObj.get("results");
 
-        ZonedDateTime sunrise                   = ZonedDateTime.parse(results.get("sunrise").toString(), DateTimeFormatter.ISO_DATE_TIME);
-        ZonedDateTime sunset                    = ZonedDateTime.parse(results.get("sunset").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime sunrise                   = LocalDateTime.parse(results.get("sunrise").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime sunset                    = LocalDateTime.parse(results.get("sunset").toString(), DateTimeFormatter.ISO_DATE_TIME);
         /*
-        ZonedDateTime solarNoon                 = ZonedDateTime.parse(results.get("solar_noon").toString(), DateTimeFormatter.ISO_DATE_TIME);
-        ZonedDateTime dayLength                 = ZonedDateTime.parse(results.get("day_length").toString(), DateTimeFormatter.ISO_DATE_TIME);
-        ZonedDateTime civilTwilightBegin        = ZonedDateTime.parse(results.get("civil_twilight_begin").toString(), DateTimeFormatter.ISO_DATE_TIME);
-        ZonedDateTime nauticalTwilightBegin     = ZonedDateTime.parse(results.get("nautical_twilight_begin").toString(), DateTimeFormatter.ISO_DATE_TIME);
-        ZonedDateTime nauticalTwilightEnd       = ZonedDateTime.parse(results.get("nautical_twilight_end").toString(), DateTimeFormatter.ISO_DATE_TIME);
-        ZonedDateTime astronomicalTwilightBegin = ZonedDateTime.parse(results.get("astronomical_twilight_begin").toString(), DateTimeFormatter.ISO_DATE_TIME);
-        ZonedDateTime astronomicalTwilightEnd   = ZonedDateTime.parse(results.get("astronomical_twilight_end").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime solarNoon                 = LocalDateTime.parse(results.get("solar_noon").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime dayLength                 = LocalDateTime.parse(results.get("day_length").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime civilTwilightBegin        = LocalDateTime.parse(results.get("civil_twilight_begin").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime nauticalTwilightBegin     = LocalDateTime.parse(results.get("nautical_twilight_begin").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime nauticalTwilightEnd       = LocalDateTime.parse(results.get("nautical_twilight_end").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime astronomicalTwilightBegin = LocalDateTime.parse(results.get("astronomical_twilight_begin").toString(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime astronomicalTwilightEnd   = LocalDateTime.parse(results.get("astronomical_twilight_end").toString(), DateTimeFormatter.ISO_DATE_TIME);
         */
-        return new ZonedDateTime[] {sunrise, sunset};
+
+        return new ZonedDateTime[] {ZonedDateTime.of(sunrise, ZONE_ID), ZonedDateTime.of(sunset, ZONE_ID)};
     }
 }

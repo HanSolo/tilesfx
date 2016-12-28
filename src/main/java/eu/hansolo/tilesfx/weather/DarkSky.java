@@ -64,19 +64,26 @@ public class DarkSky {
         }
     }
     public enum Unit {
-        US("us", "\u00B0F"), // imperial units
-        SI("si", "\u00B0C"), // SI units
-        CA("ca", "\u00B0C"), // same as SI except wind speed is in kph
-        UK("uk", "\u00B0C"),
-        UK2("uk2", "\u00B0C"), // same as SI except that nearest storm distance and visibility are in miles and wind speed is in mph
-        AUTO("auto", "\u00B0C"); // units based on geographic location
+        US("us", "\u00B0F", "mb", "\u0025", "mph"),     // imperial units
+        SI("si", "\u00B0C", "mb", "\u0025", "m/s"),     // SI units
+        CA("ca", "\u00B0C", "mb", "\u0025", "kph"),     // same as SI except wind speed is in kph
+        UK("uk", "\u00B0C", "mb", "\u0025", "mph"),
+        UK2("uk2", "\u00B0C", "mb", "\u0025", "mph"),   // same as SI except that nearest storm distance and visibility are in miles and wind speed is in mph
+        AUTO("auto", "\u00B0C", "mb", "\u0025", "mph"); // units based on geographic location
 
         public final String value;
         public final String temperatureUnitString;
+        public final String pressureUnitString;
+        public final String humidityUnitString;
+        public final String speedUnitString;
 
-        Unit(final String VALUE, final String TEMPERATURE_UNIT_STRING) {
+        Unit(final String VALUE, final String TEMPERATURE_UNIT_STRING, final String PRESSURE_UNIT_STRING,
+             final String HUMIDITY_UNIT_STRING, final String SPEED_UNIT_STRING) {
             value                 = VALUE;
             temperatureUnitString = TEMPERATURE_UNIT_STRING;
+            pressureUnitString    = PRESSURE_UNIT_STRING;
+            humidityUnitString    = HUMIDITY_UNIT_STRING;
+            speedUnitString       = SPEED_UNIT_STRING;
         }
     }
     public enum ConditionAndIcon {

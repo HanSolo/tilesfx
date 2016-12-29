@@ -39,7 +39,6 @@ import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -55,11 +54,9 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class SparkLineTileSkin extends TileSkin {
-    private static final DateTimeFormatter TF     = DateTimeFormatter.ofPattern("HH:mm");
-    private static final DateTimeFormatter DTF_EU = DateTimeFormatter.ofPattern("dd.MM HH:mm");
-    private static final DateTimeFormatter DTF_US = DateTimeFormatter.ofPattern("MM/dd HH:mm");
-    private static final DateTimeFormatter DF_EU  = DateTimeFormatter.ofPattern("dd.MM");
-    private static final DateTimeFormatter DF_US  = DateTimeFormatter.ofPattern("MM/dd");
+    private DateTimeFormatter timeFormatter   = DateTimeFormatter.ofPattern("HH:mm");
+    private DateTimeFormatter dateFormatterEU = DateTimeFormatter.ofPattern("dd.MM");
+    private DateTimeFormatter dateFormatterUS = DateTimeFormatter.ofPattern("MM/dd");
     private Text              titleText;
     private Text              valueText;
     private Text              unitText;
@@ -92,6 +89,10 @@ public class SparkLineTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        timeFormatter   = DateTimeFormatter.ofPattern("HH:mm", getSkinnable().getLocale());
+        dateFormatterEU = DateTimeFormatter.ofPattern("dd.MM", getSkinnable().getLocale());
+        dateFormatterUS = DateTimeFormatter.ofPattern("MM/dd", getSkinnable().getLocale());
 
         if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
 
@@ -270,17 +271,17 @@ public class SparkLineTileSkin extends TileSkin {
                 if (timeSpan > 86400) {
                     if (Locale.US == locale) {
                         lowText.setText(String.join(", ", String.format(locale, formatString, low),
-                                                    DF_US.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
-                        subTitleText.setText(DF_US.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                                                    dateFormatterUS.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
+                        subTitleText.setText(dateFormatterUS.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
                     } else {
                         lowText.setText(String.join(", ", String.format(locale, formatString, low),
-                                                    DF_EU.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
-                        subTitleText.setText(DF_EU.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                                                    dateFormatterEU.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
+                        subTitleText.setText(dateFormatterEU.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
                     }
                 } else {
                     lowText.setText(String.join(", ", String.format(locale, formatString, low),
-                                                TF.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
-                    subTitleText.setText(TF.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                                                timeFormatter.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
+                    subTitleText.setText(timeFormatter.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
                 }
             }
         } else {

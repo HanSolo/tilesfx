@@ -61,6 +61,13 @@ public class MovingAverage {
     public Data getFirstEntry() { return window.peek(); }
     public Data getLastEntry() { return window.stream().reduce((first, second) -> second).orElse(null); }
 
+    public Instant getTimeSpan() {
+        Data firstEntry = getFirstEntry();
+        Data lastEntry  = getLastEntry();
+        if (null == firstEntry || null == lastEntry) return null;
+        return lastEntry.getTimestamp().minusSeconds(firstEntry.getTimestamp().getEpochSecond());
+    }
+
     public double getAverage() {
         if (window.isEmpty()) return 0; // technically the average is undefined
         return (sum / window.size());

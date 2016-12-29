@@ -17,6 +17,8 @@
 package eu.hansolo.tilesfx.tools;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 
 /**
@@ -38,6 +40,8 @@ public class Data {
     public double getValue() { return value; }
 
     public Instant getTimestamp() { return timestamp; }
+
+    public ZonedDateTime getTimestampAsDateTime(final ZoneId ZONE_ID) { return ZonedDateTime.ofInstant(timestamp, ZONE_ID); }
 
     @Override  public String toString() {
         return new StringBuilder().append("{\n")

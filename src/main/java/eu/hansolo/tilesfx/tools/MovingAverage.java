@@ -58,6 +58,9 @@ public class MovingAverage {
 
     public Queue<Data> getWindow() { return new LinkedList<>(window); }
 
+    public Data getFirstEntry() { return window.peek(); }
+    public Data getLastEntry() { return window.stream().reduce((first, second) -> second).orElse(null); }
+
     public double getAverage() {
         if (window.isEmpty()) return 0; // technically the average is undefined
         return (sum / window.size());

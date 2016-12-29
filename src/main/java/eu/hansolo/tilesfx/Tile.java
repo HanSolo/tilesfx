@@ -909,6 +909,12 @@ public class Tile extends Control {
     }
 
     /**
+     * Returns the moving average object
+     * @return the moving average object
+     */
+    public MovingAverage getMovingAverage() { return movingAverage; }
+
+    /**
      * Returns true if the averaging functionality is enabled.
      * @return true if the averaging functionality is enabled
      */

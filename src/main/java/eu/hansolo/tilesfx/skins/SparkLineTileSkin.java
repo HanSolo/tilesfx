@@ -39,7 +39,7 @@ import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -267,21 +267,19 @@ public class SparkLineTileSkin extends TileSkin {
             if (null == movingAverage.getTimeSpan()) {
                 lowText.setText(String.format(locale, formatString, low));
             } else {
-                long timeSpan = movingAverage.getTimeSpan().getEpochSecond();
+                long   timeSpan = movingAverage.getTimeSpan().getEpochSecond();
+                ZoneId zoneId   = getSkinnable().getZoneId();
                 if (timeSpan > 86400) {
                     if (Locale.US == locale) {
-                        lowText.setText(String.join(", ", String.format(locale, formatString, low),
-                                                    dateFormatterUS.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
-                        subTitleText.setText(dateFormatterUS.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                        lowText.setText(String.join(", ", String.format(locale, formatString, low), dateFormatterUS.format(movingAverage.getFirstEntry().getTimestampAsDateTime(zoneId))));
+                        subTitleText.setText(dateFormatterUS.format(movingAverage.getLastEntry().getTimestampAsDateTime(zoneId)));
                     } else {
-                        lowText.setText(String.join(", ", String.format(locale, formatString, low),
-                                                    dateFormatterEU.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
-                        subTitleText.setText(dateFormatterEU.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                        lowText.setText(String.join(", ", String.format(locale, formatString, low), dateFormatterEU.format(movingAverage.getFirstEntry().getTimestampAsDateTime(zoneId))));
+                        subTitleText.setText(dateFormatterEU.format(movingAverage.getLastEntry().getTimestampAsDateTime(zoneId)));
                     }
                 } else {
-                    lowText.setText(String.join(", ", String.format(locale, formatString, low),
-                                                timeFormatter.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
-                    subTitleText.setText(timeFormatter.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                    lowText.setText(String.join(", ", String.format(locale, formatString, low), timeFormatter.format(movingAverage.getFirstEntry().getTimestampAsDateTime(zoneId))));
+                    subTitleText.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(zoneId)));
                 }
             }
         } else {

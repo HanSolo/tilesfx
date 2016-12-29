@@ -20,6 +20,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.geometry.VPos;
 import javafx.scene.paint.CycleMethod;
@@ -38,10 +39,14 @@ import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
@@ -50,6 +55,11 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class SparkLineTileSkin extends TileSkin {
+    private static final DateTimeFormatter TF     = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter DTF_EU = DateTimeFormatter.ofPattern("dd.MM HH:mm");
+    private static final DateTimeFormatter DTF_US = DateTimeFormatter.ofPattern("MM/dd HH:mm");
+    private static final DateTimeFormatter DF_EU  = DateTimeFormatter.ofPattern("dd.MM");
+    private static final DateTimeFormatter DF_US  = DateTimeFormatter.ofPattern("MM/dd");
     private Text              titleText;
     private Text              valueText;
     private Text              unitText;
@@ -70,6 +80,7 @@ public class SparkLineTileSkin extends TileSkin {
     private double            stdDeviation;
     private int               noOfDatapoints;
     private List<Double>      dataList;
+    private MovingAverage     movingAverage;
 
 
     // ******************** Constructors **************************************
@@ -88,6 +99,7 @@ public class SparkLineTileSkin extends TileSkin {
         low            = getSkinnable().getMaxValue();
         high           = getSkinnable().getMinValue();
         stdDeviation   = 0;
+        movingAverage  = getSkinnable().getMovingAverage();
         noOfDatapoints = getSkinnable().getAveragingPeriod();
         dataList       = new LinkedList<>();
         for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
@@ -165,7 +177,7 @@ public class SparkLineTileSkin extends TileSkin {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
+            //Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
             Helper.enableNode(averageLine, getSkinnable().isAverageVisible());
             Helper.enableNode(averageText, getSkinnable().isAverageVisible());
             Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
@@ -249,7 +261,31 @@ public class SparkLineTileSkin extends TileSkin {
         averageText.setText(String.format(locale, formatString, average));
 
         highText.setText(String.format(locale, formatString, high));
-        lowText.setText(String.format(locale, formatString, low));
+
+        if (getSkinnable().getSubTitle().isEmpty()) {
+            if (null == movingAverage.getTimeSpan()) {
+                lowText.setText(String.format(locale, formatString, low));
+            } else {
+                long timeSpan = movingAverage.getTimeSpan().getEpochSecond();
+                if (timeSpan > 86400) {
+                    if (Locale.US == locale) {
+                        lowText.setText(String.join(", ", String.format(locale, formatString, low),
+                                                    DF_US.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
+                        subTitleText.setText(DF_US.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                    } else {
+                        lowText.setText(String.join(", ", String.format(locale, formatString, low),
+                                                    DF_EU.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
+                        subTitleText.setText(DF_EU.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                    }
+                } else {
+                    lowText.setText(String.join(", ", String.format(locale, formatString, low),
+                                                TF.format(LocalDateTime.ofInstant(movingAverage.getFirstEntry().getTimestamp(), getSkinnable().getZoneId()))));
+                    subTitleText.setText(TF.format(LocalDateTime.ofInstant(movingAverage.getLastEntry().getTimestamp(), getSkinnable().getZoneId())));
+                }
+            }
+        } else {
+            lowText.setText(String.format(locale, formatString, low));
+        }
         resizeDynamicText();
     }
 
@@ -386,6 +422,12 @@ public class SparkLineTileSkin extends TileSkin {
         lowText.setFont(Fonts.latoRegular(fontSize));
         if (lowText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(lowText, maxWidth, fontSize); }
         lowText.setY(size * 0.9);
+
+        maxWidth = size * 0.75;
+        fontSize = size * 0.05;
+        subTitleText.setFont(Fonts.latoRegular(fontSize));
+        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
+        subTitleText.relocate(size * 0.95 - subTitleText.getLayoutBounds().getWidth(), size * 0.9);
     }
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
@@ -403,12 +445,6 @@ public class SparkLineTileSkin extends TileSkin {
         averageText.setX(size * 0.05);
         highText.setX(size * 0.05);
         lowText.setX(size * 0.05);
-
-        maxWidth = size * 0.75;
-        fontSize = size * 0.05;
-        subTitleText.setFont(Fonts.latoRegular(fontSize));
-        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
-        subTitleText.relocate(size * 0.95 - subTitleText.getLayoutBounds().getWidth(), size * 0.9);
     }
 
     @Override protected void resize() {
@@ -433,7 +469,7 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
-        subTitleText.setText(getSkinnable().getSubTitle());
+        if (!getSkinnable().getSubTitle().isEmpty()) { subTitleText.setText(getSkinnable().getSubTitle()); }
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());

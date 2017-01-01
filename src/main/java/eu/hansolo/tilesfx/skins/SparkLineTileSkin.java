@@ -64,6 +64,7 @@ public class SparkLineTileSkin extends TileSkin {
     private Text              highText;
     private Text              lowText;
     private Text              subTitleText;
+    private Text              timeSpanText;
     private Rectangle         graphBounds;
     private List<PathElement> pathElements;
     private Path              sparkLine;
@@ -138,6 +139,11 @@ public class SparkLineTileSkin extends TileSkin {
         subTitleText.setTextOrigin(VPos.TOP);
         subTitleText.setFill(getSkinnable().getSubTitleColor());
 
+        timeSpanText = new Text("");
+        timeSpanText.setTextOrigin(VPos.TOP);
+        timeSpanText.setFill(getSkinnable().getSubTitleColor());
+        Helper.enableNode(timeSpanText, getSkinnable().getSubTitle().isEmpty());
+
         stdDeviationArea = new Rectangle();
         Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
 
@@ -161,7 +167,7 @@ public class SparkLineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(getSkinnable().getBarColor());
 
-        getPane().getChildren().addAll(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, subTitleText);
+        getPane().getChildren().addAll(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, subTitleText);
     }
 
     @Override protected void registerListeners() {
@@ -178,7 +184,7 @@ public class SparkLineTileSkin extends TileSkin {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            //Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
+            Helper.enableNode(timeSpanText, getSkinnable().getSubTitle().isEmpty());
             Helper.enableNode(averageLine, getSkinnable().isAverageVisible());
             Helper.enableNode(averageText, getSkinnable().isAverageVisible());
             Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
@@ -267,20 +273,8 @@ public class SparkLineTileSkin extends TileSkin {
             if (null == movingAverage.getTimeSpan()) {
                 lowText.setText(String.format(locale, formatString, low));
             } else {
-                long   timeSpan = movingAverage.getTimeSpan().getEpochSecond();
-                ZoneId zoneId   = getSkinnable().getZoneId();
-                if (timeSpan > 86400) {
-                    if (Locale.US == locale) {
-                        lowText.setText(String.join(", ", String.format(locale, formatString, low), dateFormatterUS.format(movingAverage.getFirstEntry().getTimestampAsDateTime(zoneId))));
-                        subTitleText.setText(dateFormatterUS.format(movingAverage.getLastEntry().getTimestampAsDateTime(zoneId)));
-                    } else {
-                        lowText.setText(String.join(", ", String.format(locale, formatString, low), dateFormatterEU.format(movingAverage.getFirstEntry().getTimestampAsDateTime(zoneId))));
-                        subTitleText.setText(dateFormatterEU.format(movingAverage.getLastEntry().getTimestampAsDateTime(zoneId)));
-                    }
-                } else {
-                    lowText.setText(String.join(", ", String.format(locale, formatString, low), timeFormatter.format(movingAverage.getFirstEntry().getTimestampAsDateTime(zoneId))));
-                    subTitleText.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(zoneId)));
-                }
+                timeSpanText.setText(createTimeSpanText());
+                subTitleText.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(getSkinnable().getZoneId())));
             }
         } else {
             lowText.setText(String.format(locale, formatString, low));
@@ -304,6 +298,33 @@ public class SparkLineTileSkin extends TileSkin {
         Stop   loStop   = new Stop(loFactor, gradientLookup.getColorAt(loFactor));
         Stop   hiStop   = new Stop(hiFactor, gradientLookup.getColorAt(hiFactor));
         gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, loStop, hiStop);
+    }
+
+    private String createTimeSpanText() {
+        long   timeSpan = movingAverage.getTimeSpan().getEpochSecond();
+        ZoneId zoneId   = getSkinnable().getZoneId();
+        StringBuilder timeSpanBuilder = new StringBuilder("\u2190 ");
+        if (timeSpan > 2_592_000) { // 1 Month (30 days)
+            int    months = (int)(timeSpan / 2_592_000);
+            double days   = timeSpan % 2_592_200;
+            timeSpanBuilder.append(months).append("M").append(String.format(Locale.US, "%.0f", days)).append("d").append(" \u2192");
+        } else if (timeSpan > 86_400) { // 1 Day
+            int    days  = (int)(timeSpan / 86_400);
+            double hours = timeSpan % 86_400;
+            timeSpanBuilder.append(days).append("d").append(String.format(Locale.US, "%.0f", hours)).append("h").append(" \u2192");
+        } else if (timeSpan > 3_600) { // 1 Hour
+            int    hours   = (int)(timeSpan / 3600);
+            double minutes = timeSpan % 3_600;
+            timeSpanBuilder.append(hours).append("h").append(String.format(Locale.US, "%.0f", minutes)).append("m").append(" \u2192");
+        } else if (timeSpan > 60) { // 1 Minute
+            int    minutes = (int)(timeSpan / 60);
+            double seconds = timeSpan % 60;
+            timeSpanBuilder.append(minutes).append("m").append(String.format(Locale.US, "%.0f", seconds)).append("s").append(" \u2192");
+        } else {
+            int seconds = (int)timeSpan;
+            timeSpanBuilder.append(seconds).append("s").append(" \u2192");
+        }
+        return timeSpanBuilder.toString();
     }
 
 
@@ -427,6 +448,12 @@ public class SparkLineTileSkin extends TileSkin {
         subTitleText.setFont(Fonts.latoRegular(fontSize));
         if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
         subTitleText.relocate(size * 0.95 - subTitleText.getLayoutBounds().getWidth(), size * 0.9);
+
+        maxWidth = size * 0.75;
+        fontSize = size * 0.05;
+        timeSpanText.setFont(Fonts.latoRegular(fontSize));
+        if (timeSpanText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(timeSpanText, maxWidth, fontSize); }
+        timeSpanText.relocate((size - timeSpanText.getLayoutBounds().getWidth()) * 0.5, size * 0.9);
     }
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
@@ -476,6 +503,7 @@ public class SparkLineTileSkin extends TileSkin {
         highText.setFill(getSkinnable().getValueColor());
         lowText.setFill(getSkinnable().getValueColor());
         subTitleText.setFill(getSkinnable().getSubTitleColor());
+        timeSpanText.setFill(getSkinnable().getSubTitleColor());
         sparkLine.setStroke(getSkinnable().isStrokeWithGradient() ? gradient : getSkinnable().getBarColor());
         stdDeviationArea.setFill(Helper.getTranslucentColorFrom(Tile.FOREGROUND, 0.1));
         dot.setFill(getSkinnable().isStrokeWithGradient() ? gradient : getSkinnable().getBarColor());

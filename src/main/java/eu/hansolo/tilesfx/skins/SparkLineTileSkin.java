@@ -54,9 +54,11 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class SparkLineTileSkin extends TileSkin {
+    private static final int  MONTH           = 2_592_000;
+    private static final int  DAY             = 86_400;
+    private static final int  HOUR            = 3_600;
+    private static final int  MINUTE          = 60;
     private DateTimeFormatter timeFormatter   = DateTimeFormatter.ofPattern("HH:mm");
-    private DateTimeFormatter dateFormatterEU = DateTimeFormatter.ofPattern("dd.MM");
-    private DateTimeFormatter dateFormatterUS = DateTimeFormatter.ofPattern("MM/dd");
     private Text              titleText;
     private Text              valueText;
     private Text              unitText;
@@ -92,8 +94,6 @@ public class SparkLineTileSkin extends TileSkin {
         super.initGraphics();
 
         timeFormatter   = DateTimeFormatter.ofPattern("HH:mm", getSkinnable().getLocale());
-        dateFormatterEU = DateTimeFormatter.ofPattern("dd.MM", getSkinnable().getLocale());
-        dateFormatterUS = DateTimeFormatter.ofPattern("MM/dd", getSkinnable().getLocale());
 
         if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
 
@@ -304,21 +304,21 @@ public class SparkLineTileSkin extends TileSkin {
         long   timeSpan = movingAverage.getTimeSpan().getEpochSecond();
         ZoneId zoneId   = getSkinnable().getZoneId();
         StringBuilder timeSpanBuilder = new StringBuilder("\u2190 ");
-        if (timeSpan > 2_592_000) { // 1 Month (30 days)
-            int    months = (int)(timeSpan / 2_592_000);
-            double days   = timeSpan % 2_592_200;
+        if (timeSpan > MONTH) { // 1 Month (30 days)
+            int    months = (int)(timeSpan / MONTH);
+            double days   = timeSpan % MONTH;
             timeSpanBuilder.append(months).append("M").append(String.format(Locale.US, "%.0f", days)).append("d").append(" \u2192");
-        } else if (timeSpan > 86_400) { // 1 Day
-            int    days  = (int)(timeSpan / 86_400);
-            double hours = timeSpan % 86_400;
+        } else if (timeSpan > DAY) { // 1 Day
+            int    days  = (int)(timeSpan / DAY);
+            double hours = timeSpan % DAY;
             timeSpanBuilder.append(days).append("d").append(String.format(Locale.US, "%.0f", hours)).append("h").append(" \u2192");
-        } else if (timeSpan > 3_600) { // 1 Hour
-            int    hours   = (int)(timeSpan / 3600);
-            double minutes = timeSpan % 3_600;
+        } else if (timeSpan > HOUR) { // 1 Hour
+            int    hours   = (int)(timeSpan / HOUR);
+            double minutes = timeSpan % HOUR;
             timeSpanBuilder.append(hours).append("h").append(String.format(Locale.US, "%.0f", minutes)).append("m").append(" \u2192");
-        } else if (timeSpan > 60) { // 1 Minute
-            int    minutes = (int)(timeSpan / 60);
-            double seconds = timeSpan % 60;
+        } else if (timeSpan > MINUTE) { // 1 Minute
+            int    minutes = (int)(timeSpan / MINUTE);
+            double seconds = timeSpan % MINUTE;
             timeSpanBuilder.append(minutes).append("m").append(String.format(Locale.US, "%.0f", seconds)).append("s").append(" \u2192");
         } else {
             int seconds = (int)timeSpan;

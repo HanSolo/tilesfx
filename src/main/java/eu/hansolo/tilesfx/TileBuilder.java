@@ -722,6 +722,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case CUSTOM:
                     break;
+                case INDICATOR:
+                    break;
             }
         } else {
             CONTROL = new Tile();

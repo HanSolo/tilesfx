@@ -85,10 +85,11 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class Tile extends Control {
-    public enum SkinType { //AREA_CHART, LEADER_BOARD,
+    public enum SkinType { //AREA_CHART, LEADER_BOARD
                     BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                     PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                    TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM }
+                    TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM,
+                    INDICATOR }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -3786,6 +3787,7 @@ public class Tile extends Control {
             case WEATHER      : return new WeatherTileSkin(Tile.this);
             case TIME         : return new TimeTileSkin(Tile.this);
             case CUSTOM       : return new CustomTileSkin(Tile.this);
+            case INDICATOR    : return new IndicatorTileSkin(Tile.this);
             default           : return new TileSkin(Tile.this);
         }
     }
@@ -3869,7 +3871,12 @@ public class Tile extends Control {
             case CUSTOM:
                 super.setSkin(new CustomTileSkin(Tile.this));
                 break;
-            default: super.setSkin(new TileSkin(Tile.this)); break;
+            case INDICATOR:
+                super.setSkin(new IndicatorTileSkin(Tile.this));
+                break;
+            default:
+                super.setSkin(new TileSkin(Tile.this));
+                break;
         }
     }
 }

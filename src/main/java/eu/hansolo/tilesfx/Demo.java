@@ -57,6 +57,7 @@ public class Demo extends Application {
     private Tile           clockTile;
     private Tile           gaugeTile;
     private Tile           sparkLineTile;
+    private Tile           areaChartTile;
     private Tile           lineChartTile;
     private Tile           highLowTile;
     private Tile           timerControlTile;
@@ -77,7 +78,7 @@ public class Demo extends Application {
     @Override public void init() {
         // LineChart Data
         XYChart.Series<String, Number> series1 = new XYChart.Series();
-        series1.setName("Inside");
+        series1.setName("Whatever");
         series1.getData().add(new XYChart.Data("MO", 23));
         series1.getData().add(new XYChart.Data("TU", 21));
         series1.getData().add(new XYChart.Data("WE", 20));
@@ -87,7 +88,7 @@ public class Demo extends Application {
         series1.getData().add(new XYChart.Data("SU", 20));
 
         XYChart.Series<String, Number> series2 = new XYChart.Series();
-        series2.setName("Outside");
+        series2.setName("Inside");
         series2.getData().add(new XYChart.Data("MO", 8));
         series2.getData().add(new XYChart.Data("TU", 5));
         series2.getData().add(new XYChart.Data("WE", 0));
@@ -95,6 +96,16 @@ public class Demo extends Application {
         series2.getData().add(new XYChart.Data("FR", 4));
         series2.getData().add(new XYChart.Data("SA", 3));
         series2.getData().add(new XYChart.Data("SU", 5));
+
+        XYChart.Series<String, Number> series3 = new XYChart.Series();
+        series3.setName("Outside");
+        series3.getData().add(new XYChart.Data("MO", 8));
+        series3.getData().add(new XYChart.Data("TU", 5));
+        series3.getData().add(new XYChart.Data("WE", 0));
+        series3.getData().add(new XYChart.Data("TH", 2));
+        series3.getData().add(new XYChart.Data("FR", 4));
+        series3.getData().add(new XYChart.Data("SA", 3));
+        series3.getData().add(new XYChart.Data("SU", 5));
 
         // WorldMap Data
         for (int i = 0 ; i < Country.values().length ; i++) {
@@ -170,10 +181,16 @@ public class Demo extends Application {
                                    .strokeWithGradient(true)
                                    .build();
 
+        areaChartTile = TileBuilder.create()
+                                   .skinType(SkinType.AREA_CHART)
+                                   .title("AreaChart Tile")
+                                   .series(series1)
+                                   .build();
+
         lineChartTile = TileBuilder.create()
                                    .skinType(SkinType.LINE_CHART)
                                    .title("LineChart Tile")
-                                   .series(series1, series2)
+                                   .series(series2, series3)
                                    .build();
 
         highLowTile = TileBuilder.create()
@@ -281,8 +298,9 @@ public class Demo extends Application {
                     //sliderTile.setValue(RND.nextDouble() * sliderTile.getRange() + sliderTile.getMinValue());
                     //plusMinusTile.setValue(RND.nextDouble() * plusMinusTile.getRange() + plusMinusTile.getMinValue());
                     //switchTile.setSelected(RND.nextBoolean());
-                    series1.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
-                    series2.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
+                    series1.getData().forEach(data -> data.setYValue(RND.nextInt(100)));
+                    series2.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
+                    series3.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
                     segment1.setValue(RND.nextDouble() * 80);
                     segment2.setValue(RND.nextDouble() * 80);
                     segment3.setValue(RND.nextDouble() * 80);
@@ -295,7 +313,7 @@ public class Demo extends Application {
 
     @Override public void start(Stage stage) {
         FlowPane pane = new FlowPane(Orientation.HORIZONTAL, 10, 10,
-                                     percentageTile, clockTile, gaugeTile, sparkLineTile,
+                                     percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                      lineChartTile, highLowTile, timerControlTile, numberTile, textTile,
                                      plusMinusTile, sliderTile, switchTile, worldTile, timeTile,
                                      barChartTile, customTile);// , weatherTile);

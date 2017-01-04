@@ -137,6 +137,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             angleStep         = angleRange / range;
             highlightSections = getSkinnable().isHighlightSections();
             redraw();
+            handleCurrentValue(getSkinnable().getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = getSkinnable().getSections();
         }

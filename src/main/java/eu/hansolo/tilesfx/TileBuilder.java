@@ -666,7 +666,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
             SkinType skinType = ((ObjectProperty<SkinType>) properties.get("skinType")).get();
             CONTROL = new Tile(skinType);
             switch(skinType) {
-                //case AREA_CHART: break;
+                case AREA_CHART:
+                    break;
                 case BAR_CHART:
                     break;
                 case LINE_CHART:

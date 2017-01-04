@@ -85,11 +85,10 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class Tile extends Control {
-    public enum SkinType { //AREA_CHART, LEADER_BOARD
-                    BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
-                    PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                    TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM,
-                    INDICATOR }
+    public enum SkinType { AREA_CHART, BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
+                           PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
+                           TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM,
+                           INDICATOR }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -1740,6 +1739,7 @@ public class Tile extends Control {
         if (null == angleRange) {
             _angleRange = tmpAngleRange;
             setAngleStep(tmpAngleRange / getRange());
+            if (isAutoScale()) { calcAutoScale(); }
             fireTileEvent(RECALC_EVENT);
         } else {
             angleRange.set(tmpAngleRange);
@@ -1752,6 +1752,7 @@ public class Tile extends Control {
                     final double ANGLE_RANGE = get();
                     if (ANGLE_RANGE < 0 || ANGLE_RANGE > 360) set(clamp(0.0, 360.0, ANGLE_RANGE));
                     setAngleStep(get() / getRange());
+                    if (isAutoScale()) { calcAutoScale(); }
                     fireTileEvent(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }
@@ -3768,13 +3769,12 @@ public class Tile extends Control {
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch (skinType) {
-            //case AREA_CHART   : return new AreaChartTileSkin(Tile.this);
+            case AREA_CHART   : return new AreaChartTileSkin(Tile.this);
             case BAR_CHART    : return new BarChartTileSkin(Tile.this);
             case LINE_CHART   : return new LineChartTileSkin(Tile.this);
             case CLOCK        : return new ClockTileSkin(Tile.this);
             case GAUGE        : return new GaugeTileSkin(Tile.this);
             case HIGH_LOW     : return new HighLowTileSkin(Tile.this);
-            //case LEADER_BOARD : return new LeaderBoardTileSkin(Tile.this);
             case PERCENTAGE   : return new PercentageTileSkin(Tile.this);
             case PLUS_MINUS   : return new PlusMinusTileSkin(Tile.this);
             case SLIDER       : return new SliderTileSkin(Tile.this);
@@ -3798,7 +3798,9 @@ public class Tile extends Control {
     public void setSkinType(final SkinType SKIN_TYPE) {
         skinType = SKIN_TYPE;
         switch (SKIN_TYPE) {
-            //case AREA_CHART   : super.setSkin(new AreaChartTileSkin(Tile.this)); break;
+            case AREA_CHART:
+                super.setSkin(new AreaChartTileSkin(Tile.this));
+                break;
             case BAR_CHART:
                 super.setSkin(new BarChartTileSkin(Tile.this));
                 break;
@@ -3822,7 +3824,6 @@ public class Tile extends Control {
                 setTickLabelDecimals(1);
                 super.setSkin(new HighLowTileSkin(Tile.this));
                 break;
-            //case LEADER_BOARD : super.setSkin(new LeaderBoardTileSkin(Tile.this)); break;
             case PERCENTAGE:
                 setAnimated(true);
                 setThresholdColor(GRAY);

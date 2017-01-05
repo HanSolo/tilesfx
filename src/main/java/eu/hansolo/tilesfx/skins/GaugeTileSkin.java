@@ -212,8 +212,8 @@ public class GaugeTileSkin extends TileSkin {
     }
 
     private void drawSections() {
-        if (!sectionsVisible || sections.isEmpty()) return;
         sectionPane.getChildren().clear();
+        if (!sectionsVisible || sections.isEmpty()) return;
 
         double     centerX      = size * 0.5;
         double     centerY      = size * 0.7825;
@@ -526,6 +526,7 @@ public class GaugeTileSkin extends TileSkin {
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundColor());
         valueText.setFill(getSkinnable().getValueColor());
 
+        drawSections();
         highlightSections(getSkinnable().getValue());
     };
 }

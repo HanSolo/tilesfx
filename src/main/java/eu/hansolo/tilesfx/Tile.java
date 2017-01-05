@@ -87,8 +87,7 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 public class Tile extends Control {
     public enum SkinType { AREA_CHART, BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                            PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                           TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM,
-                           INDICATOR }
+                           TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -117,6 +116,7 @@ public class Tile extends Control {
     private        final TileEvent   ALERT_EVENT           = new TileEvent(Tile.this, EventType.ALERT);
     private        final TileEvent   VALUE_EVENT           = new TileEvent(Tile.this, EventType.VALUE);
     private        final TileEvent   FINISHED_EVENT        = new TileEvent(Tile.this, EventType.FINISHED);
+    private        final TileEvent   GRAPHIC_EVENT         = new TileEvent(Tile.this, EventType.GRAPHIC);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
@@ -1157,7 +1157,7 @@ public class Tile extends Control {
     public ObjectProperty<Node> graphicProperty() {
         if (null == graphic) {
             graphic = new ObjectPropertyBase<Node>() {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvent(GRAPHIC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "graphic"; }
             };
@@ -3787,7 +3787,6 @@ public class Tile extends Control {
             case WEATHER      : return new WeatherTileSkin(Tile.this);
             case TIME         : return new TimeTileSkin(Tile.this);
             case CUSTOM       : return new CustomTileSkin(Tile.this);
-            case INDICATOR    : return new IndicatorTileSkin(Tile.this);
             default           : return new TileSkin(Tile.this);
         }
     }
@@ -3870,10 +3869,8 @@ public class Tile extends Control {
                 super.setSkin(new TimeTileSkin(Tile.this));
                 break;
             case CUSTOM:
+                setTextVisible(true);
                 super.setSkin(new CustomTileSkin(Tile.this));
-                break;
-            case INDICATOR:
-                super.setSkin(new IndicatorTileSkin(Tile.this));
                 break;
             default:
                 super.setSkin(new TileSkin(Tile.this));

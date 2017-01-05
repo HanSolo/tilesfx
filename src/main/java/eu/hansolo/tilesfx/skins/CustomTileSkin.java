@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -28,6 +29,7 @@ import javafx.scene.text.Text;
  */
 public class CustomTileSkin extends TileSkin {
     private Text      titleText;
+    private Text      text;
     private StackPane graphicContainer;
 
 
@@ -45,11 +47,17 @@ public class CustomTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        graphicContainer = new StackPane();
-        graphicContainer.setPrefSize(PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.795);
-        if (null != getSkinnable().getGraphic()) graphicContainer.getChildren().add(getSkinnable().getGraphic());
+        text = new Text(getSkinnable().getText());
+        text.setFill(getSkinnable().getTextColor());
+        Helper.enableNode(text, getSkinnable().isTextVisible());
 
-        getPane().getChildren().addAll(titleText, graphicContainer);
+        graphicContainer = new StackPane();
+        graphicContainer.setMinSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.72 : size * 0.795);
+        graphicContainer.setMaxSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.72 : size * 0.795);
+        graphicContainer.setPrefSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.72 : size * 0.795);
+        if (null != getSkinnable().getGraphic()) graphicContainer.getChildren().setAll(getSkinnable().getGraphic());
+
+        getPane().getChildren().addAll(titleText, graphicContainer, text);
     }
 
     @Override protected void registerListeners() {
@@ -66,6 +74,11 @@ public class CustomTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(text, getSkinnable().isTextVisible());
+            graphicContainer.setMaxSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.68 : size * 0.795);
+            graphicContainer.setPrefSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.68 : size * 0.795);
+        } else if ("GRAPHIC".equals(EVENT_TYPE)) {
+            if (null != getSkinnable().getGraphic()) graphicContainer.getChildren().setAll(getSkinnable().getGraphic());
         }
     };
 
@@ -78,23 +91,58 @@ public class CustomTileSkin extends TileSkin {
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
+
+        maxWidth = size * 0.9;
+        fontSize = size * 0.05;
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(size * 0.95);
     };
 
     @Override protected void resize() {
         super.resize();
 
-        graphicContainer.setMaxSize(size * 0.9, size * 0.795);
-        graphicContainer.setPrefSize(size * 0.9, size * 0.795);
-        graphicContainer.relocate(size * 0.05, size * 0.15);
+        double containerWidth  = size * 0.9;
+        double containerHeight = getSkinnable().isTextVisible() ? size * 0.72 : size * 0.795;
+
+        if (containerWidth > 0 && containerHeight > 0) {
+            graphicContainer.setMinSize(containerWidth, containerHeight);
+            graphicContainer.setMaxSize(containerWidth, containerHeight);
+            graphicContainer.setPrefSize(containerWidth, containerHeight);
+            graphicContainer.relocate(size * 0.05, size * 0.15);
+
+            if (null != getSkinnable().getGraphic()) {
+                Node   graphic = getSkinnable().getGraphic();
+                double width   = graphic.getBoundsInLocal().getWidth();
+                double height  = graphic.getBoundsInLocal().getHeight();
+                if (width > containerWidth || height > containerHeight) {
+                    double aspect = height / width;
+                    if (aspect * width > height) {
+                        width = 1 / (aspect / height);
+                        graphic.setScaleX(containerWidth / width);
+                        graphic.setScaleY(containerWidth / width);
+                    } else if (1 / (aspect / height) > width) {
+                        height = aspect * width;
+                        graphic.setScaleX(containerHeight / height);
+                        graphic.setScaleY(containerHeight / height);
+                    } else {
+                        graphic.setScaleX(containerHeight / height);
+                        graphic.setScaleY(containerHeight / height);
+                    }
+                }
+            }
+        }
+        resizeStaticText();
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
+        text.setText(getSkinnable().getText());
 
-        resizeDynamicText();
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
+        text.setFill(getSkinnable().getTextColor());
     };
 }

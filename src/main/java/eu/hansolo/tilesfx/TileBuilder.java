@@ -686,7 +686,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setDecimals(2);
                     CONTROL.setTickLabelDecimals(1);
                     break;
-                //case LEADER_BOARD: break;
                 case PERCENTAGE:
                     CONTROL.setAnimated(true);
                     CONTROL.setTickLabelDecimals(0);
@@ -722,8 +721,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case TIME:
                     break;
                 case CUSTOM:
-                    break;
-                case INDICATOR:
+                    CONTROL.setTextVisible(true);
                     break;
             }
         } else {

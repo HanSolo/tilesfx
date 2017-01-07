@@ -215,7 +215,7 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void handleCurrentValue(final double VALUE) {
         low  = Statistics.getMin(dataList);
         high = Statistics.getMax(dataList);
-        if (Double.compare(low, high) == 0) {
+        if (Helper.equals(low, high)) {
             low  = minValue;
             high = maxValue;
         }
@@ -331,7 +331,7 @@ public class SparkLineTileSkin extends TileSkin {
 
         low  = Statistics.getMin(DATA_LIST);
         high = Statistics.getMax(DATA_LIST);
-        if (Double.compare(low, high) == 0) {
+        if (Helper.equals(low, high)) {
             low  = minValue;
             high = maxValue;
         }

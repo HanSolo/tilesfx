@@ -25,7 +25,7 @@ import java.util.EventObject;
 public class TileEvent extends EventObject {
     public enum EventType { RECALC, REDRAW, RESIZE, VISIBILITY, SECTION, ALERT, VALUE,
                             THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN, FINISHED, SERIES,
-                            DATA, GRAPHIC };
+                            DATA, GRAPHIC, UPDATE };
     public final EventType eventType;
 
 

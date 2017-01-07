@@ -117,6 +117,7 @@ public class Tile extends Control {
     private        final TileEvent   VALUE_EVENT           = new TileEvent(Tile.this, EventType.VALUE);
     private        final TileEvent   FINISHED_EVENT        = new TileEvent(Tile.this, EventType.FINISHED);
     private        final TileEvent   GRAPHIC_EVENT         = new TileEvent(Tile.this, EventType.GRAPHIC);
+    private        final TileEvent   UPDATE_EVENT          = new TileEvent(Tile.this, EventType.UPDATE);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();

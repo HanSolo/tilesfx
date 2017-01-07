@@ -370,7 +370,7 @@ public class Tile extends Control {
             @Override public void set(final double VALUE) {
                 super.set(VALUE);
                 fireTileEvent(VALUE_EVENT);
-                // Handle the case where the former value == the current value (should not be needed!!!)
+                // TODO:  Remove if possible: Handle the case where the former value == the current value (should not be needed!!!)
                 if (Helper.equals(VALUE, getFormerValue())) { invalidated(); }
             }
             @Override public Object getBean() { return Tile.this; }

@@ -34,6 +34,8 @@ import java.util.concurrent.ThreadFactory;
  * Created by hansolo on 11.12.15.
  */
 public class Helper {
+    private static final double EPSILON = 1E-6;
+
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;
         if (VALUE.doubleValue() > MAX.doubleValue()) return MAX;
@@ -204,4 +206,8 @@ public class Helper {
                                .replaceAll("\u00c4", "AE");
         return normalized;
     }
+
+    public static final boolean equals(final double A, final double B) { return A == B ? true : Math.abs(A - B) < EPSILON; }
+    public static final boolean biggerThan(final double A, final double B) { return (A - B) > EPSILON; }
+    public static final boolean lessThan(final double A, final double B) { return (B - A) > EPSILON; }
 }

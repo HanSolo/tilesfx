@@ -309,16 +309,16 @@ public class SparkLineTileSkin extends TileSkin {
             double days   = timeSpan % MONTH;
             timeSpanBuilder.append(months).append("M").append(String.format(Locale.US, "%.0f", days)).append("d").append(" \u2192");
         } else if (timeSpan > DAY) { // 1 Day
-            int    days  = (int)(timeSpan / DAY);
-            double hours = timeSpan % DAY;
+            int    days  = (int) (timeSpan / DAY);
+            double hours = (timeSpan - (days * DAY)) / HOUR;
             timeSpanBuilder.append(days).append("d").append(String.format(Locale.US, "%.0f", hours)).append("h").append(" \u2192");
         } else if (timeSpan > HOUR) { // 1 Hour
             int    hours   = (int)(timeSpan / HOUR);
-            double minutes = timeSpan % HOUR;
+            double minutes = (timeSpan - (hours * HOUR)) / MINUTE;
             timeSpanBuilder.append(hours).append("h").append(String.format(Locale.US, "%.0f", minutes)).append("m").append(" \u2192");
         } else if (timeSpan > MINUTE) { // 1 Minute
             int    minutes = (int)(timeSpan / MINUTE);
-            double seconds = timeSpan % MINUTE;
+            double seconds = (timeSpan - (minutes * MINUTE));
             timeSpanBuilder.append(minutes).append("m").append(String.format(Locale.US, "%.0f", seconds)).append("s").append(" \u2192");
         } else {
             int seconds = (int)timeSpan;

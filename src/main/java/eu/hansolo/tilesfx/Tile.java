@@ -370,6 +370,8 @@ public class Tile extends Control {
             @Override public void set(final double VALUE) {
                 super.set(VALUE);
                 fireTileEvent(VALUE_EVENT);
+                // Handle the case where the former value == the current value (should not be needed!!!)
+                if (Helper.equals(VALUE, getFormerValue())) { invalidated(); }
             }
             @Override public Object getBean() { return Tile.this; }
             @Override public String getName() { return "value"; }
@@ -519,7 +521,7 @@ public class Tile extends Control {
         lastCall                            = Instant.now();
         timeline                            = new Timeline();
         timeline.setOnFinished(e -> {
-            if (isReturnToZero() && Double.compare(currentValue.get(), 0.0) != 0.0) {
+            if (isReturnToZero() && !Helper.equals(currentValue.get(), 0.0)) {
                 final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
                 final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis((long) (0.8 * getAnimationDuration())), KEY_VALUE2);
                 timeline.getKeyFrames().setAll(KEY_FRAME2);
@@ -605,9 +607,9 @@ public class Tile extends Control {
             if (VALUE > getMaxValue()) { setMaxValue(VALUE); }
             _minValue = clamp(-Double.MAX_VALUE, getMaxValue(), VALUE);
             setRange(getMaxValue() - _minValue);
-            if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = _minValue;
+            if (Helper.equals(originalMinValue, -Double.MAX_VALUE)) originalMinValue = _minValue;
             if (isStartFromZero() && _minValue < 0) setValue(0);
-            if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(clamp(_minValue, getMaxValue(), originalThreshold)); }
+            if (Helper.equals(originalThreshold, getThreshold())) { setThreshold(clamp(_minValue, getMaxValue(), originalThreshold)); }
             fireTileEvent(RECALC_EVENT);
             if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
         } else {
@@ -621,9 +623,9 @@ public class Tile extends Control {
                     final double VALUE = get();
                     if (VALUE > getMaxValue()) setMaxValue(VALUE);
                     setRange(getMaxValue() - VALUE);
-                    if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = VALUE;
+                    if (Helper.equals(originalMinValue, -Double.MAX_VALUE)) originalMinValue = VALUE;
                     if (isStartFromZero() && _minValue < 0) Tile.this.setValue(0);
-                    if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(clamp(VALUE, getMaxValue(), originalThreshold)); }
+                    if (Helper.lessThan(originalThreshold, getThreshold())) { setThreshold(clamp(VALUE, getMaxValue(), originalThreshold)); }
                     fireTileEvent(RECALC_EVENT);
                     if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
                 }
@@ -652,8 +654,8 @@ public class Tile extends Control {
             if (VALUE < getMinValue()) { setMinValue(VALUE); }
             _maxValue = clamp(getMinValue(), Double.MAX_VALUE, VALUE);
             setRange(_maxValue - getMinValue());
-            if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = _maxValue;
-            if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(clamp(getMinValue(), _maxValue, originalThreshold)); }
+            if (Helper.equals(originalMaxValue, Double.MAX_VALUE)) originalMaxValue = _maxValue;
+            if (Helper.biggerThan(originalThreshold, getThreshold())) { setThreshold(clamp(getMinValue(), _maxValue, originalThreshold)); }
             fireTileEvent(RECALC_EVENT);
             if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
         } else {
@@ -667,8 +669,8 @@ public class Tile extends Control {
                     final double VALUE = get();
                     if (VALUE < getMinValue()) setMinValue(VALUE);
                     setRange(VALUE - getMinValue());
-                    if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = VALUE;
-                    if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(clamp(getMinValue(), VALUE, originalThreshold)); }
+                    if (Helper.equals(originalMaxValue, Double.MAX_VALUE)) originalMaxValue = VALUE;
+                    if (Helper.biggerThan(originalThreshold, getThreshold())) { setThreshold(clamp(getMinValue(), VALUE, originalThreshold)); }
                     fireTileEvent(RECALC_EVENT);
                     if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
                 }
@@ -1248,7 +1250,7 @@ public class Tile extends Control {
         if (null == returnToZero) {
             returnToZero = new BooleanPropertyBase(_returnToZero) {
                 @Override protected void invalidated() {
-                    if (Double.compare(getMaxValue(), 0.0) > 0) set(false);
+                    if (Helper.biggerThan(getMaxValue(), 0.0)) set(false);
                     fireTileEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
@@ -1816,8 +1818,8 @@ public class Tile extends Control {
                 originalMaxValue = getMaxValue();
                 calcAutoScale();
             } else {
-                setMinValue(Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ? getMinValue() : originalMinValue);
-                setMaxValue(Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ? getMaxValue() : originalMaxValue);
+                setMinValue(Helper.equals(-Double.MAX_VALUE, originalMinValue) ? getMinValue() : originalMinValue);
+                setMaxValue(Helper.equals(Double.MAX_VALUE, originalMaxValue) ? getMaxValue() : originalMaxValue);
             }
             fireTileEvent(RECALC_EVENT);
         } else {

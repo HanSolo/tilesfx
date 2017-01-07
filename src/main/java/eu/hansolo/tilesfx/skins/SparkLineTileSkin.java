@@ -268,16 +268,11 @@ public class SparkLineTileSkin extends TileSkin {
         averageText.setText(String.format(locale, formatString, average));
 
         highText.setText(String.format(locale, formatString, high));
+        lowText.setText(String.format(locale, formatString, low));
 
-        if (getSkinnable().getSubTitle().isEmpty()) {
-            if (null == movingAverage.getTimeSpan()) {
-                lowText.setText(String.format(locale, formatString, low));
-            } else {
-                timeSpanText.setText(createTimeSpanText());
-                subTitleText.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(getSkinnable().getZoneId())));
-            }
-        } else {
-            lowText.setText(String.format(locale, formatString, low));
+        if (getSkinnable().getSubTitle().isEmpty() && null != movingAverage.getTimeSpan()) {
+            timeSpanText.setText(createTimeSpanText());
+            subTitleText.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(getSkinnable().getZoneId())));
         }
         resizeDynamicText();
     }

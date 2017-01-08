@@ -308,7 +308,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-
     public final B titleColor(final Color COLOR) {
         properties.put("titleColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -585,6 +584,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B strokeWithGradient(final boolean STROKE_WITH_GRADIENT) {
         properties.put("strokeWithGradient", new SimpleBooleanProperty(STROKE_WITH_GRADIENT));
+        return (B)this;
+    }
+
+    public final B roundedCorners(final boolean ROUNDED) {
+        properties.put("roundedCorners", new SimpleBooleanProperty(ROUNDED));
         return (B)this;
     }
 
@@ -992,6 +996,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
             } else if ("graphic".equals(key)) {
                 CONTROL.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
+            } else if ("roundedCorners".equals(key)) {
+                CONTROL.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

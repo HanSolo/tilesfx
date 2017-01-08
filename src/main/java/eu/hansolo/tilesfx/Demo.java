@@ -285,6 +285,7 @@ public class Demo extends Application {
                                 .skinType(SkinType.CUSTOM)
                                 .title("Custom Tile")
                                 .graphic(new Button("Click Me"))
+                                .roundedCorners(false)
                                 .build();
 
         lastTimerCall = System.nanoTime();

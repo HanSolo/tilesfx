@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
@@ -172,6 +173,8 @@ public class Tile extends Control {
 
     // UI related
     private              SkinType                      skinType;
+    private              boolean                       _roundedCorners;
+    private              BooleanProperty               roundedCorners;
     private              boolean                       _startFromZero;
     private              BooleanProperty               startFromZero;
     private              boolean                       _returnToZero;
@@ -444,6 +447,7 @@ public class Tile extends Control {
         barChartData                        = FXCollections.observableArrayList();
         gradientStops                       = new ArrayList<>(4);
 
+        _roundedCorners                     = true;
         _startFromZero                      = false;
         _returnToZero                       = false;
         _minMeasuredValue                   = _maxValue;
@@ -1181,7 +1185,37 @@ public class Tile extends Control {
         if (null == subTitleColor) { _subTitleColor = COLOR; } else { subTitleColor.set(COLOR); }
         if (null == unitColor) { _unitColor = COLOR; } else { unitColor.set(COLOR); }
         if (null == valueColor) { _valueColor = COLOR; } else { valueColor.set(COLOR); }
+        if (null == textColor) { _textColor = COLOR; } else { textColor.set(COLOR); }
+        if (null == foregroundColor) { _foregroundColor = COLOR; } else { foregroundColor.set(COLOR); }
         fireTileEvent(REDRAW_EVENT);
+    }
+
+    /**
+     * Returns true if the corners of the Tiles are rounded
+     * @return true if the corners of the Tiles are rounded
+     */
+    public boolean getRoundedCorners() { return null == roundedCorners ? _roundedCorners : roundedCorners.get(); }
+    /**
+     * Switches the corners of the Tiles between rounded and rectangular
+     * @param ROUNDED
+     */
+    public void setRoundedCorners(final boolean ROUNDED) {
+        if (null == roundedCorners) {
+            _roundedCorners = ROUNDED;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            roundedCorners.set(ROUNDED);
+        }
+    }
+    public BooleanProperty roundedCornersProperty() {
+        if (null == roundedCorners) {
+            roundedCorners = new BooleanPropertyBase(_roundedCorners) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "roundedCorners"; }
+            };
+        }
+        return roundedCorners;
     }
 
     /**

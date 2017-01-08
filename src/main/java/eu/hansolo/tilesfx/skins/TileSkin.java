@@ -166,8 +166,8 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     };
 
     protected void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderColor(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundColor(), new CornerRadii(size * 0.025), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderColor(), BorderStrokeStyle.SOLID, getSkinnable().getRoundedCorners() ? new CornerRadii(size * 0.025) : CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundColor(), getSkinnable().getRoundedCorners() ? new CornerRadii(size * 0.025) : CornerRadii.EMPTY, Insets.EMPTY)));
 
         locale          = getSkinnable().getLocale();
         formatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();

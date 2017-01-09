@@ -22,18 +22,16 @@ import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 
 /**
  * Created by hansolo on 20.12.16.
  */
 public class NumberTileSkin extends TileSkin {
-    private Text     titleText;
-    private Text     numberText;
-    private Text     unitText;
-    private TextFlow valueText;
-    private Label    text;
+    private Text  titleText;
+    private Text  valueText;
+    private Text  unitText;
+    private Label label;
 
 
     // ******************** Constructors **************************************
@@ -50,24 +48,21 @@ public class NumberTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        numberText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
-        numberText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(numberText, getSkinnable().isValueVisible());
+        valueText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
+        valueText.setFill(getSkinnable().getValueColor());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         unitText = new Text(" " + getSkinnable().getUnit());
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
-        valueText = new TextFlow(numberText, unitText);
-        valueText.setPrefWidth(PREFERRED_WIDTH * 0.9);
+        label = new Label(getSkinnable().getText());
+        label.setAlignment(Pos.TOP_RIGHT);
+        label.setWrapText(true);
+        label.setTextFill(getSkinnable().getTextColor());
+        Helper.enableNode(label, getSkinnable().isTextVisible());
 
-        text = new Label(getSkinnable().getText());
-        text.setAlignment(Pos.TOP_LEFT);
-        text.setWrapText(true);
-        text.setTextFill(getSkinnable().getTextColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
-
-        getPane().getChildren().addAll(titleText, valueText, text);
+        getPane().getChildren().addAll(titleText, valueText, unitText, label);
     }
 
     @Override protected void registerListeners() {
@@ -88,7 +83,7 @@ public class NumberTileSkin extends TileSkin {
     };
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        numberText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         resizeDynamicText();
     };
 
@@ -97,45 +92,51 @@ public class NumberTileSkin extends TileSkin {
     @Override protected void resizeDynamicText() {
         double maxWidth = size * 0.9;
         double fontSize = size * 0.24;
-        numberText.setFont(Fonts.latoRegular(fontSize));
+        valueText.setFont(Fonts.latoRegular(fontSize));
+        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
+        if (unitText.isVisible()) {
+            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
+        } else {
+            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
+        }
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
+        maxWidth = size * 0.15;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
+        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.29);
 
         fontSize = size * 0.1;
-        text.setFont(Fonts.latoRegular(fontSize));
+        label.setFont(Fonts.latoRegular(fontSize));
     };
 
     @Override protected void resize() {
         super.resize();
 
-        valueText.setPrefWidth(size * 0.9);
-        valueText.relocate(size * 0.05, size * 0.15);
-
-        text.setPrefSize(size * 0.9, size * 43);
-        text.relocate(size * 0.05, size * 0.42);
+        label.setPrefSize(size * 0.9, size * 43);
+        label.relocate(size * 0.05, size * 0.42);
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
         unitText.setText(" " + getSkinnable().getUnit());
-        text.setText(getSkinnable().getText());
+        label.setText(getSkinnable().getText());
 
         resizeDynamicText();
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
-        numberText.setFill(getSkinnable().getValueColor());
+        valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());
-        text.setTextFill(getSkinnable().getTextColor());
+        label.setTextFill(getSkinnable().getTextColor());
     };
 }

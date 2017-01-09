@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
+import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
@@ -592,6 +593,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B textSize(final TextSize SIZE) {
+        properties.put("textSize", new SimpleObjectProperty(SIZE));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -998,6 +1004,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
             } else if ("roundedCorners".equals(key)) {
                 CONTROL.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
+            } else if ("textSize".equals(key)) {
+                CONTROL.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
             }
         }
         return CONTROL;

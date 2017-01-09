@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.TimeSection;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -328,7 +329,7 @@ public class TimerControlTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         title.setFont(Fonts.latoRegular(fontSize));
         title.setText(getSkinnable().getTitle());
@@ -337,7 +338,8 @@ public class TimerControlTileSkin extends TileSkin {
         title.setY(size * 0.05);
 
         maxWidth = size * 0.2;
-        fontSize = size * 0.05;
+        fontSize = size * textSize.factor;
+        amPmText.setFont(Fonts.latoRegular(fontSize));
         amPmText.setText(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, maxWidth, fontSize);
         amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
@@ -350,8 +352,9 @@ public class TimerControlTileSkin extends TileSkin {
         dateText.setY(size * 0.65);
 
         maxWidth = size * 0.9;
-        fontSize = size * 0.05;
+        fontSize = size * textSize.factor;
         text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
         text.setY(size * 0.95);
@@ -359,7 +362,7 @@ public class TimerControlTileSkin extends TileSkin {
 
     @Override protected void resize() {
         super.resize();
-        clockSize     = size * CLOCK_SCALE_FACTOR;
+        clockSize     = size * CLOCK_SCALE_FACTOR * (TextSize.NORMAL == textSize ? 1.0 : 0.95);
         double center = size * 0.5;
 
         sectionsPane.setMinSize(clockSize, clockSize);

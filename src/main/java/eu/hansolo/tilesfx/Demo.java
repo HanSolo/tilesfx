@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
+import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
@@ -138,7 +139,7 @@ public class Demo extends Application {
         timeSection.setOnTimeSectionLeft(e -> System.out.println("Section INACTIVE"));
 
         // Weather (You can get a DarkSky API key here: https://darksky.net/dev/ )
-        DarkSky darkSky = new DarkSky("YOUR_DARK_SKY_API_KEY", Unit.CA, Language.ENGLISH, 51.911858, 7.632815);
+        DarkSky darkSky = new DarkSky("YOUR DARKSKY API KEY", Unit.CA, Language.ENGLISH, 51.911858, 7.632815);
         //darkSky.update();
 
         // BarChart Data
@@ -169,12 +170,14 @@ public class Demo extends Application {
         gaugeTile = TileBuilder.create()
                                .skinType(SkinType.GAUGE)
                                .title("Gauge Tile")
+                               .unit("V")
                                .threshold(75)
                                .build();
 
         sparkLineTile = TileBuilder.create()
                                    .skinType(SkinType.SPARK_LINE)
                                    .title("SparkLine Tile")
+                                   .unit("mb")
                                    .gradientStops(new Stop(0, Tile.GREEN),
                                                   new Stop(0.5, Tile.YELLOW),
                                                   new Stop(1.0, Tile.RED))
@@ -205,7 +208,7 @@ public class Demo extends Application {
                                       .skinType(SkinType.TIMER_CONTROL)
                                       .title("TimerControl Tile")
                                       .subTitle("test")
-                                      .text("TEST")
+                                      .text("Whatever text")
                                       .secondsVisible(true)
                                       .textVisible(true)
                                       .dateVisible(true)
@@ -217,6 +220,7 @@ public class Demo extends Application {
                                 .skinType(SkinType.NUMBER)
                                 .title("Number Tile")
                                 .value(13)
+                                .unit("mb")
                                 .text("Things")
                                 .textVisible(true)
                                 .build();
@@ -263,6 +267,7 @@ public class Demo extends Application {
         weatherTile = TileBuilder.create()
                                  .skinType(SkinType.WEATHER)
                                  .title("YOUR CITY NAME")
+                                 .text("Whatever text")
                                  .darkSky(darkSky)
                                  .build();
 
@@ -284,6 +289,7 @@ public class Demo extends Application {
         customTile = TileBuilder.create()
                                 .skinType(SkinType.CUSTOM)
                                 .title("Custom Tile")
+                                .text("Whatever text")
                                 .graphic(new Button("Click Me"))
                                 .roundedCorners(false)
                                 .build();
@@ -317,7 +323,7 @@ public class Demo extends Application {
                                      percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                      lineChartTile, highLowTile, timerControlTile, numberTile, textTile,
                                      plusMinusTile, sliderTile, switchTile, worldTile, timeTile,
-                                     barChartTile, customTile);// , weatherTile);
+                                     barChartTile, customTile);//, weatherTile);
 
         pane.setColumnHalignment(HPos.CENTER);
         pane.setRowValignment(VPos.CENTER);

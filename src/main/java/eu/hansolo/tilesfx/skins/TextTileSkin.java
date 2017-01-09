@@ -48,7 +48,7 @@ public class TextTileSkin extends TileSkin {
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         text = new Label(getSkinnable().getText());
-        text.setAlignment(Pos.TOP_LEFT);
+        text.setAlignment(Pos.TOP_RIGHT);
         text.setWrapText(true);
         text.setTextOverrun(OverrunStyle.WORD_ELLIPSIS);
         text.setTextFill(getSkinnable().getTextColor());
@@ -76,12 +76,12 @@ public class TextTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double fontSize = size * 0.10;
+        double fontSize = size * 0.1;
         text.setFont(Fonts.latoRegular(fontSize));
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }

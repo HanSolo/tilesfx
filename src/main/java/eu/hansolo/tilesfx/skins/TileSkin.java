@@ -18,6 +18,7 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
@@ -61,6 +62,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              Locale        locale;
     protected              List<Section> sections;
     protected              boolean       sectionsVisible;
+    protected              TextSize      textSize;
 
 
     // ******************** Constructors **************************************
@@ -78,6 +80,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         sections          = TILE.getSections();
         sectionsVisible   = TILE.getSectionsVisible();
         highlightSections = getSkinnable().isHighlightSections();
+        textSize          = getSkinnable().getTextSize();
 
         initGraphics();
         registerListeners();
@@ -172,5 +175,6 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         locale          = getSkinnable().getLocale();
         formatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         sectionsVisible = getSkinnable().getSectionsVisible();
+        textSize        = getSkinnable().getTextSize();
     };
 }

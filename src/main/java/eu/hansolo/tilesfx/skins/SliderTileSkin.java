@@ -121,21 +121,25 @@ public class SliderTileSkin extends TileSkin {
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
+        if (unitText.isVisible()) {
+            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
+        } else {
+            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
+        }
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.9;
-        fontSize = size * 0.1;
+        maxWidth = size * 0.15;
+        fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.42);
+        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
     };
 
     @Override protected void resize() {

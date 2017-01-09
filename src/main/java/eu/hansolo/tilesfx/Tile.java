@@ -16,7 +16,6 @@
 
 package eu.hansolo.tilesfx;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
@@ -89,6 +88,16 @@ public class Tile extends Control {
     public enum SkinType { AREA_CHART, BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                            PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
                            TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM }
+    public enum TextSize {
+        NORMAL(0.06),
+        BIGGER(0.08);
+
+        public final double factor;
+
+        TextSize(final double FACTOR) {
+            factor = FACTOR;
+        }
+    }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -173,6 +182,8 @@ public class Tile extends Control {
 
     // UI related
     private              SkinType                      skinType;
+    private              TextSize                      _textSize;
+    private              ObjectProperty<TextSize>      textSize;
     private              boolean                       _roundedCorners;
     private              BooleanProperty               roundedCorners;
     private              boolean                       _startFromZero;
@@ -447,6 +458,7 @@ public class Tile extends Control {
         barChartData                        = FXCollections.observableArrayList();
         gradientStops                       = new ArrayList<>(4);
 
+        _textSize                           = TextSize.NORMAL;
         _roundedCorners                     = true;
         _startFromZero                      = false;
         _returnToZero                       = false;
@@ -1188,6 +1200,38 @@ public class Tile extends Control {
         if (null == textColor) { _textColor = COLOR; } else { textColor.set(COLOR); }
         if (null == foregroundColor) { _foregroundColor = COLOR; } else { foregroundColor.set(COLOR); }
         fireTileEvent(REDRAW_EVENT);
+    }
+
+    /**
+     * Returns the text size that will be used for the title,
+     * subtitle and text in the different skins.
+     * The factor in the text size will be used to calculate the
+     * height of the font.
+     * @return the text size that will be used for the title, subtitle and text
+     */
+    public TextSize getTextSize() { return null == textSize ? _textSize : textSize.get(); }
+    /**
+     * Defines the text size that will be used for the title,
+     * subtitle and text in the different skins.
+     * @param SIZE
+     */
+    public void setTextSize(final TextSize SIZE) {
+        if (null == textSize) {
+            _textSize = SIZE;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            textSize.set(SIZE);
+        }
+    }
+    public ObjectProperty<TextSize> textSizeProperty() {
+        if (null == textSize) {
+            textSize = new ObjectPropertyBase<TextSize>(_textSize) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT);}
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "textSize"; }
+            };
+        }
+        return textSize;
     }
 
     /**

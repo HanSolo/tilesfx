@@ -421,7 +421,7 @@ public class SparkLineTileSkin extends TileSkin {
         }
 
         maxWidth = size * 0.3;
-        fontSize = size * 0.05;
+        fontSize = size * 0.06;
         averageText.setFont(Fonts.latoRegular(fontSize));
         if (averageText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(averageText, maxWidth, fontSize); }
         if (averageLine.getStartY() < graphBounds.getY() + graphBounds.getHeight() * 0.5) {
@@ -439,29 +439,30 @@ public class SparkLineTileSkin extends TileSkin {
         lowText.setY(size * 0.9);
 
         maxWidth = size * 0.75;
-        fontSize = size * 0.05;
+        fontSize = size * 0.06;
         subTitleText.setFont(Fonts.latoRegular(fontSize));
         if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
         subTitleText.relocate(size * 0.95 - subTitleText.getLayoutBounds().getWidth(), size * 0.9);
 
         maxWidth = size * 0.75;
-        fontSize = size * 0.05;
+        fontSize = size * 0.06;
         timeSpanText.setFont(Fonts.latoRegular(fontSize));
         if (timeSpanText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(timeSpanText, maxWidth, fontSize); }
         timeSpanText.relocate((size - timeSpanText.getLayoutBounds().getWidth()) * 0.5, size * 0.9);
     }
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
         maxWidth = size * 0.15;
+        fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.3275);
+        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.28);
 
         averageText.setX(size * 0.05);
         highText.setX(size * 0.05);

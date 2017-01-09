@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 import java.time.LocalTime;
@@ -67,10 +68,11 @@ public class TimeTileSkin extends TileSkin {
         rightUnit.setFill(getSkinnable().getValueColor());
 
         timeText = new TextFlow(leftText, leftUnit, rightText, rightUnit);
+        timeText.setTextAlignment(TextAlignment.RIGHT);
         timeText.setPrefWidth(PREFERRED_WIDTH * 0.9);
 
         text = new Label(getSkinnable().getText());
-        text.setAlignment(Pos.TOP_LEFT);
+        text.setAlignment(Pos.TOP_RIGHT);
         text.setWrapText(true);
         text.setTextFill(getSkinnable().getTextColor());
         Helper.enableNode(text, getSkinnable().isTextVisible());
@@ -104,7 +106,7 @@ public class TimeTileSkin extends TileSkin {
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }

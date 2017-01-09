@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Country;
 import eu.hansolo.tilesfx.CountryPath;
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.scene.CacheHint;
@@ -116,15 +117,16 @@ public class WorldMapTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
         maxWidth = size * 0.9;
-        fontSize = size * 0.05;
+        fontSize = size * textSize.factor;
         text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
         text.setY(size * 0.95);
@@ -156,11 +158,11 @@ public class WorldMapTileSkin extends TileSkin {
             worldPane.setCache(true);
             worldPane.setCacheHint(CacheHint.SCALE);
 
-            worldPane.setScaleX(worldMapWidth / 1009);
-            worldPane.setScaleY(worldMapHeight / 665);
+            worldPane.setScaleX(worldMapWidth / 1009 * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
+            worldPane.setScaleY(worldMapHeight / 665 * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
 
             group.resize(worldMapWidth, worldMapHeight);
-            group.relocate((width - worldMapWidth) * 0.5, (height - worldMapHeight) * 0.5);
+            group.relocate((width - worldMapWidth) * 0.5, (height - worldMapHeight) * (TextSize.NORMAL == textSize ? 0.5 : 0.7));
 
             worldPane.setCache(false);
         }

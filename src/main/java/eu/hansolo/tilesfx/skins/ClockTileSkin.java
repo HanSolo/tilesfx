@@ -106,7 +106,7 @@ public class ClockTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         title.setFont(Fonts.latoRegular(fontSize));
         title.setText(getSkinnable().getTitle());

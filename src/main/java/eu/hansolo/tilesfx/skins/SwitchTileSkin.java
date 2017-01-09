@@ -122,15 +122,16 @@ public class SwitchTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
         maxWidth = size * 0.9;
-        fontSize = size * 0.05;
+        fontSize = size * textSize.factor;
         text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
         text.setY(size * 0.95);

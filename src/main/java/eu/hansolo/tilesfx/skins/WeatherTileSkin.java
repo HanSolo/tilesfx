@@ -107,35 +107,31 @@ public class WeatherTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
-
-        maxWidth = size * 0.15;
-        unitText.setFont(Fonts.latoRegular(fontSize));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.36);
 
         maxWidth = unitText.isVisible() ? size * 0.725 : size * 0.9;
         fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         if (unitText.isVisible()) {
-            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.1825);
+            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
         } else {
-            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.1825);
+            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
         }
 
         maxWidth = size * 0.9;
-        fontSize = size * 0.05;
+        fontSize = size * textSize.factor;
         summaryText.setFont(Fonts.latoRegular(fontSize));
         if (summaryText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(summaryText, maxWidth, fontSize); }
-        summaryText.relocate((size - summaryText.getLayoutBounds().getWidth()) * 0.5, size * 0.9);
+        summaryText.setX((size - summaryText.getLayoutBounds().getWidth()) * 0.5);
+        summaryText.setY(size * 0.95);
 
         maxWidth = size * 0.295;
-        fontSize = size * 0.05;
+        fontSize = size * 0.06;
 
         sunriseText.setFont(Fonts.latoRegular(fontSize));
         if (sunriseText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(sunriseText, maxWidth, fontSize); }
@@ -147,17 +143,17 @@ public class WeatherTileSkin extends TileSkin {
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.9;
-        fontSize = size * 0.1;
+        maxWidth = size * 0.15;
+        fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.42);
+        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
     };
 
     @Override protected void resize() {

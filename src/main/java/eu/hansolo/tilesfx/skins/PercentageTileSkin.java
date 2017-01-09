@@ -159,7 +159,7 @@ public class PercentageTileSkin extends TileSkin {
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
@@ -211,8 +211,8 @@ public class PercentageTileSkin extends TileSkin {
         barClip.setY(size * 0.95);
         barClip.setWidth(size);
         barClip.setHeight(size * 0.05);
-        barClip.setArcWidth(size * 0.025);
-        barClip.setArcHeight(size * 0.025);
+        barClip.setArcWidth(getSkinnable().getRoundedCorners() ? size * 0.025 : 0.0);
+        barClip.setArcHeight(getSkinnable().getRoundedCorners() ? size * 0.025 : 0.0);
 
         bar.setX(0);
         bar.setY(size * 0.965);
@@ -236,7 +236,7 @@ public class PercentageTileSkin extends TileSkin {
 
         resizeStaticText();
 
-        barBackground.setBackground(new Background(new BackgroundFill(getSkinnable().getBarBackgroundColor().brighter().brighter(), new CornerRadii(0.0, 0.0, size * 0.025, size * 0.025, false), Insets.EMPTY)));
+        barBackground.setBackground(new Background(new BackgroundFill(getSkinnable().getBarBackgroundColor().brighter().brighter(), new CornerRadii(0.0, 0.0, getSkinnable().getRoundedCorners() ? size * 0.025 : 0.0, getSkinnable().getRoundedCorners() ? size * 0.025 : 0.0, false), Insets.EMPTY)));
         barColor = getSkinnable().getBarColor();
 
         if (sectionsVisible && !sections.isEmpty()) {

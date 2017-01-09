@@ -383,12 +383,12 @@ public class GaugeTileSkin extends TileSkin {
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
         maxWidth = size * 0.15;
-        fontSize = size * 0.06;
+        fontSize = size * 0.1;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         if (unitText.isVisible()) {
             valueText.relocate((size - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.15);
-            unitText.relocate(valueText.getLayoutX() + valueText.getLayoutBounds().getWidth() + size * 0.025, size * 0.3275);
+            unitText.relocate(valueText.getLayoutX() + valueText.getLayoutBounds().getWidth() + size * 0.025, size * 0.29);
         } else {
             valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, size * 0.15);
         }
@@ -405,7 +405,7 @@ public class GaugeTileSkin extends TileSkin {
     }
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * 0.06;
+        double fontSize = size * textSize.factor;
         double textRadius;
         double sinValue;
         double cosValue;

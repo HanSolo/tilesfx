@@ -23,6 +23,8 @@ import eu.hansolo.tilesfx.weather.DarkSky.Language;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -74,9 +76,12 @@ public class Demo extends Application {
     private Tile           customTile;
     private long           lastTimerCall;
     private AnimationTimer timer;
+    private DoubleProperty value;
 
 
     @Override public void init() {
+        value = new SimpleDoubleProperty(0);
+
         // LineChart Data
         XYChart.Series<String, Number> series1 = new XYChart.Series();
         series1.setName("Whatever");
@@ -183,6 +188,7 @@ public class Demo extends Application {
                                                   new Stop(1.0, Tile.RED))
                                    .strokeWithGradient(true)
                                    .build();
+        //sparkLineTile.valueProperty().bind(value);
 
         areaChartTile = TileBuilder.create()
                                    .skinType(SkinType.AREA_CHART)
@@ -300,7 +306,11 @@ public class Demo extends Application {
                 if (now > lastTimerCall + 5_000_000_000l) {
                     percentageTile.setValue(RND.nextDouble() * percentageTile.getRange() * 1.5 + percentageTile.getMinValue());
                     gaugeTile.setValue(RND.nextDouble() * gaugeTile.getRange() * 1.5 + gaugeTile.getMinValue());
-                    sparkLineTile.setValue(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
+
+                    //sparkLineTile.setValue(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
+                    //value.set(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
+                    sparkLineTile.setValue(20);
+
                     highLowTile.setValue(RND.nextDouble() * 10);
                     //sliderTile.setValue(RND.nextDouble() * sliderTile.getRange() + sliderTile.getMinValue());
                     //plusMinusTile.setValue(RND.nextDouble() * plusMinusTile.getRange() + plusMinusTile.getMinValue());

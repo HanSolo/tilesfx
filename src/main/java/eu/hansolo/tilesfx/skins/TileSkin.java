@@ -23,6 +23,8 @@ import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -31,6 +33,7 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.Locale;
@@ -63,6 +66,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              List<Section> sections;
     protected              boolean       sectionsVisible;
     protected              TextSize      textSize;
+    protected              DropShadow    shadow;
 
 
     // ******************** Constructors **************************************
@@ -98,6 +102,8 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
                 getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
+
+        shadow = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 3, 0, 0, 0);
 
         pane = new Pane();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderColor(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(getSkinnable().getBorderWidth()))));
@@ -158,6 +164,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         height   = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
         size     = width < height ? width : height;
         stepSize = size / range;
+        shadow.setRadius(size * 0.012);
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(size, size);

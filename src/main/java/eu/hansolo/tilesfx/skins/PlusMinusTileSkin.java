@@ -65,10 +65,12 @@ public class PlusMinusTileSkin extends TileSkin {
         plusButton = new Path();
         plusButton.setPickOnBounds(true);
         drawPlusButton();
+        plusButton.setEffect(shadow);
 
         minusButton = new Path();
         minusButton.setPickOnBounds(true);
         drawMinusButton();
+        minusButton.setEffect(shadow);
 
         getPane().getChildren().addAll(titleText, valueText, unitText, minusButton, plusButton);
     }

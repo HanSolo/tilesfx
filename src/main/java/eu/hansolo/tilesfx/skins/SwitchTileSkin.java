@@ -74,6 +74,7 @@ public class SwitchTileSkin extends TileSkin {
 
         thumb = new Circle();
         thumb.setMouseTransparent(true);
+        thumb.setEffect(shadow);
 
         getPane().getChildren().addAll(titleText, text, switchBorder, switchBackground, thumb);
     }

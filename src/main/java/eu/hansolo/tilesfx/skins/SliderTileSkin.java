@@ -72,6 +72,7 @@ public class SliderTileSkin extends TileSkin {
         bar = new Rectangle(0, PREFERRED_HEIGHT * 0.0275);
 
         thumb = new Circle(PREFERRED_WIDTH * 0.09);
+        thumb.setEffect(shadow);
 
         getPane().getChildren().addAll(titleText, valueText, unitText, barBackground, bar, thumb);
     }

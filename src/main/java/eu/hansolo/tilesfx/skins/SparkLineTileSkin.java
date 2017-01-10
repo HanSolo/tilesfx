@@ -65,7 +65,7 @@ public class SparkLineTileSkin extends TileSkin {
     private Text              averageText;
     private Text              highText;
     private Text              lowText;
-    private Text              subTitleText;
+    private Text              text;
     private Text              timeSpanText;
     private Rectangle         graphBounds;
     private List<PathElement> pathElements;
@@ -135,14 +135,14 @@ public class SparkLineTileSkin extends TileSkin {
         lowText.setTextOrigin(VPos.TOP);
         lowText.setFill(getSkinnable().getValueColor());
 
-        subTitleText = new Text(getSkinnable().getSubTitle());
-        subTitleText.setTextOrigin(VPos.TOP);
-        subTitleText.setFill(getSkinnable().getSubTitleColor());
+        text = new Text(getSkinnable().getText());
+        text.setTextOrigin(VPos.TOP);
+        text.setFill(getSkinnable().getTextColor());
 
         timeSpanText = new Text("");
         timeSpanText.setTextOrigin(VPos.TOP);
-        timeSpanText.setFill(getSkinnable().getSubTitleColor());
-        Helper.enableNode(timeSpanText, getSkinnable().getSubTitle().isEmpty());
+        timeSpanText.setFill(getSkinnable().getTextColor());
+        Helper.enableNode(timeSpanText, !getSkinnable().isTextVisible());
 
         stdDeviationArea = new Rectangle();
         Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
@@ -167,7 +167,7 @@ public class SparkLineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(getSkinnable().getBarColor());
 
-        getPane().getChildren().addAll(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, subTitleText);
+        getPane().getChildren().addAll(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
     }
 
     @Override protected void registerListeners() {
@@ -182,9 +182,10 @@ public class SparkLineTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(text, getSkinnable().isTextVisible());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(timeSpanText, getSkinnable().getSubTitle().isEmpty());
+            Helper.enableNode(timeSpanText, !getSkinnable().isTextVisible());
             Helper.enableNode(averageLine, getSkinnable().isAverageVisible());
             Helper.enableNode(averageText, getSkinnable().isAverageVisible());
             Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
@@ -270,9 +271,9 @@ public class SparkLineTileSkin extends TileSkin {
         highText.setText(String.format(locale, formatString, high));
         lowText.setText(String.format(locale, formatString, low));
 
-        if (getSkinnable().getSubTitle().isEmpty() && null != movingAverage.getTimeSpan()) {
+        if (!getSkinnable().isTextVisible() && null != movingAverage.getTimeSpan()) {
             timeSpanText.setText(createTimeSpanText());
-            subTitleText.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(getSkinnable().getZoneId())));
+            text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(getSkinnable().getZoneId())));
         }
         resizeDynamicText();
     }
@@ -410,7 +411,7 @@ public class SparkLineTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = unitText.isManaged() ? size * 0.725 : size * 0.9;
+        double maxWidth = unitText.isVisible() ? size * 0.725 : size * 0.9;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
@@ -440,9 +441,9 @@ public class SparkLineTileSkin extends TileSkin {
 
         maxWidth = size * 0.75;
         fontSize = size * 0.06;
-        subTitleText.setFont(Fonts.latoRegular(fontSize));
-        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
-        subTitleText.relocate(size * 0.95 - subTitleText.getLayoutBounds().getWidth(), size * 0.9);
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.relocate(size * 0.95 - text.getLayoutBounds().getWidth(), size * 0.9);
 
         maxWidth = size * 0.75;
         fontSize = size * 0.06;
@@ -462,7 +463,7 @@ public class SparkLineTileSkin extends TileSkin {
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.28);
+        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
 
         averageText.setX(size * 0.05);
         highText.setX(size * 0.05);
@@ -491,15 +492,16 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
-        if (!getSkinnable().getSubTitle().isEmpty()) { subTitleText.setText(getSkinnable().getSubTitle()); }
+        text.setText(getSkinnable().getText());
+        if (!getSkinnable().getDescription().isEmpty()) { text.setText(getSkinnable().getDescription()); }
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
         highText.setFill(getSkinnable().getValueColor());
         lowText.setFill(getSkinnable().getValueColor());
-        subTitleText.setFill(getSkinnable().getSubTitleColor());
-        timeSpanText.setFill(getSkinnable().getSubTitleColor());
+        text.setFill(getSkinnable().getTextColor());
+        timeSpanText.setFill(getSkinnable().getTextColor());
         sparkLine.setStroke(getSkinnable().isStrokeWithGradient() ? gradient : getSkinnable().getBarColor());
         stdDeviationArea.setFill(Helper.getTranslucentColorFrom(Tile.FOREGROUND, 0.1));
         dot.setFill(getSkinnable().isStrokeWithGradient() ? gradient : getSkinnable().getBarColor());

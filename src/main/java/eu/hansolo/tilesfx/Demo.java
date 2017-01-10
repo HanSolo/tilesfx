@@ -158,15 +158,14 @@ public class Demo extends Application {
                                     .skinType(SkinType.PERCENTAGE)
                                     .title("Percentage Tile")
                                     .unit("\u0025")
+                                    .description("Test")
                                     .maxValue(60)
                                     .build();
 
         clockTile = TileBuilder.create()
                                .skinType(SkinType.CLOCK)
                                .title("Clock Tile")
-                               .subTitle("test")
-                               .text("TEST")
-                               .textVisible(true)
+                               .text("Whatever text")
                                .dateVisible(true)
                                .locale(Locale.US)
                                .running(true)
@@ -206,6 +205,8 @@ public class Demo extends Application {
                                  .skinType(SkinType.HIGH_LOW)
                                  .title("HighLow Tile")
                                  .unit("\u0025")
+                                 .description("Test")
+                                 .text("Whatever text")
                                  .referenceValue(6.7)
                                  .value(8.2)
                                  .build();
@@ -213,10 +214,8 @@ public class Demo extends Application {
         timerControlTile = TileBuilder.create()
                                       .skinType(SkinType.TIMER_CONTROL)
                                       .title("TimerControl Tile")
-                                      .subTitle("test")
                                       .text("Whatever text")
                                       .secondsVisible(true)
-                                      .textVisible(true)
                                       .dateVisible(true)
                                       .timeSections(timeSection)
                                       .running(true)
@@ -225,16 +224,18 @@ public class Demo extends Application {
         numberTile = TileBuilder.create()
                                 .skinType(SkinType.NUMBER)
                                 .title("Number Tile")
+                                .text("Whatever text")
                                 .value(13)
                                 .unit("mb")
-                                .text("Things")
+                                .description("Test")
                                 .textVisible(true)
                                 .build();
 
         textTile = TileBuilder.create()
                               .skinType(SkinType.TEXT)
                               .title("Text Tile")
-                              .text("May the force be with you\n...always")
+                              .text("Whatever text")
+                              .description("May the force be with you\n...always")
                               .textVisible(true)
                               .build();
 
@@ -243,12 +244,16 @@ public class Demo extends Application {
                                    .maxValue(30)
                                    .minValue(0)
                                    .title("PlusMinus Tile")
+                                   .text("Whatever text")
+                                   .description("Test")
                                    .unit("\u00B0C")
                                    .build();
 
         sliderTile = TileBuilder.create()
                                 .skinType(SkinType.SLIDER)
                                 .title("Slider Tile")
+                                .text("Whatever text")
+                                .description("Test")
                                 .unit("\u00B0C")
                                 .barBackgroundColor(Tile.FOREGROUND)
                                 .build();
@@ -257,6 +262,7 @@ public class Demo extends Application {
                                 .skinType(SkinType.SWITCH)
                                 .title("Switch Tile")
                                 .text("Whatever text")
+                                //.description("Test")
                                 .build();
 
         switchTile.setOnSwitchPressed(e -> System.out.println("Switch pressed"));
@@ -280,14 +286,16 @@ public class Demo extends Application {
         timeTile = TileBuilder.create()
                               .skinType(SkinType.TIME)
                               .title("Time Tile")
+                              .text("Whatever text")
                               .duration(LocalTime.of(1, 22))
-                              .text("Average reply time")
+                              .description("Average reply time")
                               .textVisible(true)
                               .build();
 
         barChartTile = TileBuilder.create()
                                   .skinType(SkinType.BAR_CHART)
                                   .title("BarChart Tile")
+                                  .text("Whatever text")
                                   .barChartData(segment1, segment2, segment3, segment4)
                                   .decimals(0)
                                   .build();

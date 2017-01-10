@@ -19,6 +19,8 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.LineTo;
@@ -33,11 +35,13 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class PlusMinusTileSkin extends TileSkin {
-    private Text titleText;
-    private Text valueText;
-    private Text unitText;
-    private Path plusButton;
-    private Path minusButton;
+    private Text  titleText;
+    private Text  text;
+    private Text  valueText;
+    private Text  unitText;
+    private Label description;
+    private Path  plusButton;
+    private Path  minusButton;
 
 
     // ******************** Constructors **************************************
@@ -54,6 +58,10 @@ public class PlusMinusTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
+        text = new Text(getSkinnable().getText());
+        text.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(text, getSkinnable().isTextVisible());
+
         valueText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
         valueText.setFill(getSkinnable().getValueColor());
         Helper.enableNode(valueText, getSkinnable().isValueVisible());
@@ -61,6 +69,12 @@ public class PlusMinusTileSkin extends TileSkin {
         unitText = new Text(getSkinnable().getUnit());
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+
+        description = new Label(getSkinnable().getDescription());
+        description.setAlignment(Pos.TOP_RIGHT);
+        description.setWrapText(true);
+        description.setTextFill(getSkinnable().getTextColor());
+        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
 
         plusButton = new Path();
         plusButton.setPickOnBounds(true);
@@ -72,7 +86,7 @@ public class PlusMinusTileSkin extends TileSkin {
         drawMinusButton();
         minusButton.setEffect(shadow);
 
-        getPane().getChildren().addAll(titleText, valueText, unitText, minusButton, plusButton);
+        getPane().getChildren().addAll(titleText, text, valueText, unitText, description, minusButton, plusButton);
     }
 
     @Override protected void registerListeners() {
@@ -90,8 +104,10 @@ public class PlusMinusTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(text, getSkinnable().isTextVisible());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
         }
     };
 
@@ -199,7 +215,7 @@ public class PlusMinusTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = unitText.isVisible() ? size * 0.725 : size * 0.9;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
@@ -217,31 +233,47 @@ public class PlusMinusTileSkin extends TileSkin {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
+        maxWidth = size * 0.9;
+        fontSize = size * textSize.factor;
+        text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(size * 0.95);
+
         maxWidth = size * 0.15;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
+
+        fontSize = size * 0.1;
+        description.setFont(Fonts.latoRegular(fontSize));
     };
 
     @Override protected void resize() {
         super.resize();
 
+        description.setPrefSize(size * 0.9, size * 43);
+        description.relocate(size * 0.05, size * 0.42);
+
         minusButton.resize(size * 0.18, size * 0.18);
-        minusButton.relocate(size * 0.05, size * 0.95 - minusButton.getLayoutBounds().getHeight());
+        minusButton.relocate(size * 0.05, size * 0.85 - minusButton.getLayoutBounds().getHeight());
 
         plusButton.resize(size * 0.18, size * 0.18);
-        plusButton.relocate(size * 0.95 - plusButton.getLayoutBounds().getWidth(), size * 0.95 - plusButton.getLayoutBounds().getHeight());
+        plusButton.relocate(size * 0.95 - plusButton.getLayoutBounds().getWidth(), size * 0.85 - plusButton.getLayoutBounds().getHeight());
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
+        text.setText(getSkinnable().getText());
         unitText.setText(getSkinnable().getUnit());
 
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
+        text.setFill(getSkinnable().getTextColor());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());
         plusButton.setFill(getSkinnable().getForegroundColor());

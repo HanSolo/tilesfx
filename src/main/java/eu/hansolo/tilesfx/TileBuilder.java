@@ -114,8 +114,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B subTitle(final String SUBTITLE) {
-        properties.put("subTitle", new SimpleStringProperty(SUBTITLE));
+    public final B description(final String SUBTITLE) {
+        properties.put("description", new SimpleStringProperty(SUBTITLE));
         return (B)this;
     }
 
@@ -314,8 +314,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B subTitleColor(final Color COLOR) {
-        properties.put("subTitleColor", new SimpleObjectProperty<>(COLOR));
+    public final B descriptionColor(final Color COLOR) {
+        properties.put("descriptionColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
@@ -706,12 +706,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case SLIDER:
                     break;
                 case SPARK_LINE:
+                    CONTROL.setTextVisible(false);
                     CONTROL.setAnimated(false);
                     CONTROL.setAveragingEnabled(true);
                     CONTROL.setAveragingPeriod(10);
                     break;
                 case SWITCH:
-                    CONTROL.setTextVisible(true);
                     break;
                 case WORLDMAP:
                     CONTROL.setPrefSize(380, 250);
@@ -724,14 +724,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case NUMBER:
                     break;
                 case TEXT:
-                    CONTROL.setTextVisible(true);
                     break;
                 case WEATHER:
                     break;
                 case TIME:
                     break;
                 case CUSTOM:
-                    CONTROL.setTextVisible(true);
                     break;
             }
         } else {
@@ -842,8 +840,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
             } else if("title".equals(key)) {
                 CONTROL.setTitle(((StringProperty) properties.get(key)).get());
-            } else if("subTitle".equals(key)) {
-                CONTROL.setSubTitle(((StringProperty) properties.get(key)).get());
+            } else if("description".equals(key)) {
+                CONTROL.setDescription(((StringProperty) properties.get(key)).get());
             } else if("unit".equals(key)) {
                 CONTROL.setUnit(((StringProperty) properties.get(key)).get());
             } else if ("selected".equals(key)) {
@@ -914,8 +912,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setHighlightSections(((BooleanProperty) properties.get(key)).get());
             } else if ("titleColor".equals(key)) {
                 CONTROL.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("subTitleColor".equals(key)) {
-                CONTROL.setSubTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("descriptionColor".equals(key)) {
+                CONTROL.setDescriptionColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("unitColor".equals(key)) {
                 CONTROL.setUnitColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("valueColor".equals(key)) {

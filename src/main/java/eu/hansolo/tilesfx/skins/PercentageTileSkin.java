@@ -21,6 +21,8 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -42,6 +44,7 @@ public class PercentageTileSkin extends TileSkin {
     private Text      titleText;
     private Text      valueText;
     private Text      unitText;
+    private Label     description;
     private Text      percentageText;
     private Text      percentageUnitText;
     private Rectangle maxValueRect;
@@ -84,6 +87,12 @@ public class PercentageTileSkin extends TileSkin {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
+        description = new Label(getSkinnable().getDescription());
+        description.setAlignment(Pos.TOP_RIGHT);
+        description.setWrapText(true);
+        description.setTextFill(getSkinnable().getTextColor());
+        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+
         percentageText = new Text();
         percentageText.setFill(getSkinnable().getBarColor());
 
@@ -99,7 +108,7 @@ public class PercentageTileSkin extends TileSkin {
         maxValueUnitText = new Text(getSkinnable().getUnit());
         maxValueUnitText.setFill(getSkinnable().getBackgroundColor());
 
-        getPane().getChildren().addAll(barBackground, bar, titleText, valueText, unitText, percentageText, percentageUnitText, maxValueRect, maxValueText, maxValueUnitText);
+        getPane().getChildren().addAll(barBackground, bar, titleText, valueText, unitText, description, percentageText, percentageUnitText, maxValueRect, maxValueText, maxValueUnitText);
     }
 
     @Override protected void registerListeners() {
@@ -116,6 +125,7 @@ public class PercentageTileSkin extends TileSkin {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
         }
     };
 
@@ -200,10 +210,17 @@ public class PercentageTileSkin extends TileSkin {
             maxValueText.setX((size * 0.925) - maxValueText.getLayoutBounds().getWidth());
         }
         maxValueText.setY(size * 0.855);
+
+        fontSize = size * 0.1;
+        description.setFont(Fonts.latoRegular(fontSize));
     };
 
     @Override protected void resize() {
         super.resize();
+
+        description.setPrefSize(size * 0.9, size * 43);
+        description.relocate(size * 0.05, size * 0.42);
+
         barBackground.setPrefSize(size, size * 0.035);
         barBackground.relocate(0, size * 0.965);
 
@@ -230,6 +247,8 @@ public class PercentageTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
+        unitText.setText(getSkinnable().getUnit());
+        description.setText(getSkinnable().getDescription());
         percentageText.setText(String.format(locale, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getValue() / range * 100));
         maxValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
         maxValueUnitText.setText(getSkinnable().getUnit());
@@ -246,6 +265,8 @@ public class PercentageTileSkin extends TileSkin {
         }
 
         titleText.setFill(getSkinnable().getTitleColor());
+        unitText.setFill(getSkinnable().getUnitColor());
+        description.setTextFill(getSkinnable().getDescriptionColor());
         maxValueText.setFill(getSkinnable().getBackgroundColor());
         maxValueUnitText.setFill(getSkinnable().getBackgroundColor());
         valueText.setFill(getSkinnable().getValueColor());

@@ -26,6 +26,8 @@ import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -38,12 +40,13 @@ import javafx.util.Duration;
 public class SwitchTileSkin extends TileSkin {
     private static final SwitchEvent SWITCH_PRESSED  = new SwitchEvent(SwitchEvent.SWITCH_PRESSED);
     private static final SwitchEvent SWITCH_RELEASED = new SwitchEvent(SwitchEvent.SWITCH_RELEASED);
-    private              Text        titleText;
-    private              Text        text;
-    private              Rectangle   switchBorder;
-    private              Rectangle   switchBackground;
-    private              Circle      thumb;
-    private              Timeline    timeline;
+    private Text      titleText;
+    private Text      text;
+    private Label     description;
+    private Rectangle switchBorder;
+    private Rectangle switchBackground;
+    private Circle    thumb;
+    private Timeline  timeline;
 
 
     // ******************** Constructors **************************************
@@ -62,9 +65,15 @@ public class SwitchTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getUnit());
+        text = new Text(getSkinnable().getText());
         text.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(text, getSkinnable().isTextVisible());
+
+        description = new Label(getSkinnable().getDescription());
+        description.setAlignment(Pos.TOP_RIGHT);
+        description.setWrapText(true);
+        description.setTextFill(getSkinnable().getTextColor());
+        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
 
         switchBorder = new Rectangle();
 
@@ -76,7 +85,7 @@ public class SwitchTileSkin extends TileSkin {
         thumb.setMouseTransparent(true);
         thumb.setEffect(shadow);
 
-        getPane().getChildren().addAll(titleText, text, switchBorder, switchBackground, thumb);
+        getPane().getChildren().addAll(titleText, text, description, switchBorder, switchBackground, thumb);
     }
 
     @Override protected void registerListeners() {
@@ -97,6 +106,7 @@ public class SwitchTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(text, getSkinnable().isTextVisible());
+            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
         }
     };
 
@@ -136,37 +146,45 @@ public class SwitchTileSkin extends TileSkin {
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
         text.setY(size * 0.95);
+
+        fontSize = size * 0.1;
+        description.setFont(Fonts.latoRegular(fontSize));
     };
 
     @Override protected void resize() {
         super.resize();
 
+        description.setPrefSize(size * 0.9, size * 43);
+        description.relocate(size * 0.05, size * 0.42);
+
         switchBorder.setWidth(size * 0.445);
         switchBorder.setHeight(size * 0.22);
         switchBorder.setArcWidth(size * 0.22);
         switchBorder.setArcHeight(size * 0.22);
-        switchBorder.relocate((size - switchBorder.getWidth()) * 0.5, (size - switchBorder.getHeight()) * 0.5);
+        switchBorder.relocate((size - switchBorder.getWidth()) * 0.5, getSkinnable().getDescription().isEmpty() ? (size - switchBorder.getHeight()) * 0.5 : size * 0.65);
 
         switchBackground.setWidth(size * 0.425);
         switchBackground.setHeight(size * 0.2);
         switchBackground.setArcWidth(size * 0.2);
         switchBackground.setArcHeight(size * 0.2);
-        switchBackground.relocate((size - switchBackground.getWidth()) * 0.5, (size - switchBackground.getHeight()) * 0.5);
+        switchBackground.relocate((size - switchBackground.getWidth()) * 0.5, getSkinnable().getDescription().isEmpty() ? (size - switchBackground.getHeight()) * 0.5 : size * 0.66);
 
         thumb.setRadius(size * 0.09);
         thumb.setCenterX(getSkinnable().isSelected() ? size * 0.6125 : size * 0.3875);
-        thumb.setCenterY(size * 0.5);
+        thumb.setCenterY(getSkinnable().getDescription().isEmpty() ? size * 0.5 : size * 0.76);
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
         text.setText(getSkinnable().getText());
+        description.setText(getSkinnable().getDescription());
 
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
         text.setFill(getSkinnable().getTextColor());
+        description.setTextFill(getSkinnable().getDescriptionColor());
         switchBorder.setFill(getSkinnable().getForegroundColor());
         thumb.setFill(getSkinnable().getForegroundColor());
     };

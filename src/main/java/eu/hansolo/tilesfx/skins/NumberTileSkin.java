@@ -29,9 +29,10 @@ import javafx.scene.text.Text;
  */
 public class NumberTileSkin extends TileSkin {
     private Text  titleText;
+    private Text  text;
     private Text  valueText;
     private Text  unitText;
-    private Label label;
+    private Label description;
 
 
     // ******************** Constructors **************************************
@@ -48,6 +49,10 @@ public class NumberTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
+        text = new Text(getSkinnable().getText());
+        text.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(text, getSkinnable().isTextVisible());
+
         valueText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
         valueText.setFill(getSkinnable().getValueColor());
         Helper.enableNode(valueText, getSkinnable().isValueVisible());
@@ -56,13 +61,13 @@ public class NumberTileSkin extends TileSkin {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
-        label = new Label(getSkinnable().getText());
-        label.setAlignment(Pos.TOP_RIGHT);
-        label.setWrapText(true);
-        label.setTextFill(getSkinnable().getTextColor());
-        Helper.enableNode(label, getSkinnable().isTextVisible());
+        description = new Label(getSkinnable().getText());
+        description.setAlignment(Pos.TOP_RIGHT);
+        description.setWrapText(true);
+        description.setTextFill(getSkinnable().getTextColor());
+        Helper.enableNode(description, getSkinnable().isTextVisible());
 
-        getPane().getChildren().addAll(titleText, valueText, unitText, label);
+        getPane().getChildren().addAll(titleText, text, valueText, unitText, description);
     }
 
     @Override protected void registerListeners() {
@@ -77,6 +82,7 @@ public class NumberTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(text, getSkinnable().isTextVisible());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
         }
@@ -90,7 +96,7 @@ public class NumberTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = unitText.isVisible() ? size * 0.725 : size * 0.9;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
@@ -108,6 +114,14 @@ public class NumberTileSkin extends TileSkin {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
+        maxWidth = size * 0.9;
+        fontSize = size * textSize.factor;
+        text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(size * 0.95);
+
         maxWidth = size * 0.15;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
@@ -115,28 +129,30 @@ public class NumberTileSkin extends TileSkin {
         unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.29);
 
         fontSize = size * 0.1;
-        label.setFont(Fonts.latoRegular(fontSize));
+        description.setFont(Fonts.latoRegular(fontSize));
     };
 
     @Override protected void resize() {
         super.resize();
 
-        label.setPrefSize(size * 0.9, size * 43);
-        label.relocate(size * 0.05, size * 0.42);
+        description.setPrefSize(size * 0.9, size * 43);
+        description.relocate(size * 0.05, size * 0.42);
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
+        text.setText(getSkinnable().getText());
         unitText.setText(" " + getSkinnable().getUnit());
-        label.setText(getSkinnable().getText());
+        description.setText(getSkinnable().getDescription());
 
         resizeDynamicText();
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
+        text.setFill(getSkinnable().getTextColor());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());
-        label.setTextFill(getSkinnable().getTextColor());
+        description.setTextFill(getSkinnable().getDescriptionColor());
     };
 }

@@ -33,12 +33,13 @@ import java.time.LocalTime;
  */
 public class TimeTileSkin extends TileSkin {
     private Text     titleText;
+    private Text     text;
     private Text     leftText;
     private Text     leftUnit;
     private Text     rightText;
     private Text     rightUnit;
     private TextFlow timeText;
-    private Label    text;
+    private Label    description;
 
 
     // ******************** Constructors **************************************
@@ -54,6 +55,10 @@ public class TimeTileSkin extends TileSkin {
         titleText = new Text();
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+
+        text = new Text(getSkinnable().getText());
+        text.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(text, getSkinnable().isTextVisible());
 
         LocalTime duration = getSkinnable().getDuration();
 
@@ -71,13 +76,13 @@ public class TimeTileSkin extends TileSkin {
         timeText.setTextAlignment(TextAlignment.RIGHT);
         timeText.setPrefWidth(PREFERRED_WIDTH * 0.9);
 
-        text = new Label(getSkinnable().getText());
-        text.setAlignment(Pos.TOP_RIGHT);
-        text.setWrapText(true);
-        text.setTextFill(getSkinnable().getTextColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        description = new Label(getSkinnable().getDescription());
+        description.setAlignment(Pos.TOP_RIGHT);
+        description.setWrapText(true);
+        description.setTextFill(getSkinnable().getTextColor());
+        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
 
-        getPane().getChildren().addAll(titleText, timeText, text);
+        getPane().getChildren().addAll(titleText, text, timeText, description);
     }
 
     @Override protected void registerListeners() {
@@ -92,8 +97,9 @@ public class TimeTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(timeText, getSkinnable().isValueVisible());
             Helper.enableNode(text, getSkinnable().isTextVisible());
+            Helper.enableNode(timeText, getSkinnable().isValueVisible());
+            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
         }
     };
 
@@ -112,12 +118,20 @@ public class TimeTileSkin extends TileSkin {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
+        maxWidth = size * 0.9;
+        fontSize = size * textSize.factor;
+        text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(size * 0.95);
+
         fontSize = size * 0.12;
         leftUnit.setFont(Fonts.latoRegular(fontSize));
         rightUnit.setFont(Fonts.latoRegular(fontSize));
 
         fontSize = size * 0.1;
-        text.setFont(Fonts.latoRegular(fontSize));
+        description.setFont(Fonts.latoRegular(fontSize));
     };
 
     @Override protected void resize() {
@@ -126,30 +140,31 @@ public class TimeTileSkin extends TileSkin {
         timeText.setPrefWidth(size * 0.9);
         timeText.relocate(size * 0.05, size * 0.15);
 
-        text.setPrefSize(size * 0.9, size * 43);
-        text.relocate(size * 0.05, size * 0.42);
+        description.setPrefSize(size * 0.9, size * 43);
+        description.relocate(size * 0.05, size * 0.42);
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
-
+        text.setText(getSkinnable().getText());
         LocalTime duration = getSkinnable().getDuration();
         leftText.setText(Integer.toString(duration.getHour() > 0 ? duration.getHour() : duration.getMinute()));
         leftUnit.setText(duration.getHour() > 0 ? " h  " : " m  ");
         rightText.setText(Integer.toString(duration.getHour() > 0 ? duration.getMinute() : duration.getSecond()));
         rightUnit.setText(duration.getHour() > 0 ? " m" : " s");
 
-        text.setText(getSkinnable().getText());
+        description.setText(getSkinnable().getDescription());
 
         resizeDynamicText();
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
+        text.setFill(getSkinnable().getTextColor());
         leftText.setFill(getSkinnable().getValueColor());
         leftUnit.setFill(getSkinnable().getValueColor());
         rightText.setFill(getSkinnable().getValueColor());
         rightUnit.setFill(getSkinnable().getValueColor());
-        text.setTextFill(getSkinnable().getTextColor());
+        description.setTextFill(getSkinnable().getDescriptionColor());
     };
 }

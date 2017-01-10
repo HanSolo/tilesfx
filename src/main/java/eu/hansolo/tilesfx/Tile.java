@@ -152,8 +152,8 @@ public class Tile extends Control {
     private              DoubleProperty                         referenceValue;
     private              String                                 _title;
     private              StringProperty                         title;
-    private              String                                 _subTitle;
-    private              StringProperty                         subTitle;
+    private              String                                 _description;
+    private              StringProperty                         description;
     private              String                                 _unit;
     private              StringProperty                         unit;
     private              boolean                                _selected;
@@ -235,24 +235,24 @@ public class Tile extends Control {
     private              IntegerProperty               decimals;
     private              int                           _tickLabelDecimals;
     private              IntegerProperty               tickLabelDecimals;
-    private              Color                         _needleColor;
-    private              ObjectProperty<Color>         needleColor;
-    private              Color                         _barColor;
-    private              ObjectProperty<Color>         barColor;
-    private              Color                         _barBackgroundColor;
-    private              ObjectProperty<Color>         barBackgroundColor;
-    private              Color                         _titleColor;
-    private              ObjectProperty<Color>         titleColor;
-    private              Color                         _subTitleColor;
-    private              ObjectProperty<Color>         subTitleColor;
-    private              Color                         _unitColor;
-    private              ObjectProperty<Color>         unitColor;
-    private              Color                         _valueColor;
-    private              ObjectProperty<Color>         valueColor;
-    private              Color                         _thresholdColor;
-    private              ObjectProperty<Color>         thresholdColor;
-    private              boolean                       _checkSectionsForValue;
-    private              BooleanProperty               checkSectionsForValue;
+    private              Color                 _needleColor;
+    private              ObjectProperty<Color> needleColor;
+    private              Color                 _barColor;
+    private              ObjectProperty<Color> barColor;
+    private              Color                 _barBackgroundColor;
+    private              ObjectProperty<Color> barBackgroundColor;
+    private              Color                 _titleColor;
+    private              ObjectProperty<Color> titleColor;
+    private              Color                 _descriptionColor;
+    private              ObjectProperty<Color> descriptionColor;
+    private              Color                 _unitColor;
+    private              ObjectProperty<Color> unitColor;
+    private              Color                 _valueColor;
+    private              ObjectProperty<Color> valueColor;
+    private              Color                 _thresholdColor;
+    private              ObjectProperty<Color> thresholdColor;
+    private              boolean               _checkSectionsForValue;
+    private              BooleanProperty       checkSectionsForValue;
     private              boolean                       _checkThreshold;
     private              BooleanProperty               checkThreshold;
     private              boolean                       _innerShadowEnabled;
@@ -444,7 +444,7 @@ public class Tile extends Control {
         };
         zoneId                              = time.get().getZone();
         _title                              = "";
-        _subTitle                           = "";
+        _description                        = "";
         _unit                               = "";
         _selected                           = false;
         _text                               = "";
@@ -494,7 +494,7 @@ public class Tile extends Control {
         _barColor                           = BLUE;
         _barBackgroundColor                 = BACKGROUND;
         _titleColor                         = FOREGROUND;
-        _subTitleColor                      = FOREGROUND;
+        _descriptionColor                   = FOREGROUND;
         _unitColor                          = FOREGROUND;
         _valueColor                         = FOREGROUND;
         _textColor                          = FOREGROUND;
@@ -524,7 +524,7 @@ public class Tile extends Control {
         _discreteSeconds                    = true;
         _discreteMinutes                    = true;
         _discreteHours                      = false;
-        _textVisible                        = false;
+        _textVisible                        = true;
         _dateVisible                        = false;
         _running                            = false;
         _hourTickMarksVisible               = true;
@@ -836,36 +836,36 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the subtitle of the gauge. This subtitle will usually
+     * Returns the description text of the gauge. This description text will usually
      * only be visible if it is not empty.
      *
-     * @return the subtitle of the gauge
+     * @return the description text of the gauge
      */
-    public String getSubTitle() { return null == subTitle ? _subTitle : subTitle.get(); }
+    public String getDescription() { return null == description ? _description : description.get(); }
     /**
-     * Sets the subtitle of the gauge. This subtitle will usually
+     * Sets the description text of the gauge. This description text will usually
      * only be visible if it is not empty.
      *
-     * @param SUBTITLE
+     * @param DESCRIPTION
      */
-    public void setSubTitle(final String SUBTITLE) {
-        if (null == subTitle) {
-            _subTitle = SUBTITLE;
+    public void setDescription(final String DESCRIPTION) {
+        if (null == description) {
+            _description = DESCRIPTION;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            subTitle.set(SUBTITLE);
+            description.set(DESCRIPTION);
         }
     }
-    public StringProperty subTitleProperty() {
-        if (null == subTitle) {
-            subTitle  = new StringPropertyBase(_subTitle) {
+    public StringProperty descriptionProperty() {
+        if (null == description) {
+            description = new StringPropertyBase(_description) {
                 @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
-                @Override public String getName() { return "subTitle"; }
+                @Override public String getName() { return "description"; }
             };
-            _subTitle = null;
+            _description = null;
         }
-        return subTitle;
+        return description;
     }
 
     /**
@@ -1189,14 +1189,14 @@ public class Tile extends Control {
 
     /**
      * A convenient method to set the color of foreground elements like
-     * title, subTitle, unit, value, tickLabel and tickMark to the given
+     * title, description, unit, value, tickLabel and tickMark to the given
      * Color.
      *
      * @param COLOR
      */
     public void setForegroundBaseColor(final Color COLOR) {
         if (null == titleColor) { _titleColor = COLOR; } else { titleColor.set(COLOR); }
-        if (null == subTitleColor) { _subTitleColor = COLOR; } else { subTitleColor.set(COLOR); }
+        if (null == descriptionColor) { _descriptionColor = COLOR; } else { descriptionColor.set(COLOR); }
         if (null == unitColor) { _unitColor = COLOR; } else { unitColor.set(COLOR); }
         if (null == valueColor) { _valueColor = COLOR; } else { valueColor.set(COLOR); }
         if (null == textColor) { _textColor = COLOR; } else { textColor.set(COLOR); }
@@ -2228,36 +2228,36 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the color that will be used to colorize the subTitle
+     * Returns the color that will be used to colorize the description text
      * of the gauge.
      *
-     * @return the color that will be used to colorize the subTitle
+     * @return the color that will be used to colorize the description
      */
-    public Color getSubTitleColor() { return null == subTitleColor ? _subTitleColor : subTitleColor.get(); }
+    public Color getDescriptionColor() { return null == descriptionColor ? _descriptionColor : descriptionColor.get(); }
     /**
-     * Defines the color that will be used to colorize the subTitle
+     * Defines the color that will be used to colorize the description text
      * of the gauge.
      *
      * @param COLOR
      */
-    public void setSubTitleColor(final Color COLOR) {
-        if (null == subTitleColor) {
-            _subTitleColor = COLOR;
+    public void setDescriptionColor(final Color COLOR) {
+        if (null == descriptionColor) {
+            _descriptionColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            subTitleColor.set(COLOR);
+            descriptionColor.set(COLOR);
         }
     }
-    public ObjectProperty<Color> subTitleColorProperty() {
-        if (null == subTitleColor) {
-            subTitleColor  = new ObjectPropertyBase<Color>(_subTitleColor) {
+    public ObjectProperty<Color> descriptionColorProperty() {
+        if (null == descriptionColor) {
+            descriptionColor = new ObjectPropertyBase<Color>(_descriptionColor) {
                 @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
-                @Override public String getName() { return "subTitleColor"; }
+                @Override public String getName() { return "descriptionColor"; }
             };
-            _subTitleColor = null;
+            _descriptionColor = null;
         }
-        return subTitleColor;
+        return descriptionColor;
     }
 
     /**
@@ -3919,13 +3919,13 @@ public class Tile extends Control {
                 super.setSkin(new SliderTileSkin(Tile.this));
                 break;
             case SPARK_LINE:
+                setTextVisible(false);
                 setAnimated(false);
                 setAveragingEnabled(true);
                 setAveragingPeriod(10);
                 super.setSkin(new SparkLineTileSkin(Tile.this));
                 break;
             case SWITCH:
-                setTextVisible(true);
                 super.setSkin(new SwitchTileSkin(Tile.this));
                 break;
             case WORLDMAP:

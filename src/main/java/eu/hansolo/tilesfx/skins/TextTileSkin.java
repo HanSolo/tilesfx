@@ -23,6 +23,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 
 /**
@@ -30,7 +31,8 @@ import javafx.scene.text.Text;
  */
 public class TextTileSkin extends TileSkin {
     private Text  titleText;
-    private Label text;
+    private Text  text;
+    private Label description;
 
 
     // ******************** Constructors **************************************
@@ -47,15 +49,20 @@ public class TextTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        text = new Label(getSkinnable().getText());
-        text.setAlignment(Pos.TOP_RIGHT);
-        text.setWrapText(true);
-        text.setTextOverrun(OverrunStyle.WORD_ELLIPSIS);
-        text.setTextFill(getSkinnable().getTextColor());
-        text.setPrefSize(PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.795);
+        description = new Label(getSkinnable().getDescription());
+        description.setAlignment(Pos.TOP_RIGHT);
+        description.setTextAlignment(TextAlignment.RIGHT);
+        description.setWrapText(true);
+        description.setTextOverrun(OverrunStyle.WORD_ELLIPSIS);
+        description.setTextFill(getSkinnable().getTextColor());
+        description.setPrefSize(PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.795);
+        Helper.enableNode(description, getSkinnable().isTextVisible());
+
+        text = new Text(getSkinnable().getText());
+        text.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(text, getSkinnable().isTextVisible());
 
-        getPane().getChildren().addAll(titleText, text);
+        getPane().getChildren().addAll(titleText, text, description);
     }
 
     @Override protected void registerListeners() {
@@ -70,6 +77,7 @@ public class TextTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(text, getSkinnable().isTextVisible());
+            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
         }
     };
 
@@ -77,7 +85,7 @@ public class TextTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
         double fontSize = size * 0.1;
-        text.setFont(Fonts.latoRegular(fontSize));
+        description.setFont(Fonts.latoRegular(fontSize));
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
@@ -86,24 +94,34 @@ public class TextTileSkin extends TileSkin {
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
+
+        maxWidth = size * 0.9;
+        fontSize = size * textSize.factor;
+        text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(size * 0.95);
     };
 
     @Override protected void resize() {
         super.resize();
 
-        text.setPrefSize(size * 0.9, size * 0.795);
-        text.relocate(size * 0.05, size * 0.15);
+        description.setPrefSize(size * 0.9, size * 0.795);
+        description.relocate(size * 0.05, size * 0.15);
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
         text.setText(getSkinnable().getText());
+        description.setText(getSkinnable().getDescription());
 
         resizeDynamicText();
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
-        text.setTextFill(getSkinnable().getTextColor());
+        text.setFill(getSkinnable().getTextColor());
+        description.setTextFill(getSkinnable().getTextColor());
     };
 }

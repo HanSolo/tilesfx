@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
  */
 public class BarChartTileSkin extends TileSkin {
     private Text                        titleText;
+    private Text                        text;
     private Pane                        barChartPane;
     private EventHandler<BarChartEvent> updateHandler;
 
@@ -72,7 +73,11 @@ public class BarChartTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        getPane().getChildren().addAll(titleText, barChartPane);
+        text = new Text(getSkinnable().getText());
+        text.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(text, getSkinnable().isTextVisible());
+
+        getPane().getChildren().addAll(titleText, text, barChartPane);
     }
 
     @Override protected void registerListeners() {
@@ -107,6 +112,7 @@ public class BarChartTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(text, getSkinnable().isTextVisible());
         } else if ("DATA".equals(EVENT_TYPE)) {
             Collections.sort(getSkinnable().getBarChartData(), Comparator.comparingDouble(BarChartSegment::getValue));
             Collections.reverse(getSkinnable().getBarChartData());
@@ -136,7 +142,7 @@ public class BarChartTileSkin extends TileSkin {
                 if (i < 4) {
                     segment.setMaxValue(maxValue);
                     segment.setVisible(true);
-                    segment.relocate(0, size * 0.18 + i * 0.2 * size);
+                    segment.relocate(0, size * 0.18 + i * 0.175 * size);
                 } else {
                     segment.setVisible(false);
                 }
@@ -151,6 +157,12 @@ public class BarChartTileSkin extends TileSkin {
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
+
+        text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(size * 0.95);
     };
 
     @Override protected void resize() {
@@ -162,6 +174,7 @@ public class BarChartTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
+        text.setText(getSkinnable().getText());
 
         getSkinnable().getBarChartData().forEach(segment -> {
             segment.setNameColor(getSkinnable().getTextColor());
@@ -172,5 +185,6 @@ public class BarChartTileSkin extends TileSkin {
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
+        text.setFill(getSkinnable().getTextColor());
     };
 }

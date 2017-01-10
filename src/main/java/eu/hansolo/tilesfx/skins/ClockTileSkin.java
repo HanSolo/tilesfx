@@ -24,7 +24,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +36,8 @@ public class ClockTileSkin extends TileSkin {
     private DateTimeFormatter timeFormatter;
     private DateTimeFormatter dateFormatter;
     private DateTimeFormatter dayOfWeekFormatter;
-    private Text              title;
+    private Text              titleText;
+    private Text              text;
     private Rectangle         timeRect;
     private Text              timeText;
     private Text              dayOfWeekText;
@@ -58,9 +58,13 @@ public class ClockTileSkin extends TileSkin {
         dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", getSkinnable().getLocale());
         dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", getSkinnable().getLocale());
 
-        title = new Text("");
-        title.setTextOrigin(VPos.TOP);
-        Helper.enableNode(title, !getSkinnable().getTitle().isEmpty());
+        titleText = new Text("");
+        titleText.setTextOrigin(VPos.TOP);
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+
+        text = new Text(getSkinnable().getText());
+        text.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(text, getSkinnable().isTextVisible());
 
         timeRect = new Rectangle();
 
@@ -71,7 +75,7 @@ public class ClockTileSkin extends TileSkin {
 
         dayOfWeekText = new Text(dayOfWeekFormatter.format(getSkinnable().getTime()));
 
-        getPane().getChildren().addAll(title, timeRect, timeText, dateText, dayOfWeekText);
+        getPane().getChildren().addAll(titleText, text, timeRect, timeText, dateText, dayOfWeekText);
     }
 
     @Override protected void registerListeners() {
@@ -88,6 +92,10 @@ public class ClockTileSkin extends TileSkin {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
+        if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(text, getSkinnable().isTextVisible());
+        }
     };
 
     public void updateTime(final ZonedDateTime TIME) {
@@ -106,16 +114,8 @@ public class ClockTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
         double maxWidth = size * 0.9;
-        double fontSize = size * textSize.factor;
+        double fontSize = size * 0.3;
 
-        title.setFont(Fonts.latoRegular(fontSize));
-        title.setText(getSkinnable().getTitle());
-        if (title.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(title, maxWidth, fontSize); }
-        title.setX(size * 0.05);
-        title.setY(size * 0.05);
-
-        maxWidth = size * 0.9;
-        fontSize = size * 0.3;
         timeText.setFont(Fonts.latoRegular(fontSize));
         timeText.setText(timeFormatter.format(getSkinnable().getTime()));
         Helper.adjustTextSize(timeText, maxWidth, fontSize);
@@ -127,13 +127,29 @@ public class ClockTileSkin extends TileSkin {
         dayOfWeekText.setFont(Fonts.latoRegular(fontSize));
         if (dayOfWeekText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(dayOfWeekText, maxWidth, fontSize); }
         dayOfWeekText.setX(size * 0.05);
-        dayOfWeekText.setY(size * 0.75);
+        dayOfWeekText.setY(size * 0.725);
 
         maxWidth = size * 0.9;
         dateText.setFont(Fonts.latoRegular(fontSize));
         if (dateText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(dateText, maxWidth, fontSize); }
         dateText.setX(size * 0.05);
-        dateText.setY(size * 0.875);
+        dateText.setY(size * 0.85);
+    };
+    @Override protected void resizeStaticText() {
+        double maxWidth = size * 0.9;
+        double fontSize = size * textSize.factor;
+
+        titleText.setFont(Fonts.latoRegular(fontSize));
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
+        titleText.relocate(size * 0.05, size * 0.05);
+
+        maxWidth = size * 0.9;
+        fontSize = size * textSize.factor;
+        text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(size * 0.95);
     };
 
     @Override protected void resize() {
@@ -148,6 +164,8 @@ public class ClockTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
 
+        titleText.setText(getSkinnable().getTitle());
+        text.setText(getSkinnable().getText());
         timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", getSkinnable().getLocale());
         dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", getSkinnable().getLocale());
         dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", getSkinnable().getLocale());
@@ -156,9 +174,11 @@ public class ClockTileSkin extends TileSkin {
 
         updateTime(time);
 
+        resizeStaticText();
         resizeDynamicText();
 
-        title.setFill(getSkinnable().getTitleColor());
+        titleText.setFill(getSkinnable().getTitleColor());
+        text.setFill(getSkinnable().getTextColor());
         timeRect.setFill(getSkinnable().getBackgroundColor().darker());
         timeText.setFill(getSkinnable().getTitleColor());
         dateText.setFill(getSkinnable().getDateColor());

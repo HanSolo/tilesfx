@@ -20,6 +20,8 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -32,8 +34,10 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  */
 public class SliderTileSkin extends TileSkin {
     private Text      titleText;
+    private Text      text;
     private Text      valueText;
     private Text      unitText;
+    private Label     description;
     private Circle    thumb;
     private Rectangle barBackground;
     private Rectangle bar;
@@ -59,6 +63,10 @@ public class SliderTileSkin extends TileSkin {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
+        text = new Text(getSkinnable().getText());
+        text.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(text, getSkinnable().isTextVisible());
+
         valueText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
         valueText.setFill(getSkinnable().getValueColor());
         Helper.enableNode(valueText, getSkinnable().isValueVisible());
@@ -67,6 +75,12 @@ public class SliderTileSkin extends TileSkin {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
+        description = new Label(getSkinnable().getDescription());
+        description.setAlignment(Pos.TOP_RIGHT);
+        description.setWrapText(true);
+        description.setTextFill(getSkinnable().getTextColor());
+        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+
         barBackground = new Rectangle(PREFERRED_WIDTH * 0.795, PREFERRED_HEIGHT * 0.0275);
 
         bar = new Rectangle(0, PREFERRED_HEIGHT * 0.0275);
@@ -74,7 +88,7 @@ public class SliderTileSkin extends TileSkin {
         thumb = new Circle(PREFERRED_WIDTH * 0.09);
         thumb.setEffect(shadow);
 
-        getPane().getChildren().addAll(titleText, valueText, unitText, barBackground, bar, thumb);
+        getPane().getChildren().addAll(titleText, text, valueText, unitText, description, barBackground, bar, thumb);
     }
 
     @Override protected void registerListeners() {
@@ -97,8 +111,10 @@ public class SliderTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(text, getSkinnable().isTextVisible());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
         }
     };
 
@@ -118,7 +134,7 @@ public class SliderTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = unitText.isVisible() ? size * 0.725 : size * 0.9;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
@@ -136,49 +152,64 @@ public class SliderTileSkin extends TileSkin {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
+        maxWidth = size * 0.9;
+        fontSize = size * textSize.factor;
+        text.setText(getSkinnable().getText());
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(size * 0.95);
+
         maxWidth = size * 0.15;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
+
+        fontSize = size * 0.1;
+        description.setFont(Fonts.latoRegular(fontSize));
     };
 
     @Override protected void resize() {
         super.resize();
 
+        description.setPrefSize(size * 0.9, size * 43);
+        description.relocate(size * 0.05, size * 0.42);
+
         trackStart  = size * 0.14;
         trackLength = size * 0.72;
         centerX     = trackStart + (trackLength * ((getSkinnable().getCurrentValue() - minValue) / range));
-        centerY     = size * 0.86;
+        centerY     = size * 0.76;
 
         barBackground.setWidth(trackLength);
         barBackground.setHeight(size * 0.0275);
         barBackground.setX(trackStart);
-        barBackground.setY(size * 0.84625);
+        barBackground.setY(size * 0.74625);
         barBackground.setArcWidth(size * 0.0275);
         barBackground.setArcHeight(size * 0.0275);
 
         bar.setWidth(thumb.getCenterX() - trackStart);
         bar.setHeight(size * 0.0275);
         bar.setX(trackStart);
-        bar.setY(size * 0.84625);
+        bar.setY(size * 0.74625);
         bar.setArcWidth(size * 0.0275);
         bar.setArcHeight(size * 0.0275);
 
         thumb.setRadius(size * 0.09);
         thumb.setCenterX(centerX);
-        thumb.setCenterY(size * 0.675);
         thumb.setCenterY(centerY);
     };
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
+        text.setText(getSkinnable().getText());
         unitText.setText(getSkinnable().getUnit());
 
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
+        text.setFill(getSkinnable().getTextColor());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());
         barBackground.setFill(getSkinnable().getBarBackgroundColor());

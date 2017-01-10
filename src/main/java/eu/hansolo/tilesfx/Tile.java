@@ -363,7 +363,7 @@ public class Tile extends Control {
         _minValue                           = 0;
         _maxValue                           = 100;
         value                               = new DoublePropertyBase(_minValue) {
-            @Override protected void invalidated() {
+            private void update() {
                 final double VALUE = get();
                 withinSpeedLimit = !(Instant.now().minusMillis(getAnimationDuration()).isBefore(lastCall));
                 lastCall = Instant.now();
@@ -381,11 +381,13 @@ public class Tile extends Control {
                 }
                 if (isAveragingEnabled()) { movingAverage.addData(new Data(VALUE)); }
             }
+            @Override protected void invalidated() { update(); }
             @Override public void set(final double VALUE) {
                 super.set(VALUE);
                 fireTileEvent(VALUE_EVENT);
-                // TODO:  Remove if possible: Handle the case where the former value == the current value (should not be needed!!!)
-                if (Helper.equals(VALUE, getFormerValue())) { invalidated(); }
+                // ATTENTION There is an optimization in the properties so that properties
+                // only get invalid if the the new value is different from the old value
+                if (Helper.equals(VALUE, getFormerValue())) { update(); }
             }
             @Override public Object getBean() { return Tile.this; }
             @Override public String getName() { return "value"; }

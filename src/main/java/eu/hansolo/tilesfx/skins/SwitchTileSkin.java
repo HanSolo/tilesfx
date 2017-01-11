@@ -161,17 +161,17 @@ public class SwitchTileSkin extends TileSkin {
         switchBorder.setHeight(size * 0.22);
         switchBorder.setArcWidth(size * 0.22);
         switchBorder.setArcHeight(size * 0.22);
-        switchBorder.relocate((size - switchBorder.getWidth()) * 0.5, getSkinnable().getDescription().isEmpty() ? (size - switchBorder.getHeight()) * 0.5 : size * 0.65);
+        switchBorder.relocate((size - switchBorder.getWidth()) * 0.5, getSkinnable().getDescription().isEmpty() ? (size - switchBorder.getHeight()) * 0.5 : size * 0.60);
 
         switchBackground.setWidth(size * 0.425);
         switchBackground.setHeight(size * 0.2);
         switchBackground.setArcWidth(size * 0.2);
         switchBackground.setArcHeight(size * 0.2);
-        switchBackground.relocate((size - switchBackground.getWidth()) * 0.5, getSkinnable().getDescription().isEmpty() ? (size - switchBackground.getHeight()) * 0.5 : size * 0.66);
+        switchBackground.relocate((size - switchBackground.getWidth()) * 0.5, getSkinnable().getDescription().isEmpty() ? (size - switchBackground.getHeight()) * 0.5 : size * 0.61);
 
         thumb.setRadius(size * 0.09);
         thumb.setCenterX(getSkinnable().isSelected() ? size * 0.6125 : size * 0.3875);
-        thumb.setCenterY(getSkinnable().getDescription().isEmpty() ? size * 0.5 : size * 0.76);
+        thumb.setCenterY(getSkinnable().getDescription().isEmpty() ? size * 0.5 : size * 0.71);
     };
 
     @Override protected void redraw() {

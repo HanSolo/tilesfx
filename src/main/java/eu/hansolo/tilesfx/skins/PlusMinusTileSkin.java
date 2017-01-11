@@ -258,10 +258,10 @@ public class PlusMinusTileSkin extends TileSkin {
         description.relocate(size * 0.05, size * 0.42);
 
         minusButton.resize(size * 0.18, size * 0.18);
-        minusButton.relocate(size * 0.05, size * 0.85 - minusButton.getLayoutBounds().getHeight());
+        minusButton.relocate(size * 0.05, size * 0.80 - minusButton.getLayoutBounds().getHeight());
 
         plusButton.resize(size * 0.18, size * 0.18);
-        plusButton.relocate(size * 0.95 - plusButton.getLayoutBounds().getWidth(), size * 0.85 - plusButton.getLayoutBounds().getHeight());
+        plusButton.relocate(size * 0.95 - plusButton.getLayoutBounds().getWidth(), size * 0.80 - plusButton.getLayoutBounds().getHeight());
     };
 
     @Override protected void redraw() {

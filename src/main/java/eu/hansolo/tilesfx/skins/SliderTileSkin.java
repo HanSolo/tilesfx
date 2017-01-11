@@ -179,19 +179,19 @@ public class SliderTileSkin extends TileSkin {
         trackStart  = size * 0.14;
         trackLength = size * 0.72;
         centerX     = trackStart + (trackLength * ((getSkinnable().getCurrentValue() - minValue) / range));
-        centerY     = size * 0.76;
+        centerY     = size * 0.71;
 
         barBackground.setWidth(trackLength);
         barBackground.setHeight(size * 0.0275);
         barBackground.setX(trackStart);
-        barBackground.setY(size * 0.74625);
+        barBackground.setY(size * 0.69625);
         barBackground.setArcWidth(size * 0.0275);
         barBackground.setArcHeight(size * 0.0275);
 
         bar.setWidth(thumb.getCenterX() - trackStart);
         bar.setHeight(size * 0.0275);
         bar.setX(trackStart);
-        bar.setY(size * 0.74625);
+        bar.setY(size * 0.69625);
         bar.setArcWidth(size * 0.0275);
         bar.setArcHeight(size * 0.0275);
 

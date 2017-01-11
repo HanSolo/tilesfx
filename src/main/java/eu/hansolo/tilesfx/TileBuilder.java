@@ -21,6 +21,8 @@ import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
+import eu.hansolo.tilesfx.skins.BarChartItem;
+import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -299,13 +301,23 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B barChartData(final BarChartSegment... DATA) {
-        properties.put("barDataArray", new SimpleObjectProperty<>(DATA));
+    public final B barChartItems(final BarChartItem... ITEMS) {
+        properties.put("barChartItemsArray", new SimpleObjectProperty<>(ITEMS));
         return (B)this;
     }
 
-    public final B barChartData(final List<BarChartSegment> DATA) {
-        properties.put("barDataList", new SimpleObjectProperty<>(DATA));
+    public final B barChartItems(final List<BarChartItem> ITEMS) {
+        properties.put("barChartItemsList", new SimpleObjectProperty<>(ITEMS));
+        return (B)this;
+    }
+
+    public final B leaderBoardItems(final LeaderBoardItem... ITEMS) {
+        properties.put("leaderBoardItemsArray", new SimpleObjectProperty<>(ITEMS));
+        return (B)this;
+    }
+
+    public final B leaderBoardItems(final List<LeaderBoardItem> ITEMS) {
+        properties.put("leaderBoardItemsList", new SimpleObjectProperty<>(ITEMS));
         return (B)this;
     }
 
@@ -731,6 +743,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case CUSTOM:
                     break;
+                case LEADER_BOARD:
+                    break;
             }
         } else {
             CONTROL = new Tile();
@@ -777,11 +791,18 @@ public class TileBuilder<B extends TileBuilder<B>> {
             CONTROL.setSeries(((ObjectProperty<List<Series<String, Number>>>) properties.get("seriesList")).get());
         }
 
-        if (properties.keySet().contains("barDataArray")) {
-            CONTROL.setBarChartData(((ObjectProperty<BarChartSegment[]>) properties.get("barDataArray")).get());
+        if (properties.keySet().contains("barChartItemsArray")) {
+            CONTROL.setBarChartItems(((ObjectProperty<BarChartItem[]>) properties.get("barChartItemsArray")).get());
         }
-        if(properties.keySet().contains("barDataList")) {
-            CONTROL.setBarChartData(((ObjectProperty<List<BarChartSegment>>) properties.get("barDataList")).get());
+        if(properties.keySet().contains("barChartItemsList")) {
+            CONTROL.setBarChartItems(((ObjectProperty<List<BarChartItem>>) properties.get("barChartItemsList")).get());
+        }
+
+        if (properties.keySet().contains("leaderBoardItemsArray")) {
+            CONTROL.setLeaderBoardItems(((ObjectProperty<LeaderBoardItem[]>) properties.get("leaderBoardItemsArray")).get());
+        }
+        if(properties.keySet().contains("leaderBoardItemsList")) {
+            CONTROL.setLeaderBoardItems(((ObjectProperty<List<LeaderBoardItem>>) properties.get("leaderBoardItemsList")).get());
         }
 
         if (properties.keySet().contains("gradientStopsArray")) {

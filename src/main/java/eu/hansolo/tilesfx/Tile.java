@@ -87,7 +87,7 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 public class Tile extends Control {
     public enum SkinType { AREA_CHART, BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
                            PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                           TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM }
+                           TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM, LEADER_BOARD }
     public enum TextSize {
         NORMAL(0.06),
         BIGGER(0.08);
@@ -177,7 +177,8 @@ public class Tile extends Control {
     private              StringProperty                         text;
     private              LocalTime                              _duration;
     private              ObjectProperty<LocalTime>              duration;
-    private              ObservableList<BarChartSegment>        barChartData;
+    private              ObservableList<BarChartItem>           barChartItems;
+    private              List<LeaderBoardItem>                  leaderBoardItems;
     private              ObjectProperty<Node>                   graphic;
 
     // UI related
@@ -457,7 +458,8 @@ public class Tile extends Control {
         timeSections                        = FXCollections.observableArrayList();
         alarms                              = FXCollections.observableArrayList();
         alarmsToRemove                      = new ArrayList<>();
-        barChartData                        = FXCollections.observableArrayList();
+        barChartItems                       = FXCollections.observableArrayList();
+        leaderBoardItems                    = new ArrayList();
         gradientStops                       = new ArrayList<>(4);
 
         _textSize                           = TextSize.NORMAL;
@@ -1132,24 +1134,46 @@ public class Tile extends Control {
         fireTileEvent(SERIES_EVENT);
     }
 
-    public ObservableList<BarChartSegment> getBarChartData() { return barChartData; }
-    public void setBarChartData(final List<BarChartSegment> DATA) {
-        barChartData.setAll(DATA);
+    public ObservableList<BarChartItem> getBarChartItems() { return barChartItems; }
+    public void setBarChartItems(final List<BarChartItem> ITEMS) {
+        barChartItems.setAll(ITEMS);
         fireTileEvent(DATA_EVENT);
     }
-    public void setBarChartData(final BarChartSegment... DATA) { setBarChartData(Arrays.asList(DATA)); }
-    public void addBarChartData(final BarChartSegment DATA) {
-        if (null == DATA) return;
-        barChartData.add(DATA);
+    public void setBarChartItems(final BarChartItem... ITEMS) { setBarChartItems(Arrays.asList(ITEMS)); }
+    public void addBarChartItem(final BarChartItem ITEM) {
+        if (null == ITEM) return;
+        barChartItems.add(ITEM);
         fireTileEvent(DATA_EVENT);
     }
-    public void removeBarChartData(final BarChartSegment DATA) {
-        if (null == DATA) return;
-        barChartData.remove(DATA);
+    public void removeBarChartItem(final BarChartItem ITEM) {
+        if (null == ITEM) return;
+        barChartItems.remove(ITEM);
         fireTileEvent(DATA_EVENT);
     }
-    public void clearBarChartData() {
-        barChartData.clear();
+    public void clearBarChartItems() {
+        barChartItems.clear();
+        fireTileEvent(DATA_EVENT);
+    }
+
+    public List<LeaderBoardItem> getLeaderBoardItems() { return leaderBoardItems; }
+    public void setLeaderBoardItems(final List<LeaderBoardItem> ITEMS) {
+        leaderBoardItems.clear();
+        leaderBoardItems.addAll(ITEMS);
+        fireTileEvent(DATA_EVENT);
+    }
+    public void setLeaderBoardItems(final LeaderBoardItem... ITEMS) { setLeaderBoardItems(Arrays.asList(ITEMS)); }
+    public void addLeaderBoardItem(final LeaderBoardItem ITEM) {
+        if (null == ITEM) return;
+        leaderBoardItems.add(ITEM);
+        fireTileEvent(DATA_EVENT);
+    }
+    public void removeLeaderBoardItem(final LeaderBoardItem ITEM) {
+        if (null == ITEM) return;
+        leaderBoardItems.remove(ITEM);
+        fireTileEvent(DATA_EVENT);
+    }
+    public void clearLeaderBoardItems() {
+        leaderBoardItems.clear();
         fireTileEvent(DATA_EVENT);
     }
 
@@ -3870,6 +3894,7 @@ public class Tile extends Control {
             case WEATHER      : return new WeatherTileSkin(Tile.this);
             case TIME         : return new TimeTileSkin(Tile.this);
             case CUSTOM       : return new CustomTileSkin(Tile.this);
+            case LEADER_BOARD : return new LeaderBoardTileSkin(Tile.this);
             default           : return new TileSkin(Tile.this);
         }
     }
@@ -3954,6 +3979,9 @@ public class Tile extends Control {
             case CUSTOM:
                 setTextVisible(true);
                 super.setSkin(new CustomTileSkin(Tile.this));
+                break;
+            case LEADER_BOARD:
+                super.setSkin(new LeaderBoardTileSkin(Tile.this));
                 break;
             default:
                 super.setSkin(new TileSkin(Tile.this));

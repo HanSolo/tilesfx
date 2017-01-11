@@ -23,6 +23,7 @@ import javafx.animation.FillTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
@@ -98,7 +99,7 @@ public class HighLowTileSkin extends TileSkin {
 
         indicator = new SVGPath();
         indicator.setContent("M 14 8 C 15 7 16 7 17 8 C 17 8 30 20 30 20 C 32 22 31 24 28 24 C 28 24 3 24 3 24 C 0 24 -1 22 1 20 C 1 20 14 8 14 8 Z");
-        indicator.resize(PREFERRED_WIDTH * 0.11034483, PREFERRED_HEIGHT * 0.11034483);
+        indicator.resize(PREFERRED_WIDTH * 0.11034483, PREFERRED_HEIGHT * 0.06896552);
         indicator.setFill(state.color);
 
         referenceText = new Text(String.format(locale, formatString, getSkinnable().getReferenceValue()));
@@ -222,13 +223,18 @@ public class HighLowTileSkin extends TileSkin {
         description.setPrefSize(size * 0.9, size * 43);
         description.relocate(size * 0.05, size * 0.42);
 
-        indicator.resize(size * 0.11034483, size * 0.11034483);
+        setIndicatorSize(indicator, size * 0.11034483, size * 0.06896552);
         indicator.setLayoutX(size * 0.05);
-        indicator.setLayoutY(size * 0.75);
+        indicator.setLayoutY(size * 0.65);
         resizeStaticText();
         resizeDynamicText();
-        referenceUnitFlow.relocate(size * 0.225, size * 0.695);
+        referenceUnitFlow.relocate(size * 0.225, size * 0.595);
     };
+
+    private void setIndicatorSize(final Node NODE, final double TARGET_WIDTH, final double TARGET_HEIGHT) {
+        NODE.setScaleX(TARGET_WIDTH / NODE.getLayoutBounds().getWidth());
+        NODE.setScaleY(TARGET_HEIGHT / NODE.getLayoutBounds().getHeight());
+    }
 
     @Override protected void redraw() {
         super.redraw();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 by Gerrit Grunwald
+ * Copyright (c) 2017 by Gerrit Grunwald
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,13 @@ import javafx.event.EventType;
 
 
 /**
- * Created by hansolo on 23.12.16.
+ * Created by hansolo on 11.01.17.
  */
-public class BarChartEvent extends Event {
-    public static EventType<BarChartEvent> UPDATE = new EventType<>(ANY, "UPDATE");
+public class UpdateEvent extends Event {
+    public static EventType<UpdateEvent> UPDATE_BAR_CHART    = new EventType<>(ANY, "UPDATE_BAR_CHART");
+    public static EventType<UpdateEvent> UPDATE_LEADER_BOARD = new EventType<>(ANY, "UPDATE_LEADER_BOARD");
 
-    public BarChartEvent(@NamedArg("eventType") final EventType<? extends Event> TYPE) {
+    public UpdateEvent(@NamedArg("eventType") final EventType<? extends Event> TYPE) {
         super(TYPE);
     }
 }

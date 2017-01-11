@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 by Gerrit Grunwald
+ * Copyright (c) 2017 by Gerrit Grunwald
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package eu.hansolo.tilesfx;
+package eu.hansolo.tilesfx.skins;
 
-import eu.hansolo.tilesfx.events.BarChartEvent;
+import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.UpdateEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.DoubleProperty;
@@ -48,45 +49,45 @@ import java.util.Locale;
  * Time: 13:10
  */
 @DefaultProperty("children")
-public class BarChartSegment extends Region implements Comparable<BarChartSegment>{
-    private static final double         PREFERRED_WIDTH  = 250;
-    private static final double         PREFERRED_HEIGHT = 30;
-    private static final double         MINIMUM_WIDTH    = 25;
-    private static final double         MINIMUM_HEIGHT   = 3.6;
-    private static final double         MAXIMUM_WIDTH    = 1024;
-    private static final double         MAXIMUM_HEIGHT   = 1024;
-    private static final double         ASPECT_RATIO     = PREFERRED_HEIGHT / PREFERRED_WIDTH;
-    private static final BarChartEvent  UPDATE_EVENT     = new BarChartEvent(BarChartEvent.UPDATE);
-    private       double                width;
-    private       double                height;
-    private       Text                  nameText;
-    private       Text                  valueText;
-    private       Rectangle             barBackground;
-    private       Rectangle             bar;
-    private       Pane                  pane;
-    private       StringProperty        name;
-    private       DoubleProperty        value;
-    private       ObjectProperty<Color> nameColor;
-    private       ObjectProperty<Color> valueColor;
-    private       ObjectProperty<Color> barBackgroundColor;
-    private       ObjectProperty<Color> barColor;
-    private       String                formatString;
-    private       Locale                locale;
-    private       double                maxValue;
-    private       double                stepSize;
+public class BarChartItem extends Region implements Comparable<BarChartItem>{
+    private static final double                PREFERRED_WIDTH  = 250;
+    private static final double                PREFERRED_HEIGHT = 30;
+    private static final double                MINIMUM_WIDTH    = 25;
+    private static final double                MINIMUM_HEIGHT   = 3.6;
+    private static final double                MAXIMUM_WIDTH    = 1024;
+    private static final double                MAXIMUM_HEIGHT   = 1024;
+    private static final double                ASPECT_RATIO     = PREFERRED_HEIGHT / PREFERRED_WIDTH;
+    private static final UpdateEvent           UPDATE_EVENT     = new UpdateEvent(UpdateEvent.UPDATE_BAR_CHART);
+    private              double                width;
+    private              double                height;
+    private              Text                  nameText;
+    private              Text                  valueText;
+    private              Rectangle             barBackground;
+    private              Rectangle             bar;
+    private              Pane                  pane;
+    private              StringProperty        name;
+    private              DoubleProperty        value;
+    private              ObjectProperty<Color> nameColor;
+    private              ObjectProperty<Color> valueColor;
+    private              ObjectProperty<Color> barBackgroundColor;
+    private              ObjectProperty<Color> barColor;
+    private              String                formatString;
+    private              Locale                locale;
+    private              double                maxValue;
+    private              double                stepSize;
 
 
     // ******************** Constructors **************************************
-    public BarChartSegment(final String NAME) {
+    public BarChartItem(final String NAME) {
         this(NAME, 0, Tile.BLUE);
     }
-    public BarChartSegment(final String NAME, final double VALUE) {
+    public BarChartItem(final String NAME, final double VALUE) {
         this(NAME, VALUE, Tile.BLUE);
     }
-    public BarChartSegment(final String NAME, final double VALUE, final Color COLOR) {
+    public BarChartItem(final String NAME, final double VALUE, final Color COLOR) {
         name               = new StringPropertyBase(NAME) {
             @Override protected void invalidated() { nameText.setText(get()); }
-            @Override public Object getBean() { return BarChartSegment.this; }
+            @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "name"; }
         };
         value              = new DoublePropertyBase(VALUE) {
@@ -94,27 +95,27 @@ public class BarChartSegment extends Region implements Comparable<BarChartSegmen
                 updateBar(get());
                 fireEvent(UPDATE_EVENT);
             }
-            @Override public Object getBean() { return BarChartSegment.this; }
+            @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "value"; }
         };
         nameColor          = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
-            @Override public Object getBean() { return BarChartSegment.this; }
+            @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "nameColor"; }
         };
         valueColor         = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
             @Override protected void invalidated() {  valueText.setFill(get()); }
-            @Override public Object getBean() { return BarChartSegment.this; }
+            @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "valueColor"; }
         };
         barBackgroundColor = new ObjectPropertyBase<Color>(Color.rgb(72, 72, 72)) {
             @Override protected void invalidated() { barBackground.setFill(get()); }
-            @Override public Object getBean() { return BarChartSegment.this; }
+            @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "barBackgroundColor"; }
         };
         barColor           = new ObjectPropertyBase<Color>(COLOR) {
             @Override protected void invalidated() { bar.setFill(get()); }
-            @Override public Object getBean() { return BarChartSegment.this; }
+            @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "barColor"; }
         };
         formatString       = "%.0f";
@@ -192,7 +193,7 @@ public class BarChartSegment extends Region implements Comparable<BarChartSegmen
     public void setBarColor(final Color COLOR) { barColor.set(COLOR); }
     public ObjectProperty<Color> barColorProperty() { return barColor; }
 
-    @Override public int compareTo(final BarChartSegment SEGMENT) { return Double.compare(getValue(), SEGMENT.getValue()); }
+    @Override public int compareTo(final BarChartItem SEGMENT) { return Double.compare(getValue(), SEGMENT.getValue()); }
 
     public void setStepSize(final double STEP_SIZE) {
         stepSize = STEP_SIZE;
@@ -238,7 +239,6 @@ public class BarChartSegment extends Region implements Comparable<BarChartSegmen
 
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
-            pane.relocate((getWidth() - width) * 0.5, (getHeight() - height) * 0.5);
 
             nameText.setFont(Fonts.latoRegular(width * 0.06));
             nameText.setX(width * 0.05);

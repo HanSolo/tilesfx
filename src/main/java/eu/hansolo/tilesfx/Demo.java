@@ -17,7 +17,8 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
-import eu.hansolo.tilesfx.Tile.TextSize;
+import eu.hansolo.tilesfx.skins.BarChartItem;
+import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
@@ -25,25 +26,21 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Random;
@@ -55,28 +52,37 @@ import java.util.Random;
  * Time: 12:54
  */
 public class Demo extends Application {
-    private static final Random RND = new Random();
-    private Tile           percentageTile;
-    private Tile           clockTile;
-    private Tile           gaugeTile;
-    private Tile           sparkLineTile;
-    private Tile           areaChartTile;
-    private Tile           lineChartTile;
-    private Tile           highLowTile;
-    private Tile           timerControlTile;
-    private Tile           numberTile;
-    private Tile           textTile;
-    private Tile           plusMinusTile;
-    private Tile           sliderTile;
-    private Tile           switchTile;
-    private Tile           worldTile;
-    private Tile           weatherTile;
-    private Tile           timeTile;
-    private Tile           barChartTile;
-    private Tile           customTile;
-    private long           lastTimerCall;
-    private AnimationTimer timer;
-    private DoubleProperty value;
+    private static final    Random RND = new Random();
+    private BarChartItem    barChartItem1;
+    private BarChartItem    barChartItem2;
+    private BarChartItem    barChartItem3;
+    private BarChartItem    barChartItem4;
+    private LeaderBoardItem leaderBoardItem1;
+    private LeaderBoardItem leaderBoardItem2;
+    private LeaderBoardItem leaderBoardItem3;
+    private LeaderBoardItem leaderBoardItem4;
+    private Tile            percentageTile;
+    private Tile            clockTile;
+    private Tile            gaugeTile;
+    private Tile            sparkLineTile;
+    private Tile            areaChartTile;
+    private Tile            lineChartTile;
+    private Tile            highLowTile;
+    private Tile            timerControlTile;
+    private Tile            numberTile;
+    private Tile            textTile;
+    private Tile            plusMinusTile;
+    private Tile            sliderTile;
+    private Tile            switchTile;
+    private Tile            worldTile;
+    private Tile            weatherTile;
+    private Tile            timeTile;
+    private Tile            barChartTile;
+    private Tile            customTile;
+    private Tile            leaderBoardTile;
+    private long            lastTimerCall;
+    private AnimationTimer  timer;
+    private DoubleProperty  value;
 
 
     @Override public void init() {
@@ -147,11 +153,17 @@ public class Demo extends Application {
         DarkSky darkSky = new DarkSky("YOUR DARKSKY API KEY", Unit.CA, Language.ENGLISH, 51.911858, 7.632815);
         //darkSky.update();
 
-        // BarChart Data
-        BarChartSegment segment1 = new BarChartSegment("Gerrit", 47, Tile.BLUE);
-        BarChartSegment segment2 = new BarChartSegment("Sandra", 43, Tile.RED);
-        BarChartSegment segment3 = new BarChartSegment("Lilli", 12, Tile.GREEN);
-        BarChartSegment segment4 = new BarChartSegment("Anton", 8, Tile.ORANGE);
+        // BarChart Items
+        barChartItem1 = new BarChartItem("Gerrit", 47, Tile.BLUE);
+        barChartItem2 = new BarChartItem("Sandra", 43, Tile.RED);
+        barChartItem3 = new BarChartItem("Lilli", 12, Tile.GREEN);
+        barChartItem4 = new BarChartItem("Anton", 8, Tile.ORANGE);
+
+        // LeaderBoard Items
+        leaderBoardItem1 = new LeaderBoardItem("Gerrit", 47);
+        leaderBoardItem2 = new LeaderBoardItem("Sandra", 43);
+        leaderBoardItem3 = new LeaderBoardItem("Lilli", 12);
+        leaderBoardItem4 = new LeaderBoardItem("Anton", 8);
 
         // Creating Tiles
         percentageTile = TileBuilder.create()
@@ -296,7 +308,7 @@ public class Demo extends Application {
                                   .skinType(SkinType.BAR_CHART)
                                   .title("BarChart Tile")
                                   .text("Whatever text")
-                                  .barChartData(segment1, segment2, segment3, segment4)
+                                  .barChartItems(barChartItem1, barChartItem2, barChartItem3, barChartItem4)
                                   .decimals(0)
                                   .build();
 
@@ -307,6 +319,13 @@ public class Demo extends Application {
                                 .graphic(new Button("Click Me"))
                                 .roundedCorners(false)
                                 .build();
+
+        leaderBoardTile = TileBuilder.create()
+                                     .skinType(SkinType.LEADER_BOARD)
+                                     .title("LeaderBoard Tile")
+                                     .text("Whatever text")
+                                     .leaderBoardItems(leaderBoardItem1, leaderBoardItem2, leaderBoardItem3, leaderBoardItem4)
+                                     .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -326,10 +345,11 @@ public class Demo extends Application {
                     series1.getData().forEach(data -> data.setYValue(RND.nextInt(100)));
                     series2.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
                     series3.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
-                    segment1.setValue(RND.nextDouble() * 80);
-                    segment2.setValue(RND.nextDouble() * 80);
-                    segment3.setValue(RND.nextDouble() * 80);
-                    segment4.setValue(RND.nextDouble() * 80);
+
+                    barChartTile.getBarChartItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
+
+                    leaderBoardTile.getLeaderBoardItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
+
                     lastTimerCall = now;
                 }
             }
@@ -339,9 +359,9 @@ public class Demo extends Application {
     @Override public void start(Stage stage) {
         FlowPane pane = new FlowPane(Orientation.HORIZONTAL, 10, 10,
                                      percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
-                                     lineChartTile, highLowTile, timerControlTile, numberTile, textTile,
-                                     plusMinusTile, sliderTile, switchTile, worldTile, timeTile,
-                                     barChartTile, customTile);//, weatherTile);
+                                     lineChartTile, timerControlTile, numberTile, textTile,
+                                     highLowTile, plusMinusTile, sliderTile, switchTile, worldTile, timeTile,
+                                     barChartTile, customTile, leaderBoardTile);//, weatherTile);
 
         pane.setColumnHalignment(HPos.CENTER);
         pane.setRowValignment(VPos.CENTER);

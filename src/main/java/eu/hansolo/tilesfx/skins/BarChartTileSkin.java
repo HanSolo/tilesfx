@@ -16,9 +16,8 @@
 
 package eu.hansolo.tilesfx.skins;
 
-import eu.hansolo.tilesfx.BarChartSegment;
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.BarChartEvent;
+import eu.hansolo.tilesfx.events.UpdateEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
@@ -28,7 +27,6 @@ import javafx.event.EventHandler;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,10 +36,10 @@ import java.util.stream.Collectors;
  * Created by hansolo on 19.12.16.
  */
 public class BarChartTileSkin extends TileSkin {
-    private Text                        titleText;
-    private Text                        text;
-    private Pane                        barChartPane;
-    private EventHandler<BarChartEvent> updateHandler;
+    private Text                      titleText;
+    private Text                      text;
+    private Pane                      barChartPane;
+    private EventHandler<UpdateEvent> updateHandler;
 
 
     // ******************** Constructors **************************************
@@ -56,18 +54,18 @@ public class BarChartTileSkin extends TileSkin {
 
         updateHandler = e -> updateChart();
 
-        List<BarChartSegment> barChartData = getSkinnable().getBarChartData().stream()
-                                                           .sorted(Comparator.comparing(BarChartSegment::getValue).reversed())
-                                                           .collect(Collectors.toList());
+        List<BarChartItem> barChartItems = getSkinnable().getBarChartItems().stream()
+                                                         .sorted(Comparator.comparing(BarChartItem::getValue).reversed())
+                                                         .collect(Collectors.toList());
 
-        getSkinnable().getBarChartData().forEach(segment -> {
-            segment.addEventHandler(BarChartEvent.UPDATE, updateHandler);
-            segment.setMaxValue(getSkinnable().getMaxValue());
-            segment.setFormatString(formatString);
-            segment.valueProperty().addListener(new WeakInvalidationListener(o -> updateChart()));
+        getSkinnable().getBarChartItems().forEach(item -> {
+            item.addEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);
+            item.setMaxValue(getSkinnable().getMaxValue());
+            item.setFormatString(formatString);
+            item.valueProperty().addListener(new WeakInvalidationListener(o -> updateChart()));
         });
         barChartPane = new Pane();
-        barChartPane.getChildren().addAll(barChartData);
+        barChartPane.getChildren().addAll(barChartItems);
 
         titleText = new Text();
         titleText.setFill(getSkinnable().getTitleColor());
@@ -82,7 +80,7 @@ public class BarChartTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        getSkinnable().getBarChartData().addListener(new WeakListChangeListener<>(change -> {
+        getSkinnable().getBarChartItems().addListener(new WeakListChangeListener<>(change -> {
             while (change.next()) {
                 if (change.wasPermutated()) {
                     //updateChart();
@@ -91,18 +89,21 @@ public class BarChartTileSkin extends TileSkin {
                 } else if (change.wasAdded()) {
                     change.getAddedSubList().forEach(addedItem -> {
                         barChartPane.getChildren().add(addedItem);
-                        addedItem.addEventHandler(BarChartEvent.UPDATE, updateHandler);
+                        addedItem.addEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);
                     });
                     updateChart();
                 } else if (change.wasRemoved()) {
                     change.getRemoved().forEach(removedItem -> {
-                        removedItem.removeEventHandler(BarChartEvent.UPDATE, updateHandler);
+                        removedItem.removeEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);
                         barChartPane.getChildren().remove(removedItem);
                     });
                     updateChart();
                 }
             }
         }));
+
+        pane.widthProperty().addListener(o -> resizeItems());
+        pane.heightProperty().addListener(o -> resizeItems());
     }
 
 
@@ -114,15 +115,6 @@ public class BarChartTileSkin extends TileSkin {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(text, getSkinnable().isTextVisible());
         } else if ("DATA".equals(EVENT_TYPE)) {
-            Collections.sort(getSkinnable().getBarChartData(), Comparator.comparingDouble(BarChartSegment::getValue));
-            Collections.reverse(getSkinnable().getBarChartData());
-            getSkinnable().getBarChartData().forEach(segment -> {
-                segment.setMaxValue(getSkinnable().getMaxValue());
-                segment.setFormatString(formatString);
-            });
-            pane.getChildren().clear();
-            pane.getChildren().add(titleText);
-            pane.getChildren().addAll(getSkinnable().getBarChartData());
             updateChart();
         }
     };
@@ -131,20 +123,20 @@ public class BarChartTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     private void updateChart() {
         Platform.runLater(() -> {
-            getSkinnable().getBarChartData().sort(Comparator.comparing(BarChartSegment::getValue).reversed());
-            List<BarChartSegment> segments = getSkinnable().getBarChartData();
-            int noOfSegments = segments.size();
-            if (noOfSegments == 0) return;
+            getSkinnable().getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());
+            List<BarChartItem> items     = getSkinnable().getBarChartItems();
+            int                noOfItems = items.size();
+            if (noOfItems == 0) return;
             double maxValue = getSkinnable().getMaxValue();
 
-            for (int i = 0 ; i < noOfSegments ; i++) {
-                BarChartSegment segment = segments.get(i);
+            for (int i = 0 ; i < noOfItems ; i++) {
+                BarChartItem item = items.get(i);
                 if (i < 4) {
-                    segment.setMaxValue(maxValue);
-                    segment.setVisible(true);
-                    segment.relocate(0, size * 0.18 + i * 0.175 * size);
+                    item.setMaxValue(maxValue);
+                    item.setVisible(true);
+                    item.relocate(0, size * 0.18 + i * 0.175 * size);
                 } else {
-                    segment.setVisible(false);
+                    item.setVisible(false);
                 }
             }
         });
@@ -165,6 +157,9 @@ public class BarChartTileSkin extends TileSkin {
         text.setY(size * 0.95);
     };
 
+    private void resizeItems() {
+        barChartPane.getChildren().forEach(node -> ((BarChartItem) node).setPrefSize(pane.getWidth(), pane.getHeight()));
+    }
     @Override protected void resize() {
         super.resize();
         barChartPane.setPrefSize(pane.getPrefWidth(), pane.getPrefHeight());
@@ -176,9 +171,9 @@ public class BarChartTileSkin extends TileSkin {
         titleText.setText(getSkinnable().getTitle());
         text.setText(getSkinnable().getText());
 
-        getSkinnable().getBarChartData().forEach(segment -> {
-            segment.setNameColor(getSkinnable().getTextColor());
-            segment.setValueColor(getSkinnable().getValueColor());
+        getSkinnable().getBarChartItems().forEach(item -> {
+            item.setNameColor(getSkinnable().getTextColor());
+            item.setValueColor(getSkinnable().getValueColor());
         });
 
         resizeDynamicText();

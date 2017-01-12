@@ -339,9 +339,6 @@ public class Demo extends Application {
                     sparkLineTile.setValue(20);
 
                     highLowTile.setValue(RND.nextDouble() * 10);
-                    //sliderTile.setValue(RND.nextDouble() * sliderTile.getRange() + sliderTile.getMinValue());
-                    //plusMinusTile.setValue(RND.nextDouble() * plusMinusTile.getRange() + plusMinusTile.getMinValue());
-                    //switchTile.setSelected(RND.nextBoolean());
                     series1.getData().forEach(data -> data.setYValue(RND.nextInt(100)));
                     series2.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
                     series3.getData().forEach(data -> data.setYValue(RND.nextInt(10)));

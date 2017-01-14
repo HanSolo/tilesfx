@@ -58,6 +58,12 @@ repositories {
     mavenCentral()
 }
 
+// start the demo from gradle
+task Demo(type: JavaExec) {
+    main = "eu.hansolo.tilesfx.Demo"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 // create one jar for the javadoc
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'

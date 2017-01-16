@@ -96,7 +96,6 @@ public class Tile extends Control {
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin");
 
         public final String CLASS_NAME;
-
         SkinType(final String CLASS_NAME) {
             this.CLASS_NAME = CLASS_NAME;
         }
@@ -568,13 +567,13 @@ public class Tile extends Control {
         disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1));
         valueProperty().addListener((o, ov, nv) -> oldValue.set(ov.doubleValue()));
         skinProperty().addListener((o, ov, nv) -> {
-           String className = (nv.getClass().toString()).substring(nv.getClass().toString().lastIndexOf(".") + 1);
-           for (SkinType skinType : SkinType.values()) {
-               if (skinType.CLASS_NAME.equals(className)) {
-                   presetTileParameters(skinType);
-                   break;
-               }
-           }
+            String className = (nv.getClass().toString()).substring(nv.getClass().toString().lastIndexOf(".") + 1);
+            for (SkinType skinType : SkinType.values()) {
+                if (skinType.CLASS_NAME.equals(className)) {
+                    presetTileParameters(skinType);
+                    break;
+                }
+            }
         });
     }
 

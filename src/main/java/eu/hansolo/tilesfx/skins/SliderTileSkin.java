@@ -25,6 +25,8 @@ import javafx.scene.control.Label;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
@@ -37,6 +39,7 @@ public class SliderTileSkin extends TileSkin {
     private Text      text;
     private Text      valueText;
     private Text      unitText;
+    private TextFlow  valueUnitFlow;
     private Label     description;
     private Circle    thumb;
     private Rectangle barBackground;
@@ -75,6 +78,9 @@ public class SliderTileSkin extends TileSkin {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
+        valueUnitFlow = new TextFlow(valueText, unitText);
+        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+
         description = new Label(getSkinnable().getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
@@ -88,7 +94,7 @@ public class SliderTileSkin extends TileSkin {
         thumb = new Circle(PREFERRED_WIDTH * 0.09);
         thumb.setEffect(shadow);
 
-        getPane().getChildren().addAll(titleText, text, valueText, unitText, description, barBackground, bar, thumb);
+        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, barBackground, bar, thumb);
     }
 
     @Override protected void registerListeners() {
@@ -138,11 +144,6 @@ public class SliderTileSkin extends TileSkin {
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        if (unitText.isVisible()) {
-            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
-        } else {
-            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
-        }
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
@@ -164,7 +165,6 @@ public class SliderTileSkin extends TileSkin {
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
@@ -198,6 +198,9 @@ public class SliderTileSkin extends TileSkin {
         thumb.setRadius(size * 0.09);
         thumb.setCenterX(centerX);
         thumb.setCenterY(centerY);
+
+        valueUnitFlow.setPrefWidth(size * 0.9);
+        valueUnitFlow.relocate(size * 0.05, size * 0.15);
     };
 
     @Override protected void redraw() {

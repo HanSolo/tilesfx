@@ -29,6 +29,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
@@ -92,12 +93,8 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
 
     // ******************** Constructors **************************************
     public SmoothAreaChart(final @NamedArg("xAxis") Axis<X> X_AXIS, @NamedArg("yAxis") Axis<Y> Y_AXIS, final @NamedArg("data") ObservableList<Series<X,Y>> DATA) {
-        this(X_AXIS, Y_AXIS);
-        setLegend(getLegend());
-        setData(DATA);
-    }
-    public SmoothAreaChart(final @NamedArg("xAxis") Axis<X> X_AXIS, final @NamedArg("yAxis") Axis<Y> Y_AXIS) {
-        super(X_AXIS, Y_AXIS);
+        super(X_AXIS, Y_AXIS, DATA);
+
         selectorColor             = new StyleableObjectProperty<Color>(SELECTOR_COLOR.getInitialValue(SmoothAreaChart.this)) {
             @Override protected void invalidated() {
                 selector.setStroke(get());
@@ -152,7 +149,6 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
         mousePressHandler         = evt -> selectData(evt);
         mouseReleaseHandler       = evt -> timeline.play();
 
-
         // Add additional nodes
         selector = new Line();
         selector.setStroke(getSelectorColor());
@@ -176,6 +172,12 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
         getChartChildren().addAll(selector, selectorCircle, selectedValueText);
 
         initTimeline();
+
+        setLegend(getLegend());
+        setData(DATA);
+    }
+    public SmoothAreaChart(final @NamedArg("xAxis") Axis<X> X_AXIS, final @NamedArg("yAxis") Axis<Y> Y_AXIS) {
+        this(X_AXIS, Y_AXIS, FXCollections.<Series<X,Y>>observableArrayList());
     }
 
     private void initTimeline() {

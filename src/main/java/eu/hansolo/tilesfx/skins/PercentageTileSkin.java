@@ -30,6 +30,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
@@ -44,6 +46,7 @@ public class PercentageTileSkin extends TileSkin {
     private Text      titleText;
     private Text      valueText;
     private Text      unitText;
+    private TextFlow  valueUnitFlow;
     private Label     description;
     private Text      percentageText;
     private Text      percentageUnitText;
@@ -87,6 +90,9 @@ public class PercentageTileSkin extends TileSkin {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
+        valueUnitFlow = new TextFlow(valueText, unitText);
+        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+
         description = new Label(getSkinnable().getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
@@ -108,7 +114,7 @@ public class PercentageTileSkin extends TileSkin {
         maxValueUnitText = new Text(getSkinnable().getUnit());
         maxValueUnitText.setFill(getSkinnable().getBackgroundColor());
 
-        getPane().getChildren().addAll(barBackground, bar, titleText, valueText, unitText, description, percentageText, percentageUnitText, maxValueRect, maxValueText, maxValueUnitText);
+        getPane().getChildren().addAll(barBackground, bar, titleText, valueUnitFlow, description, percentageText, percentageUnitText, maxValueRect, maxValueText, maxValueUnitText);
     }
 
     @Override protected void registerListeners() {
@@ -134,7 +140,7 @@ public class PercentageTileSkin extends TileSkin {
         bar.setWidth(targetValue);
         valueText.setText(String.format(locale, formatString, VALUE));
         percentageText.setText(String.format(locale, formatString, ((VALUE - minValue) / range * 100)));
-        maxValueRect.setFill(VALUE > maxValue ? barColor : getSkinnable().getThresholdColor());
+        maxValueRect.setFill(Double.compare(VALUE, maxValue) >= 0 ? barColor : getSkinnable().getThresholdColor());
         resizeDynamicText();
         if (sectionsVisible && !sections.isEmpty()) { setBarColor(VALUE); }
     };
@@ -159,11 +165,6 @@ public class PercentageTileSkin extends TileSkin {
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        if (unitText.isVisible()) {
-            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
-        } else {
-            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
-        }
 
         percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, size * 0.75);
     };
@@ -179,7 +180,6 @@ public class PercentageTileSkin extends TileSkin {
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
 
         maxWidth = size * 0.45;
         fontSize = size * 0.18;
@@ -242,6 +242,9 @@ public class PercentageTileSkin extends TileSkin {
         maxValueRect.setY(size * 0.7775);
         maxValueRect.setArcWidth(size * 0.025);
         maxValueRect.setArcHeight(size * 0.025);
+
+        valueUnitFlow.setPrefWidth(size * 0.9);
+        valueUnitFlow.relocate(size * 0.05, size * 0.15);
     };
 
     @Override protected void redraw() {
@@ -269,6 +272,7 @@ public class PercentageTileSkin extends TileSkin {
         description.setTextFill(getSkinnable().getDescriptionColor());
         maxValueText.setFill(getSkinnable().getBackgroundColor());
         maxValueUnitText.setFill(getSkinnable().getBackgroundColor());
+        maxValueRect.setFill(Double.compare(getSkinnable().getCurrentValue(), maxValue) >= 0 ? barColor : getSkinnable().getThresholdColor());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());
     };

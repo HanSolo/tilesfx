@@ -78,6 +78,9 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
 
     // ******************** Constructors **************************************
+    public BarChartItem() {
+        this("", 0, Tile.BLUE);
+    }
     public BarChartItem(final String NAME) {
         this(NAME, 0, Tile.BLUE);
     }
@@ -86,7 +89,10 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     }
     public BarChartItem(final String NAME, final double VALUE, final Color COLOR) {
         name               = new StringPropertyBase(NAME) {
-            @Override protected void invalidated() { nameText.setText(get()); }
+            @Override protected void invalidated() {
+                nameText.setText(get());
+                fireEvent(UPDATE_EVENT);
+            }
             @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "name"; }
         };
@@ -171,7 +177,8 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     @Override public ObservableList<Node> getChildren() { return super.getChildren(); }
 
     public String getName() { return name.get(); }
-    public ReadOnlyStringProperty nameProperty() { return name; }
+    public void setName(final String NAME) { name.set(NAME); }
+    public StringProperty nameProperty() { return name; }
 
     public double getValue() { return value.get(); }
     public void setValue(final double VALUE) { value.set(VALUE); }

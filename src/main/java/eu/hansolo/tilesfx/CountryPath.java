@@ -26,30 +26,39 @@ import java.util.Locale;
  * Created by hansolo on 21.12.16.
  */
 public class CountryPath extends SVGPath {
-    private final String  NAME;
-    private final Locale  LOCALE;
-    private final Tooltip TOOLTIP;
+    private String  name;
+    private Locale  locale;
+    private Tooltip tooltip;
 
 
     // ******************** Constructors **************************************
+    public CountryPath() {
+        this ("", null);
+    }
     public CountryPath(final String NAME) {
         this(NAME, null);
     }
     public CountryPath(final String NAME, final String CONTENT) {
         super();
-        this.NAME    = NAME;
-        this.LOCALE  = new Locale("", NAME);
-        this.TOOLTIP = new Tooltip(LOCALE.getDisplayCountry());
-        Tooltip.install(this, TOOLTIP);
+        name = NAME;
+        locale = new Locale("", NAME);
+        tooltip = new Tooltip(locale.getDisplayCountry());
+        Tooltip.install(CountryPath.this, tooltip);
         if (null == CONTENT) return;
         setContent(CONTENT);
     }
 
 
     // ******************** Methods *******************************************
-    public String getName() { return NAME; }
+    public String getName() { return name; }
+    public void setName(final String NAME) { this.name = NAME; }
 
-    public Locale getLocale() { return LOCALE; }
+    public Locale getLocale() { return locale; }
+    public void setLocale(final Locale LOCALE) { locale = LOCALE; }
 
-    public Tooltip getTooltip() { return TOOLTIP; }
+    public Tooltip getTooltip() { return tooltip; }
+    public void setTooltip(final Tooltip TOOLTIP) {
+        tooltip = TOOLTIP;
+        Tooltip.install(CountryPath.this, tooltip);
+    }
 }

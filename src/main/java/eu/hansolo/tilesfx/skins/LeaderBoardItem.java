@@ -93,6 +93,9 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
 
 
     // ******************** Constructors **************************************
+    public LeaderBoardItem() {
+        this("", 0);
+    }
     public LeaderBoardItem(final String NAME) {
         this(NAME, 0);
     }
@@ -185,7 +188,8 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     @Override public ObservableList<Node> getChildren() { return super.getChildren(); }
 
     public String getName() { return name.get(); }
-    public ReadOnlyStringProperty nameProperty() { return name; }
+    public void setName(final String NAME) { name.set(NAME); }
+    public StringProperty nameProperty() { return name; }
 
     public double getValue() { return value.get(); }
     public void setValue(final double VALUE) { value.set(VALUE); }

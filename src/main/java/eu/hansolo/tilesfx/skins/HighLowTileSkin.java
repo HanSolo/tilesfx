@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
@@ -56,6 +57,7 @@ public class HighLowTileSkin extends TileSkin {
     private Text     text;
     private Text     valueText;
     private Text     unitText;
+    private TextFlow valueUnitFlow;
     private Label    description;
     private Text     referenceText;
     private Text     referenceUnitText;
@@ -91,6 +93,9 @@ public class HighLowTileSkin extends TileSkin {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
+        valueUnitFlow = new TextFlow(valueText, unitText);
+        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+
         description = new Label(getSkinnable().getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
@@ -110,7 +115,7 @@ public class HighLowTileSkin extends TileSkin {
 
         referenceUnitFlow = new TextFlow(referenceText, referenceUnitText);
 
-        getPane().getChildren().addAll(titleText, text, valueText, unitText, description, indicator, referenceUnitFlow);
+        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, indicator, referenceUnitFlow);
     }
 
     @Override protected void registerListeners() {
@@ -175,11 +180,6 @@ public class HighLowTileSkin extends TileSkin {
         double fontSize = 0.24 * size;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        if (unitText.isVisible()) {
-            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
-        } else {
-            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
-        }
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
@@ -201,7 +201,6 @@ public class HighLowTileSkin extends TileSkin {
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
 
         maxWidth = size * 0.45;
         fontSize = size * 0.18;
@@ -229,6 +228,9 @@ public class HighLowTileSkin extends TileSkin {
         resizeStaticText();
         resizeDynamicText();
         referenceUnitFlow.relocate(size * 0.225, size * 0.595);
+
+        valueUnitFlow.setPrefWidth(size * 0.9);
+        valueUnitFlow.relocate(size * 0.05, size * 0.15);
     };
 
     private void setIndicatorSize(final Node NODE, final double TARGET_WIDTH, final double TARGET_HEIGHT) {

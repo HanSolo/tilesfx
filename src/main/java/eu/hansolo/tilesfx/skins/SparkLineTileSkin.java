@@ -37,6 +37,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 import javafx.util.Pair;
 
 import java.time.ZoneId;
@@ -62,6 +64,7 @@ public class SparkLineTileSkin extends TileSkin {
     private Text              titleText;
     private Text              valueText;
     private Text              unitText;
+    private TextFlow          valueUnitFlow;
     private Text              averageText;
     private Text              highText;
     private Text              lowText;
@@ -123,6 +126,9 @@ public class SparkLineTileSkin extends TileSkin {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
+        valueUnitFlow = new TextFlow(valueText, unitText);
+        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+
         averageText = new Text(String.format(locale, formatString, getSkinnable().getAverage()));
         averageText.setFill(Tile.FOREGROUND);
         Helper.enableNode(averageText, getSkinnable().isAverageVisible());
@@ -167,7 +173,7 @@ public class SparkLineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(getSkinnable().getBarColor());
 
-        getPane().getChildren().addAll(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
     }
 
     @Override protected void registerListeners() {
@@ -415,11 +421,6 @@ public class SparkLineTileSkin extends TileSkin {
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        if (unitText.isVisible()) {
-            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
-        } else {
-            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
-        }
 
         maxWidth = size * 0.3;
         fontSize = size * 0.06;
@@ -463,7 +464,6 @@ public class SparkLineTileSkin extends TileSkin {
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
 
         averageText.setX(size * 0.05);
         highText.setX(size * 0.05);
@@ -487,6 +487,9 @@ public class SparkLineTileSkin extends TileSkin {
 
         resizeStaticText();
         resizeDynamicText();
+
+        valueUnitFlow.setPrefWidth(size * 0.9);
+        valueUnitFlow.relocate(size * 0.05, size * 0.15);
     };
 
     @Override protected void redraw() {

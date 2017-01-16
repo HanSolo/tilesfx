@@ -20,19 +20,23 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 
 /**
  * Created by hansolo on 20.12.16.
  */
 public class NumberTileSkin extends TileSkin {
-    private Text  titleText;
-    private Text  text;
-    private Text  valueText;
-    private Text  unitText;
-    private Label description;
+    private Text     titleText;
+    private Text     text;
+    private Text     valueText;
+    private Text     unitText;
+    private TextFlow valueUnitFlow;
+    private Label    description;
 
 
     // ******************** Constructors **************************************
@@ -55,11 +59,16 @@ public class NumberTileSkin extends TileSkin {
 
         valueText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
         valueText.setFill(getSkinnable().getValueColor());
+        valueText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         unitText = new Text(" " + getSkinnable().getUnit());
         unitText.setFill(getSkinnable().getUnitColor());
+        unitText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+
+        valueUnitFlow = new TextFlow(valueText, unitText);
+        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
         description = new Label(getSkinnable().getText());
         description.setAlignment(Pos.TOP_RIGHT);
@@ -67,7 +76,7 @@ public class NumberTileSkin extends TileSkin {
         description.setTextFill(getSkinnable().getTextColor());
         Helper.enableNode(description, getSkinnable().isTextVisible());
 
-        getPane().getChildren().addAll(titleText, text, valueText, unitText, description);
+        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description);
     }
 
     @Override protected void registerListeners() {
@@ -100,11 +109,6 @@ public class NumberTileSkin extends TileSkin {
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        if (unitText.isVisible()) {
-            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
-        } else {
-            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
-        }
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
@@ -126,7 +130,6 @@ public class NumberTileSkin extends TileSkin {
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.29);
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
@@ -134,6 +137,9 @@ public class NumberTileSkin extends TileSkin {
 
     @Override protected void resize() {
         super.resize();
+
+        valueUnitFlow.setPrefWidth(size * 0.9);
+        valueUnitFlow.relocate(size * 0.05, size * 0.15);
 
         description.setPrefSize(size * 0.9, size * 43);
         description.relocate(size * 0.05, size * 0.42);
@@ -143,7 +149,8 @@ public class NumberTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(getSkinnable().getTitle());
         text.setText(getSkinnable().getText());
-        unitText.setText(" " + getSkinnable().getUnit());
+        valueText.setText(String.format(locale, formatString, getSkinnable().getCurrentValue()));
+        unitText.setText(getSkinnable().getUnit());
         description.setText(getSkinnable().getDescription());
 
         resizeDynamicText();

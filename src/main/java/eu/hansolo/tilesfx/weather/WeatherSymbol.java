@@ -42,6 +42,9 @@ public class WeatherSymbol extends Region {
 
 
     // ******************** Constructor ***************************************
+    public WeatherSymbol() {
+        this(ConditionAndIcon.NONE, PREFERRED_WIDTH, Color.WHITE);
+    }
     public WeatherSymbol(final ConditionAndIcon CONDITION, final double SIZE, final Color COLOR) {
         condition   = new ObjectPropertyBase<ConditionAndIcon>(null == CONDITION ? ConditionAndIcon.NONE : CONDITION) {
             @Override protected void invalidated() {

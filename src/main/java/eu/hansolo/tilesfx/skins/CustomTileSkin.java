@@ -20,7 +20,9 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 
 
@@ -110,10 +112,11 @@ public class CustomTileSkin extends TileSkin {
             graphicContainer.setPrefSize(containerWidth, containerHeight);
             graphicContainer.relocate(size * 0.05, size * 0.15);
 
-            if (null != getSkinnable().getGraphic()) {
+            if (null != getSkinnable().getGraphic() && getSkinnable().getGraphic() instanceof Shape) {
                 Node   graphic = getSkinnable().getGraphic();
                 double width   = graphic.getBoundsInLocal().getWidth();
                 double height  = graphic.getBoundsInLocal().getHeight();
+
                 if (width > containerWidth || height > containerHeight) {
                     double aspect = height / width;
                     if (aspect * width > height) {

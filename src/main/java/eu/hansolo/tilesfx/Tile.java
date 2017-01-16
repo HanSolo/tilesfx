@@ -85,9 +85,22 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class Tile extends Control {
-    public enum SkinType { AREA_CHART, BAR_CHART, LINE_CHART, CLOCK, GAUGE, HIGH_LOW,
-                           PERCENTAGE, PLUS_MINUS, SLIDER, SPARK_LINE, SWITCH, WORLDMAP,
-                           TIMER_CONTROL, NUMBER, TEXT, WEATHER, TIME, CUSTOM, LEADER_BOARD }
+    public enum SkinType { AREA_CHART("AreaChartTileSkin"), BAR_CHART("BarChartTileSkin"),
+                           LINE_CHART("LineChartTileSkin"), CLOCK("ClockTileSkin"), GAUGE("GaugeTileSkin"),
+                           HIGH_LOW("HighLowTileSkin)"), PERCENTAGE("PercentageTileSkin"),
+                           PLUS_MINUS("PlusMinusTileSkin"), SLIDER("SliderTileSkin"),
+                           SPARK_LINE("SparkLineTileSkin"), SWITCH("SwitchTileSkin"),
+                           WORLDMAP("WorldMapTileSkin"), TIMER_CONTROL("TimerControlTileSkin"),
+                           NUMBER("NumberTileSkin"), TEXT("TextTileSkin"),
+                           WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
+                           CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin");
+
+        public final String CLASS_NAME;
+
+        SkinType(final String CLASS_NAME) {
+            this.CLASS_NAME = CLASS_NAME;
+        }
+    }
     public enum TextSize {
         NORMAL(0.06),
         BIGGER(0.08);
@@ -554,6 +567,15 @@ public class Tile extends Control {
     private void registerListeners() {
         disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1));
         valueProperty().addListener((o, ov, nv) -> oldValue.set(ov.doubleValue()));
+        skinProperty().addListener((o, ov, nv) -> {
+           String className = (nv.getClass().toString()).substring(nv.getClass().toString().lastIndexOf(".") + 1);
+           for (SkinType skinType : SkinType.values()) {
+               if (skinType.CLASS_NAME.equals(className)) {
+                   presetTileParameters(skinType);
+                   break;
+               }
+           }
+        });
     }
 
 
@@ -3901,21 +3923,15 @@ public class Tile extends Control {
 
     @Override public String getUserAgentStylesheet() { return getClass().getResource("tilesfx.css").toExternalForm(); }
 
-    public SkinType getSkinType() { return skinType; }
-    public void setSkinType(final SkinType SKIN_TYPE) {
-        skinType = SKIN_TYPE;
+    private void presetTileParameters(final SkinType SKIN_TYPE) {
         switch (SKIN_TYPE) {
             case AREA_CHART:
-                super.setSkin(new AreaChartTileSkin(Tile.this));
                 break;
             case BAR_CHART:
-                super.setSkin(new BarChartTileSkin(Tile.this));
                 break;
             case LINE_CHART:
-                super.setSkin(new LineChartTileSkin(Tile.this));
                 break;
             case CLOCK:
-                super.setSkin(new ClockTileSkin(Tile.this));
                 break;
             case GAUGE:
                 setAnimated(true);
@@ -3923,69 +3939,79 @@ public class Tile extends Control {
                 setBarColor(FOREGROUND);
                 setThresholdColor(Tile.BLUE);
                 setThresholdVisible(true);
-                super.setSkin(new GaugeTileSkin(Tile.this));
                 break;
             case HIGH_LOW:
                 setMaxValue(Double.MAX_VALUE);
                 setDecimals(2);
                 setTickLabelDecimals(1);
-                super.setSkin(new HighLowTileSkin(Tile.this));
                 break;
             case PERCENTAGE:
                 setAnimated(true);
                 setThresholdColor(GRAY);
                 setTickLabelDecimals(0);
-                super.setSkin(new PercentageTileSkin(Tile.this));
                 break;
             case PLUS_MINUS:
-                super.setSkin(new PlusMinusTileSkin(Tile.this));
                 break;
             case SLIDER:
-                super.setSkin(new SliderTileSkin(Tile.this));
+                setBarBackgroundColor(Tile.FOREGROUND);
                 break;
             case SPARK_LINE:
                 setTextVisible(false);
                 setAnimated(false);
                 setAveragingEnabled(true);
                 setAveragingPeriod(10);
-                super.setSkin(new SparkLineTileSkin(Tile.this));
                 break;
             case SWITCH:
-                super.setSkin(new SwitchTileSkin(Tile.this));
                 break;
             case WORLDMAP:
                 setPrefSize(380, 250);
-                super.setSkin(new WorldMapTileSkin(Tile.this));
                 break;
             case TIMER_CONTROL:
                 setSectionsVisible(true);
                 setHighlightSections(true);
                 setCheckSectionsForValue(true);
-                super.setSkin(new TimerControlTileSkin(Tile.this));
                 break;
             case NUMBER:
-                super.setSkin(new NumberTileSkin(Tile.this));
                 break;
             case TEXT:
-                setTextVisible(true);
-                super.setSkin(new TextTileSkin(Tile.this));
                 break;
             case WEATHER:
-                super.setSkin(new WeatherTileSkin(Tile.this));
                 break;
             case TIME:
-                super.setSkin(new TimeTileSkin(Tile.this));
                 break;
             case CUSTOM:
-                setTextVisible(true);
-                super.setSkin(new CustomTileSkin(Tile.this));
                 break;
             case LEADER_BOARD:
-                super.setSkin(new LeaderBoardTileSkin(Tile.this));
                 break;
             default:
-                super.setSkin(new TileSkin(Tile.this));
                 break;
+        }
+    }
+
+    public SkinType getSkinType() { return skinType; }
+    public void setSkinType(final SkinType SKIN_TYPE) {
+        skinType = SKIN_TYPE;
+        switch (SKIN_TYPE) {
+            case AREA_CHART   : setSkin(new AreaChartTileSkin(Tile.this)); break;
+            case BAR_CHART    : setSkin(new BarChartTileSkin(Tile.this)); break;
+            case LINE_CHART   : setSkin(new LineChartTileSkin(Tile.this)); break;
+            case CLOCK        : setSkin(new ClockTileSkin(Tile.this)); break;
+            case GAUGE        : setSkin(new GaugeTileSkin(Tile.this)); break;
+            case HIGH_LOW     : setSkin(new HighLowTileSkin(Tile.this)); break;
+            case PERCENTAGE   : setSkin(new PercentageTileSkin(Tile.this)); break;
+            case PLUS_MINUS   : setSkin(new PlusMinusTileSkin(Tile.this)); break;
+            case SLIDER       : setSkin(new SliderTileSkin(Tile.this)); break;
+            case SPARK_LINE   : setSkin(new SparkLineTileSkin(Tile.this)); break;
+            case SWITCH       : setSkin(new SwitchTileSkin(Tile.this)); break;
+            case WORLDMAP     : setSkin(new WorldMapTileSkin(Tile.this)); break;
+            case TIMER_CONTROL: setSkin(new TimerControlTileSkin(Tile.this)); break;
+            case NUMBER       : setSkin(new NumberTileSkin(Tile.this)); break;
+            case TEXT         : setSkin(new TextTileSkin(Tile.this)); break;
+            case WEATHER      : setSkin(new WeatherTileSkin(Tile.this)); break;
+            case TIME         : setSkin(new TimeTileSkin(Tile.this)); break;
+            case CUSTOM       : setSkin(new CustomTileSkin(Tile.this)); break;
+            case LEADER_BOARD : setSkin(new LeaderBoardTileSkin(Tile.this)); break;
+            default           : setSkin(new TileSkin(Tile.this)); break;
         }
     }
 }

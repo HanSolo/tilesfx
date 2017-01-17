@@ -101,40 +101,49 @@ public class CustomTileSkin extends TileSkin {
     };
 
     @Override protected void resize() {
-        super.resize();
+        //super.resize();
 
-        double containerWidth  = size * 0.9;
-        double containerHeight = getSkinnable().isTextVisible() ? size * 0.72 : size * 0.795;
+        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
+        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+        size   = width < height ? width : height;
 
-        if (containerWidth > 0 && containerHeight > 0) {
-            graphicContainer.setMinSize(containerWidth, containerHeight);
-            graphicContainer.setMaxSize(containerWidth, containerHeight);
-            graphicContainer.setPrefSize(containerWidth, containerHeight);
-            graphicContainer.relocate(size * 0.05, size * 0.15);
+        double containerWidth  = width * 0.9;
+        double containerHeight = getSkinnable().isTextVisible() ? height * 0.72 : height * 0.795;
 
-            if (null != getSkinnable().getGraphic() && getSkinnable().getGraphic() instanceof Shape) {
-                Node   graphic = getSkinnable().getGraphic();
-                double width   = graphic.getBoundsInLocal().getWidth();
-                double height  = graphic.getBoundsInLocal().getHeight();
+        if (width > 0 && height > 0) {
+            pane.setMaxSize(width, height);
+            pane.setPrefSize(width, height);
 
-                if (width > containerWidth || height > containerHeight) {
-                    double aspect = height / width;
-                    if (aspect * width > height) {
-                        width = 1 / (aspect / height);
-                        graphic.setScaleX(containerWidth / width);
-                        graphic.setScaleY(containerWidth / width);
-                    } else if (1 / (aspect / height) > width) {
-                        height = aspect * width;
-                        graphic.setScaleX(containerHeight / height);
-                        graphic.setScaleY(containerHeight / height);
-                    } else {
-                        graphic.setScaleX(containerHeight / height);
-                        graphic.setScaleY(containerHeight / height);
+            if (containerWidth > 0 && containerHeight > 0) {
+                graphicContainer.setMinSize(containerWidth, containerHeight);
+                graphicContainer.setMaxSize(containerWidth, containerHeight);
+                graphicContainer.setPrefSize(containerWidth, containerHeight);
+                graphicContainer.relocate(size * 0.05, size * 0.15);
+
+                if (null != getSkinnable().getGraphic() && getSkinnable().getGraphic() instanceof Shape) {
+                    Node   graphic = getSkinnable().getGraphic();
+                    double width   = graphic.getBoundsInLocal().getWidth();
+                    double height  = graphic.getBoundsInLocal().getHeight();
+
+                    if (width > containerWidth || height > containerHeight) {
+                        double aspect = height / width;
+                        if (aspect * width > height) {
+                            width = 1 / (aspect / height);
+                            graphic.setScaleX(containerWidth / width);
+                            graphic.setScaleY(containerWidth / width);
+                        } else if (1 / (aspect / height) > width) {
+                            height = aspect * width;
+                            graphic.setScaleX(containerHeight / height);
+                            graphic.setScaleY(containerHeight / height);
+                        } else {
+                            graphic.setScaleX(containerHeight / height);
+                            graphic.setScaleY(containerHeight / height);
+                        }
                     }
                 }
             }
+            resizeStaticText();
         }
-        resizeStaticText();
     };
 
     @Override protected void redraw() {

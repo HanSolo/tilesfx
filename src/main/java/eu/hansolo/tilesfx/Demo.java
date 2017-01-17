@@ -313,6 +313,7 @@ public class Demo extends Application {
                                   .build();
 
         customTile = TileBuilder.create()
+                                .prefSize(510, 250)
                                 .skinType(SkinType.CUSTOM)
                                 .title("Custom Tile")
                                 .text("Whatever text")

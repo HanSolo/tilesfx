@@ -101,8 +101,6 @@ public class CustomTileSkin extends TileSkin {
     };
 
     @Override protected void resize() {
-        //super.resize();
-
         width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
         size   = width < height ? width : height;

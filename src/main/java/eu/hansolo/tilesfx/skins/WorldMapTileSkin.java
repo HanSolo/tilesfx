@@ -28,18 +28,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 
 /**
  * Created by hansolo on 19.12.16.
  */
 public class WorldMapTileSkin extends TileSkin {
-    protected static final double                         PREFERRED_WIDTH  = 380; //510;
+    protected static final double                         PREFERRED_WIDTH  = 500; //380; //510;
     protected static final double                         PREFERRED_HEIGHT = 250;
     private                Text                           titleText;
     private                Text                           text;
@@ -137,13 +134,8 @@ public class WorldMapTileSkin extends TileSkin {
         height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
         size   = width < height ? width : height;
 
-        final double ASPECT_RATIO = PREFERRED_HEIGHT / PREFERRED_WIDTH;
-
-        if (ASPECT_RATIO * width > height) {
-            width = 1 / (ASPECT_RATIO / height);
-        } else if (1 / (ASPECT_RATIO / height) > width) {
-            height = ASPECT_RATIO * width;
-        }
+        double containerWidth  = width * 0.9;
+        double containerHeight = getSkinnable().isTextVisible() ? height * 0.72 : height * 0.795;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -152,8 +144,8 @@ public class WorldMapTileSkin extends TileSkin {
             resizeStaticText();
             resizeDynamicText();
 
-            double worldMapHeight = height * 0.8;
-            double worldMapWidth  = worldMapHeight / 0.65906838;
+            double worldMapHeight = containerHeight;
+            double worldMapWidth  = containerHeight / 0.65906838;
 
             worldPane.setCache(true);
             worldPane.setCacheHint(CacheHint.SCALE);
@@ -162,7 +154,7 @@ public class WorldMapTileSkin extends TileSkin {
             worldPane.setScaleY(worldMapHeight / 665 * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
 
             group.resize(worldMapWidth, worldMapHeight);
-            group.relocate((width - worldMapWidth) * 0.5, (height - worldMapHeight) * (TextSize.NORMAL == textSize ? 0.5 : 0.7));
+            group.relocate((width - worldMapWidth) * 0.5, size * 0.15);
 
             worldPane.setCache(false);
         }

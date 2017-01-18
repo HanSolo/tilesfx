@@ -281,10 +281,13 @@ public class Demo extends Application {
         switchTile.setOnSwitchReleased(e -> System.out.println("Switch released"));
 
         worldTile = TileBuilder.create()
+                               .minWidth(510)
+                               .prefWidth(510)
+                               .maxWidth(510)
                                .skinType(SkinType.WORLDMAP)
                                .title("WorldMap Tile")
                                .text("Whatever text")
-                               .textVisible(true)
+                               .textVisible(false)
                                .build();
 
         // Update the weather information by calling weatherTile.updateWeather()
@@ -365,7 +368,7 @@ public class Demo extends Application {
         pane.setRowValignment(VPos.CENTER);
         pane.setCenterShape(true);
         pane.setPadding(new Insets(10));
-        pane.setPrefSize(1570, 790);
+        pane.setPrefSize(1310, 1050);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);

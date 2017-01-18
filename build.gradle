@@ -11,6 +11,7 @@ buildscript {
 
 // Medusa main build file
 plugins {
+    id 'com.gradle.build-scan' version '1.5'
     id 'idea'
     id 'java'
     id 'maven-publish'
@@ -19,6 +20,11 @@ plugins {
 }
 
 apply plugin: 'biz.aQute.bnd.builder'
+
+buildScan {
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
+}
 
 description = 'TilesFX is a JavaFX 8 library containing tiles for dashboards'
 

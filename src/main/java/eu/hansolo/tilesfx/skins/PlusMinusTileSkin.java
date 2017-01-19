@@ -86,10 +86,12 @@ public class PlusMinusTileSkin extends TileSkin {
         plusLabel = new Label("+");
         plusLabel.setAlignment(Pos.CENTER);
         plusLabel.setEffect(shadow);
+        plusLabel.setPickOnBounds(false);
         
         minusLabel = new Label("-");
         minusLabel.setAlignment(Pos.CENTER);
         minusLabel.setEffect(shadow);
+        minusLabel.setPickOnBounds(false);
 
         getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, minusLabel, plusLabel);
     }

@@ -19,13 +19,14 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.shape.ClosePath;
-import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -43,8 +44,8 @@ public class PlusMinusTileSkin extends TileSkin {
     private Text     unitText;
     private TextFlow valueUnitFlow;
     private Label    description;
-    private Path     plusButton;
-    private Path     minusButton;
+    private Label    plusLabel;
+    private Label    minusLabel;
 
 
     // ******************** Constructors **************************************
@@ -82,25 +83,29 @@ public class PlusMinusTileSkin extends TileSkin {
         description.setTextFill(getSkinnable().getTextColor());
         Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
 
-        plusButton = new Path();
-        plusButton.setPickOnBounds(true);
-        drawPlusButton();
-        plusButton.setEffect(shadow);
+        plusLabel = new Label("+");
+        plusLabel.setAlignment(Pos.CENTER);
+        plusLabel.setEffect(shadow);
+        
+        minusLabel = new Label("-");
+        minusLabel.setAlignment(Pos.CENTER);
+        minusLabel.setEffect(shadow);
 
-        minusButton = new Path();
-        minusButton.setPickOnBounds(true);
-        drawMinusButton();
-        minusButton.setEffect(shadow);
-
-        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, minusButton, plusButton);
+        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, minusLabel, plusLabel);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        plusButton.setOnMousePressed(e -> increment());
-        plusButton.setOnMouseReleased(e -> plusButton.setFill(getSkinnable().getForegroundColor()));
-        minusButton.setOnMousePressed(e -> decrement());
-        minusButton.setOnMouseReleased(e -> minusButton.setFill(getSkinnable().getForegroundColor()));
+        plusLabel.setOnMousePressed(e -> increment());
+        plusLabel.setOnMouseReleased(e -> {
+            plusLabel.setTextFill(getSkinnable().getForegroundColor());
+            plusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+        });
+        minusLabel.setOnMousePressed(e -> decrement());
+        minusLabel.setOnMouseReleased(e -> {
+            minusLabel.setTextFill(getSkinnable().getForegroundColor());
+            minusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+        });
     }
 
 
@@ -123,99 +128,16 @@ public class PlusMinusTileSkin extends TileSkin {
     };
 
     private void increment() {
-        plusButton.setFill(getSkinnable().getActiveColor());
+        plusLabel.setTextFill(getSkinnable().getActiveColor());
+        plusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getActiveColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
         double newValue = clamp(minValue, maxValue, getSkinnable().getValue() + getSkinnable().getIncrement());
         getSkinnable().setValue(newValue);
     }
     private void decrement() {
-        minusButton.setFill(getSkinnable().getActiveColor());
+        minusLabel.setTextFill(getSkinnable().getActiveColor());
+        minusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getActiveColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
         double newValue = clamp(minValue, maxValue, getSkinnable().getValue() - getSkinnable().getIncrement());
         getSkinnable().setValue(newValue);
-    }
-
-    private void drawMinusButton() {
-        double iconSize = PREFERRED_WIDTH * 0.18;
-        minusButton.getElements().clear();
-        minusButton.getElements().add(new MoveTo(0.05555555555555555 * iconSize, 0.5 * iconSize));
-        minusButton.getElements().add(new CubicCurveTo(0.05555555555555555 * iconSize, 0.25 * iconSize,
-                                                       0.25 * iconSize, 0.05555555555555555 * iconSize,
-                                                       0.5 * iconSize, 0.05555555555555555 * iconSize));
-        minusButton.getElements().add(new CubicCurveTo(0.75 * iconSize, 0.05555555555555555 * iconSize,
-                                                       0.9444444444444444 * iconSize, 0.25 * iconSize,
-                                                       0.9444444444444444 * iconSize, 0.5 * iconSize));
-        minusButton.getElements().add(new CubicCurveTo(0.9444444444444444 * iconSize, 0.75 * iconSize,
-                                                       0.75 * iconSize, 0.9444444444444444 * iconSize,
-                                                       0.5 * iconSize, 0.9444444444444444 * iconSize));
-        minusButton.getElements().add(new CubicCurveTo(0.25 * iconSize, 0.9444444444444444 * iconSize,
-                                                       0.05555555555555555 * iconSize, 0.75 * iconSize,
-                                                       0.05555555555555555 * iconSize, 0.5 * iconSize));
-        minusButton.getElements().add(new ClosePath());
-        minusButton.getElements().add(new MoveTo(0.0, 0.5 * iconSize));
-        minusButton.getElements().add(new CubicCurveTo(0.0, 0.7777777777777778 * iconSize,
-                                                       0.2222222222222222 * iconSize, iconSize,
-                                                       0.5 * iconSize, iconSize));
-        minusButton.getElements().add(new CubicCurveTo(0.7777777777777778 * iconSize, iconSize,
-                                                       iconSize, 0.7777777777777778 * iconSize,
-                                                       iconSize, 0.5 * iconSize));
-        minusButton.getElements().add(new CubicCurveTo(iconSize, 0.2222222222222222 * iconSize,
-                                                       0.7777777777777778 * iconSize, 0.0,
-                                                       0.5 * iconSize, 0.0));
-        minusButton.getElements().add(new CubicCurveTo(0.2222222222222222 * iconSize, 0.0,
-                                                       0.0, 0.2222222222222222 * iconSize,
-                                                       0.0, 0.5 * iconSize));
-        minusButton.getElements().add(new ClosePath());
-        minusButton.getElements().add(new MoveTo(0.19444444444444445 * iconSize, 0.4583333333333333 * iconSize));
-        minusButton.getElements().add(new LineTo(0.19444444444444445 * iconSize, 0.5694444444444444 * iconSize));
-        minusButton.getElements().add(new LineTo(0.8055555555555556 * iconSize, 0.5694444444444444 * iconSize));
-        minusButton.getElements().add(new LineTo(0.8055555555555556 * iconSize, 0.4583333333333333 * iconSize));
-        minusButton.getElements().add(new LineTo(0.19444444444444445 * iconSize, 0.4583333333333333 * iconSize));
-        minusButton.getElements().add(new ClosePath());
-    }
-    private void drawPlusButton() {
-        double iconSize = PREFERRED_WIDTH * 0.18;
-        plusButton.getElements().clear();
-        plusButton.getElements().add(new MoveTo(0.05555555555555555 * iconSize, 0.5 * iconSize));
-        plusButton.getElements().add(new CubicCurveTo(0.05555555555555555 * iconSize, 0.25 * iconSize,
-                                                      0.25 * iconSize, 0.05555555555555555 * iconSize,
-                                                      0.5 * iconSize, 0.05555555555555555 * iconSize));
-        plusButton.getElements().add(new CubicCurveTo(0.75 * iconSize, 0.05555555555555555 * iconSize,
-                                                      0.9444444444444444 * iconSize, 0.25 * iconSize,
-                                                      0.9444444444444444 * iconSize, 0.5 * iconSize));
-        plusButton.getElements().add(new CubicCurveTo(0.9444444444444444 * iconSize, 0.75 * iconSize,
-                                                      0.75 * iconSize, 0.9444444444444444 * iconSize,
-                                                      0.5 * iconSize, 0.9444444444444444 * iconSize));
-        plusButton.getElements().add(new CubicCurveTo(0.25 * iconSize, 0.9444444444444444 * iconSize,
-                                                      0.05555555555555555 * iconSize, 0.75 * iconSize,
-                                                      0.05555555555555555 * iconSize, 0.5 * iconSize));
-        plusButton.getElements().add(new ClosePath());
-        plusButton.getElements().add(new MoveTo(0.0, 0.5 * iconSize));
-        plusButton.getElements().add(new CubicCurveTo(0.0, 0.7777777777777778 * iconSize,
-                                                      0.2222222222222222 * iconSize, iconSize,
-                                                      0.5 * iconSize, iconSize));
-        plusButton.getElements().add(new CubicCurveTo(0.7777777777777778 * iconSize, iconSize,
-                                                      iconSize, 0.7777777777777778 * iconSize,
-                                                      iconSize, 0.5 * iconSize));
-        plusButton.getElements().add(new CubicCurveTo(iconSize, 0.2222222222222222 * iconSize,
-                                                      0.7777777777777778 * iconSize, 0.0,
-                                                      0.5 * iconSize, 0.0));
-        plusButton.getElements().add(new CubicCurveTo(0.2222222222222222 * iconSize, 0.0,
-                                                      0.0, 0.2222222222222222 * iconSize,
-                                                      0.0, 0.5 * iconSize));
-        plusButton.getElements().add(new ClosePath());
-        plusButton.getElements().add(new MoveTo(0.19444444444444445 * iconSize, 0.4583333333333333 * iconSize));
-        plusButton.getElements().add(new LineTo(0.19444444444444445 * iconSize, 0.5694444444444444 * iconSize));
-        plusButton.getElements().add(new LineTo(0.4444444444444444 * iconSize, 0.5694444444444444 * iconSize));
-        plusButton.getElements().add(new LineTo(0.4444444444444444 * iconSize, 0.8194444444444444 * iconSize));
-        plusButton.getElements().add(new LineTo(0.5555555555555556 * iconSize, 0.8194444444444444 * iconSize));
-        plusButton.getElements().add(new LineTo(0.5555555555555556 * iconSize, 0.5694444444444444 * iconSize));
-        plusButton.getElements().add(new LineTo(0.8055555555555556 * iconSize, 0.5694444444444444 * iconSize));
-        plusButton.getElements().add(new LineTo(0.8055555555555556 * iconSize, 0.4583333333333333 * iconSize));
-        plusButton.getElements().add(new LineTo(0.5555555555555556 * iconSize, 0.4583333333333333 * iconSize));
-        plusButton.getElements().add(new LineTo(0.5555555555555556 * iconSize, 0.20833333333333334 * iconSize));
-        plusButton.getElements().add(new LineTo(0.4444444444444444 * iconSize, 0.20833333333333334 * iconSize));
-        plusButton.getElements().add(new LineTo(0.4444444444444444 * iconSize, 0.4583333333333333 * iconSize));
-        plusButton.getElements().add(new LineTo(0.19444444444444445 * iconSize, 0.4583333333333333 * iconSize));
-        plusButton.getElements().add(new ClosePath());
     }
 
 
@@ -257,11 +179,23 @@ public class PlusMinusTileSkin extends TileSkin {
         description.setPrefSize(size * 0.9, size * 43);
         description.relocate(size * 0.05, size * 0.42);
 
-        minusButton.resize(size * 0.18, size * 0.18);
-        minusButton.relocate(size * 0.05, size * 0.80 - minusButton.getLayoutBounds().getHeight());
+        double buttonSize = size * 0.18;
 
-        plusButton.resize(size * 0.18, size * 0.18);
-        plusButton.relocate(size * 0.95 - plusButton.getLayoutBounds().getWidth(), size * 0.80 - plusButton.getLayoutBounds().getHeight());
+        minusLabel.setFont(Fonts.latoBold(size * 0.2));
+        minusLabel.setPrefSize(buttonSize, buttonSize);
+        minusLabel.setMinSize(buttonSize, buttonSize);
+        minusLabel.setMaxSize(buttonSize, buttonSize);
+        minusLabel.setPadding(new Insets(-0.055 * size, 0, 0, 0));
+        minusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+        minusLabel.relocate(size * 0.05, size * 0.80 - buttonSize);
+        
+        plusLabel.setFont(Fonts.latoBold(size * 0.2));
+        plusLabel.setPrefSize(buttonSize, buttonSize);
+        plusLabel.setMinSize(buttonSize, buttonSize);
+        plusLabel.setMaxSize(buttonSize, buttonSize);
+        plusLabel.setPadding(new Insets(-0.05 * size, 0, 0, 0));
+        plusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+        plusLabel.relocate(size * 0.95 - buttonSize, size * 0.80 - buttonSize);
 
         valueUnitFlow.setPrefWidth(size * 0.9);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
@@ -279,7 +213,7 @@ public class PlusMinusTileSkin extends TileSkin {
         text.setFill(getSkinnable().getTextColor());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());
-        plusButton.setFill(getSkinnable().getForegroundColor());
-        minusButton.setFill(getSkinnable().getForegroundColor());
+        plusLabel.setTextFill(getSkinnable().getForegroundColor());
+        minusLabel.setTextFill(getSkinnable().getForegroundColor());
     };
 }

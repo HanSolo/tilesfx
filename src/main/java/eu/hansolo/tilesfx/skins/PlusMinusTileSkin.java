@@ -19,9 +19,12 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
@@ -38,14 +41,15 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class PlusMinusTileSkin extends TileSkin {
-    private Text     titleText;
-    private Text     text;
-    private Text     valueText;
-    private Text     unitText;
-    private TextFlow valueUnitFlow;
-    private Label    description;
-    private Label    plusLabel;
-    private Label    minusLabel;
+    private Text                     titleText;
+    private Text                     text;
+    private Text                     valueText;
+    private Text                     unitText;
+    private TextFlow                 valueUnitFlow;
+    private Label                    description;
+    private Label                    plusLabel;
+    private Label                    minusLabel;
+    private EventHandler<MouseEvent> mouseEventHandler;
 
 
     // ******************** Constructors **************************************
@@ -58,30 +62,50 @@ public class PlusMinusTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
+        mouseEventHandler = e -> {
+            final EventType TYPE = e.getEventType();
+            final Label     SRC  = (Label) e.getSource();
+            if (MouseEvent.MOUSE_PRESSED == TYPE) {
+                if (SRC.equals(minusLabel)) {
+                    decrement();
+                } else if (SRC.equals(plusLabel)) {
+                    increment();
+                }
+            } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
+                if (SRC.equals(minusLabel)) {
+                    minusLabel.setTextFill(tile.getForegroundColor());
+                    minusLabel.setBorder(new Border(new BorderStroke(tile.getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+                } else if (SRC.equals(plusLabel)) {
+                    plusLabel.setTextFill(tile.getForegroundColor());
+                    plusLabel.setBorder(new Border(new BorderStroke(tile.getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+                }
+            }
+        };
+
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getText());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getText());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
-        valueText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText = new Text(String.format(locale, formatString, ((tile.getValue() - minValue) / range * 100)));
+        valueText.setFill(tile.getValueColor());
+        Helper.enableNode(valueText, tile.isValueVisible());
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText = new Text(tile.getUnit());
+        unitText.setFill(tile.getUnitColor());
+        Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
         valueUnitFlow = new TextFlow(valueText, unitText);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
-        description = new Label(getSkinnable().getDescription());
+        description = new Label(tile.getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
-        description.setTextFill(getSkinnable().getTextColor());
-        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+        description.setTextFill(tile.getTextColor());
+        Helper.enableNode(description, !tile.getDescription().isEmpty());
 
         plusLabel = new Label("+");
         plusLabel.setAlignment(Pos.CENTER);
@@ -98,16 +122,10 @@ public class PlusMinusTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        plusLabel.setOnMousePressed(e -> increment());
-        plusLabel.setOnMouseReleased(e -> {
-            plusLabel.setTextFill(getSkinnable().getForegroundColor());
-            plusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
-        });
-        minusLabel.setOnMousePressed(e -> decrement());
-        minusLabel.setOnMouseReleased(e -> {
-            minusLabel.setTextFill(getSkinnable().getForegroundColor());
-            minusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
-        });
+        plusLabel.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
+        plusLabel.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
+        minusLabel.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
+        minusLabel.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
     }
 
 
@@ -116,11 +134,11 @@ public class PlusMinusTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
+            Helper.enableNode(valueText, tile.isValueVisible());
+            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     };
 
@@ -130,16 +148,24 @@ public class PlusMinusTileSkin extends TileSkin {
     };
 
     private void increment() {
-        plusLabel.setTextFill(getSkinnable().getActiveColor());
-        plusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getActiveColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
-        double newValue = clamp(minValue, maxValue, getSkinnable().getValue() + getSkinnable().getIncrement());
-        getSkinnable().setValue(newValue);
+        plusLabel.setTextFill(tile.getActiveColor());
+        plusLabel.setBorder(new Border(new BorderStroke(tile.getActiveColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+        double newValue = clamp(minValue, maxValue, tile.getValue() + tile.getIncrement());
+        tile.setValue(newValue);
     }
     private void decrement() {
-        minusLabel.setTextFill(getSkinnable().getActiveColor());
-        minusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getActiveColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
-        double newValue = clamp(minValue, maxValue, getSkinnable().getValue() - getSkinnable().getIncrement());
-        getSkinnable().setValue(newValue);
+        minusLabel.setTextFill(tile.getActiveColor());
+        minusLabel.setBorder(new Border(new BorderStroke(tile.getActiveColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+        double newValue = clamp(minValue, maxValue, tile.getValue() - tile.getIncrement());
+        tile.setValue(newValue);
+    }
+
+    @Override public void dispose() {
+        plusLabel.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
+        plusLabel.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
+        minusLabel.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
+        minusLabel.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
+        super.dispose();
     }
 
 
@@ -160,7 +186,7 @@ public class PlusMinusTileSkin extends TileSkin {
 
         maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -188,7 +214,7 @@ public class PlusMinusTileSkin extends TileSkin {
         minusLabel.setMinSize(buttonSize, buttonSize);
         minusLabel.setMaxSize(buttonSize, buttonSize);
         minusLabel.setPadding(new Insets(-0.055 * size, 0, 0, 0));
-        minusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+        minusLabel.setBorder(new Border(new BorderStroke(tile.getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
         minusLabel.relocate(size * 0.05, size * 0.80 - buttonSize);
         
         plusLabel.setFont(Fonts.latoBold(size * 0.2));
@@ -196,7 +222,7 @@ public class PlusMinusTileSkin extends TileSkin {
         plusLabel.setMinSize(buttonSize, buttonSize);
         plusLabel.setMaxSize(buttonSize, buttonSize);
         plusLabel.setPadding(new Insets(-0.05 * size, 0, 0, 0));
-        plusLabel.setBorder(new Border(new BorderStroke(getSkinnable().getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
+        plusLabel.setBorder(new Border(new BorderStroke(tile.getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
         plusLabel.relocate(size * 0.95 - buttonSize, size * 0.80 - buttonSize);
 
         valueUnitFlow.setPrefWidth(size * 0.9);
@@ -205,17 +231,17 @@ public class PlusMinusTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
-        unitText.setText(getSkinnable().getUnit());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
+        unitText.setText(tile.getUnit());
 
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        plusLabel.setTextFill(getSkinnable().getForegroundColor());
-        minusLabel.setTextFill(getSkinnable().getForegroundColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
+        valueText.setFill(tile.getValueColor());
+        unitText.setFill(tile.getUnitColor());
+        plusLabel.setTextFill(tile.getForegroundColor());
+        minusLabel.setTextFill(tile.getForegroundColor());
     };
 }

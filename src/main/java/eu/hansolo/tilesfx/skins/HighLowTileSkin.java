@@ -75,42 +75,42 @@ public class HighLowTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateState(getSkinnable().getValue(), getSkinnable().getReferenceValue());
+        updateState(tile.getValue(), tile.getReferenceValue());
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getUnit());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getUnit());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText = new Text(String.format(locale, formatString, tile.getValue()));
+        valueText.setFill(tile.getValueColor());
+        Helper.enableNode(valueText, tile.isValueVisible());
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText = new Text(tile.getUnit());
+        unitText.setFill(tile.getUnitColor());
+        Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
         valueUnitFlow = new TextFlow(valueText, unitText);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
-        description = new Label(getSkinnable().getDescription());
+        description = new Label(tile.getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
-        description.setTextFill(getSkinnable().getTextColor());
-        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+        description.setTextFill(tile.getTextColor());
+        Helper.enableNode(description, !tile.getDescription().isEmpty());
 
         indicator = new SVGPath();
         indicator.setContent("M 14 8 C 15 7 16 7 17 8 C 17 8 30 20 30 20 C 32 22 31 24 28 24 C 28 24 3 24 3 24 C 0 24 -1 22 1 20 C 1 20 14 8 14 8 Z");
         indicator.resize(PREFERRED_WIDTH * 0.11034483, PREFERRED_HEIGHT * 0.06896552);
         indicator.setFill(state.color);
 
-        referenceText = new Text(String.format(locale, formatString, getSkinnable().getReferenceValue()));
+        referenceText = new Text(String.format(locale, formatString, tile.getReferenceValue()));
         referenceText.setFill(state.color);
 
-        referenceUnitText = new Text(getSkinnable().getUnit());
+        referenceUnitText = new Text(tile.getUnit());
         referenceUnitText.setFill(Tile.FOREGROUND);
 
         referenceUnitFlow = new TextFlow(referenceText, referenceUnitText);
@@ -128,18 +128,18 @@ public class HighLowTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
+            Helper.enableNode(valueText, tile.isValueVisible());
+            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     };
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        updateState(VALUE, getSkinnable().getReferenceValue());
+        updateState(VALUE, tile.getReferenceValue());
         valueText.setText(String.format(locale, formatString, VALUE));
-        referenceText.setText(String.format(locale, formatString, getSkinnable().getReferenceValue()));
+        referenceText.setText(String.format(locale, formatString, tile.getReferenceValue()));
 
         resizeDynamicText();
 
@@ -191,7 +191,7 @@ public class HighLowTileSkin extends TileSkin {
 
         maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -240,19 +240,19 @@ public class HighLowTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
-        referenceText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getReferenceValue()));
-        unitText.setText(getSkinnable().getUnit());
-        description.setText(getSkinnable().getDescription());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
+        referenceText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getReferenceValue()));
+        unitText.setText(tile.getUnit());
+        description.setText(tile.getDescription());
 
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        description.setTextFill(getSkinnable().getDescriptionColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
+        valueText.setFill(tile.getValueColor());
+        unitText.setFill(tile.getUnitColor());
+        description.setTextFill(tile.getDescriptionColor());
         referenceText.setFill(state.color);
         referenceUnitText.setFill(state.color);
         indicator.setFill(state.color);

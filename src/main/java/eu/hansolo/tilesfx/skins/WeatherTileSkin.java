@@ -59,29 +59,29 @@ public class WeatherTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        darkSky = getSkinnable().getDarkSky();
+        darkSky = tile.getDarkSky();
 
-        titleText = new Text(getSkinnable().getTitle());
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText = new Text(tile.getTitle());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
         valueText = new Text();
 
         unitText = new Text(darkSky.getUnit().temperatureUnitString);
 
         summaryText = new Text("");
-        summaryText.setFill(getSkinnable().getTextColor());
+        summaryText.setFill(tile.getTextColor());
 
-        sunriseSymbol = new WeatherSymbol(ConditionAndIcon.SUNRISE, 22, getSkinnable().getForegroundColor());
-        sunsetSymbol = new WeatherSymbol(ConditionAndIcon.SUNSET, 22, getSkinnable().getForegroundColor());
+        sunriseSymbol = new WeatherSymbol(ConditionAndIcon.SUNRISE, 22, tile.getForegroundColor());
+        sunsetSymbol = new WeatherSymbol(ConditionAndIcon.SUNSET, 22, tile.getForegroundColor());
 
         sunriseText = new Text("");
-        sunriseText.setFill(getSkinnable().getTextColor());
+        sunriseText.setFill(tile.getTextColor());
 
         sunsetText = new Text("");
-        sunsetText.setFill(getSkinnable().getTextColor());
+        sunsetText.setFill(tile.getTextColor());
 
-        weatherSymbol = new WeatherSymbol(ConditionAndIcon.NONE, 250, getSkinnable().getForegroundColor());
+        weatherSymbol = new WeatherSymbol(ConditionAndIcon.NONE, 250, tile.getForegroundColor());
 
         getPane().getChildren().addAll(titleText, valueText, unitText, weatherSymbol, summaryText,
                                        sunriseSymbol, sunsetSymbol, sunriseText, sunsetText);
@@ -97,9 +97,9 @@ public class WeatherTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(valueText, tile.isValueVisible());
+            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
         }
     };
 
@@ -174,7 +174,7 @@ public class WeatherTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
 
-        titleText.setText(getSkinnable().getTitle());
+        titleText.setText(tile.getTitle());
         resizeStaticText();
 
         DataPoint today = darkSky.getToday();
@@ -188,12 +188,12 @@ public class WeatherTileSkin extends TileSkin {
         sunsetText.setText(TF.format(today.getSunsetTime()));
         resizeDynamicText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        summaryText.setFill(getSkinnable().getTextColor());
-        weatherSymbol.setSymbolColor(getSkinnable().getForegroundColor());
-        sunriseSymbol.setSymbolColor(getSkinnable().getForegroundColor());
-        sunsetSymbol.setSymbolColor(getSkinnable().getForegroundColor());
+        titleText.setFill(tile.getTitleColor());
+        valueText.setFill(tile.getValueColor());
+        unitText.setFill(tile.getUnitColor());
+        summaryText.setFill(tile.getTextColor());
+        weatherSymbol.setSymbolColor(tile.getForegroundColor());
+        sunriseSymbol.setSymbolColor(tile.getForegroundColor());
+        sunsetSymbol.setSymbolColor(tile.getForegroundColor());
     };
 }

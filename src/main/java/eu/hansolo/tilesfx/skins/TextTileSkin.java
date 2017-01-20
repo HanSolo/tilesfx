@@ -46,21 +46,21 @@ public class TextTileSkin extends TileSkin {
         super.initGraphics();
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        description = new Label(getSkinnable().getDescription());
+        description = new Label(tile.getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setTextAlignment(TextAlignment.RIGHT);
         description.setWrapText(true);
         description.setTextOverrun(OverrunStyle.WORD_ELLIPSIS);
-        description.setTextFill(getSkinnable().getTextColor());
+        description.setTextFill(tile.getTextColor());
         description.setPrefSize(PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.795);
-        Helper.enableNode(description, getSkinnable().isTextVisible());
+        Helper.enableNode(description, tile.isTextVisible());
 
-        text = new Text(getSkinnable().getText());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getText());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
         getPane().getChildren().addAll(titleText, text, description);
     }
@@ -75,9 +75,9 @@ public class TextTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
+            Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     };
 
@@ -97,7 +97,7 @@ public class TextTileSkin extends TileSkin {
 
         maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -113,15 +113,15 @@ public class TextTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
-        description.setText(getSkinnable().getDescription());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
+        description.setText(tile.getDescription());
 
         resizeDynamicText();
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
-        description.setTextFill(getSkinnable().getTextColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
+        description.setTextFill(tile.getTextColor());
     };
 }

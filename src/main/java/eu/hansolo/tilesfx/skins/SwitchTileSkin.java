@@ -26,8 +26,12 @@ import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
+import javafx.beans.InvalidationListener;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -40,13 +44,15 @@ import javafx.util.Duration;
 public class SwitchTileSkin extends TileSkin {
     private static final SwitchEvent SWITCH_PRESSED  = new SwitchEvent(SwitchEvent.SWITCH_PRESSED);
     private static final SwitchEvent SWITCH_RELEASED = new SwitchEvent(SwitchEvent.SWITCH_RELEASED);
-    private Text      titleText;
-    private Text      text;
-    private Label     description;
-    private Rectangle switchBorder;
-    private Rectangle switchBackground;
-    private Circle    thumb;
-    private Timeline  timeline;
+    private Text                     titleText;
+    private Text                     text;
+    private Label                    description;
+    private Rectangle                switchBorder;
+    private Rectangle                switchBackground;
+    private Circle                   thumb;
+    private Timeline                 timeline;
+    private EventHandler<MouseEvent> mouseEventHandler;
+    private InvalidationListener     selectedListener;
 
 
     // ******************** Constructors **************************************
@@ -59,27 +65,38 @@ public class SwitchTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
+        mouseEventHandler = e -> {
+            final EventType TYPE = e.getEventType();
+            if (MouseEvent.MOUSE_PRESSED == TYPE) {
+                tile.setSelected(!tile.isSelected());
+                tile.fireEvent(SWITCH_PRESSED);
+            } else if(MouseEvent.MOUSE_RELEASED == TYPE) {
+                tile.fireEvent(SWITCH_RELEASED);
+            }
+        };
+        selectedListener = o -> moveThumb();
+
         timeline = new Timeline();
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getText());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getText());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
-        description = new Label(getSkinnable().getDescription());
+        description = new Label(tile.getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
-        description.setTextFill(getSkinnable().getTextColor());
-        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+        description.setTextFill(tile.getTextColor());
+        Helper.enableNode(description, !tile.getDescription().isEmpty());
 
         switchBorder = new Rectangle();
 
         switchBackground = new Rectangle();
         switchBackground.setMouseTransparent(true);
-        switchBackground.setFill(getSkinnable().isSelected() ? getSkinnable().getActiveColor() : getSkinnable().getBackgroundColor());
+        switchBackground.setFill(tile.isSelected() ? tile.getActiveColor() : tile.getBackgroundColor());
 
         thumb = new Circle();
         thumb.setMouseTransparent(true);
@@ -90,12 +107,9 @@ public class SwitchTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        switchBorder.setOnMousePressed(e -> {
-            getSkinnable().setSelected(!getSkinnable().isSelected());
-            getSkinnable().fireEvent(SWITCH_PRESSED);
-        });
-        switchBorder.setOnMouseReleased(e -> getSkinnable().fireEvent(SWITCH_RELEASED));
-        getSkinnable().selectedProperty().addListener(e -> moveThumb());
+        switchBorder.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
+        switchBorder.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
+        tile.selectedProperty().addListener(selectedListener);
     }
 
 
@@ -104,18 +118,18 @@ public class SwitchTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
+            Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     };
 
     private void moveThumb() {
         KeyValue thumbLeftX                 = new KeyValue(thumb.centerXProperty(), size * 0.3875);
         KeyValue thumbRightX                = new KeyValue(thumb.centerXProperty(), size * 0.6125);
-        KeyValue switchBackgroundLeftColor  = new KeyValue(switchBackground.fillProperty(), getSkinnable().getBackgroundColor());
-        KeyValue switchBackgroundRightColor = new KeyValue(switchBackground.fillProperty(), getSkinnable().getActiveColor());
-        if (getSkinnable().isSelected()) {
+        KeyValue switchBackgroundLeftColor  = new KeyValue(switchBackground.fillProperty(), tile.getBackgroundColor());
+        KeyValue switchBackgroundRightColor = new KeyValue(switchBackground.fillProperty(), tile.getActiveColor());
+        if (tile.isSelected()) {
             // move thumb from left to the right
             KeyFrame kf0 = new KeyFrame(Duration.ZERO, thumbLeftX, switchBackgroundLeftColor);
             KeyFrame kf1 = new KeyFrame(Duration.millis(200), thumbRightX, switchBackgroundRightColor);
@@ -127,6 +141,13 @@ public class SwitchTileSkin extends TileSkin {
             timeline.getKeyFrames().setAll(kf0, kf1);
         }
         timeline.play();
+    }
+
+    @Override public void dispose() {
+        switchBorder.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
+        switchBorder.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
+        tile.selectedProperty().removeListener(selectedListener);
+        super.dispose();
     }
 
 
@@ -141,7 +162,7 @@ public class SwitchTileSkin extends TileSkin {
 
         maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -161,31 +182,31 @@ public class SwitchTileSkin extends TileSkin {
         switchBorder.setHeight(size * 0.22);
         switchBorder.setArcWidth(size * 0.22);
         switchBorder.setArcHeight(size * 0.22);
-        switchBorder.relocate((size - switchBorder.getWidth()) * 0.5, getSkinnable().getDescription().isEmpty() ? (size - switchBorder.getHeight()) * 0.5 : size * 0.60);
+        switchBorder.relocate((size - switchBorder.getWidth()) * 0.5, tile.getDescription().isEmpty() ? (size - switchBorder.getHeight()) * 0.5 : size * 0.60);
 
         switchBackground.setWidth(size * 0.425);
         switchBackground.setHeight(size * 0.2);
         switchBackground.setArcWidth(size * 0.2);
         switchBackground.setArcHeight(size * 0.2);
-        switchBackground.relocate((size - switchBackground.getWidth()) * 0.5, getSkinnable().getDescription().isEmpty() ? (size - switchBackground.getHeight()) * 0.5 : size * 0.61);
+        switchBackground.relocate((size - switchBackground.getWidth()) * 0.5, tile.getDescription().isEmpty() ? (size - switchBackground.getHeight()) * 0.5 : size * 0.61);
 
         thumb.setRadius(size * 0.09);
-        thumb.setCenterX(getSkinnable().isSelected() ? size * 0.6125 : size * 0.3875);
-        thumb.setCenterY(getSkinnable().getDescription().isEmpty() ? size * 0.5 : size * 0.71);
+        thumb.setCenterX(tile.isSelected() ? size * 0.6125 : size * 0.3875);
+        thumb.setCenterY(tile.getDescription().isEmpty() ? size * 0.5 : size * 0.71);
     };
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
-        description.setText(getSkinnable().getDescription());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
+        description.setText(tile.getDescription());
 
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
-        description.setTextFill(getSkinnable().getDescriptionColor());
-        switchBorder.setFill(getSkinnable().getForegroundColor());
-        thumb.setFill(getSkinnable().getForegroundColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
+        description.setTextFill(tile.getDescriptionColor());
+        switchBorder.setFill(tile.getForegroundColor());
+        thumb.setFill(tile.getForegroundColor());
     };
 }

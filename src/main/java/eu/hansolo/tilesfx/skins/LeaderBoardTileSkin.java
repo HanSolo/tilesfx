@@ -21,6 +21,7 @@ import eu.hansolo.tilesfx.events.UpdateEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
 import javafx.scene.layout.Pane;
@@ -39,6 +40,7 @@ public class LeaderBoardTileSkin extends TileSkin {
     private Text                      text;
     private Pane                      leaderBoardPane;
     private EventHandler<UpdateEvent> updateHandler;
+    private InvalidationListener      paneSizeListener;
 
 
     // ******************** Constructors **************************************
@@ -51,9 +53,10 @@ public class LeaderBoardTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateHandler = e -> updateChart();
+        updateHandler    = e -> updateChart();
+        paneSizeListener = o -> resizeItems();
 
-        List<LeaderBoardItem> leaderBoardItems = getSkinnable().getLeaderBoardItems().stream()
+        List<LeaderBoardItem> leaderBoardItems = tile.getLeaderBoardItems().stream()
                                                                .sorted(Comparator.comparing(LeaderBoardItem::getValue).reversed())
                                                                .collect(Collectors.toList());
 
@@ -63,20 +66,20 @@ public class LeaderBoardTileSkin extends TileSkin {
         leaderBoardPane.getChildren().addAll(leaderBoardItems);
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getText());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getText());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
         getPane().getChildren().addAll(titleText, text, leaderBoardPane);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        pane.widthProperty().addListener(o -> resizeItems());
-        pane.heightProperty().addListener(o -> resizeItems());
+        pane.widthProperty().addListener(paneSizeListener);
+        pane.heightProperty().addListener(paneSizeListener);
     }
 
 
@@ -85,15 +88,15 @@ public class LeaderBoardTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
         } else if ("DATA".equals(EVENT_TYPE)) {
             registerItemListeners();
         }
     };
 
     private void registerItemListeners() {
-        getSkinnable().getLeaderBoardItems().forEach(item -> {
+        tile.getLeaderBoardItems().forEach(item -> {
             item.setFormatString(formatString);
             item.addEventFilter(UpdateEvent.UPDATE_LEADER_BOARD, new WeakEventHandler<>(updateHandler));
             item.valueProperty().addListener((o, ov, nv) -> sortItems());
@@ -101,17 +104,23 @@ public class LeaderBoardTileSkin extends TileSkin {
     }
 
     private void sortItems() {
-        List<LeaderBoardItem> items = getSkinnable().getLeaderBoardItems();
+        List<LeaderBoardItem> items = tile.getLeaderBoardItems();
         items.sort(Comparator.comparing(LeaderBoardItem::getValue).reversed());
         items.forEach(i -> i.setIndex(items.indexOf(i)));
         updateChart();
+    }
+
+    @Override public void dispose() {
+        pane.widthProperty().removeListener(paneSizeListener);
+        pane.heightProperty().removeListener(paneSizeListener);
+        super.dispose();
     }
 
 
     // ******************** Resizing ******************************************
     private void updateChart() {
         Platform.runLater(() -> {
-            List<LeaderBoardItem> items = getSkinnable().getLeaderBoardItems();
+            List<LeaderBoardItem> items = tile.getLeaderBoardItems();
             int noOfItems = items.size();
             if (noOfItems == 0) return;
 
@@ -135,7 +144,7 @@ public class LeaderBoardTileSkin extends TileSkin {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -149,7 +158,7 @@ public class LeaderBoardTileSkin extends TileSkin {
         super.resize();
 
         leaderBoardPane.setPrefSize(width, height);
-        List<LeaderBoardItem> items = getSkinnable().getLeaderBoardItems();
+        List<LeaderBoardItem> items = tile.getLeaderBoardItems();
         int noOfItems = items.size();
         if (noOfItems == 0) return;
         for (int i = 0 ; i < noOfItems ; i++) {
@@ -165,18 +174,18 @@ public class LeaderBoardTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
 
-        getSkinnable().getLeaderBoardItems().forEach(item -> {
-            item.setNameColor(getSkinnable().getTextColor());
-            item.setValueColor(getSkinnable().getValueColor());
+        tile.getLeaderBoardItems().forEach(item -> {
+            item.setNameColor(tile.getTextColor());
+            item.setValueColor(tile.getValueColor());
         });
 
         resizeDynamicText();
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
     };
 }

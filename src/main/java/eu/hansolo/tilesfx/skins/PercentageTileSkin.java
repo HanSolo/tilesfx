@@ -66,60 +66,59 @@ public class PercentageTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        barColor = getSkinnable().getBarColor();
+        barColor = tile.getBarColor();
 
         barBackground = new Region();
-        barBackground.setBackground(new Background(new BackgroundFill(getSkinnable().getBarBackgroundColor(), new CornerRadii(0.0, 0.0, 0.025, 0.025, true), Insets.EMPTY)));
+        barBackground.setBackground(new Background(new BackgroundFill(tile.getBarBackgroundColor(), new CornerRadii(0.0, 0.0, 0.025, 0.025, true), Insets.EMPTY)));
 
         barClip = new Rectangle();
 
         bar = new Rectangle();
-        bar.setFill(getSkinnable().getBarColor());
+        bar.setFill(tile.getBarColor());
         bar.setStroke(null);
         bar.setClip(barClip);
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, ((getSkinnable().getValue() - minValue) / range * 100)));
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText = new Text(String.format(locale, formatString, ((tile.getValue() - minValue) / range * 100)));
+        valueText.setFill(tile.getValueColor());
+        Helper.enableNode(valueText, tile.isValueVisible());
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText = new Text(tile.getUnit());
+        unitText.setFill(tile.getUnitColor());
+        Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
         valueUnitFlow = new TextFlow(valueText, unitText);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
-        description = new Label(getSkinnable().getDescription());
+        description = new Label(tile.getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
-        description.setTextFill(getSkinnable().getTextColor());
-        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+        description.setTextFill(tile.getTextColor());
+        Helper.enableNode(description, !tile.getDescription().isEmpty());
 
         percentageText = new Text();
-        percentageText.setFill(getSkinnable().getBarColor());
+        percentageText.setFill(tile.getBarColor());
 
         percentageUnitText = new Text("%");
-        percentageUnitText.setFill(getSkinnable().getBarColor());
+        percentageUnitText.setFill(tile.getBarColor());
 
         maxValueRect = new Rectangle();
-        maxValueRect.setFill(getSkinnable().getThresholdColor());
+        maxValueRect.setFill(tile.getThresholdColor());
 
         maxValueText = new Text();
-        maxValueText.setFill(getSkinnable().getBackgroundColor());
+        maxValueText.setFill(tile.getBackgroundColor());
 
-        maxValueUnitText = new Text(getSkinnable().getUnit());
-        maxValueUnitText.setFill(getSkinnable().getBackgroundColor());
+        maxValueUnitText = new Text(tile.getUnit());
+        maxValueUnitText.setFill(tile.getBackgroundColor());
 
         getPane().getChildren().addAll(barBackground, bar, titleText, valueUnitFlow, description, percentageText, percentageUnitText, maxValueRect, maxValueText, maxValueUnitText);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-
     }
 
 
@@ -128,10 +127,10 @@ public class PercentageTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(valueText, tile.isValueVisible());
+            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     };
 
@@ -140,7 +139,7 @@ public class PercentageTileSkin extends TileSkin {
         bar.setWidth(targetValue);
         valueText.setText(String.format(locale, formatString, VALUE));
         percentageText.setText(String.format(locale, formatString, ((VALUE - minValue) / range * 100)));
-        maxValueRect.setFill(Double.compare(VALUE, maxValue) >= 0 ? barColor : getSkinnable().getThresholdColor());
+        maxValueRect.setFill(Double.compare(VALUE, maxValue) >= 0 ? barColor : tile.getThresholdColor());
         resizeDynamicText();
         if (sectionsVisible && !sections.isEmpty()) { setBarColor(VALUE); }
     };
@@ -228,12 +227,12 @@ public class PercentageTileSkin extends TileSkin {
         barClip.setY(size * 0.95);
         barClip.setWidth(size);
         barClip.setHeight(size * 0.05);
-        barClip.setArcWidth(getSkinnable().getRoundedCorners() ? size * 0.025 : 0.0);
-        barClip.setArcHeight(getSkinnable().getRoundedCorners() ? size * 0.025 : 0.0);
+        barClip.setArcWidth(tile.getRoundedCorners() ? size * 0.025 : 0.0);
+        barClip.setArcHeight(tile.getRoundedCorners() ? size * 0.025 : 0.0);
 
         bar.setX(0);
         bar.setY(size * 0.965);
-        bar.setWidth(clamp(minValue, maxValue, getSkinnable().getCurrentValue()) * stepSize);
+        bar.setWidth(clamp(minValue, maxValue, tile.getCurrentValue()) * stepSize);
         bar.setHeight(size * 0.035);
 
         maxValueRect.setWidth((maxValueText.getLayoutBounds().getWidth() + maxValueUnitText.getLayoutBounds().getWidth()) + size * 0.06);
@@ -249,31 +248,31 @@ public class PercentageTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        unitText.setText(getSkinnable().getUnit());
-        description.setText(getSkinnable().getDescription());
-        percentageText.setText(String.format(locale, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getValue() / range * 100));
-        maxValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        maxValueUnitText.setText(getSkinnable().getUnit());
+        titleText.setText(tile.getTitle());
+        unitText.setText(tile.getUnit());
+        description.setText(tile.getDescription());
+        percentageText.setText(String.format(locale, "%." + tile.getDecimals() + "f", tile.getValue() / range * 100));
+        maxValueText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getMaxValue()));
+        maxValueUnitText.setText(tile.getUnit());
 
         resizeStaticText();
 
-        barBackground.setBackground(new Background(new BackgroundFill(getSkinnable().getBarBackgroundColor().brighter().brighter(), new CornerRadii(0.0, 0.0, getSkinnable().getRoundedCorners() ? size * 0.025 : 0.0, getSkinnable().getRoundedCorners() ? size * 0.025 : 0.0, false), Insets.EMPTY)));
-        barColor = getSkinnable().getBarColor();
+        barBackground.setBackground(new Background(new BackgroundFill(tile.getBarBackgroundColor().brighter().brighter(), new CornerRadii(0.0, 0.0, tile.getRoundedCorners() ? size * 0.025 : 0.0, tile.getRoundedCorners() ? size * 0.025 : 0.0, false), Insets.EMPTY)));
+        barColor = tile.getBarColor();
 
         if (sectionsVisible && !sections.isEmpty()) {
-            setBarColor(getSkinnable().getValue());
+            setBarColor(tile.getValue());
         } else {
             bar.setFill(barColor);
         }
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        description.setTextFill(getSkinnable().getDescriptionColor());
-        maxValueText.setFill(getSkinnable().getBackgroundColor());
-        maxValueUnitText.setFill(getSkinnable().getBackgroundColor());
-        maxValueRect.setFill(Double.compare(getSkinnable().getCurrentValue(), maxValue) >= 0 ? barColor : getSkinnable().getThresholdColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
+        titleText.setFill(tile.getTitleColor());
+        unitText.setFill(tile.getUnitColor());
+        description.setTextFill(tile.getDescriptionColor());
+        maxValueText.setFill(tile.getBackgroundColor());
+        maxValueUnitText.setFill(tile.getBackgroundColor());
+        maxValueRect.setFill(Double.compare(tile.getCurrentValue(), maxValue) >= 0 ? barColor : tile.getThresholdColor());
+        valueText.setFill(tile.getValueColor());
+        unitText.setFill(tile.getUnitColor());
     };
 }

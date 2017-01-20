@@ -53,41 +53,40 @@ public class TimeTileSkin extends TileSkin {
         super.initGraphics();
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getText());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getText());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
-        LocalTime duration = getSkinnable().getDuration();
+        LocalTime duration = tile.getDuration();
 
         leftText = new Text(Integer.toString(duration.getHour() > 0 ? duration.getHour() : duration.getMinute()));
-        leftText.setFill(getSkinnable().getValueColor());
+        leftText.setFill(tile.getValueColor());
         leftUnit = new Text(duration.getHour() > 0 ? "h" : "m");
-        leftUnit.setFill(getSkinnable().getValueColor());
+        leftUnit.setFill(tile.getValueColor());
 
         rightText = new Text(Integer.toString(duration.getHour() > 0 ? duration.getMinute() : duration.getSecond()));
-        rightText.setFill(getSkinnable().getValueColor());
+        rightText.setFill(tile.getValueColor());
         rightUnit = new Text(duration.getHour() > 0 ? "m" : "s");
-        rightUnit.setFill(getSkinnable().getValueColor());
+        rightUnit.setFill(tile.getValueColor());
 
         timeText = new TextFlow(leftText, leftUnit, rightText, rightUnit);
         timeText.setTextAlignment(TextAlignment.RIGHT);
         timeText.setPrefWidth(PREFERRED_WIDTH * 0.9);
 
-        description = new Label(getSkinnable().getDescription());
+        description = new Label(tile.getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
-        description.setTextFill(getSkinnable().getTextColor());
-        Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+        description.setTextFill(tile.getTextColor());
+        Helper.enableNode(description, !tile.getDescription().isEmpty());
 
         getPane().getChildren().addAll(titleText, text, timeText, description);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-
     }
 
 
@@ -96,10 +95,10 @@ public class TimeTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            Helper.enableNode(timeText, getSkinnable().isValueVisible());
-            Helper.enableNode(description, !getSkinnable().getDescription().isEmpty());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
+            Helper.enableNode(timeText, tile.isValueVisible());
+            Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     };
 
@@ -120,7 +119,7 @@ public class TimeTileSkin extends TileSkin {
 
         maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -146,25 +145,25 @@ public class TimeTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
-        LocalTime duration = getSkinnable().getDuration();
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
+        LocalTime duration = tile.getDuration();
         leftText.setText(Integer.toString(duration.getHour() > 0 ? duration.getHour() : duration.getMinute()));
         leftUnit.setText(duration.getHour() > 0 ? " h  " : " m  ");
         rightText.setText(Integer.toString(duration.getHour() > 0 ? duration.getMinute() : duration.getSecond()));
         rightUnit.setText(duration.getHour() > 0 ? " m" : " s");
 
-        description.setText(getSkinnable().getDescription());
+        description.setText(tile.getDescription());
 
         resizeDynamicText();
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
-        leftText.setFill(getSkinnable().getValueColor());
-        leftUnit.setFill(getSkinnable().getValueColor());
-        rightText.setFill(getSkinnable().getValueColor());
-        rightUnit.setFill(getSkinnable().getValueColor());
-        description.setTextFill(getSkinnable().getDescriptionColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
+        leftText.setFill(tile.getValueColor());
+        leftUnit.setFill(tile.getValueColor());
+        rightText.setFill(tile.getValueColor());
+        rightUnit.setFill(tile.getValueColor());
+        description.setTextFill(tile.getDescriptionColor());
     };
 }

@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -30,9 +31,10 @@ import javafx.scene.text.Text;
  * Created by hansolo on 26.12.16.
  */
 public class CustomTileSkin extends TileSkin {
-    private Text      titleText;
-    private Text      text;
-    private StackPane graphicContainer;
+    private Text           titleText;
+    private Text           text;
+    private StackPane      graphicContainer;
+    private ChangeListener graphicListener;
 
 
     // ******************** Constructors **************************************
@@ -45,28 +47,28 @@ public class CustomTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        graphicListener = (o, ov, nv) -> { if (nv != null) { graphicContainer.getChildren().setAll(tile.getGraphic()); }};
 
-        text = new Text(getSkinnable().getText());
-        text.setFill(getSkinnable().getTextColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        titleText = new Text();
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+
+        text = new Text(tile.getText());
+        text.setFill(tile.getTextColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
         graphicContainer = new StackPane();
-        graphicContainer.setMinSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.72 : size * 0.795);
-        graphicContainer.setMaxSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.72 : size * 0.795);
-        graphicContainer.setPrefSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.72 : size * 0.795);
-        if (null != getSkinnable().getGraphic()) graphicContainer.getChildren().setAll(getSkinnable().getGraphic());
+        graphicContainer.setMinSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
+        graphicContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
+        graphicContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
+        if (null != tile.getGraphic()) graphicContainer.getChildren().setAll(tile.getGraphic());
 
         getPane().getChildren().addAll(titleText, graphicContainer, text);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        getSkinnable().graphicProperty().addListener((o, ov, nv) -> {
-            if (nv != null) { graphicContainer.getChildren().setAll(getSkinnable().getGraphic()); }
-        });
+        tile.graphicProperty().addListener(graphicListener);
     }
 
 
@@ -75,14 +77,19 @@ public class CustomTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            graphicContainer.setMaxSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.68 : size * 0.795);
-            graphicContainer.setPrefSize(size * 0.9, getSkinnable().isTextVisible() ? size * 0.68 : size * 0.795);
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
+            graphicContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
+            graphicContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
         } else if ("GRAPHIC".equals(EVENT_TYPE)) {
-            if (null != getSkinnable().getGraphic()) graphicContainer.getChildren().setAll(getSkinnable().getGraphic());
+            if (null != tile.getGraphic()) graphicContainer.getChildren().setAll(tile.getGraphic());
         }
     };
+
+    @Override public void dispose() {
+        tile.graphicProperty().removeListener(graphicListener);
+        super.dispose();
+    }
 
 
     // ******************** Resizing ******************************************
@@ -101,12 +108,12 @@ public class CustomTileSkin extends TileSkin {
     };
 
     @Override protected void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+        width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
+        height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
         double containerWidth  = width * 0.9;
-        double containerHeight = getSkinnable().isTextVisible() ? height * 0.72 : height * 0.795;
+        double containerHeight = tile.isTextVisible() ? height * 0.72 : height * 0.795;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -118,8 +125,8 @@ public class CustomTileSkin extends TileSkin {
                 graphicContainer.setPrefSize(containerWidth, containerHeight);
                 graphicContainer.relocate(size * 0.05, size * 0.15);
 
-                if (null != getSkinnable().getGraphic() && getSkinnable().getGraphic() instanceof Shape) {
-                    Node   graphic = getSkinnable().getGraphic();
+                if (null != tile.getGraphic() && tile.getGraphic() instanceof Shape) {
+                    Node   graphic = tile.getGraphic();
                     double width   = graphic.getBoundsInLocal().getWidth();
                     double height  = graphic.getBoundsInLocal().getHeight();
 
@@ -146,12 +153,12 @@ public class CustomTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
 
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
     };
 }

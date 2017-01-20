@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.VPos;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -54,37 +55,39 @@ public class ClockTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", getSkinnable().getLocale());
-        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", getSkinnable().getLocale());
-        dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", getSkinnable().getLocale());
+        currentValueListener = o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(tile.getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())));
+        timeListener         = o -> updateTime(tile.getTime());
+
+        timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
+        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", tile.getLocale());
+        dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", tile.getLocale());
 
         titleText = new Text("");
         titleText.setTextOrigin(VPos.TOP);
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getText());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getText());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
         timeRect = new Rectangle();
 
-        timeText = new Text(timeFormatter.format(getSkinnable().getTime()));
+        timeText = new Text(timeFormatter.format(tile.getTime()));
         timeText.setTextOrigin(VPos.CENTER);
 
-        dateText = new Text(dateFormatter.format(getSkinnable().getTime()));
+        dateText = new Text(dateFormatter.format(tile.getTime()));
 
-        dayOfWeekText = new Text(dayOfWeekFormatter.format(getSkinnable().getTime()));
+        dayOfWeekText = new Text(dayOfWeekFormatter.format(tile.getTime()));
 
         getPane().getChildren().addAll(titleText, text, timeRect, timeText, dateText, dayOfWeekText);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        if (getSkinnable().isAnimated()) {
-            getSkinnable().currentTimeProperty().addListener(o -> updateTime(
-                ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
+        if (tile.isAnimated()) {
+            tile.currentTimeProperty().addListener(currentTimeListener);
         } else {
-            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+            tile.timeProperty().addListener(timeListener);
         }
     }
 
@@ -93,13 +96,13 @@ public class ClockTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
         }
     };
 
     public void updateTime(final ZonedDateTime TIME) {
-        timeText.setText(timeFormatter.format(getSkinnable().getTime()));
+        timeText.setText(timeFormatter.format(tile.getTime()));
         timeText.setX((size - timeText.getLayoutBounds().getWidth()) * 0.5);
         timeText.setY(size * 0.4);
 
@@ -110,6 +113,15 @@ public class ClockTileSkin extends TileSkin {
         dateText.setX(size * 0.05);
     }
 
+    @Override public void dispose() {
+        if (tile.isAnimated()) {
+            tile.currentTimeProperty().removeListener(currentTimeListener);
+        } else {
+            tile.timeProperty().removeListener(timeListener);
+        }
+        super.dispose();
+    }
+
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
@@ -117,7 +129,7 @@ public class ClockTileSkin extends TileSkin {
         double fontSize = size * 0.3;
 
         timeText.setFont(Fonts.latoRegular(fontSize));
-        timeText.setText(timeFormatter.format(getSkinnable().getTime()));
+        timeText.setText(timeFormatter.format(tile.getTime()));
         Helper.adjustTextSize(timeText, maxWidth, fontSize);
         timeText.setX((size - timeText.getLayoutBounds().getWidth()) * 0.5);
         timeText.setY(size * 0.4);
@@ -145,7 +157,7 @@ public class ClockTileSkin extends TileSkin {
 
         maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -164,24 +176,24 @@ public class ClockTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
 
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
-        timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", getSkinnable().getLocale());
-        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", getSkinnable().getLocale());
-        dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", getSkinnable().getLocale());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
+        timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
+        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", tile.getLocale());
+        dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", tile.getLocale());
 
-        ZonedDateTime time = getSkinnable().getTime();
+        ZonedDateTime time = tile.getTime();
 
         updateTime(time);
 
         resizeStaticText();
         resizeDynamicText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
-        timeRect.setFill(getSkinnable().getBackgroundColor().darker());
-        timeText.setFill(getSkinnable().getTitleColor());
-        dateText.setFill(getSkinnable().getDateColor());
-        dayOfWeekText.setFill(getSkinnable().getDateColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
+        timeRect.setFill(tile.getBackgroundColor().darker());
+        timeText.setFill(tile.getTitleColor());
+        dateText.setFill(tile.getDateColor());
+        dayOfWeekText.setFill(tile.getDateColor());
     };
 }

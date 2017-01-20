@@ -47,14 +47,14 @@ public class AreaChartTileSkin extends TileSkin {
         super.initGraphics();
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
         xAxis = new CategoryAxis();
         yAxis = new NumberAxis();
 
         chart = new SmoothAreaChart<>(xAxis, yAxis);
-        chart.getData().addAll(getSkinnable().getSeries());
+        chart.getData().addAll(tile.getSeries());
         chart.setLegendSide(Side.TOP);
         chart.setVerticalZeroLineVisible(false);
         chart.setCreateSymbols(false);
@@ -64,7 +64,6 @@ public class AreaChartTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-
     }
 
 
@@ -102,10 +101,10 @@ public class AreaChartTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
+        titleText.setText(tile.getTitle());
 
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
+        titleText.setFill(tile.getTitleColor());
     };
 }

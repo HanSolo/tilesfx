@@ -52,18 +52,18 @@ public class WorldMapTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
-        countryPaths = getSkinnable().getCountryPaths();
+        countryPaths = tile.getCountryPaths();
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getUnit());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getUnit());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
-        Color fill   = getSkinnable().getForegroundColor();
-        Color stroke = getSkinnable().getBackgroundColor();
+        Color fill   = tile.getForegroundColor();
+        Color stroke = tile.getBackgroundColor();
 
         worldPane = new Pane();
         countryPaths.forEach((name, pathList) -> {
@@ -82,7 +82,6 @@ public class WorldMapTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-
     }
 
 
@@ -91,15 +90,15 @@ public class WorldMapTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
         }
     };
 
     private void setFillAndStroke() {
         countryPaths.keySet().forEach(name -> {
             Country country = Country.valueOf(name);
-            setCountryFillAndStroke(country, null == country.getColor() ? getSkinnable().getForegroundColor() : country.getColor(), getSkinnable().getBackgroundColor());
+            setCountryFillAndStroke(country, null == country.getColor() ? tile.getForegroundColor() : country.getColor(), tile.getBackgroundColor());
         });
     }
     private void setCountryFillAndStroke(final Country COUNTRY, final Color FILL, final Color STROKE) {
@@ -122,7 +121,7 @@ public class WorldMapTileSkin extends TileSkin {
 
         maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -130,12 +129,12 @@ public class WorldMapTileSkin extends TileSkin {
     };
 
     @Override protected void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+        width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
+        height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
         double containerWidth  = width * 0.9;
-        double containerHeight = getSkinnable().isTextVisible() ? height * 0.72 : height * 0.795;
+        double containerHeight = tile.isTextVisible() ? height * 0.72 : height * 0.795;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -162,12 +161,12 @@ public class WorldMapTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
 
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
     };
 }

@@ -21,6 +21,7 @@ import eu.hansolo.tilesfx.events.UpdateEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.event.EventHandler;
@@ -40,6 +41,7 @@ public class BarChartTileSkin extends TileSkin {
     private Text                      text;
     private Pane                      barChartPane;
     private EventHandler<UpdateEvent> updateHandler;
+    private InvalidationListener      paneSizeListener;
 
 
     // ******************** Constructors **************************************
@@ -52,15 +54,16 @@ public class BarChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateHandler = e -> updateChart();
+        updateHandler    = e -> updateChart();
+        paneSizeListener = o -> resizeItems();
 
-        List<BarChartItem> barChartItems = getSkinnable().getBarChartItems().stream()
+        List<BarChartItem> barChartItems = tile.getBarChartItems().stream()
                                                          .sorted(Comparator.comparing(BarChartItem::getValue).reversed())
                                                          .collect(Collectors.toList());
 
-        getSkinnable().getBarChartItems().forEach(item -> {
+        tile.getBarChartItems().forEach(item -> {
             item.addEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);
-            item.setMaxValue(getSkinnable().getMaxValue());
+            item.setMaxValue(tile.getMaxValue());
             item.setFormatString(formatString);
             item.valueProperty().addListener(new WeakInvalidationListener(o -> updateChart()));
         });
@@ -68,19 +71,19 @@ public class BarChartTileSkin extends TileSkin {
         barChartPane.getChildren().addAll(barChartItems);
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(getSkinnable().getText());
-        text.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        text = new Text(tile.getText());
+        text.setFill(tile.getUnitColor());
+        Helper.enableNode(text, tile.isTextVisible());
 
         getPane().getChildren().addAll(titleText, text, barChartPane);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        getSkinnable().getBarChartItems().addListener(new WeakListChangeListener<>(change -> {
+        tile.getBarChartItems().addListener(new WeakListChangeListener<>(change -> {
             while (change.next()) {
                 if (change.wasPermutated()) {
                     //updateChart();
@@ -102,8 +105,8 @@ public class BarChartTileSkin extends TileSkin {
             }
         }));
 
-        pane.widthProperty().addListener(o -> resizeItems());
-        pane.heightProperty().addListener(o -> resizeItems());
+        pane.widthProperty().addListener(paneSizeListener);
+        pane.heightProperty().addListener(paneSizeListener);
     }
 
 
@@ -112,22 +115,28 @@ public class BarChartTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
         } else if ("DATA".equals(EVENT_TYPE)) {
             updateChart();
         }
     };
 
+    @Override public void dispose() {
+        pane.widthProperty().removeListener(paneSizeListener);
+        pane.heightProperty().removeListener(paneSizeListener);
+        super.dispose();
+    }
+
 
     // ******************** Resizing ******************************************
     private void updateChart() {
         Platform.runLater(() -> {
-            getSkinnable().getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());
-            List<BarChartItem> items     = getSkinnable().getBarChartItems();
+            tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());
+            List<BarChartItem> items     = tile.getBarChartItems();
             int                noOfItems = items.size();
             if (noOfItems == 0) return;
-            double maxValue = getSkinnable().getMaxValue();
+            double maxValue = tile.getMaxValue();
 
             for (int i = 0 ; i < noOfItems ; i++) {
                 BarChartItem item = items.get(i);
@@ -150,7 +159,7 @@ public class BarChartTileSkin extends TileSkin {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -168,18 +177,18 @@ public class BarChartTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
 
-        getSkinnable().getBarChartItems().forEach(item -> {
-            item.setNameColor(getSkinnable().getTextColor());
-            item.setValueColor(getSkinnable().getValueColor());
+        tile.getBarChartItems().forEach(item -> {
+            item.setNameColor(tile.getTextColor());
+            item.setValueColor(tile.getValueColor());
         });
 
         resizeDynamicText();
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        text.setFill(getSkinnable().getTextColor());
+        titleText.setFill(tile.getTitleColor());
+        text.setFill(tile.getTextColor());
     };
 }

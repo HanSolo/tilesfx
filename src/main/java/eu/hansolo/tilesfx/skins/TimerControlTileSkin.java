@@ -90,10 +90,13 @@ public class TimerControlTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        dateFormatter = DateTimeFormatter.ofPattern("EE d", getSkinnable().getLocale());
+        currentValueListener = o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(tile.getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())));
+        timeListener         = o -> updateTime(tile.getTime());
 
-        sectionMap   = new HashMap<>(getSkinnable().getTimeSections().size());
-        for (TimeSection section : getSkinnable().getTimeSections()) { sectionMap.put(section, new Arc()); }
+        dateFormatter = DateTimeFormatter.ofPattern("EE d", tile.getLocale());
+
+        sectionMap   = new HashMap<>(tile.getTimeSections().size());
+        for (TimeSection section : tile.getTimeSections()) { sectionMap.put(section, new Arc()); }
 
         minuteRotate = new Rotate();
         hourRotate   = new Rotate();
@@ -101,39 +104,39 @@ public class TimerControlTileSkin extends TileSkin {
 
         sectionsPane = new Pane();
         sectionsPane.getChildren().addAll(sectionMap.values());
-        Helper.enableNode(sectionsPane, getSkinnable().getSectionsVisible());
+        Helper.enableNode(sectionsPane, tile.getSectionsVisible());
 
         minuteTickMarks = new Path();
         minuteTickMarks.setFillRule(FillRule.EVEN_ODD);
         minuteTickMarks.setFill(null);
-        minuteTickMarks.setStroke(getSkinnable().getMinuteColor());
+        minuteTickMarks.setStroke(tile.getMinuteColor());
         minuteTickMarks.setStrokeLineCap(StrokeLineCap.ROUND);
 
         hourTickMarks = new Path();
         hourTickMarks.setFillRule(FillRule.EVEN_ODD);
         hourTickMarks.setFill(null);
-        hourTickMarks.setStroke(getSkinnable().getHourColor());
+        hourTickMarks.setStroke(tile.getHourColor());
         hourTickMarks.setStrokeLineCap(StrokeLineCap.ROUND);
 
         hour = new Rectangle(3, 60);
         hour.setArcHeight(3);
         hour.setArcWidth(3);
-        hour.setStroke(getSkinnable().getHourColor());
+        hour.setStroke(tile.getHourColor());
         hour.getTransforms().setAll(hourRotate);
 
         minute = new Rectangle(3, 96);
         minute.setArcHeight(3);
         minute.setArcWidth(3);
-        minute.setStroke(getSkinnable().getMinuteColor());
+        minute.setStroke(tile.getMinuteColor());
         minute.getTransforms().setAll(minuteRotate);
 
         second = new Rectangle(1, 96);
         second.setArcHeight(1);
         second.setArcWidth(1);
-        second.setStroke(getSkinnable().getSecondColor());
+        second.setStroke(tile.getSecondColor());
         second.getTransforms().setAll(secondRotate);
-        second.setVisible(getSkinnable().isSecondsVisible());
-        second.setManaged(getSkinnable().isSecondsVisible());
+        second.setVisible(tile.isSecondsVisible());
+        second.setManaged(tile.isSecondsVisible());
 
         knob = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, 4.5);
         knob.setStroke(Color.web("#282a3280"));
@@ -148,32 +151,31 @@ public class TimerControlTileSkin extends TileSkin {
         shadowGroupMinute = new Group(minute);
         shadowGroupSecond = new Group(second, knob);
 
-        shadowGroupHour.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
-        shadowGroupMinute.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
-        shadowGroupSecond.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
+        shadowGroupHour.setEffect(tile.isShadowsEnabled() ? dropShadow : null);
+        shadowGroupMinute.setEffect(tile.isShadowsEnabled() ? dropShadow : null);
+        shadowGroupSecond.setEffect(tile.isShadowsEnabled() ? dropShadow : null);
 
         title = new Text("");
         title.setTextOrigin(VPos.TOP);
-        Helper.enableNode(title, !getSkinnable().getTitle().isEmpty());
+        Helper.enableNode(title, !tile.getTitle().isEmpty());
 
-        amPmText = new Text(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        amPmText = new Text(tile.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
 
         dateText = new Text("");
-        Helper.enableNode(dateText, getSkinnable().isDateVisible());
+        Helper.enableNode(dateText, tile.isDateVisible());
 
         text = new Text("");
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        Helper.enableNode(text, tile.isTextVisible());
 
         getPane().getChildren().addAll(sectionsPane, hourTickMarks, minuteTickMarks, title, amPmText, dateText, text, shadowGroupHour, shadowGroupMinute, shadowGroupSecond);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        if (getSkinnable().isAnimated()) {
-            getSkinnable().currentTimeProperty().addListener(o -> updateTime(
-                ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
+        if (tile.isAnimated()) {
+            tile.currentTimeProperty().addListener(currentTimeListener);
         } else {
-            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+            tile.timeProperty().addListener(timeListener);
         }
     }
 
@@ -183,14 +185,14 @@ public class TimerControlTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(title, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            Helper.enableNode(dateText, getSkinnable().isDateVisible());
-            Helper.enableNode(second, getSkinnable().isSecondsVisible());
-            Helper.enableNode(sectionsPane, getSkinnable().getSectionsVisible());
+            Helper.enableNode(title, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
+            Helper.enableNode(dateText, tile.isDateVisible());
+            Helper.enableNode(second, tile.isSecondsVisible());
+            Helper.enableNode(sectionsPane, tile.getSectionsVisible());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sectionMap.clear();
-            for (TimeSection section : getSkinnable().getTimeSections()) { sectionMap.put(section, new Arc()); }
+            for (TimeSection section : tile.getTimeSections()) { sectionMap.put(section, new Arc()); }
             sectionsPane.getChildren().setAll(sectionMap.values());
             resize();
             redraw();
@@ -207,8 +209,8 @@ public class TimerControlTileSkin extends TileSkin {
         double  startAngle             = 180;
         double  angleStep              = 360 / 60;
         Point2D center                 = new Point2D(clockSize * 0.5, clockSize * 0.5);
-        boolean hourTickMarksVisible   = getSkinnable().isHourTickMarksVisible();
-        boolean minuteTickMarksVisible = getSkinnable().isMinuteTickMarksVisible();
+        boolean hourTickMarksVisible   = tile.isHourTickMarksVisible();
+        boolean minuteTickMarksVisible = tile.isMinuteTickMarksVisible();
         for (double angle = 0, counter = 0 ; Double.compare(counter, 59) <= 0 ; angle -= angleStep, counter++) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
@@ -243,12 +245,12 @@ public class TimerControlTileSkin extends TileSkin {
 
     private void drawTimeSections() {
         if (sectionMap.isEmpty()) return;
-        ZonedDateTime     time              = getSkinnable().getTime();
+        ZonedDateTime     time              = tile.getTime();
         DayOfWeek         day               = time.getDayOfWeek();
         boolean           isAM              = time.get(ChronoField.AMPM_OF_DAY) == 0;
         double            offset            = 90;
         double            angleStep         = 360.0 / 60.0;
-        boolean           highlightSections = getSkinnable().isHighlightSections();
+        boolean           highlightSections = tile.isHighlightSections();
         for (TimeSection section : sectionMap.keySet()) {
             LocalTime   start     = section.getStart();
             LocalTime   stop      = section.getStop();
@@ -284,20 +286,20 @@ public class TimerControlTileSkin extends TileSkin {
     }
 
     public void updateTime(final ZonedDateTime TIME) {
-        if (getSkinnable().isDiscreteHours()) {
+        if (tile.isDiscreteHours()) {
             hourRotate.setAngle(TIME.getHour() * 30);
         } else {
             hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
         }
 
-        if (getSkinnable().isDiscreteMinutes()) {
+        if (tile.isDiscreteMinutes()) {
             minuteRotate.setAngle(TIME.getMinute() * 6);
         } else {
             minuteRotate.setAngle(TIME.getMinute() * 6 + TIME.getSecond() * 0.1);
         }
 
         if (second.isVisible()) {
-            if (getSkinnable().isDiscreteSeconds()) {
+            if (tile.isDiscreteSeconds()) {
                 secondRotate.setAngle(TIME.getSecond() * 6);
             } else {
                 secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
@@ -314,7 +316,7 @@ public class TimerControlTileSkin extends TileSkin {
             }
         }
 
-        amPmText.setText(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        amPmText.setText(tile.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, 0.2 * size, size * 0.05);
         amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(size * 0.4);
@@ -325,6 +327,15 @@ public class TimerControlTileSkin extends TileSkin {
         dateText.setY(size * 0.65);
     }
 
+    @Override public void dispose() {
+        if (tile.isAnimated()) {
+            tile.currentTimeProperty().removeListener(currentTimeListener);
+        } else {
+            tile.timeProperty().removeListener(timeListener);
+        }
+        super.dispose();
+    }
+
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
@@ -332,7 +343,7 @@ public class TimerControlTileSkin extends TileSkin {
         double fontSize = size * textSize.factor;
 
         title.setFont(Fonts.latoRegular(fontSize));
-        title.setText(getSkinnable().getTitle());
+        title.setText(tile.getTitle());
         if (title.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(title, maxWidth, fontSize); }
         title.setX(size * 0.05);
         title.setY(size * 0.05);
@@ -340,7 +351,7 @@ public class TimerControlTileSkin extends TileSkin {
         maxWidth = size * 0.2;
         fontSize = size * textSize.factor;
         amPmText.setFont(Fonts.latoRegular(fontSize));
-        amPmText.setText(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        amPmText.setText(tile.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, maxWidth, fontSize);
         amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(size * 0.4);
@@ -353,7 +364,7 @@ public class TimerControlTileSkin extends TileSkin {
 
         maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
-        text.setText(getSkinnable().getText());
+        text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
@@ -379,7 +390,7 @@ public class TimerControlTileSkin extends TileSkin {
         minuteTickMarks.relocate((size - minuteTickMarks.getLayoutBounds().getWidth()) * 0.5,
                                  (size - minuteTickMarks.getLayoutBounds().getHeight()) * 0.5);
 
-        hour.setFill(getSkinnable().getHourColor());
+        hour.setFill(tile.getHourColor());
         hour.setCache(false);
         hour.setWidth(clockSize * 0.015);
         hour.setHeight(clockSize * 0.29);
@@ -389,7 +400,7 @@ public class TimerControlTileSkin extends TileSkin {
         hour.setCacheHint(CacheHint.ROTATE);
         hour.relocate((size - hour.getWidth()) * 0.5, size * 0.21 / CLOCK_SCALE_FACTOR);
 
-        minute.setFill(getSkinnable().getMinuteColor());
+        minute.setFill(tile.getMinuteColor());
         minute.setCache(false);
         minute.setWidth(clockSize * 0.015);
         minute.setHeight(clockSize * 0.47);
@@ -399,7 +410,7 @@ public class TimerControlTileSkin extends TileSkin {
         minute.setCacheHint(CacheHint.ROTATE);
         minute.relocate((size - minute.getWidth()) * 0.5, size * 0.11 / CLOCK_SCALE_FACTOR);
 
-        second.setFill(getSkinnable().getSecondColor());
+        second.setFill(tile.getSecondColor());
         second.setCache(false);
         second.setWidth(clockSize * 0.005);
         second.setHeight(clockSize * 0.47);
@@ -409,7 +420,7 @@ public class TimerControlTileSkin extends TileSkin {
         second.setCacheHint(CacheHint.ROTATE);
         second.relocate((size - second.getWidth()) * 0.5, size * 0.11 / CLOCK_SCALE_FACTOR);
 
-        knob.setFill(getSkinnable().getKnobColor());
+        knob.setFill(tile.getKnobColor());
         knob.setRadius(clockSize * 0.0225);
         knob.setCenterX(center);
         knob.setCenterY(center);
@@ -425,25 +436,25 @@ public class TimerControlTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
 
-        dateFormatter = DateTimeFormatter.ofPattern("EE d", getSkinnable().getLocale());
+        dateFormatter = DateTimeFormatter.ofPattern("EE d", tile.getLocale());
 
-        shadowGroupHour.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
-        shadowGroupMinute.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
-        shadowGroupSecond.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
+        shadowGroupHour.setEffect(tile.isShadowsEnabled() ? dropShadow : null);
+        shadowGroupMinute.setEffect(tile.isShadowsEnabled() ? dropShadow : null);
+        shadowGroupSecond.setEffect(tile.isShadowsEnabled() ? dropShadow : null);
 
         // Tick Marks
-        minuteTickMarks.setStroke(getSkinnable().getMinuteColor());
-        hourTickMarks.setStroke(getSkinnable().getHourColor());
+        minuteTickMarks.setStroke(tile.getMinuteColor());
+        hourTickMarks.setStroke(tile.getHourColor());
 
-        ZonedDateTime time = getSkinnable().getTime();
+        ZonedDateTime time = tile.getTime();
 
         updateTime(time);
 
         resizeDynamicText();
 
-        title.setFill(getSkinnable().getTitleColor());
-        amPmText.setFill(getSkinnable().getTitleColor());
-        dateText.setFill(getSkinnable().getDateColor());
-        text.setFill(getSkinnable().getTextColor());
+        title.setFill(tile.getTitleColor());
+        amPmText.setFill(tile.getTitleColor());
+        dateText.setFill(tile.getDateColor());
+        text.setFill(tile.getTextColor());
     };
 }

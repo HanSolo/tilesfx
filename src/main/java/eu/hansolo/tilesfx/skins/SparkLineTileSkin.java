@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.Statistics;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.VPos;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -56,34 +57,35 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class SparkLineTileSkin extends TileSkin {
-    private static final int  MONTH           = 2_592_000;
-    private static final int  DAY             = 86_400;
-    private static final int  HOUR            = 3_600;
-    private static final int  MINUTE          = 60;
-    private DateTimeFormatter timeFormatter   = DateTimeFormatter.ofPattern("HH:mm");
-    private Text              titleText;
-    private Text              valueText;
-    private Text              unitText;
-    private TextFlow          valueUnitFlow;
-    private Text              averageText;
-    private Text              highText;
-    private Text              lowText;
-    private Text              text;
-    private Text              timeSpanText;
-    private Rectangle         graphBounds;
-    private List<PathElement> pathElements;
-    private Path              sparkLine;
-    private Circle            dot;
-    private Rectangle         stdDeviationArea;
-    private Line              averageLine;
-    private LinearGradient    gradient;
-    private GradientLookup    gradientLookup;
-    private double            low;
-    private double            high;
-    private double            stdDeviation;
-    private int               noOfDatapoints;
-    private List<Double>      dataList;
-    private MovingAverage     movingAverage;
+    private static final int     MONTH           = 2_592_000;
+    private static final int     DAY             = 86_400;
+    private static final int     HOUR            = 3_600;
+    private static final int     MINUTE          = 60;
+    private DateTimeFormatter    timeFormatter   = DateTimeFormatter.ofPattern("HH:mm");
+    private Text                 titleText;
+    private Text                 valueText;
+    private Text                 unitText;
+    private TextFlow             valueUnitFlow;
+    private Text                 averageText;
+    private Text                 highText;
+    private Text                 lowText;
+    private Text                 text;
+    private Text                 timeSpanText;
+    private Rectangle            graphBounds;
+    private List<PathElement>    pathElements;
+    private Path                 sparkLine;
+    private Circle               dot;
+    private Rectangle            stdDeviationArea;
+    private Line                 averageLine;
+    private LinearGradient       gradient;
+    private GradientLookup       gradientLookup;
+    private double               low;
+    private double               high;
+    private double               stdDeviation;
+    private int                  noOfDatapoints;
+    private List<Double>         dataList;
+    private MovingAverage        movingAverage;
+    private InvalidationListener averagingListener;
 
 
     // ******************** Constructors **************************************
@@ -96,16 +98,18 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        timeFormatter   = DateTimeFormatter.ofPattern("HH:mm", getSkinnable().getLocale());
+        averagingListener = o -> handleEvents("AVERAGING_PERIOD");
 
-        if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
+        timeFormatter   = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
 
-        gradientLookup = new GradientLookup(getSkinnable().getGradientStops());
-        low            = getSkinnable().getMaxValue();
-        high           = getSkinnable().getMinValue();
+        if (tile.isAutoScale()) tile.calcAutoScale();
+
+        gradientLookup = new GradientLookup(tile.getGradientStops());
+        low            = tile.getMaxValue();
+        high           = tile.getMinValue();
         stdDeviation   = 0;
-        movingAverage  = getSkinnable().getMovingAverage();
-        noOfDatapoints = getSkinnable().getAveragingPeriod();
+        movingAverage  = tile.getMovingAverage();
+        noOfDatapoints = tile.getAveragingPeriod();
         dataList       = new LinkedList<>();
         for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
 
@@ -114,49 +118,49 @@ public class SparkLineTileSkin extends TileSkin {
 
         graphBounds = new Rectangle(PREFERRED_WIDTH * 0.05, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.45);
 
-        titleText = new Text(getSkinnable().getTitle());
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText = new Text(tile.getTitle());
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText = new Text(String.format(locale, formatString, tile.getValue()));
+        valueText.setFill(tile.getValueColor());
+        Helper.enableNode(valueText, tile.isValueVisible());
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText = new Text(tile.getUnit());
+        unitText.setFill(tile.getUnitColor());
+        Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
         valueUnitFlow = new TextFlow(valueText, unitText);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
-        averageText = new Text(String.format(locale, formatString, getSkinnable().getAverage()));
+        averageText = new Text(String.format(locale, formatString, tile.getAverage()));
         averageText.setFill(Tile.FOREGROUND);
-        Helper.enableNode(averageText, getSkinnable().isAverageVisible());
+        Helper.enableNode(averageText, tile.isAverageVisible());
 
         highText = new Text();
         highText.setTextOrigin(VPos.BOTTOM);
-        highText.setFill(getSkinnable().getValueColor());
+        highText.setFill(tile.getValueColor());
 
         lowText = new Text();
         lowText.setTextOrigin(VPos.TOP);
-        lowText.setFill(getSkinnable().getValueColor());
+        lowText.setFill(tile.getValueColor());
 
-        text = new Text(getSkinnable().getText());
+        text = new Text(tile.getText());
         text.setTextOrigin(VPos.TOP);
-        text.setFill(getSkinnable().getTextColor());
+        text.setFill(tile.getTextColor());
 
         timeSpanText = new Text("");
         timeSpanText.setTextOrigin(VPos.TOP);
-        timeSpanText.setFill(getSkinnable().getTextColor());
-        Helper.enableNode(timeSpanText, !getSkinnable().isTextVisible());
+        timeSpanText.setFill(tile.getTextColor());
+        Helper.enableNode(timeSpanText, !tile.isTextVisible());
 
         stdDeviationArea = new Rectangle();
-        Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
+        Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
 
         averageLine = new Line();
         averageLine.setStroke(Tile.FOREGROUND);
         averageLine.getStrokeDashArray().addAll(PREFERRED_WIDTH * 0.005, PREFERRED_WIDTH * 0.005);
-        Helper.enableNode(averageLine, getSkinnable().isAverageVisible());
+        Helper.enableNode(averageLine, tile.isAverageVisible());
 
         pathElements = new ArrayList<>(noOfDatapoints);
         pathElements.add(0, new MoveTo());
@@ -165,20 +169,20 @@ public class SparkLineTileSkin extends TileSkin {
         sparkLine = new Path();
         sparkLine.getElements().addAll(pathElements);
         sparkLine.setFill(null);
-        sparkLine.setStroke(getSkinnable().getBarColor());
+        sparkLine.setStroke(tile.getBarColor());
         sparkLine.setStrokeWidth(PREFERRED_WIDTH * 0.0075);
         sparkLine.setStrokeLineCap(StrokeLineCap.ROUND);
         sparkLine.setStrokeLineJoin(StrokeLineJoin.ROUND);
 
         dot = new Circle();
-        dot.setFill(getSkinnable().getBarColor());
+        dot.setFill(tile.getBarColor());
 
         getPane().getChildren().addAll(titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        getSkinnable().averagingPeriodProperty().addListener(o -> handleEvents("AVERAGING_PERIOD"));
+        tile.averagingPeriodProperty().addListener(averagingListener);
     }
 
 
@@ -187,27 +191,27 @@ public class SparkLineTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(timeSpanText, !getSkinnable().isTextVisible());
-            Helper.enableNode(averageLine, getSkinnable().isAverageVisible());
-            Helper.enableNode(averageText, getSkinnable().isAverageVisible());
-            Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
+            Helper.enableNode(valueText, tile.isValueVisible());
+            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(timeSpanText, !tile.isTextVisible());
+            Helper.enableNode(averageLine, tile.isAverageVisible());
+            Helper.enableNode(averageText, tile.isAverageVisible());
+            Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
 
         } else if ("ALERT".equals(EVENT_TYPE)) {
 
         } else if ("VALUE".equals(EVENT_TYPE)) {
-            if(getSkinnable().isAnimated()) { getSkinnable().setAnimated(false); }
-            if (!getSkinnable().isAveragingEnabled()) { getSkinnable().setAveragingEnabled(true); }
-            double value = clamp(minValue, maxValue, getSkinnable().getValue());
+            if(tile.isAnimated()) { tile.setAnimated(false); }
+            if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
+            double value = clamp(minValue, maxValue, tile.getValue());
             addData(value);
             handleCurrentValue(value);
         } else if ("AVERAGING_PERIOD".equals(EVENT_TYPE)) {
-            noOfDatapoints = getSkinnable().getAveragingPeriod();
+            noOfDatapoints = tile.getAveragingPeriod();
             // To get smooth lines in the chart we need at least 4 values
             if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
             for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
@@ -235,7 +239,7 @@ public class SparkLineTileSkin extends TileSkin {
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        if (getSkinnable().isSmoothing()) {
+        if (tile.isSmoothing()) {
             smooth(dataList);
         } else {
             MoveTo begin = (MoveTo) pathElements.get(0);
@@ -253,14 +257,14 @@ public class SparkLineTileSkin extends TileSkin {
             dot.setCenterX(maxX);
             dot.setCenterY(end.getY());
 
-            if (getSkinnable().isStrokeWithGradient()) {
+            if (tile.isStrokeWithGradient()) {
                 setupGradient();
                 dot.setFill(gradient);
                 sparkLine.setStroke(gradient);
             }
         }
 
-        double average = getSkinnable().getAverage();
+        double average = tile.getAverage();
         double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
 
         averageLine.setStartX(minX);
@@ -277,9 +281,9 @@ public class SparkLineTileSkin extends TileSkin {
         highText.setText(String.format(locale, formatString, high));
         lowText.setText(String.format(locale, formatString, low));
 
-        if (!getSkinnable().isTextVisible() && null != movingAverage.getTimeSpan()) {
+        if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
             timeSpanText.setText(createTimeSpanText());
-            text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(getSkinnable().getZoneId())));
+            text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
         }
         resizeDynamicText();
     }
@@ -295,8 +299,8 @@ public class SparkLineTileSkin extends TileSkin {
     }
 
     private void setupGradient() {
-        double loFactor = (low - minValue) / getSkinnable().getRange();
-        double hiFactor = (high - minValue) / getSkinnable().getRange();
+        double loFactor = (low - minValue) / tile.getRange();
+        double hiFactor = (high - minValue) / tile.getRange();
         Stop   loStop   = new Stop(loFactor, gradientLookup.getColorAt(loFactor));
         Stop   hiStop   = new Stop(hiFactor, gradientLookup.getColorAt(hiFactor));
         gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, loStop, hiStop);
@@ -304,7 +308,7 @@ public class SparkLineTileSkin extends TileSkin {
 
     private String createTimeSpanText() {
         long   timeSpan = movingAverage.getTimeSpan().getEpochSecond();
-        ZoneId zoneId   = getSkinnable().getZoneId();
+        ZoneId zoneId   = tile.getZoneId();
         StringBuilder timeSpanBuilder = new StringBuilder("\u2190 ");
         if (timeSpan > MONTH) { // 1 Month (30 days)
             int    months = (int)(timeSpan / MONTH);
@@ -327,6 +331,11 @@ public class SparkLineTileSkin extends TileSkin {
             timeSpanBuilder.append(seconds).append("s").append(" \u2192");
         }
         return timeSpanBuilder.toString();
+    }
+
+    @Override public void dispose() {
+        tile.averagingPeriodProperty().removeListener(averagingListener);
+        super.dispose();
     }
 
 
@@ -479,11 +488,11 @@ public class SparkLineTileSkin extends TileSkin {
 
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
-        handleCurrentValue(getSkinnable().getValue());
+        handleCurrentValue(tile.getValue());
         sparkLine.setStrokeWidth(size * 0.01);
         dot.setRadius(size * 0.014);
 
-        if (getSkinnable().isStrokeWithGradient()) { setupGradient(); }
+        if (tile.isStrokeWithGradient()) { setupGradient(); }
 
         resizeStaticText();
         resizeDynamicText();
@@ -494,19 +503,19 @@ public class SparkLineTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        titleText.setText(getSkinnable().getTitle());
-        text.setText(getSkinnable().getText());
-        if (!getSkinnable().getDescription().isEmpty()) { text.setText(getSkinnable().getDescription()); }
+        titleText.setText(tile.getTitle());
+        text.setText(tile.getText());
+        if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        highText.setFill(getSkinnable().getValueColor());
-        lowText.setFill(getSkinnable().getValueColor());
-        text.setFill(getSkinnable().getTextColor());
-        timeSpanText.setFill(getSkinnable().getTextColor());
-        sparkLine.setStroke(getSkinnable().isStrokeWithGradient() ? gradient : getSkinnable().getBarColor());
+        titleText.setFill(tile.getTitleColor());
+        valueText.setFill(tile.getValueColor());
+        highText.setFill(tile.getValueColor());
+        lowText.setFill(tile.getValueColor());
+        text.setFill(tile.getTextColor());
+        timeSpanText.setFill(tile.getTextColor());
+        sparkLine.setStroke(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
         stdDeviationArea.setFill(Helper.getTranslucentColorFrom(Tile.FOREGROUND, 0.1));
-        dot.setFill(getSkinnable().isStrokeWithGradient() ? gradient : getSkinnable().getBarColor());
+        dot.setFill(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
     };
 }

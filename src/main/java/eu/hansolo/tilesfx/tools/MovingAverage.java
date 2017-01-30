@@ -30,7 +30,7 @@ public class MovingAverage {
     public  static final int         MAX_PERIOD     = 1000;
     private static final int         DEFAULT_PERIOD = 10;
     private        final Queue<Data> window;
-    private              int         numberPeriod;
+    private              int         period;
     private              double      sum;
 
 
@@ -38,9 +38,9 @@ public class MovingAverage {
     public MovingAverage() {
         this(DEFAULT_PERIOD);
     }
-    public MovingAverage(final int NUMBER_PERIOD) {
-        numberPeriod = Helper.clamp(0, MAX_PERIOD, NUMBER_PERIOD);
-        window       = new ConcurrentLinkedQueue<>();
+    public MovingAverage(final int PERIOD) {
+        period = Helper.clamp(0, MAX_PERIOD, PERIOD);
+        window = new ConcurrentLinkedQueue<>();
     }
 
 
@@ -48,7 +48,7 @@ public class MovingAverage {
     public void addData(final Data DATA) {
         sum += DATA.getValue();
         window.add(DATA);
-        if (window.size() > numberPeriod) {
+        if (window.size() > period) {
             sum -= window.remove().getValue();
         }
     }
@@ -82,6 +82,12 @@ public class MovingAverage {
                                 .average()
                                 .getAsDouble();
         return average;
+    }
+
+    public int getPeriod() { return period; }
+    public void setPeriod(final int PERIOD) {
+        period = Helper.clamp(0, MAX_PERIOD, PERIOD);
+        reset();
     }
 
     public void reset() { window.clear(); }

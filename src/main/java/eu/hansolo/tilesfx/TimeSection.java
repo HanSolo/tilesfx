@@ -85,6 +85,9 @@ public class TimeSection implements Comparable<TimeSection> {
     public TimeSection(final LocalTime START, final LocalTime STOP, final Color COLOR, final Color HIGHLIGHT_COLOR) {
         this(START, STOP, "", null, COLOR, HIGHLIGHT_COLOR, Color.TRANSPARENT, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
+    public TimeSection(final LocalTime START, final LocalTime STOP, final Color COLOR, final Color HIGHLIGHT_COLOR, final DayOfWeek... DAYS) {
+        this(START, STOP, "", null, COLOR, HIGHLIGHT_COLOR, Color.TRANSPARENT, true, DAYS);
+    }
     public TimeSection(final LocalTime START, final LocalTime STOP, final Image ICON, final Color COLOR) {
         this(START, STOP, "", ICON, COLOR, COLOR, Color.WHITE, true, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }

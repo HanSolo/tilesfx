@@ -199,6 +199,7 @@ public class Demo extends Application {
                                                   new Stop(1.0, Tile.RED))
                                    .strokeWithGradient(true)
                                    .build();
+
         //sparkLineTile.valueProperty().bind(value);
 
         areaChartTile = TileBuilder.create()
@@ -334,13 +335,13 @@ public class Demo extends Application {
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
-                if (now > lastTimerCall + 5_000_000_000l) {
+                if (now > lastTimerCall + 3_500_000_000l) {
                     percentageTile.setValue(RND.nextDouble() * percentageTile.getRange() * 1.5 + percentageTile.getMinValue());
                     gaugeTile.setValue(RND.nextDouble() * gaugeTile.getRange() * 1.5 + gaugeTile.getMinValue());
 
-                    //sparkLineTile.setValue(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
+                    sparkLineTile.setValue(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
                     //value.set(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
-                    sparkLineTile.setValue(20);
+                    //sparkLineTile.setValue(20);
 
                     highLowTile.setValue(RND.nextDouble() * 10);
                     series1.getData().forEach(data -> data.setYValue(RND.nextInt(100)));

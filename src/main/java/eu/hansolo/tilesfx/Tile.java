@@ -79,6 +79,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
+import static eu.hansolo.tilesfx.tools.MovingAverage.MAX_PERIOD;
 
 
 /**
@@ -139,6 +140,7 @@ public class Tile extends Control {
     private        final TileEvent   VALUE_EVENT           = new TileEvent(Tile.this, EventType.VALUE);
     private        final TileEvent   FINISHED_EVENT        = new TileEvent(Tile.this, EventType.FINISHED);
     private        final TileEvent   GRAPHIC_EVENT         = new TileEvent(Tile.this, EventType.GRAPHIC);
+    private        final TileEvent   AVERAGING_EVENT       = new TileEvent(Tile.this, EventType.AVERAGING);
     private        final TileEvent   UPDATE_EVENT          = new TileEvent(Tile.this, EventType.UPDATE);
     
     // Tile events
@@ -361,9 +363,9 @@ public class Tile extends Control {
     public Tile(final SkinType SKIN) {
         this(SKIN, ZonedDateTime.now());
     }
-    public Tile(final SkinType SKIN, final ZonedDateTime TIME) {
+    public Tile(final SkinType SKIN_TYPE, final ZonedDateTime TIME) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        skinType = SKIN;
+        skinType = SKIN_TYPE;
         getStyleClass().add("tile");
 
         init(TIME);
@@ -566,15 +568,6 @@ public class Tile extends Control {
     private void registerListeners() {
         disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1));
         valueProperty().addListener((o, ov, nv) -> oldValue.set(ov.doubleValue()));
-        skinProperty().addListener((o, ov, nv) -> {
-            String className = (nv.getClass().toString()).substring(nv.getClass().toString().lastIndexOf(".") + 1);
-            for (SkinType skinType : SkinType.values()) {
-                if (skinType.CLASS_NAME.equals(className)) {
-                    presetTileParameters(skinType);
-                    break;
-                }
-            }
-        });
     }
 
 
@@ -1000,19 +993,19 @@ public class Tile extends Control {
      */
     public void setAveragingPeriod(final int PERIOD) {
         if (null == averagingPeriod) {
-            _averagingPeriod = PERIOD;
-            movingAverage    = new MovingAverage(PERIOD); // MAX 1000 values
-            fireTileEvent(REDRAW_EVENT);
+            _averagingPeriod = Helper.clamp(0, MAX_PERIOD, PERIOD);
+            movingAverage.setPeriod(_averagingPeriod); // MAX 1000 values
+            fireTileEvent(AVERAGING_EVENT);
         } else {
-            averagingPeriod.set(PERIOD);
+            averagingPeriod.set(Helper.clamp(0, MAX_PERIOD, PERIOD));
         }
     }
     public IntegerProperty averagingPeriodProperty() {
         if (null == averagingPeriod) {
             averagingPeriod = new IntegerPropertyBase(_averagingPeriod) {
                 @Override protected void invalidated() {
-                    movingAverage = new MovingAverage(get());
-                    fireTileEvent(REDRAW_EVENT);
+                    movingAverage.setPeriod(get());
+                    fireTileEvent(AVERAGING_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "averagingPeriod"; }
@@ -4012,5 +4005,6 @@ public class Tile extends Control {
             case LEADER_BOARD : setSkin(new LeaderBoardTileSkin(Tile.this)); break;
             default           : setSkin(new TileSkin(Tile.this)); break;
         }
+        presetTileParameters(SKIN_TYPE);
     }
 }

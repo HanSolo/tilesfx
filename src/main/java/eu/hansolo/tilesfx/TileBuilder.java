@@ -687,6 +687,68 @@ public class TileBuilder<B extends TileBuilder<B>> {
         if (properties.containsKey("skinType")) {
             SkinType skinType = ((ObjectProperty<SkinType>) properties.get("skinType")).get();
             CONTROL = new Tile(skinType);
+            switch (skinType) {
+                case AREA_CHART:
+                    break;
+                case BAR_CHART:
+                    break;
+                case LINE_CHART:
+                    break;
+                case CLOCK:
+                    break;
+                case GAUGE:
+                    CONTROL.setAnimated(true);
+                    CONTROL.setTickLabelDecimals(0);
+                    CONTROL.setBarColor(Tile.FOREGROUND);
+                    CONTROL.setThresholdColor(Tile.BLUE);
+                    CONTROL.setThresholdVisible(true);
+                    break;
+                case HIGH_LOW:
+                    CONTROL.setMaxValue(Double.MAX_VALUE);
+                    CONTROL.setDecimals(2);
+                    CONTROL.setTickLabelDecimals(1);
+                    break;
+                case PERCENTAGE:
+                    CONTROL.setAnimated(true);
+                    CONTROL.setThresholdColor(Tile.GRAY);
+                    CONTROL.setTickLabelDecimals(0);
+                    break;
+                case PLUS_MINUS:
+                    break;
+                case SLIDER:
+                    CONTROL.setBarBackgroundColor(Tile.FOREGROUND);
+                    break;
+                case SPARK_LINE:
+                    CONTROL.setTextVisible(false);
+                    CONTROL.setAnimated(false);
+                    CONTROL.setAveragingEnabled(true);
+                    CONTROL.setAveragingPeriod(10);
+                    break;
+                case SWITCH:
+                    break;
+                case WORLDMAP:
+                    CONTROL.setPrefSize(380, 250);
+                    break;
+                case TIMER_CONTROL:
+                    CONTROL.setSectionsVisible(true);
+                    CONTROL.setHighlightSections(true);
+                    CONTROL.setCheckSectionsForValue(true);
+                    break;
+                case NUMBER:
+                    break;
+                case TEXT:
+                    break;
+                case WEATHER:
+                    break;
+                case TIME:
+                    break;
+                case CUSTOM:
+                    break;
+                case LEADER_BOARD:
+                    break;
+                default:
+                    break;
+            }
         } else {
             CONTROL = new Tile();
         }

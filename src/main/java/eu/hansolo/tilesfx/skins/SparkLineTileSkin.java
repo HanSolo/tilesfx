@@ -210,7 +210,7 @@ public class SparkLineTileSkin extends TileSkin {
             double value = clamp(minValue, maxValue, tile.getValue());
             addData(value);
             handleCurrentValue(value);
-        } else if ("AVERAGING_PERIOD".equals(EVENT_TYPE)) {
+        } else if ("AVERAGING".equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
             // To get smooth lines in the chart we need at least 4 values
             if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");

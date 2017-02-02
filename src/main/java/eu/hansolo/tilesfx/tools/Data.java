@@ -31,8 +31,11 @@ public class Data {
 
     // ******************** Constructors **************************************
     public Data(final double VALUE) {
+        this(VALUE, Instant.now());
+    }
+    public Data(final double VALUE, final Instant TIMESTAMP) {
         value     = VALUE;
-        timestamp = Instant.now();
+        timestamp = TIMESTAMP;
     }
 
 

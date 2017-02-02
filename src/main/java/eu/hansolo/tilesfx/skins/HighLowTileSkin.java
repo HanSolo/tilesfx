@@ -32,8 +32,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
-import static eu.hansolo.tilesfx.tools.Helper.clamp;
-
 
 /**
  * Created by hansolo on 19.12.16.

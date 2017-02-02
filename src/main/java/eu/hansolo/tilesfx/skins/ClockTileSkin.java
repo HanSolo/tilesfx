@@ -19,7 +19,6 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import javafx.beans.InvalidationListener;
 import javafx.geometry.VPos;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;

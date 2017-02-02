@@ -85,11 +85,7 @@ public class BarChartTileSkin extends TileSkin {
         super.registerListeners();
         tile.getBarChartItems().addListener(new WeakListChangeListener<>(change -> {
             while (change.next()) {
-                if (change.wasPermutated()) {
-                    //updateChart();
-                } else if (change.wasUpdated()) {
-                    //updateChart();
-                } else if (change.wasAdded()) {
+                if (change.wasAdded()) {
                     change.getAddedSubList().forEach(addedItem -> {
                         barChartPane.getChildren().add(addedItem);
                         addedItem.addEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);

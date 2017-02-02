@@ -70,10 +70,6 @@ public class LineChartTileSkin extends TileSkin {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
-
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
-
-        }
     };
 
 

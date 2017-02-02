@@ -335,7 +335,7 @@ public class Demo extends Application {
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
-                if (now > lastTimerCall + 3_500_000_000l) {
+                if (now > lastTimerCall + 3_500_000_000L) {
                     percentageTile.setValue(RND.nextDouble() * percentageTile.getRange() * 1.5 + percentageTile.getMinValue());
                     gaugeTile.setValue(RND.nextDouble() * gaugeTile.getRange() * 1.5 + gaugeTile.getMinValue());
 

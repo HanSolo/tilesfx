@@ -337,8 +337,7 @@ public class DarkSky {
             for (Exclude exclude : EXCLUDES) { PARAMETERS.append(exclude.value).append(","); }
             PARAMETERS.deleteCharAt(PARAMETERS.length() - 1);
         }
-        final String URL_STRING = String.join("", darkSkyUrl, PARAMETERS.toString());
-        return URL_STRING;
+        return String.join("", darkSkyUrl, PARAMETERS.toString());
     }
 
     public JSONObject toJsonObject() {

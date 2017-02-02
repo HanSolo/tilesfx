@@ -35,6 +35,7 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -288,7 +289,7 @@ public class TimeSection implements Comparable<TimeSection> {
     public List<DayOfWeek> getDaysAsList() { return new ArrayList<>(days); }
     public void setDays(final DayOfWeek... DAYS) {
         days.clear();
-        for(DayOfWeek day : DAYS) { days.add(day); }
+        Collections.addAll(days, DAYS);
     }
     public void setDays(final Set<DayOfWeek> DAYS) {
         days.clear();
@@ -401,8 +402,8 @@ public class TimeSection implements Comparable<TimeSection> {
 
     // ******************** Inner Classes *************************************
     public static class TimeSectionEvent extends Event {
-        public static final EventType<TimeSectionEvent> TIME_SECTION_ENTERED = new EventType(ANY, "TIME_SECTION_ENTERED");
-        public static final EventType<TimeSectionEvent> TIME_SECTION_LEFT    = new EventType(ANY, "TIME_SECTION_LEFT");
+        public static final EventType<TimeSectionEvent> TIME_SECTION_ENTERED = new EventType<>(ANY, "TIME_SECTION_ENTERED");
+        public static final EventType<TimeSectionEvent> TIME_SECTION_LEFT    = new EventType<>(ANY, "TIME_SECTION_LEFT");
 
         // ******************** Constructors **************************************
         public TimeSectionEvent(final Object SOURCE, final EventTarget TARGET, EventType<TimeSectionEvent> TYPE) {

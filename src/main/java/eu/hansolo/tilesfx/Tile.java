@@ -473,7 +473,7 @@ public class Tile extends Control {
         alarms                              = FXCollections.observableArrayList();
         alarmsToRemove                      = new ArrayList<>();
         barChartItems                       = FXCollections.observableArrayList();
-        leaderBoardItems                    = new ArrayList();
+        leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
 
         _textSize                           = TextSize.NORMAL;
@@ -1082,7 +1082,7 @@ public class Tile extends Control {
      */
     public void setSections(final List<Section> SECTIONS) {
         sections.setAll(SECTIONS);
-        Collections.sort(sections, new SectionComparator());
+        sections.sort(new SectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -1103,7 +1103,7 @@ public class Tile extends Control {
     public void addSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.add(SECTION);
-        Collections.sort(sections, new SectionComparator());
+        sections.sort(new SectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -1116,7 +1116,7 @@ public class Tile extends Control {
     public void removeSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.remove(SECTION);
-        Collections.sort(sections, new SectionComparator());
+        sections.sort(new SectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -1358,7 +1358,7 @@ public class Tile extends Control {
      */
     public void setReturnToZero(final boolean IS_TRUE) {
         if (null == returnToZero) {
-            _returnToZero = Double.compare(getMinValue(), 0.0) <= 0 ? IS_TRUE : false;
+            _returnToZero = Double.compare(getMinValue(), 0.0) <= 0 && IS_TRUE;
             fireTileEvent(REDRAW_EVENT);
         } else {
             returnToZero.set(IS_TRUE);
@@ -2944,7 +2944,7 @@ public class Tile extends Control {
      */
     public void setTimeSections(final List<TimeSection> SECTIONS) {
         timeSections.setAll(SECTIONS);
-        Collections.sort(timeSections, new TimeSectionComparator());
+        timeSections.sort(new TimeSectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -2964,7 +2964,7 @@ public class Tile extends Control {
     public void addTimeSection(final TimeSection SECTION) {
         if (null == SECTION) return;
         timeSections.add(SECTION);
-        Collections.sort(timeSections, new TimeSectionComparator());
+        timeSections.sort(new TimeSectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -2976,7 +2976,7 @@ public class Tile extends Control {
     public void removeTimeSection(final TimeSection SECTION) {
         if (null == SECTION) return;
         timeSections.remove(SECTION);
-        Collections.sort(timeSections, new TimeSectionComparator());
+        timeSections.sort(new TimeSectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -3798,7 +3798,7 @@ public class Tile extends Control {
         if (isAlarmsEnabled()) checkAlarms(now);
         if (getCheckSectionsForValue()) {
             int listSize = timeSections.size();
-            for (int i = 0 ; i < listSize ; i++) { timeSections.get(i).checkForTimeAndDate(now); }
+            for (TimeSection timeSection : timeSections) { timeSection.checkForTimeAndDate(now); }
         }
 
         if (timeEventListenerList.isEmpty()) return;
@@ -3856,7 +3856,7 @@ public class Tile extends Control {
 
     public void fireTileEvent(final TileEvent EVENT) {
         int listSize = listenerList.size();
-        for (int i = 0; i < listSize; i++) { listenerList.get(i).onTileEvent(EVENT); }
+        for (TileEventListener aListenerList : listenerList) { aListenerList.onTileEvent(EVENT); }
     }
 
     
@@ -3866,7 +3866,7 @@ public class Tile extends Control {
 
     public void fireAlarmEvent(final AlarmEvent EVENT) {
         int listSize = alarmListenerList.size();
-        for (int i = 0 ; i < listSize ; i++) { alarmListenerList.get(i).onAlarmEvent(EVENT); }
+        for (AlarmEventListener anAlarmListenerList : alarmListenerList) { anAlarmListenerList.onAlarmEvent(EVENT); }
     }
 
 
@@ -3876,7 +3876,7 @@ public class Tile extends Control {
 
     public void fireTimeEvent(final TimeEvent EVENT) {
         int listSize = timeEventListenerList.size();
-        for (int i = 0 ; i < listSize ; i++) { timeEventListenerList.get(i).onTimeEvent(EVENT); }
+        for (TimeEventListener aTimeEventListenerList : timeEventListenerList) { aTimeEventListenerList.onTimeEvent(EVENT); }
     }
 
 

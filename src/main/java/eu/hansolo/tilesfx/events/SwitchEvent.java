@@ -25,8 +25,8 @@ import javafx.event.EventType;
  * Created by hansolo on 26.12.16.
  */
 public class SwitchEvent extends Event {
-    public static final EventType<SwitchEvent> SWITCH_PRESSED  = new EventType(ANY, "SWITCH_PRESSED");
-    public static final EventType<SwitchEvent> SWITCH_RELEASED = new EventType(ANY, "SWITCH_RELEASED");
+    public static final EventType<SwitchEvent> SWITCH_PRESSED  = new EventType<>(ANY, "SWITCH_PRESSED");
+    public static final EventType<SwitchEvent> SWITCH_RELEASED = new EventType<>(ANY, "SWITCH_RELEASED");
 
 
     // ******************** Constructors **************************************

@@ -200,10 +200,6 @@ public class SparkLineTileSkin extends TileSkin {
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
-        } else if ("SECTION".equals(EVENT_TYPE)) {
-
-        } else if ("ALERT".equals(EVENT_TYPE)) {
-
         } else if ("VALUE".equals(EVENT_TYPE)) {
             if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }

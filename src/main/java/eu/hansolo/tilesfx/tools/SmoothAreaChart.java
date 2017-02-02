@@ -177,7 +177,7 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
         setData(DATA);
     }
     public SmoothAreaChart(final @NamedArg("xAxis") Axis<X> X_AXIS, final @NamedArg("yAxis") Axis<Y> Y_AXIS) {
-        this(X_AXIS, Y_AXIS, FXCollections.<Series<X,Y>>observableArrayList());
+        this(X_AXIS, Y_AXIS, FXCollections.observableArrayList());
     }
 
     private void initTimeline() {

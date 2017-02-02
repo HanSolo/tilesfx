@@ -408,9 +408,9 @@ public class Section implements Comparable<Section> {
 
     // ******************** Inner Classes *************************************
     public static class SectionEvent extends Event {
-        public static final EventType<SectionEvent> SECTION_ENTERED = new EventType(ANY, "SECTION_ENTERED");
-        public static final EventType<SectionEvent> SECTION_LEFT    = new EventType(ANY, "SECTION_LEFT");
-        public static final EventType<SectionEvent> SECTION_UPDATE  = new EventType(ANY, "SECTION_UPDATE");
+        public static final EventType<SectionEvent> SECTION_ENTERED = new EventType<>(ANY, "SECTION_ENTERED");
+        public static final EventType<SectionEvent> SECTION_LEFT    = new EventType<>(ANY, "SECTION_LEFT");
+        public static final EventType<SectionEvent> SECTION_UPDATE  = new EventType<>(ANY, "SECTION_UPDATE");
 
 
         // ******************** Constructors **************************************

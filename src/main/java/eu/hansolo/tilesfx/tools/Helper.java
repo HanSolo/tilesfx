@@ -207,7 +207,7 @@ public class Helper {
         return normalized;
     }
 
-    public static final boolean equals(final double A, final double B) { return A == B ? true : Math.abs(A - B) < EPSILON; }
+    public static final boolean equals(final double A, final double B) { return A == B || Math.abs(A - B) < EPSILON; }
     public static final boolean biggerThan(final double A, final double B) { return (A - B) > EPSILON; }
     public static final boolean lessThan(final double A, final double B) { return (B - A) > EPSILON; }
 }

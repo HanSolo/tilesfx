@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.tools;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -54,6 +55,9 @@ public class MovingAverage {
     }
     public void addValue(final double VALUE) {
         addData(new Data(VALUE));
+    }
+    public void addListOfData(final List<Data> LIST_OF_DATA) {
+        LIST_OF_DATA.forEach(data -> addData(data));
     }
 
     public Queue<Data> getWindow() { return new LinkedList<>(window); }

@@ -110,20 +110,19 @@ public class TimeTileSkin extends TileSkin {
         rightText.setFont(Fonts.latoRegular(fontSize));
     };
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
         text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
 
         fontSize = size * 0.12;
         leftUnit.setFont(Fonts.latoRegular(fontSize));
@@ -136,11 +135,11 @@ public class TimeTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        timeText.setPrefWidth(size * 0.9);
+        timeText.setPrefWidth(width - size * 0.1);
         timeText.relocate(size * 0.05, size * 0.15);
 
-        description.setPrefSize(size * 0.9, size * 43);
-        description.relocate(size * 0.05, size * 0.42);
+        description.setPrefSize(width - size * 0.1, size * 0.43);
+        description.relocate(size * 0.05, height * 0.42);
     };
 
     @Override protected void redraw() {

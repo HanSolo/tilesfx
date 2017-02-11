@@ -125,7 +125,7 @@ public class WeatherSymbol extends Region {
             pane.relocate((getWidth() - size) * 0.5, (getHeight() - size) * 0.5);
 
             conditionIcon.setPrefSize(size * getCondition().widthFactor, size * getCondition().heightFactor);
-            conditionIcon.relocate((width - conditionIcon.getPrefWidth()) * 0.5, (height - conditionIcon.getPrefHeight()) * 0.5);
+            conditionIcon.relocate((size - conditionIcon.getPrefWidth()) * 0.5, (size - conditionIcon.getPrefHeight()) * 0.5);
         }
     }
 }

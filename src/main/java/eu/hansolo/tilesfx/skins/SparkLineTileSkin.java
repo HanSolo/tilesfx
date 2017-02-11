@@ -422,12 +422,12 @@ public class SparkLineTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = unitText.isVisible() ? size * 0.725 : size * 0.9;
+        double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
-        maxWidth = size * 0.3;
+        maxWidth = width - size * 0.7;
         fontSize = size * 0.06;
         averageText.setFont(Fonts.latoRegular(fontSize));
         if (averageText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(averageText, maxWidth, fontSize); }
@@ -443,29 +443,29 @@ public class SparkLineTileSkin extends TileSkin {
 
         lowText.setFont(Fonts.latoRegular(fontSize));
         if (lowText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(lowText, maxWidth, fontSize); }
-        lowText.setY(size * 0.9);
+        lowText.setY(height - size * 0.1);
 
-        maxWidth = size * 0.75;
+        maxWidth = width - size * 0.25;
         fontSize = size * 0.06;
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
-        text.relocate(size * 0.95 - text.getLayoutBounds().getWidth(), size * 0.9);
+        text.relocate(width - size * 0.05 - text.getLayoutBounds().getWidth(), height - size * 0.1);
 
-        maxWidth = size * 0.75;
+        maxWidth = width - size * 0.25;
         fontSize = size * 0.06;
         timeSpanText.setFont(Fonts.latoRegular(fontSize));
         if (timeSpanText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(timeSpanText, maxWidth, fontSize); }
-        timeSpanText.relocate((size - timeSpanText.getLayoutBounds().getWidth()) * 0.5, size * 0.9);
+        timeSpanText.relocate((width - timeSpanText.getLayoutBounds().getWidth()) * 0.5, height - size * 0.1);
     }
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.15;
+        maxWidth = width - size * 0.85;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
@@ -477,7 +477,7 @@ public class SparkLineTileSkin extends TileSkin {
 
     @Override protected void resize() {
         super.resize();
-        graphBounds = new Rectangle(size * 0.05, size * 0.5, size * 0.9, size * 0.39);
+        graphBounds = new Rectangle(size * 0.05, size * 0.5, width - size * 0.1, height - size * 0.61);
 
         stdDeviationArea.setX(graphBounds.getX());
         stdDeviationArea.setWidth(graphBounds.getWidth());
@@ -493,7 +493,7 @@ public class SparkLineTileSkin extends TileSkin {
         resizeStaticText();
         resizeDynamicText();
 
-        valueUnitFlow.setPrefWidth(size * 0.9);
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
     };
 

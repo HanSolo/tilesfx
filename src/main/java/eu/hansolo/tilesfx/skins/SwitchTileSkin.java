@@ -122,8 +122,8 @@ public class SwitchTileSkin extends TileSkin {
     };
 
     private void moveThumb() {
-        KeyValue thumbLeftX                 = new KeyValue(thumb.centerXProperty(), size * 0.3875);
-        KeyValue thumbRightX                = new KeyValue(thumb.centerXProperty(), size * 0.6125);
+        KeyValue thumbLeftX                 = new KeyValue(thumb.centerXProperty(), switchBackground.getLayoutX() + size * 0.1);
+        KeyValue thumbRightX                = new KeyValue(thumb.centerXProperty(), switchBackground.getLayoutX() + switchBackground.getWidth() - size * 0.1);
         KeyValue switchBackgroundLeftColor  = new KeyValue(switchBackground.fillProperty(), tile.getBackgroundColor());
         KeyValue switchBackgroundRightColor = new KeyValue(switchBackground.fillProperty(), tile.getActiveColor());
         if (tile.isSelected()) {
@@ -150,20 +150,19 @@ public class SwitchTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
         text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
@@ -172,24 +171,25 @@ public class SwitchTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        description.setPrefSize(size * 0.9, size * 43);
-        description.relocate(size * 0.05, size * 0.42);
+        description.setPrefSize(width - size * 0.1, size * 0.43);
+        description.relocate(size * 0.05, height * 0.42);
 
         switchBorder.setWidth(size * 0.445);
         switchBorder.setHeight(size * 0.22);
         switchBorder.setArcWidth(size * 0.22);
         switchBorder.setArcHeight(size * 0.22);
-        switchBorder.relocate((size - switchBorder.getWidth()) * 0.5, tile.getDescription().isEmpty() ? (size - switchBorder.getHeight()) * 0.5 : size * 0.60);
+        switchBorder.relocate((width - switchBorder.getWidth()) * 0.5, tile.getDescription().isEmpty() ? (height - switchBorder.getHeight()) * 0.5 : height - size * 0.40);
 
         switchBackground.setWidth(size * 0.425);
         switchBackground.setHeight(size * 0.2);
         switchBackground.setArcWidth(size * 0.2);
         switchBackground.setArcHeight(size * 0.2);
-        switchBackground.relocate((size - switchBackground.getWidth()) * 0.5, tile.getDescription().isEmpty() ? (size - switchBackground.getHeight()) * 0.5 : size * 0.61);
+        switchBackground.relocate((width - switchBackground.getWidth()) * 0.5, tile.getDescription().isEmpty() ? (height - switchBackground.getHeight()) * 0.5 : height - size * 0.39);
 
         thumb.setRadius(size * 0.09);
-        thumb.setCenterX(tile.isSelected() ? size * 0.6125 : size * 0.3875);
-        thumb.setCenterY(tile.getDescription().isEmpty() ? size * 0.5 : size * 0.71);
+        thumb.setCenterX(tile.isSelected() ? width * 0.6125 : width * 0.3875);
+        thumb.setCenterX(tile.isSelected() ? switchBackground.getLayoutX() + switchBackground.getWidth() - size * 0.1 : switchBackground.getLayoutX() + size * 0.1);
+        thumb.setCenterY(tile.getDescription().isEmpty() ? height * 0.5 : height - size * 0.29);
     };
 
     @Override protected void redraw() {

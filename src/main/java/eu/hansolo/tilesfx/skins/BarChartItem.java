@@ -59,6 +59,9 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     private static final UpdateEvent           UPDATE_EVENT     = new UpdateEvent(UpdateEvent.UPDATE_BAR_CHART);
     private              double                width;
     private              double                height;
+    private              double                size;
+    private              double                parentWidth;
+    private              double                parentHeight;
     private              Text                  nameText;
     private              Text                  valueText;
     private              Rectangle             barBackground;
@@ -127,6 +130,8 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         locale             = Locale.US;
         maxValue           = 100;
         stepSize           = PREFERRED_WIDTH * 0.85 / maxValue;
+        parentWidth        = 250;
+        parentHeight       = 250;
         initGraphics();
         registerListeners();
     }
@@ -222,9 +227,14 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         valueText.setText(String.format(locale, formatString, getValue()));
     }
 
+    protected void setParentSize(final double WIDTH, final double HEIGHT) {
+        parentWidth  = WIDTH;
+        parentHeight = HEIGHT;
+    }
+
     private void updateBar(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
-        valueText.setX((width * 0.95) - valueText.getLayoutBounds().getWidth());
+        valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
         bar.setWidth(VALUE * stepSize);
     }
 
@@ -233,6 +243,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     private void resize() {
         width  = getWidth() - getInsets().getLeft() - getInsets().getRight();
         height = getHeight() - getInsets().getTop() - getInsets().getBottom();
+        size   = parentWidth < parentHeight ? parentWidth : parentHeight;
 
         if (ASPECT_RATIO * width > height) {
             width = 1 / (ASPECT_RATIO / height);
@@ -241,28 +252,28 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         }
 
         if (width > 0 && height > 0) {
-            stepSize = width * 0.85 / maxValue;
+            stepSize = (width - size * 0.15) / maxValue;
 
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            nameText.setFont(Fonts.latoRegular(width * 0.06));
-            nameText.setX(width * 0.05);
+            nameText.setFont(Fonts.latoRegular(size * 0.06));
+            nameText.setX(size * 0.05);
             nameText.setY(0);
 
-            valueText.setFont(Fonts.latoRegular(width * 0.06));
-            valueText.setX((width * 0.95) - valueText.getLayoutBounds().getWidth());
+            valueText.setFont(Fonts.latoRegular(size * 0.06));
+            valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
             valueText.setY(0);
 
-            barBackground.setX(width * 0.075);
-            barBackground.setY(height * 0.86111111);
-            barBackground.setWidth(width * 0.85);
-            barBackground.setHeight(height * 0.08333333);
+            barBackground.setX(size * 0.075);
+            barBackground.setY(size * 0.10333333);
+            barBackground.setWidth(width - size * 0.15);
+            barBackground.setHeight(size * 0.01);
 
-            bar.setX(width * 0.075);
-            bar.setY(height * 0.80555556);
+            bar.setX(size * 0.075);
+            bar.setY(size * 0.09666667);
             bar.setWidth(getValue() * stepSize);
-            bar.setHeight(height * 0.19444444);
+            bar.setHeight(size * 0.02333333);
 
             redraw();
         }

@@ -103,7 +103,7 @@ public class CustomTileSkin extends TileSkin {
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
     };
 
     @Override protected void resize() {

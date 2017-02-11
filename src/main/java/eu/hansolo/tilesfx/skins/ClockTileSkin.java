@@ -102,8 +102,8 @@ public class ClockTileSkin extends TileSkin {
 
     public void updateTime(final ZonedDateTime TIME) {
         timeText.setText(timeFormatter.format(tile.getTime()));
-        timeText.setX((size - timeText.getLayoutBounds().getWidth()) * 0.5);
-        timeText.setY(size * 0.4);
+        timeText.setX((width - timeText.getLayoutBounds().getWidth()) * 0.5);
+        timeText.setY(height * 0.4);
 
         dayOfWeekText.setText(dayOfWeekFormatter.format(TIME));
         dayOfWeekText.setX(size * 0.05);
@@ -124,27 +124,29 @@ public class ClockTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * 0.3;
 
         timeText.setFont(Fonts.latoRegular(fontSize));
         timeText.setText(timeFormatter.format(tile.getTime()));
         Helper.adjustTextSize(timeText, maxWidth, fontSize);
-        timeText.setX((size - timeText.getLayoutBounds().getWidth()) * 0.5);
-        timeText.setY(size * 0.4);
+        timeText.setX((width - timeText.getLayoutBounds().getWidth()) * 0.5);
+        timeText.setY(height * 0.4);
 
-        maxWidth = size * 0.9;
+        //maxWidth = width - size * 0.1;
         fontSize = size * 0.1;
         dayOfWeekText.setFont(Fonts.latoRegular(fontSize));
         if (dayOfWeekText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(dayOfWeekText, maxWidth, fontSize); }
         dayOfWeekText.setX(size * 0.05);
-        dayOfWeekText.setY(size * 0.725);
+        dayOfWeekText.setY(height - size * 0.275);
+        dayOfWeekText.setY(timeRect.getLayoutBounds().getMaxY() + size * 0.11);
 
-        maxWidth = size * 0.9;
+        //maxWidth = width - size * 0.1;
         dateText.setFont(Fonts.latoRegular(fontSize));
         if (dateText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(dateText, maxWidth, fontSize); }
         dateText.setX(size * 0.05);
-        dateText.setY(size * 0.85);
+        dateText.setY(height - size * 0.15);
+        dateText.setY(timeRect.getLayoutBounds().getMaxY() + size * 0.235);
     };
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
@@ -160,16 +162,16 @@ public class ClockTileSkin extends TileSkin {
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
     };
 
     @Override protected void resize() {
         super.resize();
 
-        timeRect.setWidth(size);
-        timeRect.setHeight(size * 0.4);
+        timeRect.setWidth(width);
+        timeRect.setHeight(height * 0.4);
         timeRect.setX(0);
-        timeRect.setY(size * 0.2);
+        timeRect.setY(height * 0.2);
     };
 
     @Override protected void redraw() {

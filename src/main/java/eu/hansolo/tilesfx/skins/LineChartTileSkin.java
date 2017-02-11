@@ -77,7 +77,7 @@ public class LineChartTileSkin extends TileSkin {
     @Override protected void resizeDynamicText() {
     };
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
@@ -88,9 +88,9 @@ public class LineChartTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        chart.setMinSize(size * 0.9, size * 0.9);
-        chart.setPrefSize(size * 0.9, size * 0.9);
-        chart.setMaxSize(size * 0.9, size * 0.9);
+        chart.setMinSize(width - size * 0.1, height - size * 0.1);
+        chart.setPrefSize(width - size * 0.1, height - size * 0.1);
+        chart.setMaxSize(width - size * 0.1, height - size * 0.1);
         chart.setPadding(new Insets(titleText.getLayoutBounds().getHeight() + size * 0.05, 0, 0, 0));
         chart.relocate(size * 0.05, size * 0.05);
     };

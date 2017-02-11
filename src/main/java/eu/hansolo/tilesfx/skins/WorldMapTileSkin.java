@@ -31,6 +31,8 @@ import javafx.scene.text.Text;
 import java.util.List;
 import java.util.Map;
 
+import static eu.hansolo.tilesfx.tools.Helper.clamp;
+
 
 /**
  * Created by hansolo on 19.12.16.
@@ -112,20 +114,19 @@ public class WorldMapTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
         text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
     };
 
     @Override protected void resize() {
@@ -133,8 +134,8 @@ public class WorldMapTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double containerWidth  = width * 0.9;
-        double containerHeight = tile.isTextVisible() ? height * 0.72 : height * 0.795;
+        double containerWidth  = width - size * 0.1;
+        double containerHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.215;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -143,8 +144,8 @@ public class WorldMapTileSkin extends TileSkin {
             resizeStaticText();
             resizeDynamicText();
 
-            double worldMapHeight = containerHeight;
-            double worldMapWidth  = containerHeight / 0.65906838;
+            double worldMapHeight = clamp(0, containerWidth * 0.65906838, containerHeight);
+            double worldMapWidth  = clamp(0, width, containerHeight / 0.65906838);
 
             worldPane.setCache(true);
             worldPane.setCacheHint(CacheHint.SCALE);
@@ -153,7 +154,7 @@ public class WorldMapTileSkin extends TileSkin {
             worldPane.setScaleY(worldMapHeight / 665 * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
 
             group.resize(worldMapWidth, worldMapHeight);
-            group.relocate((width - worldMapWidth) * 0.5, size * 0.15);
+            group.relocate((width - worldMapWidth) * 0.5, (height - worldMapHeight) * 0.5);
 
             worldPane.setCache(false);
         }

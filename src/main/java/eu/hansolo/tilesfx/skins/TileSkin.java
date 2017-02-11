@@ -22,6 +22,8 @@ import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.InvalidationListener;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -35,7 +37,9 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 import java.util.Locale;
@@ -180,15 +184,19 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected void resizeStaticText() {};
 
     protected void resize() {
-        width    = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
-        height   = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
-        size     = width < height ? width : height;
-        stepSize = size / range;
+        width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
+        height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
+        size   = width < height ? width : height;
+
+        stepSize = width / range;
         shadow.setRadius(size * 0.012);
 
         if (width > 0 && height > 0) {
-            pane.setMaxSize(size, size);
-            pane.relocate((width - size) * 0.5, (height - size) * 0.5);
+            //pane.setMaxSize(size, size);
+            //pane.relocate((width - size) * 0.5, (height - size) * 0.5);
+
+            pane.setMaxSize(width, height);
+            pane.setPrefSize(width, height);
 
             resizeStaticText();
             resizeDynamicText();

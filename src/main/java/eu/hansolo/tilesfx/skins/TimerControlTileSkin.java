@@ -318,13 +318,13 @@ public class TimerControlTileSkin extends TileSkin {
 
         amPmText.setText(tile.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, 0.2 * size, size * 0.05);
-        amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
-        amPmText.setY(size * 0.4);
+        amPmText.setX((width - amPmText.getLayoutBounds().getWidth()) * 0.5);
+        amPmText.setY(height * 0.5 - size * 0.1);
 
         dateText.setText(dateFormatter.format(TIME).toUpperCase());
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
-        dateText.setX((size - dateText.getLayoutBounds().getWidth()) * 0.5);
-        dateText.setY(size * 0.65);
+        dateText.setX((width - dateText.getLayoutBounds().getWidth()) * 0.5);
+        dateText.setY(height * 0.5 + size * 0.15);
     }
 
     @Override public void dispose() {
@@ -339,7 +339,7 @@ public class TimerControlTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         title.setFont(Fonts.latoRegular(fontSize));
@@ -348,36 +348,37 @@ public class TimerControlTileSkin extends TileSkin {
         title.setX(size * 0.05);
         title.setY(size * 0.05);
 
-        maxWidth = size * 0.2;
+        maxWidth = width - size * 0.8;
         fontSize = size * textSize.factor;
         amPmText.setFont(Fonts.latoRegular(fontSize));
         amPmText.setText(tile.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, maxWidth, fontSize);
-        amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
-        amPmText.setY(size * 0.4);
+        amPmText.setX((width - amPmText.getLayoutBounds().getWidth()) * 0.5);
+        amPmText.setY(height * 0.5 - size * 0.1);
 
-        maxWidth = size * 0.6;
+        maxWidth = width - size * 0.4;
         dateText.setFont(Fonts.latoRegular(fontSize));
         if (dateText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(dateText, maxWidth, fontSize); }
-        dateText.setX((size - dateText.getLayoutBounds().getWidth()) * 0.5);
-        dateText.setY(size * 0.65);
+        dateText.setX((width - dateText.getLayoutBounds().getWidth()) * 0.5);
+        dateText.setY(height * 0.5 + size * 0.15);
 
-        maxWidth = size * 0.9;
+        maxWidth = width - size * 0.1;
         fontSize = size * textSize.factor;
         text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
     };
 
     @Override protected void resize() {
         super.resize();
-        clockSize     = size * CLOCK_SCALE_FACTOR * (TextSize.NORMAL == textSize ? 1.0 : 0.95);
-        double center = size * 0.5;
+        clockSize      = size * CLOCK_SCALE_FACTOR * (TextSize.NORMAL == textSize ? 1.0 : 0.95);
+        double centerX = width * 0.5;
+        double centerY = height * 0.5;
 
         sectionsPane.setMinSize(clockSize, clockSize);
-        sectionsPane.relocate((size - clockSize) * 0.5, (size - clockSize) * 0.5);
+        sectionsPane.relocate((width - clockSize) * 0.5, (height - clockSize) * 0.5);
 
         dropShadow.setRadius(0.008 * size);
         dropShadow.setOffsetY(0.008 * size);
@@ -385,10 +386,10 @@ public class TimerControlTileSkin extends TileSkin {
         drawTimeSections();
         drawTicks();
 
-        hourTickMarks.relocate((size - hourTickMarks.getLayoutBounds().getWidth()) * 0.5,
-                               (size - hourTickMarks.getLayoutBounds().getHeight()) * 0.5);
-        minuteTickMarks.relocate((size - minuteTickMarks.getLayoutBounds().getWidth()) * 0.5,
-                                 (size - minuteTickMarks.getLayoutBounds().getHeight()) * 0.5);
+        hourTickMarks.relocate((width - hourTickMarks.getLayoutBounds().getWidth()) * 0.5,
+                               (height - hourTickMarks.getLayoutBounds().getHeight()) * 0.5);
+        minuteTickMarks.relocate((width - minuteTickMarks.getLayoutBounds().getWidth()) * 0.5,
+                                 (height - minuteTickMarks.getLayoutBounds().getHeight()) * 0.5);
 
         hour.setFill(tile.getHourColor());
         hour.setCache(false);
@@ -398,7 +399,7 @@ public class TimerControlTileSkin extends TileSkin {
         hour.setArcHeight(clockSize * 0.015);
         hour.setCache(true);
         hour.setCacheHint(CacheHint.ROTATE);
-        hour.relocate((size - hour.getWidth()) * 0.5, size * 0.21 / CLOCK_SCALE_FACTOR);
+        hour.relocate((width - hour.getWidth()) * 0.5, centerY - size * 0.165 / CLOCK_SCALE_FACTOR);
 
         minute.setFill(tile.getMinuteColor());
         minute.setCache(false);
@@ -408,7 +409,7 @@ public class TimerControlTileSkin extends TileSkin {
         minute.setArcHeight(clockSize * 0.015);
         minute.setCache(true);
         minute.setCacheHint(CacheHint.ROTATE);
-        minute.relocate((size - minute.getWidth()) * 0.5, size * 0.11 / CLOCK_SCALE_FACTOR);
+        minute.relocate((width - minute.getWidth()) * 0.5, centerY - size * 0.265 / CLOCK_SCALE_FACTOR);
 
         second.setFill(tile.getSecondColor());
         second.setCache(false);
@@ -418,12 +419,12 @@ public class TimerControlTileSkin extends TileSkin {
         second.setArcHeight(clockSize * 0.015);
         second.setCache(true);
         second.setCacheHint(CacheHint.ROTATE);
-        second.relocate((size - second.getWidth()) * 0.5, size * 0.11 / CLOCK_SCALE_FACTOR);
+        second.relocate((width - second.getWidth()) * 0.5, centerY - size * 0.265 / CLOCK_SCALE_FACTOR);
 
         knob.setFill(tile.getKnobColor());
         knob.setRadius(clockSize * 0.0225);
-        knob.setCenterX(center);
-        knob.setCenterY(center);
+        knob.setCenterX(centerX);
+        knob.setCenterY(centerY);
 
         minuteRotate.setPivotX(minute.getWidth() * 0.5);
         minuteRotate.setPivotY(minute.getHeight());

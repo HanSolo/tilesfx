@@ -165,50 +165,50 @@ public class PercentageTileSkin extends TileSkin {
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
-        percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, size * 0.75);
+        percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, height - size * 0.25);
     };
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.15;
+        maxWidth = width - size * 0.85;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
-        maxWidth = size * 0.45;
+        maxWidth = width - size * 0.55;
         fontSize = size * 0.18;
         percentageText.setFont(Fonts.latoRegular(fontSize));
         if (percentageText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(percentageText, maxWidth, fontSize); }
-        percentageText.relocate(size * 0.05, size * 0.695);
+        percentageText.relocate(size * 0.05, height - size * 0.305);
 
-        maxWidth = size * 0.1;
+        maxWidth = width - size * 0.9;
         fontSize = size * 0.12;
         percentageUnitText.setFont(Fonts.latoRegular(fontSize));
         if (percentageUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(percentageUnitText, maxWidth, fontSize); }
-        percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, size * 0.75);
+        percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, height - size * 0.25);
 
-        maxWidth = size * 0.2;
+        maxWidth = width - size * 0.8;
         fontSize = size * 0.05;
         maxValueUnitText.setFont(Fonts.latoRegular(fontSize));
         if (maxValueUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxValueUnitText, maxWidth, fontSize); }
-        maxValueUnitText.setX((size * 0.925) - maxValueUnitText.getLayoutBounds().getWidth());
-        maxValueUnitText.setY(size * 0.855);
+        maxValueUnitText.setX((width - size * 0.075) - maxValueUnitText.getLayoutBounds().getWidth());
+        maxValueUnitText.setY(height - size * 0.145);
 
-        maxWidth = size * 0.45;
+        maxWidth = width - size * 0.55;
         fontSize = size * 0.08;
         maxValueText.setFont(Fonts.latoRegular(fontSize));
         if (maxValueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxValueText, maxWidth, fontSize); }
         if (unitText.isVisible()) {
-            maxValueText.setX((size * 0.925) - (size * 0.01 + maxValueText.getLayoutBounds().getWidth() + maxValueUnitText.getLayoutBounds().getWidth()));
+            maxValueText.setX((width - size * 0.075) - (size * 0.01 + maxValueText.getLayoutBounds().getWidth() + maxValueUnitText.getLayoutBounds().getWidth()));
         } else {
-            maxValueText.setX((size * 0.925) - maxValueText.getLayoutBounds().getWidth());
+            maxValueText.setX((width - size * 0.075) - maxValueText.getLayoutBounds().getWidth());
         }
-        maxValueText.setY(size * 0.855);
+        maxValueText.setY(height - size * 0.145);
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
@@ -217,32 +217,32 @@ public class PercentageTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        description.setPrefSize(size * 0.9, size * 43);
-        description.relocate(size * 0.05, size * 0.42);
+        description.setPrefSize(width - size * 0.1, size * 0.43);
+        description.relocate(size * 0.05, height * 0.42);
 
-        barBackground.setPrefSize(size, size * 0.035);
-        barBackground.relocate(0, size * 0.965);
+        barBackground.setPrefSize(width, size * 0.035);
+        barBackground.relocate(0, height - size * 0.035);
 
         barClip.setX(0);
-        barClip.setY(size * 0.95);
-        barClip.setWidth(size);
+        barClip.setY(height - size * 0.05);
+        barClip.setWidth(width);
         barClip.setHeight(size * 0.05);
         barClip.setArcWidth(tile.getRoundedCorners() ? size * 0.025 : 0.0);
         barClip.setArcHeight(tile.getRoundedCorners() ? size * 0.025 : 0.0);
 
         bar.setX(0);
-        bar.setY(size * 0.965);
+        bar.setY(height - size * 0.035);
         bar.setWidth(clamp(minValue, maxValue, tile.getCurrentValue()) * stepSize);
         bar.setHeight(size * 0.035);
 
         maxValueRect.setWidth((maxValueText.getLayoutBounds().getWidth() + maxValueUnitText.getLayoutBounds().getWidth()) + size * 0.06);
         maxValueRect.setHeight(maxValueText.getLayoutBounds().getHeight() * 1.01);
-        maxValueRect.setX((size * 0.95) - maxValueRect.getWidth());
-        maxValueRect.setY(size * 0.7775);
+        maxValueRect.setX((width - size * 0.05) - maxValueRect.getWidth());
+        maxValueRect.setY(height - size * 0.2225);
         maxValueRect.setArcWidth(size * 0.025);
         maxValueRect.setArcHeight(size * 0.025);
 
-        valueUnitFlow.setPrefWidth(size * 0.9);
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
     };
 

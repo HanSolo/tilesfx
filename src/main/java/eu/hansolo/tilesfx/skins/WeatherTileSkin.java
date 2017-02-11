@@ -24,6 +24,9 @@ import eu.hansolo.tilesfx.weather.DarkSky.ConditionAndIcon;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
 import eu.hansolo.tilesfx.weather.DataPoint;
 import eu.hansolo.tilesfx.weather.WeatherSymbol;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 import java.time.format.DateTimeFormatter;
@@ -37,16 +40,18 @@ import static eu.hansolo.tilesfx.tools.Helper.normalize;
  */
 public class WeatherTileSkin extends TileSkin {
     private static final DateTimeFormatter TF = DateTimeFormatter.ofPattern("HH:mm");
-    private              Text              titleText;
-    private              Text              valueText;
-    private              Text              unitText;
-    private              WeatherSymbol     weatherSymbol;
-    private              Text              summaryText;
-    private              WeatherSymbol     sunriseSymbol;
-    private              WeatherSymbol     sunsetSymbol;
-    private              Text              sunriseText;
-    private              Text              sunsetText;
-    private              DarkSky           darkSky;
+    private              Text          titleText;
+    private              Text          valueText;
+    private              Text          unitText;
+    private              WeatherSymbol weatherSymbol;
+    private              Text          summaryText;
+    private              WeatherSymbol sunriseSymbol;
+    private              WeatherSymbol sunsetSymbol;
+    private              Text          sunriseText;
+    private              Text          sunsetText;
+    private              HBox          sunriseBox;
+    private              HBox          sunsetBox;
+    private              DarkSky       darkSky;
 
 
     // ******************** Constructors **************************************
@@ -76,15 +81,22 @@ public class WeatherTileSkin extends TileSkin {
         sunsetSymbol = new WeatherSymbol(ConditionAndIcon.SUNSET, 22, tile.getForegroundColor());
 
         sunriseText = new Text("");
+        sunriseText.setTextOrigin(VPos.CENTER);
         sunriseText.setFill(tile.getTextColor());
 
         sunsetText = new Text("");
+        sunsetText.setTextOrigin(VPos.CENTER);
         sunsetText.setFill(tile.getTextColor());
+
+        sunriseBox = new HBox(sunriseSymbol, sunriseText);
+        sunriseBox.setAlignment(Pos.CENTER_RIGHT);
+
+        sunsetBox = new HBox(sunsetSymbol, sunsetText);
+        sunsetBox.setAlignment(Pos.CENTER_RIGHT);
 
         weatherSymbol = new WeatherSymbol(ConditionAndIcon.NONE, 250, tile.getForegroundColor());
 
-        getPane().getChildren().addAll(titleText, valueText, unitText, weatherSymbol, summaryText,
-                                       sunriseSymbol, sunsetSymbol, sunriseText, sunsetText);
+        getPane().getChildren().addAll(titleText, valueText, unitText, weatherSymbol, summaryText, sunriseBox, sunsetBox);
     }
 
     @Override protected void registerListeners() {
@@ -106,67 +118,70 @@ public class WeatherTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = unitText.isVisible() ? size * 0.725 : size * 0.9;
+        maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
         fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         if (unitText.isVisible()) {
-            valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
+            valueText.relocate(width - size * 0.075 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
         } else {
-            valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
+            valueText.relocate(width - size * 0.05 - valueText.getLayoutBounds().getWidth(), size * 0.15);
         }
 
-        maxWidth = size * 0.9;
+        maxWidth = width - size * 0.1;
         fontSize = size * textSize.factor;
         summaryText.setFont(Fonts.latoRegular(fontSize));
         if (summaryText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(summaryText, maxWidth, fontSize); }
-        summaryText.setX((size - summaryText.getLayoutBounds().getWidth()) * 0.5);
-        summaryText.setY(size * 0.95);
+        summaryText.setX((width - summaryText.getLayoutBounds().getWidth()) * 0.5);
+        summaryText.setY(height - size * 0.05);
 
-        maxWidth = size * 0.295;
+        maxWidth = width - size * 0.705;
         fontSize = size * 0.06;
 
         sunriseText.setFont(Fonts.latoRegular(fontSize));
         if (sunriseText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(sunriseText, maxWidth, fontSize); }
-        sunriseText.relocate((size * 0.95 - sunriseText.getLayoutBounds().getWidth()), size * 0.6075);
 
         sunsetText.setFont(Fonts.latoRegular(fontSize));
         if (sunsetText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(sunsetText, maxWidth, fontSize); }
-        sunsetText.relocate((size * 0.95 - sunsetText.getLayoutBounds().getWidth()), size * 0.725);
     };
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.15;
+        maxWidth = width - size * 0.85;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.27);
+        unitText.relocate(width - size * 0.05 - unitText.getLayoutBounds().getWidth(), size * 0.27);
     };
 
     @Override protected void resize() {
         super.resize();
 
-        weatherSymbol.setPrefSize(size * 0.6, size * 0.6);
-        weatherSymbol.relocate( size * 0.05, size * 0.8 - weatherSymbol.getPrefHeight());
+        weatherSymbol.setPrefSize(width * 0.5, height - size * 0.4);
+        weatherSymbol.relocate( size * 0.05, (height - weatherSymbol.getPrefHeight()) * 0.5);
 
-        sunriseSymbol.setPrefSize(size * 0.09, size * 0.09);
-        sunriseSymbol.relocate(size * 0.695, size * 0.5925);
+        sunriseBox.setPrefSize(width - size * 0.1, size * 0.09);
+        sunriseBox.setSpacing(size * 0.025);
+        sunriseBox.relocate(size * 0.05, height * 0.6075 + size * 0.0);
 
-        sunsetSymbol.setPrefSize(size * 0.09, size * 0.09);
-        sunsetSymbol.relocate(size * 0.695, size * 0.7125);
+        sunsetBox.setPrefSize(width - size * 0.1, size * 0.09);
+        sunsetBox.setSpacing(size * 0.025);
+        sunsetBox.relocate(size * 0.05, height * 0.725 + size * 0.0);
+
+        sunriseSymbol.setPrefSize(size * 0.1, size * 0.1);
+        sunsetSymbol.setPrefSize(size * 0.1, size * 0.1);
 
         redraw();
     };

@@ -159,15 +159,20 @@ public class BarChartTileSkin extends TileSkin {
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
     };
 
     private void resizeItems() {
-        barChartPane.getChildren().forEach(node -> ((BarChartItem) node).setPrefSize(pane.getWidth(), pane.getHeight()));
+        barChartPane.getChildren().forEach(node -> {
+            BarChartItem item = (BarChartItem) node;
+            item.setParentSize(pane.getWidth(), pane.getHeight());
+            item.setPrefSize(pane.getWidth(), pane.getHeight());
+        });
     }
     @Override protected void resize() {
         super.resize();
         barChartPane.setPrefSize(pane.getPrefWidth(), pane.getPrefHeight());
+
         updateChart();
     };
 

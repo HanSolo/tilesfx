@@ -36,8 +36,11 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.SVGPath;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.scene.text.Text;
 
 import java.util.Locale;
@@ -73,9 +76,12 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     private static final UpdateEvent           UPDATE_EVENT     = new UpdateEvent(UpdateEvent.UPDATE_LEADER_BOARD);
     private              double                width;
     private              double                height;
+    private              double                size;
+    private              double                parentWidth;
+    private              double                parentHeight;
     private              Text                  nameText;
     private              Text                  valueText;
-    private              SVGPath               indicator;
+    private              Path                  triangle;
     private              Line                  separator;
     private              Pane                  pane;
     private              StringProperty        name;
@@ -131,6 +137,8 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         locale         = Locale.US;
         index          = 1024;
         lastIndex      = 1024;
+        parentWidth    = 250;
+        parentHeight   = 250;
 
         initGraphics();
         registerListeners();
@@ -150,11 +158,10 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
 
         state = State.CONSTANT;
 
-        indicator = new SVGPath();
-        indicator.setContent("M 0 7 L 5.5 0 L 11 7 L 0 7 Z");
-        setIndicatorSize(indicator, PREFERRED_WIDTH * 0.04782608, PREFERRED_WIDTH * 0.03043478);
-        indicator.setFill(state.color);
-        indicator.setRotate(state.angle);
+        triangle = new Path();
+        triangle.setStroke(null);
+        triangle.setFill(state.color);
+        triangle.setRotate(state.angle);
 
         nameText = new Text(getName());
         nameText.setTextOrigin(VPos.TOP);
@@ -164,7 +171,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
 
         separator = new Line();
 
-        pane = new Pane(indicator, nameText, valueText, separator);
+        pane = new Pane(triangle, nameText, valueText, separator);
         pane.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
@@ -217,8 +224,8 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         } else {
             state = State.CONSTANT;
         }
-        indicator.setFill(state.color);
-        indicator.setRotate(state.angle);
+        triangle.setFill(state.color);
+        triangle.setRotate(state.angle);
         fireEvent(UPDATE_EVENT);
     }
 
@@ -238,11 +245,25 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         valueText.setText(String.format(locale, formatString, getValue()));
     }
 
+    protected void setParentSize(final double WIDTH, final double HEIGHT) {
+        parentWidth  = WIDTH;
+        parentHeight = HEIGHT;
+    }
+
+    private void drawTriangle() {
+        MoveTo    moveTo    = new MoveTo(0, 0.028 * size);
+        LineTo    lineTo1   = new LineTo(0.022 * size, 0);
+        LineTo    lineTo2   = new LineTo(0.044 * size, 0.028 * size);
+        LineTo    lineTo3   = new LineTo(0, 0.028 * size);
+        ClosePath closePath = new ClosePath();
+        triangle.getElements().setAll(moveTo, lineTo1, lineTo2, lineTo3, closePath);
+    }
 
     // ******************** Resizing ******************************************
     private void resize() {
         width  = getWidth() - getInsets().getLeft() - getInsets().getRight();
         height = getHeight() - getInsets().getTop() - getInsets().getBottom();
+        size   = parentWidth < parentHeight ? parentWidth : parentHeight;
 
         if (ASPECT_RATIO * width > height) {
             width = 1 / (ASPECT_RATIO / height);
@@ -254,36 +275,32 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            setIndicatorSize(indicator, width * 0.04782608, width * 0.03043478);
-            indicator.setLayoutX(width * 0.05);
-            indicator.setLayoutY((height - indicator.getBoundsInLocal().getHeight()) * 0.25);
+            drawTriangle();
+            
+            triangle.setLayoutX(size * 0.05);
+            triangle.setLayoutY((height - triangle.getBoundsInLocal().getHeight()) * 0.25);
 
-            nameText.setFont(Fonts.latoRegular(width * 0.06));
-            nameText.setX(width * 0.12);
+            nameText.setFont(Fonts.latoRegular(size * 0.06));
+            nameText.setX(size * 0.12);
             nameText.setY(0);
 
-            valueText.setFont(Fonts.latoRegular(width * 0.06));
-            valueText.setX((width * 0.95) - valueText.getLayoutBounds().getWidth());
+            valueText.setFont(Fonts.latoRegular(size * 0.06));
+            valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
             valueText.setY(0);
 
-            separator.setStartX(width * 0.05);
-            separator.setStartY(height);
-            separator.setEndX(width * 0.95);
-            separator.setEndY(height);
+            separator.setStartX(size * 0.05);
+            separator.setStartY(size * 0.1);
+            separator.setEndX(width - size * 0.05);
+            separator.setEndY(size * 0.1);
 
             redraw();
         }
     }
 
-    private void setIndicatorSize(final Node NODE, final double TARGET_WIDTH, final double TARGET_HEIGHT) {
-        NODE.setScaleX(TARGET_WIDTH / NODE.getLayoutBounds().getWidth());
-        NODE.setScaleY(TARGET_HEIGHT / NODE.getLayoutBounds().getHeight());
-    }
-
     private void redraw() {
         nameText.setFill(getNameColor());
         valueText.setFill(getValueColor());
-        indicator.setFill(state.color);
+        triangle.setFill(state.color);
         separator.setStroke(getSeparatorColor());
     }
 

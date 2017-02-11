@@ -137,7 +137,7 @@ public class LeaderBoardTileSkin extends TileSkin {
     }
 
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
@@ -148,11 +148,15 @@ public class LeaderBoardTileSkin extends TileSkin {
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
     };
 
     private void resizeItems() {
-        leaderBoardPane.getChildren().forEach(node -> ((LeaderBoardItem) node).setPrefSize(pane.getWidth(), pane.getHeight()));
+        leaderBoardPane.getChildren().forEach(node -> {
+            LeaderBoardItem item = (LeaderBoardItem) node;
+            item.setParentSize(pane.getWidth(), pane.getHeight());
+            item.setPrefSize(pane.getWidth(), pane.getHeight());
+        });
     }
     @Override protected void resize() {
         super.resize();

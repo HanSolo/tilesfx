@@ -88,26 +88,25 @@ public class TextTileSkin extends TileSkin {
         description.setFont(Fonts.latoRegular(fontSize));
     };
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
         text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
-        text.setY(size * 0.95);
+        text.setY(height - size * 0.05);
     };
 
     @Override protected void resize() {
         super.resize();
 
-        description.setPrefSize(size * 0.9, size * 0.795);
+        description.setPrefSize(width - size * 0.1, height - size * 0.215);
         description.relocate(size * 0.05, size * 0.15);
     };
 

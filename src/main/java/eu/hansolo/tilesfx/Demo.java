@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
+import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
@@ -29,6 +30,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
@@ -36,6 +38,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
@@ -291,6 +294,8 @@ public class Demo extends Application {
                                .textVisible(false)
                                .build();
 
+        //GridPane.setColumnSpan(worldTile, 2);
+
         // Update the weather information by calling weatherTile.updateWeather()
         weatherTile = TileBuilder.create()
                                  .skinType(SkinType.WEATHER)
@@ -317,7 +322,6 @@ public class Demo extends Application {
                                   .build();
 
         customTile = TileBuilder.create()
-                                .prefSize(510, 250)
                                 .skinType(SkinType.CUSTOM)
                                 .title("Custom Tile")
                                 .text("Whatever text")
@@ -359,17 +363,18 @@ public class Demo extends Application {
     }
 
     @Override public void start(Stage stage) {
-        FlowPane pane = new FlowPane(Orientation.HORIZONTAL, 10, 10,
-                                     percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
-                                     lineChartTile, timerControlTile, numberTile, textTile,
-                                     highLowTile, plusMinusTile, sliderTile, switchTile, worldTile, timeTile,
-                                     barChartTile, customTile, leaderBoardTile);//, weatherTile);
+        FlowGridPane pane = new FlowGridPane(5, 4,
+                                             percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
+                                             lineChartTile, timerControlTile, numberTile, textTile,
+                                             highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
+                                             barChartTile, customTile, leaderBoardTile, worldTile);//, weatherTile);
 
-        pane.setColumnHalignment(HPos.CENTER);
-        pane.setRowValignment(VPos.CENTER);
+        pane.setAlignment(Pos.CENTER);
+        pane.setHgap(5);
+        pane.setVgap(5);
         pane.setCenterShape(true);
-        pane.setPadding(new Insets(10));
-        pane.setPrefSize(1310, 1050);
+        pane.setPadding(new Insets(5));
+        pane.setPrefSize(921, 616);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);

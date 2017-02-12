@@ -56,6 +56,8 @@ import java.util.Random;
  */
 public class Demo extends Application {
     private static final    Random RND = new Random();
+    private static final    double TILE_WIDTH  = 125;
+    private static final    double TILE_HEIGHT = 125;
     private BarChartItem    barChartItem1;
     private BarChartItem    barChartItem2;
     private BarChartItem    barChartItem3;
@@ -171,6 +173,7 @@ public class Demo extends Application {
         // Creating Tiles
         percentageTile = TileBuilder.create()
                                     .skinType(SkinType.PERCENTAGE)
+                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                     .title("Percentage Tile")
                                     .unit("\u0025")
                                     .description("Test")
@@ -179,6 +182,7 @@ public class Demo extends Application {
 
         clockTile = TileBuilder.create()
                                .skinType(SkinType.CLOCK)
+                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                .title("Clock Tile")
                                .text("Whatever text")
                                .dateVisible(true)
@@ -188,6 +192,7 @@ public class Demo extends Application {
 
         gaugeTile = TileBuilder.create()
                                .skinType(SkinType.GAUGE)
+                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                .title("Gauge Tile")
                                .unit("V")
                                .threshold(75)
@@ -195,6 +200,7 @@ public class Demo extends Application {
 
         sparkLineTile = TileBuilder.create()
                                    .skinType(SkinType.SPARK_LINE)
+                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                    .title("SparkLine Tile")
                                    .unit("mb")
                                    .gradientStops(new Stop(0, Tile.GREEN),
@@ -207,18 +213,21 @@ public class Demo extends Application {
 
         areaChartTile = TileBuilder.create()
                                    .skinType(SkinType.AREA_CHART)
+                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                    .title("AreaChart Tile")
                                    .series(series1)
                                    .build();
 
         lineChartTile = TileBuilder.create()
                                    .skinType(SkinType.LINE_CHART)
+                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                    .title("LineChart Tile")
                                    .series(series2, series3)
                                    .build();
 
         highLowTile = TileBuilder.create()
                                  .skinType(SkinType.HIGH_LOW)
+                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                  .title("HighLow Tile")
                                  .unit("\u0025")
                                  .description("Test")
@@ -229,6 +238,7 @@ public class Demo extends Application {
 
         timerControlTile = TileBuilder.create()
                                       .skinType(SkinType.TIMER_CONTROL)
+                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                       .title("TimerControl Tile")
                                       .text("Whatever text")
                                       .secondsVisible(true)
@@ -239,6 +249,7 @@ public class Demo extends Application {
 
         numberTile = TileBuilder.create()
                                 .skinType(SkinType.NUMBER)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                 .title("Number Tile")
                                 .text("Whatever text")
                                 .value(13)
@@ -249,6 +260,7 @@ public class Demo extends Application {
 
         textTile = TileBuilder.create()
                               .skinType(SkinType.TEXT)
+                              .prefSize(TILE_WIDTH, TILE_HEIGHT)
                               .title("Text Tile")
                               .text("Whatever text")
                               .description("May the force be with you\n...always")
@@ -257,6 +269,7 @@ public class Demo extends Application {
 
         plusMinusTile = TileBuilder.create()
                                    .skinType(SkinType.PLUS_MINUS)
+                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                    .maxValue(30)
                                    .minValue(0)
                                    .title("PlusMinus Tile")
@@ -267,6 +280,7 @@ public class Demo extends Application {
 
         sliderTile = TileBuilder.create()
                                 .skinType(SkinType.SLIDER)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                 .title("Slider Tile")
                                 .text("Whatever text")
                                 .description("Test")
@@ -276,6 +290,7 @@ public class Demo extends Application {
 
         switchTile = TileBuilder.create()
                                 .skinType(SkinType.SWITCH)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                 .title("Switch Tile")
                                 .text("Whatever text")
                                 //.description("Test")
@@ -285,20 +300,17 @@ public class Demo extends Application {
         switchTile.setOnSwitchReleased(e -> System.out.println("Switch released"));
 
         worldTile = TileBuilder.create()
-                               .minWidth(510)
-                               .prefWidth(510)
-                               .maxWidth(510)
+                               .prefSize(250, TILE_HEIGHT)
                                .skinType(SkinType.WORLDMAP)
                                .title("WorldMap Tile")
                                .text("Whatever text")
                                .textVisible(false)
                                .build();
 
-        //GridPane.setColumnSpan(worldTile, 2);
-
         // Update the weather information by calling weatherTile.updateWeather()
         weatherTile = TileBuilder.create()
                                  .skinType(SkinType.WEATHER)
+                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                  .title("YOUR CITY NAME")
                                  .text("Whatever text")
                                  .darkSky(darkSky)
@@ -306,6 +318,7 @@ public class Demo extends Application {
 
         timeTile = TileBuilder.create()
                               .skinType(SkinType.TIME)
+                              .prefSize(TILE_WIDTH, TILE_HEIGHT)
                               .title("Time Tile")
                               .text("Whatever text")
                               .duration(LocalTime.of(1, 22))
@@ -315,6 +328,7 @@ public class Demo extends Application {
 
         barChartTile = TileBuilder.create()
                                   .skinType(SkinType.BAR_CHART)
+                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                   .title("BarChart Tile")
                                   .text("Whatever text")
                                   .barChartItems(barChartItem1, barChartItem2, barChartItem3, barChartItem4)
@@ -323,6 +337,7 @@ public class Demo extends Application {
 
         customTile = TileBuilder.create()
                                 .skinType(SkinType.CUSTOM)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                 .title("Custom Tile")
                                 .text("Whatever text")
                                 .graphic(new Button("Click Me"))
@@ -331,6 +346,7 @@ public class Demo extends Application {
 
         leaderBoardTile = TileBuilder.create()
                                      .skinType(SkinType.LEADER_BOARD)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .title("LeaderBoard Tile")
                                      .text("Whatever text")
                                      .leaderBoardItems(leaderBoardItem1, leaderBoardItem2, leaderBoardItem3, leaderBoardItem4)
@@ -363,18 +379,16 @@ public class Demo extends Application {
     }
 
     @Override public void start(Stage stage) {
-        FlowGridPane pane = new FlowGridPane(5, 4,
-                                             percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
-                                             lineChartTile, timerControlTile, numberTile, textTile,
-                                             highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
-                                             barChartTile, customTile, leaderBoardTile, worldTile);//, weatherTile);
-
+        FlowPane pane = new FlowPane(Orientation.HORIZONTAL, 5, 5,
+                                      percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
+                                      lineChartTile, timerControlTile, numberTile, textTile,
+                                      highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
+                                      barChartTile, customTile, leaderBoardTile, worldTile);//, weatherTile);
+        pane.setPrefWrapLength(1);
         pane.setAlignment(Pos.CENTER);
-        pane.setHgap(5);
-        pane.setVgap(5);
         pane.setCenterShape(true);
         pane.setPadding(new Insets(5));
-        pane.setPrefSize(921, 616);
+        pane.setPrefSize(915, 395);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);

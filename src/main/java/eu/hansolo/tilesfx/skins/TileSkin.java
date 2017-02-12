@@ -99,7 +99,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         highlightSections    = tile.isHighlightSections();
         textSize             = tile.getTextSize();
         sizeListener         = o -> handleEvents("RESIZE");
-        tileEventListener    = e -> handleEvents(e.eventType.name());
+        tileEventListener    = e -> handleEvents(e.getEventType().name());
         currentValueListener = o -> handleCurrentValue(tile.getCurrentValue());
 
         initGraphics();

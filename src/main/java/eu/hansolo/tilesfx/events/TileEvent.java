@@ -16,22 +16,23 @@
 
 package eu.hansolo.tilesfx.events;
 
-import java.util.EventObject;
-
 
 /**
  * Created by hansolo on 19.12.16.
  */
-public class TileEvent extends EventObject {
+public class TileEvent {
     public enum EventType { RECALC, REDRAW, RESIZE, VISIBILITY, SECTION, ALERT, VALUE,
                             THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN, FINISHED, SERIES,
                             DATA, GRAPHIC, UPDATE, AVERAGING };
-    public final EventType eventType;
+    private final EventType EVENT_TYPE;
 
 
     // ******************** Constructors **************************************
-    public TileEvent(final Object SRC, final EventType EVENT_TYPE) {
-        super(SRC);
-        eventType = EVENT_TYPE;
+    public TileEvent(final EventType EVENT_TYPE) {
+        this.EVENT_TYPE = EVENT_TYPE;
     }
+
+
+    // ******************** Methods *******************************************
+    public EventType getEventType() { return EVENT_TYPE; }
 }

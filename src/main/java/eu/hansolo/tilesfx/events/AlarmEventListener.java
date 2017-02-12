@@ -16,13 +16,11 @@
 
 package eu.hansolo.tilesfx.events;
 
-import java.util.EventListener;
-
 
 /**
  * Created by hansolo on 19.12.16.
  */
 @FunctionalInterface
-public interface AlarmEventListener extends EventListener {
-    public void onAlarmEvent(final AlarmEvent EVENT);
+public interface AlarmEventListener {
+    void onAlarmEvent(final AlarmEvent EVENT);
 }

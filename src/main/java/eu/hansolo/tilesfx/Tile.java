@@ -127,21 +127,21 @@ public class Tile extends Control {
     private static final int         MAX_NO_OF_DECIMALS    = 3;
     private static final String      COUNTRY_PROPERTIES    = "eu/hansolo/tilesfx/lowres.properties";
                     
-    private        final TileEvent   EXCEEDED_EVENT        = new TileEvent(Tile.this, EventType.THRESHOLD_EXCEEDED);
-    private        final TileEvent   UNDERRUN_EVENT        = new TileEvent(Tile.this, EventType.THRESHOLD_UNDERRUN);
-    private        final TileEvent   RECALC_EVENT          = new TileEvent(Tile.this, EventType.RECALC);
-    private        final TileEvent   REDRAW_EVENT          = new TileEvent(Tile.this, EventType.REDRAW);
-    private        final TileEvent   RESIZE_EVENT          = new TileEvent(Tile.this, EventType.RESIZE);
-    private        final TileEvent   VISIBILITY_EVENT      = new TileEvent(Tile.this, EventType.VISIBILITY);
-    private        final TileEvent   SECTION_EVENT         = new TileEvent(Tile.this, EventType.SECTION);
-    private        final TileEvent   SERIES_EVENT          = new TileEvent(Tile.this, EventType.SERIES);
-    private        final TileEvent   DATA_EVENT            = new TileEvent(Tile.this, EventType.DATA);
-    private        final TileEvent   ALERT_EVENT           = new TileEvent(Tile.this, EventType.ALERT);
-    private        final TileEvent   VALUE_EVENT           = new TileEvent(Tile.this, EventType.VALUE);
-    private        final TileEvent   FINISHED_EVENT        = new TileEvent(Tile.this, EventType.FINISHED);
-    private        final TileEvent   GRAPHIC_EVENT         = new TileEvent(Tile.this, EventType.GRAPHIC);
-    private        final TileEvent   AVERAGING_EVENT       = new TileEvent(Tile.this, EventType.AVERAGING);
-    private        final TileEvent   UPDATE_EVENT          = new TileEvent(Tile.this, EventType.UPDATE);
+    private        final TileEvent   EXCEEDED_EVENT        = new TileEvent(EventType.THRESHOLD_EXCEEDED);
+    private        final TileEvent   UNDERRUN_EVENT        = new TileEvent(EventType.THRESHOLD_UNDERRUN);
+    private        final TileEvent   RECALC_EVENT          = new TileEvent(EventType.RECALC);
+    private        final TileEvent   REDRAW_EVENT          = new TileEvent(EventType.REDRAW);
+    private        final TileEvent   RESIZE_EVENT          = new TileEvent(EventType.RESIZE);
+    private        final TileEvent   VISIBILITY_EVENT      = new TileEvent(EventType.VISIBILITY);
+    private        final TileEvent   SECTION_EVENT         = new TileEvent(EventType.SECTION);
+    private        final TileEvent   SERIES_EVENT          = new TileEvent(EventType.SERIES);
+    private        final TileEvent   DATA_EVENT            = new TileEvent(EventType.DATA);
+    private        final TileEvent   ALERT_EVENT           = new TileEvent(EventType.ALERT);
+    private        final TileEvent   VALUE_EVENT           = new TileEvent(EventType.VALUE);
+    private        final TileEvent   FINISHED_EVENT        = new TileEvent(EventType.FINISHED);
+    private        final TileEvent   GRAPHIC_EVENT         = new TileEvent(EventType.GRAPHIC);
+    private        final TileEvent   AVERAGING_EVENT       = new TileEvent(EventType.AVERAGING);
+    private        final TileEvent   UPDATE_EVENT          = new TileEvent(EventType.UPDATE);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
@@ -3737,7 +3737,7 @@ public class Tile extends Control {
                 case ONCE:
                     if (TIME.isAfter(ALARM_TIME)) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Tile.this, alarm));
+                            fireAlarmEvent(new AlarmEvent(alarm));
                             alarm.executeCommand();
                         }
                         alarmsToRemove.add(alarm);
@@ -3748,7 +3748,7 @@ public class Tile extends Control {
                          ALARM_TIME.plusMinutes(30).getMinute() == TIME.getMinute()) &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Tile.this, alarm));
+                            fireAlarmEvent(new AlarmEvent(alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -3757,7 +3757,7 @@ public class Tile extends Control {
                     if (ALARM_TIME.getMinute() == TIME.getMinute() &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Tile.this, alarm));
+                            fireAlarmEvent(new AlarmEvent(alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -3767,7 +3767,7 @@ public class Tile extends Control {
                         ALARM_TIME.getMinute() == TIME.getMinute() &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Tile.this, alarm));
+                            fireAlarmEvent(new AlarmEvent(alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -3778,7 +3778,7 @@ public class Tile extends Control {
                         ALARM_TIME.getMinute()    == TIME.getMinute() &&
                         ALARM_TIME.getSecond()    == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Tile.this, alarm));
+                            fireAlarmEvent(new AlarmEvent(alarm));
                             alarm.executeCommand();
                         }
                     }

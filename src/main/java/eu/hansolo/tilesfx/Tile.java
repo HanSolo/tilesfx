@@ -3855,8 +3855,7 @@ public class Tile extends Control {
     public void removeTileEventListener(final TileEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
 
     public void fireTileEvent(final TileEvent EVENT) {
-        int listSize = listenerList.size();
-        for (TileEventListener aListenerList : listenerList) { aListenerList.onTileEvent(EVENT); }
+        for (TileEventListener listener : listenerList) { listener.onTileEvent(EVENT); }
     }
 
     
@@ -3865,8 +3864,7 @@ public class Tile extends Control {
     public void removeAlarmEventListener(final AlarmEventListener LISTENER) { if (alarmListenerList.contains(LISTENER)) alarmListenerList.remove(LISTENER); }
 
     public void fireAlarmEvent(final AlarmEvent EVENT) {
-        int listSize = alarmListenerList.size();
-        for (AlarmEventListener anAlarmListenerList : alarmListenerList) { anAlarmListenerList.onAlarmEvent(EVENT); }
+        for (AlarmEventListener listener : alarmListenerList) { listener.onAlarmEvent(EVENT); }
     }
 
 
@@ -3875,8 +3873,7 @@ public class Tile extends Control {
     public void removeTimeEventListener(final TimeEventListener LISTENER) { if (timeEventListenerList.contains(LISTENER)) timeEventListenerList.remove(LISTENER); }
 
     public void fireTimeEvent(final TimeEvent EVENT) {
-        int listSize = timeEventListenerList.size();
-        for (TimeEventListener aTimeEventListenerList : timeEventListenerList) { aTimeEventListenerList.onTimeEvent(EVENT); }
+        for (TimeEventListener listener : timeEventListenerList) { listener.onTimeEvent(EVENT); }
     }
 
 

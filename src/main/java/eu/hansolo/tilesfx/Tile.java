@@ -29,6 +29,7 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.*;
 import eu.hansolo.tilesfx.tools.Data;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.SectionComparator;
 import eu.hansolo.tilesfx.tools.TimeSectionComparator;
@@ -64,7 +65,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -94,7 +94,8 @@ public class Tile extends Control {
                            WORLDMAP("WorldMapTileSkin"), TIMER_CONTROL("TimerControlTileSkin"),
                            NUMBER("NumberTileSkin"), TEXT("TextTileSkin"),
                            WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
-                           CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin");
+                           CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
+                           MAP("MapTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -111,17 +112,35 @@ public class Tile extends Control {
             factor = FACTOR;
         }
     }
+    public enum TileColor {
+        GRAY(Color.rgb(139,144,146), "gray"),
+        RED(Color.rgb(229, 80, 76), "red"),
+        GREEN(Color.rgb(143, 198, 94), "green"),
+        BLUE(Color.rgb(55, 179, 252), "blue"),
+        ORANGE(Color.rgb(237, 162, 57), "orange"),
+        YELLOW_ORANGE(Color.rgb(229, 198, 76), "yellow-orange"),
+        YELLOW(Color.rgb(229, 229, 76), "yellow"),
+        MAGENTA(Color.rgb(198, 75, 232), "magenta");
+
+        public final Color  color;
+        public final String styleName;
+
+        TileColor(final Color COLOR, final String STYLE_NAME) {
+            color     = COLOR;
+            styleName = STYLE_NAME;
+        }
+    }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
-    public  static final Color       GRAY                  = Color.rgb(139,144,146);
-    public  static final Color       RED                   = Color.rgb(229, 80, 76);
-    public  static final Color       GREEN                 = Color.rgb(143, 198, 94);
-    public  static final Color       BLUE                  = Color.rgb(55, 179, 252);
-    public  static final Color       ORANGE                = Color.rgb(237, 162, 57);
-    public  static final Color       YELLOW_ORANGE         = Color.rgb(229, 198, 76);
-    public  static final Color       YELLOW                = Color.rgb(229, 229, 76);
-    public  static final Color       MAGENTA               = Color.rgb(198, 75, 232);
+    public  static final Color       GRAY                  = TileColor.GRAY.color;
+    public  static final Color       RED                   = TileColor.RED.color;
+    public  static final Color       GREEN                 = TileColor.GREEN.color;
+    public  static final Color       BLUE                  = TileColor.BLUE.color;
+    public  static final Color       ORANGE                = TileColor.ORANGE.color;
+    public  static final Color       YELLOW_ORANGE         = TileColor.YELLOW_ORANGE.color;
+    public  static final Color       YELLOW                = TileColor.YELLOW.color;
+    public  static final Color       MAGENTA               = TileColor.MAGENTA.color;
     public  static final int         SHORT_INTERVAL        = 20;
     public  static final int         LONG_INTERVAL         = 1000;
     private static final int         MAX_NO_OF_DECIMALS    = 3;
@@ -142,6 +161,7 @@ public class Tile extends Control {
     private        final TileEvent   GRAPHIC_EVENT         = new TileEvent(EventType.GRAPHIC);
     private        final TileEvent   AVERAGING_EVENT       = new TileEvent(EventType.AVERAGING);
     private        final TileEvent   UPDATE_EVENT          = new TileEvent(EventType.UPDATE);
+    private        final TileEvent   LOCATION_EVENT        = new TileEvent(EventType.LOCATION);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
@@ -194,6 +214,11 @@ public class Tile extends Control {
     private              ObservableList<BarChartItem>           barChartItems;
     private              List<LeaderBoardItem>                  leaderBoardItems;
     private              ObjectProperty<Node>                   graphic;
+    private              Location                               _currentLocation;
+    private              ObjectProperty<Location>               currentLocation;
+    private              TileColor                              _locationColor;
+    private              ObjectProperty<TileColor>              locationColor;
+
 
     // UI related
     private              SkinType                      skinType;
@@ -466,6 +491,8 @@ public class Tile extends Control {
         _averagingEnabled                   = false;
         _averagingPeriod                    = 10;
         _duration                           = LocalTime.of(1, 0);
+        _currentLocation                    = new Location(0, 0);
+        _locationColor                      = TileColor.BLUE;
         movingAverage                       = new MovingAverage(_averagingPeriod);
         sections                            = FXCollections.observableArrayList();
         series                              = FXCollections.observableArrayList();
@@ -1224,6 +1251,51 @@ public class Tile extends Control {
         return graphic;
     }
 
+    public Location getCurrentLocation() { return null == currentLocation ? _currentLocation : currentLocation.get(); }
+    public void setCurrentLocation(final Location LOCATION) {
+        if (null == currentLocation) {
+            _currentLocation.set(LOCATION);
+            fireTileEvent(LOCATION_EVENT);
+        } else {
+            currentLocation.set(LOCATION);
+        }
+    }
+    public ObjectProperty<Location> currentLocationProperty() {
+        if (null == currentLocation) {
+            currentLocation = new ObjectPropertyBase<Location>(_currentLocation) {
+                @Override protected void invalidated() { fireTileEvent(LOCATION_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "currentLocation"; }
+            };
+            _currentLocation = null;
+        }
+        return currentLocation;
+    }
+    public void updateLocation(final double LATITUDE, final double LONGITUDE) {
+        getCurrentLocation().set(LATITUDE, LONGITUDE);
+        fireTileEvent(LOCATION_EVENT);
+    }
+
+    public TileColor getLocationColor() { return null == locationColor ? _locationColor : locationColor.get(); }
+    public void setLocationColor(final TileColor COLOR) {
+        if (null == locationColor) {
+            _locationColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            locationColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<TileColor> locationColorProperty() {
+        if (null == locationColor) {
+            locationColor = new ObjectPropertyBase<TileColor>(_locationColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "locationColor"; }
+            };
+            _locationColor = null;
+        }
+        return locationColor;
+    }
 
     /**
      * A convenient method to set the color of foreground elements like
@@ -3906,6 +3978,7 @@ public class Tile extends Control {
             case TIME         : return new TimeTileSkin(Tile.this);
             case CUSTOM       : return new CustomTileSkin(Tile.this);
             case LEADER_BOARD : return new LeaderBoardTileSkin(Tile.this);
+            case MAP          : return new MapTileSkin(Tile.this);
             default           : return new TileSkin(Tile.this);
         }
     }
@@ -3971,6 +4044,8 @@ public class Tile extends Control {
             case CUSTOM:
                 break;
             case LEADER_BOARD:
+                break;
+            case MAP:
                 break;
             default:
                 break;

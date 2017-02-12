@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>TilesFX</title>
+    <link rel="stylesheet" href="leaflet.css" type="text/css" charset="utf-8"/>
+    <script>L_PREFER_CANVAS = true; </script>
+    <script type="text/javascript" src="leaflet.js"></script>
+    <script type="text/javascript" src="leaflet-providers.js"></script>
+</head>
+<style type="text/css">
+    html { height: 100% }
+    body { height: 100%; margin: 0px; padding: 0px; }
+    #map { width: 100%; height: 100%; }
+    /*#map_canvas { height: 100%; background-color: #666970; }*/
+</style>
+<body>
+<div id="map" style="width: 100%; height: 100%; position: relative;" class="leaflet-container leaflet-fade-anim" tabindex="0">
+
+    <script type="text/javascript">
+      var map = L.map('map').setView([0, 0], 15);
+      map.on('move', function() { java.update(parseFloat(map.getCenter().lat), parseFloat(map.getCenter().lng)); });
+      map.attributionControl.setPrefix('');
+      map.removeControl(map.zoomControl);
+      map.scrollWheelZoom.disable();
+      new L.control.zoom({position: 'bottomright'}).addTo(map);
+
+      // TileLayer
+      var mapnik             = L.tileLayer.provider('OpenStreetMap.Mapnik', {attribution: ''});
+      //var openStreetMapDE    = L.tileLayer.provider('OpenStreetMap.DE', {attribution: ''});
+      //var openStreetMapBW    = L.tileLayer.provider('OpenStreetMap.BlackAndWhite', {attribution: ''});
+      var hydda              = L.tileLayer.provider('Hydda.Full', {attribution: ''});
+      //var mapQuestOpen       = L.tileLayer.provider('MapQuestOpen.OSM', {attribution: ''});
+      //var esriWorldStreetMap = L.tileLayer.provider('Esri.WorldStreetMap', {attribution: ''});
+      var esriWorldImagery   = L.tileLayer.provider('Esri.WorldImagery', {attribution: ''});
+      //var esriWorldTopoMap   = L.tileLayer.provider('Esri.WorldTopoMap', {attribution: ''});
+
+      hydda.addTo(map);
+
+      /*
+       // Overlay
+       var clouds         = L.tileLayer.provider('OpenWeatherMap.Clouds');
+       var precipitation  = L.tileLayer.provider('OpenWeatherMap.Precipitation');
+       var rain           = L.tileLayer.provider('OpenWeatherMap.Rain');
+       var wind           = L.tileLayer.provider('OpenWeatherMap.Wind');
+       var temperature    = L.tileLayer.provider('OpenWeatherMap.Temperature');
+       var pressure       = L.tileLayer.provider('OpenWeatherMap.Pressure');
+       var snow           = L.tileLayer.provider('OpenWeatherMap.Snow');
+       var relief         = L.tileLayer('http://{s}.tile.stamen.com/toposm-color-relief/{z}/{x}/{y}.jpg', {maxZoom: 16});
+       var openCycleMap   = L.tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png');
+       */
+
+      L.Marker.prototype.setTitle = function (title) {
+        if (this._icon) {
+          this._icon.title = title;
+        } else {
+          this.options.title = title;
+        }
+      };
+
+      L.control.layers({
+                         "OSM"       : mapnik,
+                         "Hydda"     : hydda,
+                         "Satellite" : esriWorldImagery,
+                       }, {},{position:'topright'}).addTo(map);
+
+      L.control.scale({metric: true, imperial: false}).addTo(map);
+
+      var locationIconBlue         = L.icon({
+                                    iconUrl     : 'location_blue.png',
+                                    iconSize    : [19, 19],   // size of the icon
+                                    iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
+                                    popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                  });
+      var locationIconGray         = L.icon({
+                                           iconUrl     : 'location_gray.png',
+                                           iconSize    : [19, 19],   // size of the icon
+                                           iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
+                                           popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                         });
+      var locationIconGreen        = L.icon({
+                                           iconUrl     : 'location_green.png',
+                                           iconSize    : [19, 19],   // size of the icon
+                                           iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
+                                           popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                         });
+      var locationIconMagenta      = L.icon({
+                                           iconUrl     : 'location_magenta.png',
+                                           iconSize    : [19, 19],   // size of the icon
+                                           iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
+                                           popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                         });
+      var locationIconOrange       = L.icon({
+                                           iconUrl     : 'location_orange.png',
+                                           iconSize    : [19, 19],   // size of the icon
+                                           iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
+                                           popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                         });
+      var locationIconRed          = L.icon({
+                                            iconUrl     : 'location_red.png',
+                                            iconSize    : [19, 19],   // size of the icon
+                                            iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
+                                            popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                          });
+      var locationIconYellowOrange = L.icon({
+                                            iconUrl     : 'location_yellow_orange.png',
+                                            iconSize    : [19, 19],   // size of the icon
+                                            iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
+                                            popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                          });
+      var locationIconYellow       = L.icon({
+                                            iconUrl     : 'location_yellow.png',
+                                            iconSize    : [19, 19],   // size of the icon
+                                            iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
+                                            popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                          });
+      var locationMarker           = L.marker([0, 0], {
+                                     icon       : locationIconBlue,
+                                     opacity    : 1.0,
+                                     draggable  : false,
+                                     title      : 'Current Location',
+                                     riseOnHover: true,
+                                     riseOffset : 250
+                                   }).bindPopup('<p>-</p>').addTo(map);
+
+      var Poi                      = L.Class.extend({
+                                     initialize: function (title, marker) {
+                                      this.title  = title;
+                                      this.marker = marker;
+                                    },
+                                     title : this.title,
+                                     marker: this.marker
+                                  });
+
+
+      document.setLocationColor  = function(color) {
+        if ('blue' === color) {
+          locationMarker.setIcon(locationIconBlue);
+        } else if ('gray' === color) {
+          locationMarker.setIcon(locationIconGray);
+        } else if ('green' === color) {
+          locationMarker.setIcon(locationIconGreen);
+        } else if ('magenta' === color) {
+          locationMarker.setIcon(locationIconMagenta);
+        } else if ('orange' === color) {
+          locationMarker.setIcon(locationIconOrange);
+        } else if ('red' === color) {
+          locationMarker.setIcon(locationIconRed);
+        } else if ('yellow-orange' === color) {
+          locationMarker.setIcon(locationIconYellowOrange);
+        } else if ('yellow' === color) {
+          locationMarker.setIcon(locationIconYellow);
+        } else {
+          locationMarker.setIcon(locationIconBlue);
+        }
+        locationMarker.update();
+      };
+
+      document.panTo             = function(x, y) {
+        map.panTo([x, y]);
+      };
+
+      document.goToLocation      = function(x, y, acc, follow) {
+        accuracy = acc;
+        document.showOnlineMarker();
+        onlineMarker.setLatLng([x, y]);
+        onlineMarker.update();
+        accuracyCircle.setLatLng([x, y]);
+        accuracyCircle.setRadius(accuracy);
+        onlineMarker._icon.title = 'Tracked Object\nAccuracy: ' + accuracy.toFixed(1) + 'm';
+        if (follow) map.panTo([x, y]);
+      };
+
+      document.setOnline         = function() {
+        if (onlineMarker.opacity < 1.0) {
+          document.showOnlineMarker();
+        }
+      };
+      document.setOffline        = function() {
+        document.hideOnlineMarker();
+      };
+
+      document.moveMarker        = function(locationName, locationInfo, x, y) {
+        locationMarker.setLatLng([x, y]);
+        locationMarker.update();
+        locationMarker.setTitle(locationName);
+        locationMarker._popup.setContent('<p>'+ locationInfo + '</p>');
+        map.panTo(locationMarker.getLatLng());
+      };
+
+      document.clearMarkers      = function() {
+        while(markerArray.length > 0) { markerArray.pop(); }
+      };
+      document.zoomToLocation    = function() {
+        map.setZoom(17);
+        map.panTo(locationMarker.getLatLng());
+      };
+
+      document.addPoiMarker      = function(x, y, date, time) {
+        var poiMarker = L.marker([x, y], {
+          icon       : poiIcon,
+          draggable  : false,
+          riseOnHover: true,
+          riseOffset : 249,
+          title      : "Poi:" + "\n" + date + "\n" + time
+        }).addTo(map);
+        poiArray.push(poiMarker);
+      };
+      document.removePois        = function() {
+        for (var i = 0 ; i < poiArray.length ; i++) {
+          document.removeLayer(poiArray[i]); // removes poi from map
+        }
+      };
+      document.clearPois         = function() {
+        while(poiArray.length > 0) { poiArray.pop(); }
+      };
+
+      document.addRain           = function() { document.addLayer(rain); };
+      document.removeRain        = function() { document.removeLayer(rain); };
+      document.addWind           = function() { document.addLayer(wind); };
+      document.removeWind        = function() { document.removeLayer(wind); };
+      document.addClouds         = function() { document.addLayer(clouds); };
+      document.removeClouds      = function() { document.removeLayer(clouds); };
+      document.addPressure       = function() { document.addLayer(pressure); };
+      document.removePressure    = function() { document.removeLayer(pressure); };
+      document.addTemperature    = function() { document.addLayer(temperature); };
+      document.removeTemperature = function() { document.removeLayer(temperature); };
+      document.addLayer          = function(overlay) {
+        overlay.addTo(map);
+      };
+      document.removeLayer       = function(overlay) {
+        map.removeLayer(overlay);
+      };
+    </script>
+
+</div>
+</body>
+</html>

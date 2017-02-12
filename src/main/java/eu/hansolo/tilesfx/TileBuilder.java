@@ -18,11 +18,13 @@ package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
+import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
+import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -586,6 +588,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B currentLocation(final Location LOCATION) {
+        properties.put("currentLocation", new SimpleObjectProperty(LOCATION));
+        return (B)this;
+    }
+
+    public final B locationColor(final TileColor COLOR) {
+        properties.put("locationColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
     public final B gradientStops(final Stop... STOPS) {
         properties.put("gradientStopsArray", new SimpleObjectProperty(STOPS));
         return (B)this;
@@ -745,6 +757,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case CUSTOM:
                     break;
                 case LEADER_BOARD:
+                    break;
+                case MAP:
                     break;
                 default:
                     break;
@@ -1028,6 +1042,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
             } else if ("textSize".equals(key)) {
                 CONTROL.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
+            } else if ("currentLocation".equals(key)) {
+                CONTROL.setCurrentLocation(((ObjectProperty<Location>) properties.get(key)).get());
+            } else if ("locationColor".equals(key)) {
+                CONTROL.setLocationColor(((ObjectProperty<TileColor>) properties.get(key)).get());
             }
         }
         return CONTROL;

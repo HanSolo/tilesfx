@@ -74,10 +74,16 @@ public class Location {
 
     // ******************** Constructors **************************************
     public Location() {
-        this(0, 0, 0, Instant.now(), "Loc #" + new Random().nextInt(), "");
+        this(0, 0, 0, Instant.now(), "", "");
+    }
+    public Location(final double LATITUDE, final double LONGITUDE) {
+        this(LATITUDE, LONGITUDE, 0, Instant.now(), "", "");
     }
     public Location(final double LATITUDE, final double LONGITUDE, final String NAME) {
         this(LATITUDE, LONGITUDE, 0, Instant.now() ,NAME, "");
+    }
+    public Location(final double LATITUDE, final double LONGITUDE, final String NAME, final String INFO) {
+        this(LATITUDE, LONGITUDE, 0, Instant.now() ,NAME, INFO);
     }
     public Location(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final String NAME) {
         this(LATITUDE, LONGITUDE, ALTITUDE, Instant.now(), NAME, "");

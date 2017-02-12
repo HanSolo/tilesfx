@@ -17,9 +17,11 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
+import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
+import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
@@ -56,8 +58,8 @@ import java.util.Random;
  */
 public class Demo extends Application {
     private static final    Random RND = new Random();
-    private static final    double TILE_WIDTH  = 125;
-    private static final    double TILE_HEIGHT = 125;
+    private static final    double TILE_WIDTH  = 150;
+    private static final    double TILE_HEIGHT = 150;
     private BarChartItem    barChartItem1;
     private BarChartItem    barChartItem2;
     private BarChartItem    barChartItem3;
@@ -85,6 +87,7 @@ public class Demo extends Application {
     private Tile            barChartTile;
     private Tile            customTile;
     private Tile            leaderBoardTile;
+    private Tile            mapTile;
     private long            lastTimerCall;
     private AnimationTimer  timer;
     private DoubleProperty  value;
@@ -300,7 +303,7 @@ public class Demo extends Application {
         switchTile.setOnSwitchReleased(e -> System.out.println("Switch released"));
 
         worldTile = TileBuilder.create()
-                               .prefSize(250, TILE_HEIGHT)
+                               .prefSize(300, TILE_HEIGHT)
                                .skinType(SkinType.WORLDMAP)
                                .title("WorldMap Tile")
                                .text("Whatever text")
@@ -352,6 +355,16 @@ public class Demo extends Application {
                                      .leaderBoardItems(leaderBoardItem1, leaderBoardItem2, leaderBoardItem3, leaderBoardItem4)
                                      .build();
 
+        mapTile = TileBuilder.create()
+                             .skinType(SkinType.MAP)
+                             .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                             .title("Map")
+                             .text("Some text")
+                             .description("Description")
+                             .currentLocation(new Location(51.91178, 7.63379, "Gerrit", "Info"))
+                             .locationColor(TileColor.MAGENTA)
+                             .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -383,12 +396,12 @@ public class Demo extends Application {
                                       percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                       lineChartTile, timerControlTile, numberTile, textTile,
                                       highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
-                                      barChartTile, customTile, leaderBoardTile, worldTile);//, weatherTile);
+                                      barChartTile, customTile, leaderBoardTile, worldTile, mapTile);//, weatherTile);
         pane.setPrefWrapLength(1);
         pane.setAlignment(Pos.CENTER);
         pane.setCenterShape(true);
         pane.setPadding(new Insets(5));
-        pane.setPrefSize(915, 395);
+        pane.setPrefSize(780, 395);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);

@@ -19,26 +19,23 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
 import eu.hansolo.tilesfx.weather.DarkSky.Unit;
+import java.net.URISyntaxException;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
@@ -47,6 +44,10 @@ import javafx.scene.Scene;
 import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.scene.image.Image;
+import javafx.scene.shape.Rectangle;
 
 
 /**
@@ -190,9 +191,22 @@ public class Demo extends Application {
                                .running(true)
                                .build();
 
+        // Without Builder
+//        RadialGradient gradient1 = new RadialGradient(
+//            0,
+//            .1,
+//            125,
+//            200,
+//            80,
+//            false,
+//            CycleMethod.NO_CYCLE,
+//            new Stop(0, Color.rgb(42, 42, 42)),
+//            new Stop(1, Color.color(1,1,1,0.01)));
+//        Background background = new Background(new BackgroundFill(gradient1, new CornerRadii(250 * 0.025), Insets.EMPTY));
         gaugeTile = TileBuilder.create()
                                .skinType(SkinType.GAUGE)
                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+//                               .background(background)
                                .title("Gauge Tile")
                                .unit("V")
                                .threshold(75)
@@ -246,6 +260,15 @@ public class Demo extends Application {
                                       .timeSections(timeSection)
                                       .running(true)
                                       .build();
+        // With CSS
+//        timerControlTile.setStyle(
+//                "-fx-background-color:" +
+//                    "#090a0c," +
+//                    "linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%)," +
+//                    "linear-gradient(#20262b, #191d22)," +
+//                    "radial-gradient(center 50% 50%, radius 100%, rgba(104,121,138,0.9), rgba(245,245,245,0));" +
+//                "-fx-background-radius: 6.25;"
+//        );
 
         numberTile = TileBuilder.create()
                                 .skinType(SkinType.NUMBER)
@@ -257,10 +280,60 @@ public class Demo extends Application {
                                 .description("Test")
                                 .textVisible(true)
                                 .build();
+        // With CSS
+//        numberTile.setStyle(
+//                "-fx-background-color:" +
+//                    "#a6b5c9," +
+//                    "linear-gradient(#303842 0%, #3e5577 20%, #375074 100%)," +
+//                    "linear-gradient(#4a6c9b 0%, #486a9a 14%, #768aa5 15%, #849cbb 55%, #5877a2 87%, #486a9a 88%, #4a6c9b 100%);" +
+//                "-fx-background-radius: 6.25;"
+//        );
+        
+        // Without Builder
+//        List<BackgroundFill> l1 = new ArrayList<>();
+//        l1.add(new BackgroundFill(Color.CADETBLUE, new CornerRadii(250 * 0.025), Insets.EMPTY));
+//        
+//        List<BackgroundImage> l2 = new ArrayList<>();
+//        final URI uri;
+//        try {
+//            uri = Demo.class.getResource("tt-3px-tile.png").toURI();
+//            Image img = new Image(uri.toString(), 100.0d, 100.0d, true, true, true);
+//            l2.add(new BackgroundImage(img, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, 
+//                    BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT));
+//        } catch (URISyntaxException ex) {
+//            Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        Background background1 = new Background(l1, l2);
+//        textTile = TileBuilder.create()
+//                              .skinType(SkinType.TEXT)
+//                              .background(background1)
+//                              .title("Text Tile")
+//                              .text("Whatever text")
+//                              .description("May the force be with you\n...always")
+//                              .textVisible(true)
+//                              .build();
 
+        // With Builder
+        Background background1 = null;
+        try {
+            background1 = BackgroundBuilder.create()
+                    .fills(BackgroundFillBuilder.create()
+                            .fill(Color.STEELBLUE)
+                            .cornerRadii(new CornerRadii(15.0d))
+                            .build())
+                    .images(BackgroundImageBuilder.create()
+                            .image(new Image(
+                                    Demo.class.getResource("tt-3px-tile.png").toURI().toString(),
+                                    100.0d, 100.0d, true, true, true))
+                            .build())
+                    .build();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
+        }
         textTile = TileBuilder.create()
                               .skinType(SkinType.TEXT)
                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                              .background(background1)
                               .title("Text Tile")
                               .text("Whatever text")
                               .description("May the force be with you\n...always")
@@ -299,9 +372,49 @@ public class Demo extends Application {
         switchTile.setOnSwitchPressed(e -> System.out.println("Switch pressed"));
         switchTile.setOnSwitchReleased(e -> System.out.println("Switch released"));
 
+        // Without Builder
+//        Background background2 = null;
+//        try {
+//            final URI uri2 = Demo.class.getResource("black-and-blue-cubes-wallpaper1.jpg").toURI();
+//            Image img2 = new Image(uri2.toString(), 510.0d, 250.0d, false, true, true);
+//            background2 = new Background(new BackgroundImage(img2, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, 
+//                    BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT));
+//        } catch (URISyntaxException ex) {
+//            Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        worldTile = TileBuilder.create()
+//                               .minWidth(510)
+//                               .prefWidth(510)
+//                               .maxWidth(510)
+//                               .skinType(SkinType.WORLDMAP)
+//                               .background(background2)
+//                               .title("WorldMap Tile")
+//                               .text("Whatever text")
+//                               .textVisible(false)
+//                               .build();
+
+        // With Builder and Clip
+        Background background2 = null;
+        try {
+            background2 = BackgroundBuilder.create()
+                    .images(BackgroundImageBuilder.create()
+                            .image(new Image(
+                                    Demo.class.getResource("black-and-blue-cubes-wallpaper1.jpg").toURI().toString(),
+                                    410.0d, 181.0d, false, true, true))
+                            .build())
+                    .build();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        final Rectangle clip = new Rectangle(TILE_WIDTH * 2, TILE_HEIGHT);
+        clip.setArcWidth(30.0d);
+        clip.setArcHeight(30.0d);
         worldTile = TileBuilder.create()
                                .prefSize(250, TILE_HEIGHT)
                                .skinType(SkinType.WORLDMAP)
+                               .background(background2)
+                               .clip(clip)
                                .title("WorldMap Tile")
                                .text("Whatever text")
                                .textVisible(false)

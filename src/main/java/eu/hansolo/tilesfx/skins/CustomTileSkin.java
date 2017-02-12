@@ -93,7 +93,7 @@ public class CustomTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
@@ -111,8 +111,8 @@ public class CustomTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double containerWidth  = width * 0.9;
-        double containerHeight = tile.isTextVisible() ? height * 0.72 : height * 0.795;
+        double containerWidth  = width - size * 0.1;
+        double containerHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);

@@ -45,6 +45,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
+import javafx.scene.layout.Background;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
@@ -64,7 +65,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -364,6 +364,7 @@ public class Tile extends Control {
         this(SKIN, ZonedDateTime.now());
     }
     public Tile(final SkinType SKIN_TYPE, final ZonedDateTime TIME) {
+        setBackground(Background.EMPTY);
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         skinType = SKIN_TYPE;
         getStyleClass().add("tile");

@@ -53,6 +53,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import javafx.scene.layout.Background;
 
 
 /**
@@ -682,6 +683,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B background(final Background BACKGROUND) {
+        properties.put("background", new SimpleObjectProperty<>(BACKGROUND));
+        return (B) this;
+    }
+
+    public final B clip(final Node CLIP) {
+        properties.put("clip", new SimpleObjectProperty<>(CLIP));
+        return (B) this;
+    }
+
     public final Tile build() {
         final Tile CONTROL;
         if (properties.containsKey("skinType")) {
@@ -816,7 +827,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
 
         for (String key : properties.keySet()) {
-            if ("prefSize".equals(key)) {
+            if ("background".equals(key)) {
+                CONTROL.setBackground(((ObjectProperty<Background>) properties.get(key)).get());
+            } else if ("prefSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
                 CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
             } else if("minSize".equals(key)) {
@@ -1028,6 +1041,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
             } else if ("textSize".equals(key)) {
                 CONTROL.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
+            } else if ("clip".equals(key)) {
+                CONTROL.setClip(((ObjectProperty<Node>) properties.get(key)).get());
             }
         }
         return CONTROL;

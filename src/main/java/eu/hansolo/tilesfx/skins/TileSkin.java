@@ -22,8 +22,6 @@ import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.InvalidationListener;
-import javafx.geometry.BoundingBox;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -37,9 +35,7 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 import java.util.Locale;
@@ -123,8 +119,13 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
 
         pane = new Pane();
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(tile.getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
-
+        if (tile.getBackground().isEmpty()) {
+            pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
+        }
+        else {
+            pane.setBackground(tile.getBackground());
+        }
+        
         getChildren().setAll(pane);
     }
 
@@ -205,8 +206,12 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
 
     protected void redraw() {
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, tile.getRoundedCorners() ? new CornerRadii(size * 0.025) : CornerRadii.EMPTY, new BorderWidths(tile.getBorderWidth() / PREFERRED_WIDTH * size))));
+        if (tile.getBackground().isEmpty()) {
         pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), tile.getRoundedCorners() ? new CornerRadii(size * 0.025) : CornerRadii.EMPTY, Insets.EMPTY)));
-
+        }
+        else {
+            pane.setBackground(tile.getBackground());
+        }
         locale          = tile.getLocale();
         formatString    = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();
         sectionsVisible = tile.getSectionsVisible();

@@ -50,7 +50,7 @@ public class TextTileSkin extends TileSkin {
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
         description = new Label(tile.getDescription());
-        description.setAlignment(Pos.TOP_RIGHT);
+        description.setAlignment(tile.getDescriptionAlignment());
         description.setTextAlignment(TextAlignment.RIGHT);
         description.setWrapText(true);
         description.setTextOverrun(OverrunStyle.WORD_ELLIPSIS);
@@ -115,6 +115,7 @@ public class TextTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
         description.setText(tile.getDescription());
+        description.setAlignment(tile.getDescriptionAlignment());
 
         resizeDynamicText();
         resizeStaticText();

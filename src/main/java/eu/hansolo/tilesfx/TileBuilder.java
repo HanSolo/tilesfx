@@ -43,6 +43,7 @@ import javafx.beans.property.StringProperty;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.paint.Color;
@@ -120,6 +121,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B description(final String SUBTITLE) {
         properties.put("description", new SimpleStringProperty(SUBTITLE));
+        return (B)this;
+    }
+
+    public final B descriptionAlignment(final Pos ALIGNMENT) {
+        properties.put("descriptionAlignment", new SimpleObjectProperty(ALIGNMENT));
         return (B)this;
     }
 
@@ -880,6 +886,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setTitle(((StringProperty) properties.get(key)).get());
             } else if("description".equals(key)) {
                 CONTROL.setDescription(((StringProperty) properties.get(key)).get());
+            } else if ("descriptionAlignment".equals(key)) {
+                CONTROL.setDescriptionAlignment(((ObjectProperty<Pos>) properties.get(key)).get());
             } else if("unit".equals(key)) {
                 CONTROL.setUnit(((StringProperty) properties.get(key)).get());
             } else if ("selected".equals(key)) {

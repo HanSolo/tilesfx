@@ -46,6 +46,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
@@ -188,6 +189,8 @@ public class Tile extends Control {
     private              StringProperty                         title;
     private              String                                 _description;
     private              StringProperty                         description;
+    private              Pos                                    _descriptionAlignment;
+    private              ObjectProperty<Pos>                    descriptionAlignment;
     private              String                                 _unit;
     private              StringProperty                         unit;
     private              boolean                                _selected;
@@ -485,6 +488,7 @@ public class Tile extends Control {
         zoneId                              = time.get().getZone();
         _title                              = "";
         _description                        = "";
+        _descriptionAlignment               = Pos.TOP_RIGHT;
         _unit                               = "";
         _selected                           = false;
         _text                               = "";
@@ -909,6 +913,45 @@ public class Tile extends Control {
             _description = null;
         }
         return description;
+    }
+
+    /**
+     * Returns the current alignment of the description text (esp. in TextTileSkin)
+     * @return the current alignment of the description text (esp. in TextTileSkin)
+     */
+    public Pos getDescriptionAlignment() { return null == descriptionAlignment ? _descriptionAlignment : descriptionAlignment.get(); }
+    /**
+     * Defines the alignment of the description text (esp. for the TextTileSkin).
+     * Valid values are TOP_LEFT and TOP_RIGHT
+     * @param ALIGNMENT
+     */
+    public void setDescriptionAlignment(final Pos ALIGNMENT) {
+        if (null == descriptionAlignment) {
+            if (Pos.TOP_LEFT != ALIGNMENT && Pos.TOP_RIGHT != ALIGNMENT) {
+                _descriptionAlignment = Pos.TOP_RIGHT;
+            } else {
+                _descriptionAlignment = ALIGNMENT;
+            }
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            descriptionAlignment.set(ALIGNMENT);
+        }
+    }
+    public ObjectProperty<Pos> descriptionAlignmentProperty() {
+        if (null == descriptionAlignment) {
+            descriptionAlignment = new ObjectPropertyBase<Pos>(_descriptionAlignment) {
+                @Override protected void invalidated() {
+                    if (Pos.TOP_LEFT != get() && Pos.TOP_RIGHT != get()) {
+                        set(Pos.TOP_RIGHT);
+                    }
+                    fireTileEvent(REDRAW_EVENT);
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "descriptionAlignment"; }
+            };
+            _descriptionAlignment = null;
+        }
+        return descriptionAlignment;
     }
 
     /**

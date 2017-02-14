@@ -100,7 +100,7 @@ public class HighLowTileSkin extends TileSkin {
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
         description = new Label(tile.getDescription());
-        description.setAlignment(Pos.TOP_RIGHT);
+        description.setAlignment(tile.getDescriptionAlignment());
         description.setWrapText(true);
         description.setTextFill(tile.getTextColor());
         Helper.enableNode(description, !tile.getDescription().isEmpty());
@@ -257,6 +257,7 @@ public class HighLowTileSkin extends TileSkin {
         referenceText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getReferenceValue()));
         unitText.setText(tile.getUnit());
         description.setText(tile.getDescription());
+        description.setAlignment(tile.getDescriptionAlignment());
 
         resizeStaticText();
 

@@ -98,7 +98,7 @@ public class SliderTileSkin extends TileSkin {
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
         description = new Label(tile.getDescription());
-        description.setAlignment(Pos.TOP_RIGHT);
+        description.setAlignment(tile.getDescriptionAlignment());
         description.setWrapText(true);
         description.setTextFill(tile.getTextColor());
         Helper.enableNode(description, !tile.getDescription().isEmpty());
@@ -223,6 +223,8 @@ public class SliderTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
         unitText.setText(tile.getUnit());
+        description.setText(tile.getDescription());
+        description.setAlignment(tile.getDescriptionAlignment());
 
         resizeStaticText();
 

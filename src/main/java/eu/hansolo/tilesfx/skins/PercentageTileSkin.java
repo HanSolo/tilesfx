@@ -94,7 +94,7 @@ public class PercentageTileSkin extends TileSkin {
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
         description = new Label(tile.getDescription());
-        description.setAlignment(Pos.TOP_RIGHT);
+        description.setAlignment(tile.getDescriptionAlignment());
         description.setWrapText(true);
         description.setTextFill(tile.getTextColor());
         Helper.enableNode(description, !tile.getDescription().isEmpty());
@@ -251,6 +251,7 @@ public class PercentageTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         unitText.setText(tile.getUnit());
         description.setText(tile.getDescription());
+        description.setAlignment(tile.getDescriptionAlignment());
         percentageText.setText(String.format(locale, "%." + tile.getDecimals() + "f", tile.getValue() / range * 100));
         maxValueText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getMaxValue()));
         maxValueUnitText.setText(tile.getUnit());

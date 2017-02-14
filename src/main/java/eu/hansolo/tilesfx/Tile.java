@@ -53,6 +53,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -285,6 +286,8 @@ public class Tile extends Control {
     private              ObjectProperty<Color>         titleColor;
     private              Color                         _descriptionColor;
     private              ObjectProperty<Color>         descriptionColor;
+    private 			 TextAlignment				   _descriptionAlignment;
+    private			     ObjectProperty<TextAlignment> descriptionAlignment;
     private              Color                         _unitColor;
     private              ObjectProperty<Color>         unitColor;
     private              Color                         _valueColor;
@@ -538,6 +541,7 @@ public class Tile extends Control {
         _barBackgroundColor                 = BACKGROUND;
         _titleColor                         = FOREGROUND;
         _descriptionColor                   = FOREGROUND;
+        _descriptionAlignment				= TextAlignment.RIGHT;
         _unitColor                          = FOREGROUND;
         _valueColor                         = FOREGROUND;
         _textColor                          = FOREGROUND;
@@ -2368,6 +2372,39 @@ public class Tile extends Control {
             _descriptionColor = null;
         }
         return descriptionColor;
+    }
+    
+    /**
+    * Returns the alignment that will be used to align the description text
+    * of the textTile.
+    *
+    * @return the alignment that will be used to align the description
+    */
+    public TextAlignment getDescriptionAlignment() { return null == descriptionAlignment ? _descriptionAlignment : descriptionAlignment.get(); }
+    /**
+    * Defines the alignment that will be used to align the description text
+    * of the textTile.
+    *
+    * @param ALIGNMENT
+    */
+    public void setDescriptionAlignment(final TextAlignment ALIGNMENT) {
+        if (null == descriptionAlignment) {
+            _descriptionAlignment = ALIGNMENT;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+         	descriptionAlignment.set(ALIGNMENT);
+        }
+    }
+    public ObjectProperty<TextAlignment> descriptionAlignmentProperty() {
+        if (null == descriptionAlignment) {
+        	descriptionAlignment = new ObjectPropertyBase<TextAlignment>(_descriptionAlignment) {
+                 @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                 @Override public Object getBean() { return Tile.this; }
+                 @Override public String getName() { return "descriptionAlignment"; }
+            };
+            _descriptionAlignment = null;
+        }
+        return descriptionAlignment;
     }
 
     /**

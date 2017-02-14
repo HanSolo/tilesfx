@@ -51,7 +51,7 @@ public class TextTileSkin extends TileSkin {
 
         description = new Label(tile.getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
-        description.setTextAlignment(TextAlignment.RIGHT);
+        description.setTextAlignment(tile.getDescriptionAlignment());
         description.setWrapText(true);
         description.setTextOverrun(OverrunStyle.WORD_ELLIPSIS);
         description.setTextFill(tile.getTextColor());

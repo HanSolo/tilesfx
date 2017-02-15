@@ -599,11 +599,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B locationColor(final TileColor COLOR) {
-        properties.put("locationColor", new SimpleObjectProperty(COLOR));
-        return (B)this;
-    }
-
     public final B gradientStops(final Stop... STOPS) {
         properties.put("gradientStopsArray", new SimpleObjectProperty(STOPS));
         return (B)this;
@@ -1052,8 +1047,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
             } else if ("currentLocation".equals(key)) {
                 CONTROL.setCurrentLocation(((ObjectProperty<Location>) properties.get(key)).get());
-            } else if ("locationColor".equals(key)) {
-                CONTROL.setLocationColor(((ObjectProperty<TileColor>) properties.get(key)).get());
             }
         }
         return CONTROL;

@@ -219,8 +219,7 @@ public class Tile extends Control {
     private              ObjectProperty<Node>                   graphic;
     private              Location                               _currentLocation;
     private              ObjectProperty<Location>               currentLocation;
-    private              TileColor                              _locationColor;
-    private              ObjectProperty<TileColor>              locationColor;
+    private              ObservableList<Location>               poiList;
 
 
     // UI related
@@ -496,7 +495,7 @@ public class Tile extends Control {
         _averagingPeriod                    = 10;
         _duration                           = LocalTime.of(1, 0);
         _currentLocation                    = new Location(0, 0);
-        _locationColor                      = TileColor.BLUE;
+        poiList                             = FXCollections.observableArrayList();
         movingAverage                       = new MovingAverage(_averagingPeriod);
         sections                            = FXCollections.observableArrayList();
         series                              = FXCollections.observableArrayList();
@@ -1297,7 +1296,7 @@ public class Tile extends Control {
     public Location getCurrentLocation() { return null == currentLocation ? _currentLocation : currentLocation.get(); }
     public void setCurrentLocation(final Location LOCATION) {
         if (null == currentLocation) {
-            _currentLocation.set(LOCATION);
+            _currentLocation = LOCATION;
             fireTileEvent(LOCATION_EVENT);
         } else {
             currentLocation.set(LOCATION);
@@ -1319,27 +1318,28 @@ public class Tile extends Control {
         fireTileEvent(LOCATION_EVENT);
     }
 
-    public TileColor getLocationColor() { return null == locationColor ? _locationColor : locationColor.get(); }
-    public void setLocationColor(final TileColor COLOR) {
-        if (null == locationColor) {
-            _locationColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
-        } else {
-            locationColor.set(COLOR);
-        }
+    public ObservableList<Location> getPoiList() { return poiList; }
+    public void setPoiList(final List<Location> POI_LIST) {
+        poiList.clear();
+        poiList.addAll(POI_LIST);
+        fireTileEvent(LOCATION_EVENT);
     }
-    public ObjectProperty<TileColor> locationColorProperty() {
-        if (null == locationColor) {
-            locationColor = new ObjectPropertyBase<TileColor>(_locationColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
-                @Override public Object getBean() { return Tile.this; }
-                @Override public String getName() { return "locationColor"; }
-            };
-            _locationColor = null;
-        }
-        return locationColor;
+    public void setPoiLocations(final Location... LOCATIONS) { setPoiList(Arrays.asList(LOCATIONS)); }
+    public void addPoiLocation(final Location LOCATION) {
+        if (null == LOCATION) return;
+        poiList.add(LOCATION);
+        fireTileEvent(LOCATION_EVENT);
     }
-
+    public void removePoiLocation(final Location LOCATION) {
+        if (null == LOCATION) return;
+        poiList.remove(LOCATION);
+        fireTileEvent(LOCATION_EVENT);
+    }
+    public void clearPoiLocations() {
+        poiList.clear();
+        fireTileEvent(DATA_EVENT);
+    }
+    
     /**
      * A convenient method to set the color of foreground elements like
      * title, description, unit, value, tickLabel and tickMark to the given

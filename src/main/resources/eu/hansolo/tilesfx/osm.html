@@ -69,49 +69,49 @@
                                     iconUrl     : 'location_blue.png',
                                     iconSize    : [19, 19],   // size of the icon
                                     iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
-                                    popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                    popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                   });
       var locationIconGray         = L.icon({
                                            iconUrl     : 'location_gray.png',
                                            iconSize    : [19, 19],   // size of the icon
                                            iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
-                                           popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                           popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                          });
       var locationIconGreen        = L.icon({
                                            iconUrl     : 'location_green.png',
                                            iconSize    : [19, 19],   // size of the icon
                                            iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
-                                           popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                           popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                          });
       var locationIconMagenta      = L.icon({
                                            iconUrl     : 'location_magenta.png',
                                            iconSize    : [19, 19],   // size of the icon
                                            iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
-                                           popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                           popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                          });
       var locationIconOrange       = L.icon({
                                            iconUrl     : 'location_orange.png',
                                            iconSize    : [19, 19],   // size of the icon
                                            iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
-                                           popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                           popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                          });
       var locationIconRed          = L.icon({
                                             iconUrl     : 'location_red.png',
                                             iconSize    : [19, 19],   // size of the icon
                                             iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
-                                            popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                            popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                           });
       var locationIconYellowOrange = L.icon({
                                             iconUrl     : 'location_yellow_orange.png',
                                             iconSize    : [19, 19],   // size of the icon
                                             iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
-                                            popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                            popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                           });
       var locationIconYellow       = L.icon({
                                             iconUrl     : 'location_yellow.png',
                                             iconSize    : [19, 19],   // size of the icon
                                             iconAnchor  : [9.5, 9.5], // point of the icon which will correspond to marker's location
-                                            popupAnchor : [0, -13]    // point from which the popup should open relative to the iconAnchor
+                                            popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                           });
       var locationMarker           = L.marker([0, 0], {
                                      icon       : locationIconBlue,
@@ -122,7 +122,9 @@
                                      riseOffset : 250
                                    }).bindPopup('<p>-</p>').addTo(map);
 
-      var Poi                      = L.Class.extend({
+      var poiArray               = new Array();
+
+      var Poi                    = L.Class.extend({
                                      initialize: function (title, marker) {
                                       this.title  = title;
                                       this.marker = marker;
@@ -131,6 +133,12 @@
                                      marker: this.marker
                                   });
 
+      var poiIcon                = L.icon({
+                                            iconUrl     : 'poi.png',
+                                            iconSize    : [14, 14],   // size of the icon
+                                            iconAnchor  : [7, 7], // point of the icon which will correspond to marker's location
+                                            popupAnchor : [0, -14]    // point from which the popup should open relative to the iconAnchor
+                                          });
 
       document.setLocationColor  = function(color) {
         if ('blue' === color) {
@@ -195,15 +203,25 @@
         map.panTo(locationMarker.getLatLng());
       };
 
-      document.addPoiMarker      = function(x, y, date, time) {
+      document.addPoi            = function(poiName, poiInfo, x, y) {
         var poiMarker = L.marker([x, y], {
           icon       : poiIcon,
           draggable  : false,
           riseOnHover: true,
           riseOffset : 249,
-          title      : "Poi:" + "\n" + date + "\n" + time
+          title      : "Poi:" + "\n" + poiName + "\n" + poiInfo
         }).addTo(map);
         poiArray.push(poiMarker);
+      };
+      document.removePoi         = function(poiName) {
+        var size = poiArray.length;
+        for (var i = 0 ; i < size ; i++) {
+          var poi = poiArray[i];
+          if (poi.title.startsWith(poiName)) {
+            poiArray[i] = '';
+            break;
+          }
+        }
       };
       document.removePois        = function() {
         for (var i = 0 ; i < poiArray.length ; i++) {

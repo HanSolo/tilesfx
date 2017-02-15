@@ -17,9 +17,14 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.LocationEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.Location;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
@@ -35,12 +40,14 @@ import java.net.URL;
  * Created by hansolo on 12.02.17.
  */
 public class MapTileSkin extends TileSkin {
-    private Text                     titleText;
-    private Text                     text;
-    private WebView                  webView;
-    private WebEngine                webEngine;
-    private boolean                  readyToGo;
-    private EventHandler<MouseEvent> mouseHandler;
+    private Text                         titleText;
+    private Text                         text;
+    private WebView                      webView;
+    private WebEngine                    webEngine;
+    private boolean                      readyToGo;
+    private EventHandler<MouseEvent>     mouseHandler;
+    private LocationEventListener        locationListener;
+    private ListChangeListener<Location> poiListener;
 
 
     // ******************** Constructors **************************************
@@ -53,7 +60,25 @@ public class MapTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        mouseHandler = event -> { if (event.getClickCount() == 2) { centerLocation(); } };
+        mouseHandler     = event -> { if (event.getClickCount() == 2) { centerLocation(); } };
+        locationListener = e -> redraw();
+        poiListener      = c -> {
+            while (c.next()) {
+                if (c.wasPermutated()) {      // Get items that have been permutated in list
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        updatePoi(tile.getPoiList().get(i));
+                    }
+                } else if (c.wasUpdated()) {  // Get items that have been updated in list
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        updatePoi(tile.getPoiList().get(i));
+                    }
+                } else if (c.wasAdded()) {
+                    c.getAddedSubList().forEach(poi -> addPoi(poi));
+                } else if (c.wasRemoved()) {
+                    c.getRemoved().forEach(poi -> removePoi(poi));
+                }
+            }
+        };
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -75,6 +100,7 @@ public class MapTileSkin extends TileSkin {
                 readyToGo = true;
                 updateLocation();
                 updateLocationColor();
+                tile.getPoiList().forEach(poi -> addPoi(poi));
             }
         });
         URL maps = Tile.class.getResource("osm.html");
@@ -86,6 +112,7 @@ public class MapTileSkin extends TileSkin {
     @Override protected void registerListeners() {
         super.registerListeners();
         pane.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseHandler);
+        tile.getPoiList().addListener(poiListener);
     }
     
 
@@ -99,12 +126,15 @@ public class MapTileSkin extends TileSkin {
             webView.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
             webView.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
         } else if ("LOCATION".equals(EVENT_TYPE)) {
+            tile.getCurrentLocation().addLocationEventListener(locationListener);
             updateLocation();
         }
     };
 
     @Override public void dispose() {
         pane.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseHandler);
+        tile.getCurrentLocation().removeLocationEventListener(locationListener);
+        tile.getPoiList().removeListener(poiListener);
         super.dispose();
     }
 
@@ -126,10 +156,43 @@ public class MapTileSkin extends TileSkin {
         }
     }
 
+    private void updatePoi(final Location POI) {
+        removePoi(POI);
+        addPoi(POI);
+    }
+    private void addPoi(final Location POI) {
+        if (readyToGo) {
+            Platform.runLater(() -> {
+                double        lat           = POI.getLatitude();
+                double        lon           = POI.getLongitude();
+                String        name          = POI.getName();
+                String        info          = POI.getInfo();
+                StringBuilder scriptCommand = new StringBuilder();
+                scriptCommand.append("window.lat = ").append(lat).append(";")
+                             .append("window.lon = ").append(lon).append(";")
+                             .append("window.locationName = \"").append(name).append("\";")
+                             .append("window.locationInfo = \"").append(info.toString()).append("\";")
+                             .append("document.addPoi(window.locationName, window.locationInfo, window.lat, window.lon);");
+                webEngine.executeScript(scriptCommand.toString());
+            });
+        }
+    }
+    private void removePoi(final Location POI) {
+        if (readyToGo) {
+            Platform.runLater(() -> {
+                String        name          = POI.getName();
+                StringBuilder scriptCommand = new StringBuilder();
+                scriptCommand.append("window.locationName = \"").append(name).append("\";")
+                             .append("document.removePoi(window.locationName);");
+                webEngine.executeScript(scriptCommand.toString());
+            });
+        }
+    }
+
     private void updateLocationColor() {
         if (readyToGo) {
             Platform.runLater(() -> {
-                String locationColor = tile.getLocationColor().styleName;
+                String locationColor = tile.getCurrentLocation().getColor().styleName;
                 StringBuilder scriptCommand = new StringBuilder();
                 scriptCommand.append("window.locationColor = '").append(locationColor).append("';")
                              .append("document.setLocationColor(window.locationColor);");

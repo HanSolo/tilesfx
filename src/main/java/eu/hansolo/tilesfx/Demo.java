@@ -267,6 +267,7 @@ public class Demo extends Application {
                               .title("Text Tile")
                               .text("Whatever text")
                               .description("May the force be with you\n...always")
+                              .descriptionAlignment(Pos.TOP_LEFT)
                               .textVisible(true)
                               .build();
 
@@ -361,8 +362,7 @@ public class Demo extends Application {
                              .title("Map")
                              .text("Some text")
                              .description("Description")
-                             .currentLocation(new Location(51.91178, 7.63379, "Gerrit", "Info"))
-                             .locationColor(TileColor.MAGENTA)
+                             .currentLocation(new Location(51.91178, 7.63379, "Gerrit", "Info", TileColor.MAGENTA))
                              .build();
 
         lastTimerCall = System.nanoTime();
@@ -411,6 +411,9 @@ public class Demo extends Application {
         stage.show();
 
         timer.start();
+
+        mapTile.addPoiLocation(new Location(51.85, 7.75, "Test"));
+        mapTile.removePoiLocation(new Location(51.85, 7.75, "Test"));
     }
 
     @Override public void stop() {

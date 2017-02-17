@@ -27,6 +27,7 @@ import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.*;
+import eu.hansolo.tilesfx.tools.RadialChartData;
 import eu.hansolo.tilesfx.tools.Data;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
@@ -96,7 +97,7 @@ public class Tile extends Control {
                            NUMBER("NumberTileSkin"), TEXT("TextTileSkin"),
                            WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
-                           MAP("MapTileSkin");
+                           MAP("MapTileSkin"), RADIAL_CHART("RadialChart");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -220,6 +221,7 @@ public class Tile extends Control {
     private              Location                               _currentLocation;
     private              ObjectProperty<Location>               currentLocation;
     private              ObservableList<Location>               poiList;
+    private              ObservableList<RadialChartData>        radialChartDataList;
 
 
     // UI related
@@ -496,13 +498,14 @@ public class Tile extends Control {
         _duration                           = LocalTime.of(1, 0);
         _currentLocation                    = new Location(0, 0);
         poiList                             = FXCollections.observableArrayList();
+        radialChartDataList = FXCollections.observableArrayList();
         movingAverage                       = new MovingAverage(_averagingPeriod);
         sections                            = FXCollections.observableArrayList();
         series                              = FXCollections.observableArrayList();
         timeSections                        = FXCollections.observableArrayList();
         alarms                              = FXCollections.observableArrayList();
         alarmsToRemove                      = new ArrayList<>();
-        barChartItems                       = FXCollections.observableArrayList();
+        barChartItems = FXCollections.observableArrayList();
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
 
@@ -1339,7 +1342,15 @@ public class Tile extends Control {
         poiList.clear();
         fireTileEvent(DATA_EVENT);
     }
-    
+
+    public ObservableList<RadialChartData> getRadialChartData() { return radialChartDataList; }
+    public void addRadialChartData(final RadialChartData... DATA) { radialChartDataList.addAll(DATA); }
+    public void addRadialChartData(final List<RadialChartData> DATA) { radialChartDataList.addAll(DATA); }
+    public void setRadialChartData(final RadialChartData... DATA) { radialChartDataList.setAll(DATA); }
+    public void setRadialChartData(final List<RadialChartData> DATA) { radialChartDataList.setAll(DATA); }
+    public void removeRadialChartData(final RadialChartData DATA) { radialChartDataList.remove(DATA); }
+    public void clearRadialChartData() { radialChartDataList.clear(); }
+
     /**
      * A convenient method to set the color of foreground elements like
      * title, description, unit, value, tickLabel and tickMark to the given
@@ -4002,27 +4013,28 @@ public class Tile extends Control {
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch (skinType) {
-            case AREA_CHART   : return new AreaChartTileSkin(Tile.this);
-            case BAR_CHART    : return new BarChartTileSkin(Tile.this);
-            case LINE_CHART   : return new LineChartTileSkin(Tile.this);
-            case CLOCK        : return new ClockTileSkin(Tile.this);
-            case GAUGE        : return new GaugeTileSkin(Tile.this);
-            case HIGH_LOW     : return new HighLowTileSkin(Tile.this);
-            case PERCENTAGE   : return new PercentageTileSkin(Tile.this);
-            case PLUS_MINUS   : return new PlusMinusTileSkin(Tile.this);
-            case SLIDER       : return new SliderTileSkin(Tile.this);
-            case SPARK_LINE   : return new SparkLineTileSkin(Tile.this);
-            case SWITCH       : return new SwitchTileSkin(Tile.this);
-            case WORLDMAP     : return new WorldMapTileSkin(Tile.this);
-            case TIMER_CONTROL: return new TimerControlTileSkin(Tile.this);
-            case NUMBER       : return new NumberTileSkin(Tile.this);
-            case TEXT         : return new TextTileSkin(Tile.this);
-            case WEATHER      : return new WeatherTileSkin(Tile.this);
-            case TIME         : return new TimeTileSkin(Tile.this);
-            case CUSTOM       : return new CustomTileSkin(Tile.this);
-            case LEADER_BOARD : return new LeaderBoardTileSkin(Tile.this);
-            case MAP          : return new MapTileSkin(Tile.this);
-            default           : return new TileSkin(Tile.this);
+            case AREA_CHART     : return new AreaChartTileSkin(Tile.this);
+            case BAR_CHART      : return new BarChartTileSkin(Tile.this);
+            case LINE_CHART     : return new LineChartTileSkin(Tile.this);
+            case CLOCK          : return new ClockTileSkin(Tile.this);
+            case GAUGE          : return new GaugeTileSkin(Tile.this);
+            case HIGH_LOW       : return new HighLowTileSkin(Tile.this);
+            case PERCENTAGE     : return new PercentageTileSkin(Tile.this);
+            case PLUS_MINUS     : return new PlusMinusTileSkin(Tile.this);
+            case SLIDER         : return new SliderTileSkin(Tile.this);
+            case SPARK_LINE     : return new SparkLineTileSkin(Tile.this);
+            case SWITCH         : return new SwitchTileSkin(Tile.this);
+            case WORLDMAP       : return new WorldMapTileSkin(Tile.this);
+            case TIMER_CONTROL  : return new TimerControlTileSkin(Tile.this);
+            case NUMBER         : return new NumberTileSkin(Tile.this);
+            case TEXT           : return new TextTileSkin(Tile.this);
+            case WEATHER        : return new WeatherTileSkin(Tile.this);
+            case TIME           : return new TimeTileSkin(Tile.this);
+            case CUSTOM         : return new CustomTileSkin(Tile.this);
+            case LEADER_BOARD   : return new LeaderBoardTileSkin(Tile.this);
+            case MAP            : return new MapTileSkin(Tile.this);
+            case RADIAL_CHART: return new RadialChartTileSkin(Tile.this);
+            default             : return new TileSkin(Tile.this);
         }
     }
 
@@ -4090,6 +4102,8 @@ public class Tile extends Control {
                 break;
             case MAP:
                 break;
+            case RADIAL_CHART:
+                break;
             default:
                 break;
         }
@@ -4099,26 +4113,27 @@ public class Tile extends Control {
     public void setSkinType(final SkinType SKIN_TYPE) {
         skinType = SKIN_TYPE;
         switch (SKIN_TYPE) {
-            case AREA_CHART   : setSkin(new AreaChartTileSkin(Tile.this)); break;
-            case BAR_CHART    : setSkin(new BarChartTileSkin(Tile.this)); break;
-            case LINE_CHART   : setSkin(new LineChartTileSkin(Tile.this)); break;
-            case CLOCK        : setSkin(new ClockTileSkin(Tile.this)); break;
-            case GAUGE        : setSkin(new GaugeTileSkin(Tile.this)); break;
-            case HIGH_LOW     : setSkin(new HighLowTileSkin(Tile.this)); break;
-            case PERCENTAGE   : setSkin(new PercentageTileSkin(Tile.this)); break;
-            case PLUS_MINUS   : setSkin(new PlusMinusTileSkin(Tile.this)); break;
-            case SLIDER       : setSkin(new SliderTileSkin(Tile.this)); break;
-            case SPARK_LINE   : setSkin(new SparkLineTileSkin(Tile.this)); break;
-            case SWITCH       : setSkin(new SwitchTileSkin(Tile.this)); break;
-            case WORLDMAP     : setSkin(new WorldMapTileSkin(Tile.this)); break;
-            case TIMER_CONTROL: setSkin(new TimerControlTileSkin(Tile.this)); break;
-            case NUMBER       : setSkin(new NumberTileSkin(Tile.this)); break;
-            case TEXT         : setSkin(new TextTileSkin(Tile.this)); break;
-            case WEATHER      : setSkin(new WeatherTileSkin(Tile.this)); break;
-            case TIME         : setSkin(new TimeTileSkin(Tile.this)); break;
-            case CUSTOM       : setSkin(new CustomTileSkin(Tile.this)); break;
-            case LEADER_BOARD : setSkin(new LeaderBoardTileSkin(Tile.this)); break;
-            default           : setSkin(new TileSkin(Tile.this)); break;
+            case AREA_CHART     : setSkin(new AreaChartTileSkin(Tile.this)); break;
+            case BAR_CHART      : setSkin(new BarChartTileSkin(Tile.this)); break;
+            case LINE_CHART     : setSkin(new LineChartTileSkin(Tile.this)); break;
+            case CLOCK          : setSkin(new ClockTileSkin(Tile.this)); break;
+            case GAUGE          : setSkin(new GaugeTileSkin(Tile.this)); break;
+            case HIGH_LOW       : setSkin(new HighLowTileSkin(Tile.this)); break;
+            case PERCENTAGE     : setSkin(new PercentageTileSkin(Tile.this)); break;
+            case PLUS_MINUS     : setSkin(new PlusMinusTileSkin(Tile.this)); break;
+            case SLIDER         : setSkin(new SliderTileSkin(Tile.this)); break;
+            case SPARK_LINE     : setSkin(new SparkLineTileSkin(Tile.this)); break;
+            case SWITCH         : setSkin(new SwitchTileSkin(Tile.this)); break;
+            case WORLDMAP       : setSkin(new WorldMapTileSkin(Tile.this)); break;
+            case TIMER_CONTROL  : setSkin(new TimerControlTileSkin(Tile.this)); break;
+            case NUMBER         : setSkin(new NumberTileSkin(Tile.this)); break;
+            case TEXT           : setSkin(new TextTileSkin(Tile.this)); break;
+            case WEATHER        : setSkin(new WeatherTileSkin(Tile.this)); break;
+            case TIME           : setSkin(new TimeTileSkin(Tile.this)); break;
+            case CUSTOM         : setSkin(new CustomTileSkin(Tile.this)); break;
+            case LEADER_BOARD   : setSkin(new LeaderBoardTileSkin(Tile.this)); break;
+            case RADIAL_CHART: setSkin(new RadialChartTileSkin(Tile.this)); break;
+            default             : setSkin(new TileSkin(Tile.this)); break;
         }
         presetTileParameters(SKIN_TYPE);
     }

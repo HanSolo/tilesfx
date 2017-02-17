@@ -20,7 +20,7 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.tools.FlowGridPane;
+import eu.hansolo.tilesfx.tools.RadialChartData;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
@@ -29,18 +29,15 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
@@ -88,6 +85,7 @@ public class Demo extends Application {
     private Tile            customTile;
     private Tile            leaderBoardTile;
     private Tile            mapTile;
+    private Tile            radialChartTile;
     private long            lastTimerCall;
     private AnimationTimer  timer;
     private DoubleProperty  value;
@@ -172,6 +170,13 @@ public class Demo extends Application {
         leaderBoardItem2 = new LeaderBoardItem("Sandra", 43);
         leaderBoardItem3 = new LeaderBoardItem("Lilli", 12);
         leaderBoardItem4 = new LeaderBoardItem("Anton", 8);
+
+        // RadialChart Data
+        RadialChartData radialChartData1 = new RadialChartData("Switzerland", 24.0, Tile.GREEN);
+        RadialChartData radialChartData2 = new RadialChartData("Germany", 10.0, Tile.BLUE);
+        RadialChartData radialChartData3 = new RadialChartData("USA", 12.0, Tile.RED);
+        RadialChartData radialChartData4 = new RadialChartData("Singapore", 13.0, Tile.YELLOW_ORANGE);
+
 
         // Creating Tiles
         percentageTile = TileBuilder.create()
@@ -365,6 +370,15 @@ public class Demo extends Application {
                              .currentLocation(new Location(51.91178, 7.63379, "Gerrit", "Info", TileColor.MAGENTA))
                              .build();
 
+        radialChartTile = TileBuilder.create()
+                                     .skinType(SkinType.RADIAL_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("RadialChart")
+                                     .text("Some text")
+                                     .textVisible(false)
+                                     .radialChartData(radialChartData1, radialChartData2, radialChartData3, radialChartData4)
+                                     .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -381,6 +395,11 @@ public class Demo extends Application {
                     series2.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
                     series3.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
 
+                    radialChartData1.setValue(RND.nextDouble() * 50);
+                    radialChartData2.setValue(RND.nextDouble() * 50);
+                    radialChartData3.setValue(RND.nextDouble() * 50);
+                    radialChartData4.setValue(RND.nextDouble() * 50);
+
                     barChartTile.getBarChartItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
 
                     leaderBoardTile.getLeaderBoardItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
@@ -396,12 +415,12 @@ public class Demo extends Application {
                                       percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                       lineChartTile, timerControlTile, numberTile, textTile,
                                       highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
-                                      barChartTile, customTile, leaderBoardTile, worldTile, mapTile);//, weatherTile);
+                                      barChartTile, customTile, leaderBoardTile, worldTile, mapTile, radialChartTile);//, weatherTile);
         pane.setPrefWrapLength(1);
         pane.setAlignment(Pos.CENTER);
         pane.setCenterShape(true);
         pane.setPadding(new Insets(5));
-        pane.setPrefSize(780, 395);
+        pane.setPrefSize(1090, 470);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);

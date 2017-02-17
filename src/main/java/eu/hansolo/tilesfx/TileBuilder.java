@@ -18,12 +18,12 @@ package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
-import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
+import eu.hansolo.tilesfx.tools.RadialChartData;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.beans.InvalidationListener;
@@ -326,6 +326,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B leaderBoardItems(final List<LeaderBoardItem> ITEMS) {
         properties.put("leaderBoardItemsList", new SimpleObjectProperty<>(ITEMS));
+        return (B)this;
+    }
+
+    public final B radialChartData(final RadialChartData... DATA) {
+        properties.put("radialChartDataArray", new SimpleObjectProperty(DATA));
+        return (B)this;
+    }
+
+    public final B radialChartData(final List<RadialChartData> DATA) {
+        properties.put("radialChartDataList", new SimpleObjectProperty(DATA));
         return (B)this;
     }
 
@@ -761,6 +771,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case MAP:
                     break;
+                case RADIAL_CHART:
+                    break;
                 default:
                     break;
             }
@@ -828,6 +840,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
         if (properties.keySet().contains("gradientStopsList")) {
             CONTROL.setGradientStops(((ObjectProperty<List<Stop>>) properties.get("gradientStopsList")).get());
+        }
+
+        if (properties.keySet().contains("radialChartDataArray")) {
+            CONTROL.setRadialChartData(((ObjectProperty<RadialChartData[]>) properties.get("radialChartDataArray")).get());
+        }
+        if (properties.keySet().contains("radialChartDataList")) {
+            CONTROL.setRadialChartData(((ObjectProperty<List<RadialChartData>>) properties.get("radialChartDataList")).get());
         }
 
         for (String key : properties.keySet()) {

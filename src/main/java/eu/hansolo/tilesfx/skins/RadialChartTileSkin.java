@@ -18,10 +18,9 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.events.UpdateEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.RadialChartData;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.RadialChartData;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -35,7 +34,6 @@ import javafx.scene.text.TextAlignment;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 
 /**

@@ -180,6 +180,7 @@ public class Demo extends Application {
         radialChartData2 = new RadialChartData("Item 2", 10.0, Tile.BLUE);
         radialChartData3 = new RadialChartData("Item 3", 12.0, Tile.RED);
         radialChartData4 = new RadialChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
+        //RadialChartData.animated = false;
 
 
         // Creating Tiles

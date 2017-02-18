@@ -117,8 +117,10 @@ public class RadialChartTileSkin extends TileSkin {
         double                radius         = canvasSize * 0.5;
         double                innerSpacer    = radius * 0.18;
         double                barWidth       = (radius - innerSpacer) / tile.getRadialChartData().size();
-        List<RadialChartData> sortedDataList = tile.getRadialChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
-        double                max            = sortedDataList.stream().max(Comparator.comparingDouble(RadialChartData::getValue)).get().getValue();
+        //List<RadialChartData> sortedDataList = tile.getRadialChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
+        List<RadialChartData> dataList       = tile.getRadialChartData();
+        int                   noOfItems      = dataList.size();
+        double                max            = dataList.stream().max(Comparator.comparingDouble(RadialChartData::getValue)).get().getValue();
 
         double                nameX          = radius * 0.975;
         double                nameWidth      = radius * 0.95;
@@ -136,11 +138,12 @@ public class RadialChartTileSkin extends TileSkin {
 
         ctx.setStroke(bkgColor);
         ctx.setLineWidth(1);
-        ctx.strokeLine(radius, 0, radius, radius - barWidth);
-        ctx.strokeLine(0, radius, radius - barWidth, radius);
+        ctx.strokeLine(radius, 0, radius, radius - barWidth * 0.875);
+        ctx.strokeLine(0, radius, radius - barWidth * 0.875, radius);
+        ctx.strokeArc(noOfItems * barWidth, noOfItems * barWidth, canvasSize - (2 * noOfItems * barWidth), canvasSize - (2 * noOfItems * barWidth), 90, -270, ArcType.OPEN);
 
-        for (int i = 0 ; i < sortedDataList.size() ; i++) {
-            RadialChartData data  = sortedDataList.get(i);
+        for (int i = 0 ; i < noOfItems ; i++) {
+            RadialChartData data  = dataList.get(i);
             double          value = data.getValue();
             double          bkgXY = i * barWidth;
             double          bkgWH = canvasSize - (2 * i * barWidth);

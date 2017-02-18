@@ -18,7 +18,14 @@ package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,11 +35,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Created by hansolo on 17.02.17.
  */
 public class RadialChartData {
+    public  static boolean               animated     = true;
     private final ChartDataEvent         UPDATE_EVENT = new ChartDataEvent(RadialChartData.this);
     private String                       name;
     private double                       value;
     private Color                        color;
     private List<ChartDataEventListener> listenerList = new CopyOnWriteArrayList<>();
+    private DoubleProperty               currentValue;
+    private Timeline                     timeline;
 
 
     // ******************** Constructors **************************************
@@ -46,9 +56,19 @@ public class RadialChartData {
         this(NAME, VALUE, Color.rgb(0, 80, 200));
     }
     public RadialChartData(final String NAME, final double VALUE, final Color COLOR) {
-        name  = NAME;
-        value = VALUE;
-        color = COLOR;
+        name         = NAME;
+        value        = VALUE;
+        color        = COLOR;
+        currentValue = new DoublePropertyBase(value) {
+            @Override protected void invalidated() {
+                value = get();
+                fireChartDataEvent(UPDATE_EVENT);
+            }
+            @Override public Object getBean() { return RadialChartData.this; }
+            @Override public String getName() { return "currentValue"; }
+        };
+        timeline     = new Timeline();
+        animated     = true;
     }
 
 
@@ -61,8 +81,18 @@ public class RadialChartData {
 
     public double getValue() { return value; }
     public void setValue(final double VALUE) {
-        value = VALUE;
-        fireChartDataEvent(UPDATE_EVENT);
+        if (animated) {
+            timeline.stop();
+            KeyValue kv1 = new KeyValue(currentValue, value, Interpolator.EASE_BOTH);
+            KeyValue kv2 = new KeyValue(currentValue, VALUE, Interpolator.EASE_BOTH);
+            KeyFrame kf1 = new KeyFrame(Duration.ZERO, kv1);
+            KeyFrame kf2 = new KeyFrame(Duration.millis(800), kv2);
+            timeline.getKeyFrames().setAll(kf1, kf2);
+            timeline.play();
+        } else {
+            value = VALUE;
+            fireChartDataEvent(UPDATE_EVENT);
+        }
     }
 
     public Color getColor() { return color; }

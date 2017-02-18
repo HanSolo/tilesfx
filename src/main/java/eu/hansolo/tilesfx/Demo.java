@@ -65,6 +65,10 @@ public class Demo extends Application {
     private LeaderBoardItem leaderBoardItem2;
     private LeaderBoardItem leaderBoardItem3;
     private LeaderBoardItem leaderBoardItem4;
+    private RadialChartData radialChartData1;
+    private RadialChartData radialChartData2;
+    private RadialChartData radialChartData3;
+    private RadialChartData radialChartData4;
     private Tile            percentageTile;
     private Tile            clockTile;
     private Tile            gaugeTile;
@@ -172,10 +176,10 @@ public class Demo extends Application {
         leaderBoardItem4 = new LeaderBoardItem("Anton", 8);
 
         // RadialChart Data
-        RadialChartData radialChartData1 = new RadialChartData("Switzerland", 24.0, Tile.GREEN);
-        RadialChartData radialChartData2 = new RadialChartData("Germany", 10.0, Tile.BLUE);
-        RadialChartData radialChartData3 = new RadialChartData("USA", 12.0, Tile.RED);
-        RadialChartData radialChartData4 = new RadialChartData("Singapore", 13.0, Tile.YELLOW_ORANGE);
+        radialChartData1 = new RadialChartData("Item 1", 24.0, Tile.GREEN);
+        radialChartData2 = new RadialChartData("Item 2", 10.0, Tile.BLUE);
+        radialChartData3 = new RadialChartData("Item 3", 12.0, Tile.RED);
+        radialChartData4 = new RadialChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
 
 
         // Creating Tiles

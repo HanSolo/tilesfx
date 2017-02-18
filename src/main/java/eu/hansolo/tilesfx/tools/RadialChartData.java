@@ -28,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Created by hansolo on 17.02.17.
  */
 public class RadialChartData {
-    private ChartDataEvent               UPDATE_EVENT = new ChartDataEvent(RadialChartData.this);
+    private final ChartDataEvent         UPDATE_EVENT = new ChartDataEvent(RadialChartData.this);
     private String                       name;
     private double                       value;
     private Color                        color;

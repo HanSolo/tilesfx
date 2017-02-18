@@ -18,6 +18,7 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.events.UpdateEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.RadialChartData;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -59,8 +60,19 @@ public class RadialChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        chartDataListener  = e -> { registerListeners(); redraw(); };
         chartEventListener = e -> drawChart();
+        tile.getRadialChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
+
+        chartDataListener  = c -> {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    c.getAddedSubList().forEach(addedItem -> addedItem.addChartDataEventListener(chartEventListener));
+                } else if (c.wasRemoved()) {
+                    c.getRemoved().forEach(removedItem -> removedItem.removeChartDataEventListener(chartEventListener));
+                }
+            }
+            drawChart();
+        };
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -79,7 +91,6 @@ public class RadialChartTileSkin extends TileSkin {
     @Override protected void registerListeners() {
         super.registerListeners();
         tile.getRadialChartData().addListener(chartDataListener);
-        tile.getRadialChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
     }
 
 
@@ -102,19 +113,19 @@ public class RadialChartTileSkin extends TileSkin {
     }
 
     private void drawChart() {
-        double                canvasSize     = canvas.getHeight();
+        double                canvasSize     = canvas.getWidth();
         double                radius         = canvasSize * 0.5;
         double                innerSpacer    = radius * 0.18;
         double                barWidth       = (radius - innerSpacer) / tile.getRadialChartData().size();
         List<RadialChartData> sortedDataList = tile.getRadialChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
         double                max            = sortedDataList.stream().max(Comparator.comparingDouble(RadialChartData::getValue)).get().getValue();
 
-        double          nameX          = radius * 0.975;
-        double          nameWidth      = radius * 0.95;
-        double          valueY         = radius * 0.95;
-        double          valueWidth     = barWidth * 0.9;
+        double                nameX          = radius * 0.975;
+        double                nameWidth      = radius * 0.95;
+        double                valueY         = radius * 0.94;
+        double                valueWidth     = barWidth * 0.9;
 
-        Color           bkgColor       = Color.color(tile.getTextColor().getRed(), tile.getTextColor().getGreen(), tile.getTextColor().getBlue(), 0.15);
+        Color                 bkgColor       = Color.color(tile.getTextColor().getRed(), tile.getTextColor().getGreen(), tile.getTextColor().getBlue(), 0.15);
 
         ctx.clearRect(0, 0, canvasSize, canvasSize);
         ctx.setLineCap(StrokeLineCap.BUTT);
@@ -125,6 +136,7 @@ public class RadialChartTileSkin extends TileSkin {
 
         ctx.setStroke(bkgColor);
         ctx.setLineWidth(1);
+        ctx.strokeLine(radius, 0, radius, radius - barWidth);
         ctx.strokeLine(0, radius, radius - barWidth, radius);
 
         for (int i = 0 ; i < sortedDataList.size() ; i++) {
@@ -135,7 +147,6 @@ public class RadialChartTileSkin extends TileSkin {
             double          barXY = barWidth * 0.5 + i * barWidth;
             double          barWH = canvasSize - barWidth - (2 * i * barWidth);
             double          angle = value / max * 270.0;
-
 
             // Background
             ctx.setLineWidth(1);
@@ -178,7 +189,9 @@ public class RadialChartTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double canvasSize = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double canvasWidth  = width - size * 0.1;
+        double canvasHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double canvasSize   = canvasWidth < canvasHeight ? canvasWidth : canvasHeight;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -186,7 +199,8 @@ public class RadialChartTileSkin extends TileSkin {
 
             canvas.setWidth(canvasSize);
             canvas.setHeight(canvasSize);
-            canvas.relocate((size - canvasSize) * 0.5, size * 0.15);
+
+            canvas.relocate((width - canvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - canvasSize) * 0.5);
 
             resizeStaticText();
         }

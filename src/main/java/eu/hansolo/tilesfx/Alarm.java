@@ -40,12 +40,12 @@ public class Alarm {
     public        final AlarmMarkerEvent ALARM_MARKER_PRESSED_EVENT  = new AlarmMarkerEvent(Alarm.this, null, AlarmMarkerEvent.ALARM_MARKER_PRESSED);
     public        final AlarmMarkerEvent ALARM_MARKER_RELEASED_EVENT = new AlarmMarkerEvent(Alarm.this, null, AlarmMarkerEvent.ALARM_MARKER_RELEASED);
 
-    private Repetition    repetition;
-    private ZonedDateTime time;
-    private boolean       armed;
-    private String        text;
-    private Command       command;
-    private Color         color;
+    private             Repetition       repetition;
+    private             ZonedDateTime    time;
+    private             boolean          armed;
+    private             String           text;
+    private             Command          command;
+    private             Color            color;
 
 
     // ******************** Constructors **************************************

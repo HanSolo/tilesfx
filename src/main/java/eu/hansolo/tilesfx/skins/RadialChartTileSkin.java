@@ -35,6 +35,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import static eu.hansolo.tilesfx.tools.Helper.clamp;
+
 
 /**
  * Created by hansolo on 17.02.17.
@@ -142,7 +144,7 @@ public class RadialChartTileSkin extends TileSkin {
 
         for (int i = 0 ; i < noOfItems ; i++) {
             RadialChartData data  = dataList.get(i);
-            double          value = data.getValue();
+            double          value = clamp(0, Double.MAX_VALUE, data.getValue());
             double          bkgXY = i * barWidth;
             double          bkgWH = canvasSize - (2 * i * barWidth);
             double          barXY = barWidth * 0.5 + i * barWidth;

@@ -17,39 +17,29 @@
 package eu.hansolo.tilesfx.tools;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 
 /**
  * Created by hansolo on 01.11.16.
  */
-public class Data {
-    private final Instant timestamp;
-    private final double  value;
-
+public class TimeData extends ChartData {
 
     // ******************** Constructors **************************************
-    public Data(final double VALUE) {
-        this(VALUE, Instant.now());
+    public TimeData(final double VALUE) {
+        super(VALUE, Instant.now());
     }
-    public Data(final double VALUE, final Instant TIMESTAMP) {
-        value     = VALUE;
-        timestamp = TIMESTAMP;
+    public TimeData(final double VALUE, final Instant TIMESTAMP) {
+        super(VALUE, TIMESTAMP);
     }
 
 
     // ******************** Methods *******************************************
-    public double getValue() { return value; }
+    @Override public void setValue(final double VALUE) {}
 
-    public Instant getTimestamp() { return timestamp; }
-
-    public ZonedDateTime getTimestampAsDateTime(final ZoneId ZONE_ID) { return ZonedDateTime.ofInstant(timestamp, ZONE_ID); }
-
-    @Override  public String toString() {
+    @Override public String toString() {
         return new StringBuilder().append("{\n")
-                                  .append("  \"timestamp\":").append(timestamp.getEpochSecond()).append(",\n")
-                                  .append("  \"value\":").append(value).append(",\n")
+                                  .append("  \"timestamp\":").append(super.getTimestamp().getEpochSecond()).append(",\n")
+                                  .append("  \"value\":").append(super.getValue()).append(",\n")
                                   .append("}")
                                   .toString();
     }

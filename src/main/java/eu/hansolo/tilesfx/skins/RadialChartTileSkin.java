@@ -20,7 +20,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.RadialChartData;
+import eu.hansolo.tilesfx.tools.ChartData;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -42,12 +42,12 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 17.02.17.
  */
 public class RadialChartTileSkin extends TileSkin {
-    private Text                                titleText;
-    private Text                                text;
-    private Canvas                              canvas;
-    private GraphicsContext                     ctx;
-    private ListChangeListener<RadialChartData> chartDataListener;
-    private ChartDataEventListener              chartEventListener;
+    private Text                          titleText;
+    private Text                          text;
+    private Canvas                        canvas;
+    private GraphicsContext               ctx;
+    private ListChangeListener<ChartData> chartDataListener;
+    private ChartDataEventListener        chartEventListener;
 
 
     // ******************** Constructors **************************************
@@ -118,9 +118,9 @@ public class RadialChartTileSkin extends TileSkin {
         double                innerSpacer    = radius * 0.18;
         double                barWidth       = (radius - innerSpacer) / tile.getRadialChartData().size();
         //List<RadialChartData> sortedDataList = tile.getRadialChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
-        List<RadialChartData> dataList       = tile.getRadialChartData();
-        int                   noOfItems      = dataList.size();
-        double                max            = dataList.stream().max(Comparator.comparingDouble(RadialChartData::getValue)).get().getValue();
+        List<ChartData> dataList  = tile.getRadialChartData();
+        int             noOfItems = dataList.size();
+        double          max       = dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
 
         double                nameX          = radius * 0.975;
         double                nameWidth      = radius * 0.95;
@@ -143,13 +143,13 @@ public class RadialChartTileSkin extends TileSkin {
         ctx.strokeArc(noOfItems * barWidth, noOfItems * barWidth, canvasSize - (2 * noOfItems * barWidth), canvasSize - (2 * noOfItems * barWidth), 90, -270, ArcType.OPEN);
 
         for (int i = 0 ; i < noOfItems ; i++) {
-            RadialChartData data  = dataList.get(i);
-            double          value = clamp(0, Double.MAX_VALUE, data.getValue());
-            double          bkgXY = i * barWidth;
-            double          bkgWH = canvasSize - (2 * i * barWidth);
-            double          barXY = barWidth * 0.5 + i * barWidth;
-            double          barWH = canvasSize - barWidth - (2 * i * barWidth);
-            double          angle = value / max * 270.0;
+            ChartData data  = dataList.get(i);
+            double    value = clamp(0, Double.MAX_VALUE, data.getValue());
+            double    bkgXY = i * barWidth;
+            double    bkgWH = canvasSize - (2 * i * barWidth);
+            double    barXY = barWidth * 0.5 + i * barWidth;
+            double    barWH = canvasSize - barWidth - (2 * i * barWidth);
+            double    angle = value / max * 270.0;
 
             // Background
             ctx.setLineWidth(1);

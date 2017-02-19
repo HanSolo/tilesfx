@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx.tools;
 
+import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import javafx.animation.Interpolator;
@@ -27,6 +28,9 @@ import javafx.beans.property.DoublePropertyBase;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -34,37 +38,48 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by hansolo on 17.02.17.
  */
-public class RadialChartData {
+public class ChartData {
     public  static boolean               animated     = true;
-    private final ChartDataEvent         UPDATE_EVENT = new ChartDataEvent(RadialChartData.this);
+    private final ChartDataEvent         UPDATE_EVENT = new ChartDataEvent(ChartData.this);
     private String                       name;
     private double                       value;
     private Color                        color;
+    private Instant                      timestamp;
     private List<ChartDataEventListener> listenerList = new CopyOnWriteArrayList<>();
     private DoubleProperty               currentValue;
     private Timeline                     timeline;
 
 
     // ******************** Constructors **************************************
-    public RadialChartData() {
-        this("", 0, Color.rgb(0, 80, 200));
+    public ChartData() {
+        this("", 0, Tile.BLUE, Instant.now());
     }
-    public RadialChartData(double VALUE) {
-        this("", VALUE, Color.rgb(0, 80, 200));
+    public ChartData(double VALUE) {
+        this("", VALUE, Tile.BLUE, Instant.now());
     }
-    public RadialChartData(final String NAME, final double VALUE) {
-        this(NAME, VALUE, Color.rgb(0, 80, 200));
+    public ChartData(final double VALUE, final Instant TIMESTAMP) {
+        this("", VALUE, Tile.BLUE, TIMESTAMP);
     }
-    public RadialChartData(final String NAME, final double VALUE, final Color COLOR) {
+    public ChartData(final String NAME, final double VALUE) {
+        this(NAME, VALUE, Tile.BLUE, Instant.now());
+    }
+    public ChartData(final String NAME, final double VALUE, final Instant TIMESTAMP) {
+        this(NAME, VALUE, Tile.BLUE, TIMESTAMP);
+    }
+    public ChartData(final String NAME, final double VALUE, final Color COLOR) {
+        this(NAME, VALUE, COLOR, Instant.now());
+    }
+    public ChartData(final String NAME, final double VALUE, final Color COLOR, final Instant TIMESTAMP) {
         name         = NAME;
         value        = VALUE;
         color        = COLOR;
+        timestamp    = TIMESTAMP;
         currentValue = new DoublePropertyBase(value) {
             @Override protected void invalidated() {
                 value = get();
                 fireChartDataEvent(UPDATE_EVENT);
             }
-            @Override public Object getBean() { return RadialChartData.this; }
+            @Override public Object getBean() { return ChartData.this; }
             @Override public String getName() { return "currentValue"; }
         };
         timeline     = new Timeline();
@@ -99,6 +114,24 @@ public class RadialChartData {
     public void setColor(final Color COLOR) {
         color = COLOR;
         fireChartDataEvent(UPDATE_EVENT);
+    }
+
+    public Instant getTimestamp() { return timestamp; }
+    public void setTimestamp(final Instant TIMESTAMP) {
+        timestamp = TIMESTAMP;
+        fireChartDataEvent(UPDATE_EVENT);
+    }
+
+    public ZonedDateTime getTimestampAsDateTime(final ZoneId ZONE_ID) { return ZonedDateTime.ofInstant(timestamp, ZONE_ID); }
+
+    @Override public String toString() {
+        return new StringBuilder().append("{\n")
+                                  .append("  \"name\":").append(name).append(",\n")
+                                  .append("  \"value\":").append(value).append(",\n")
+                                  .append("  \"color\":").append(color.toString().replace("0x", "#")).append(",\n")
+                                  .append("  \"timestamp\":").append(timestamp.getEpochSecond()).append(",\n")
+                                  .append("}")
+                                  .toString();
     }
 
 

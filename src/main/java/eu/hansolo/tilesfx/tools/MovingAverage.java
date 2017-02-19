@@ -30,9 +30,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class MovingAverage {
     public  static final int         MAX_PERIOD     = 1000;
     private static final int         DEFAULT_PERIOD = 10;
-    private        final Queue<Data> window;
-    private              int         period;
-    private              double      sum;
+    private        final Queue<TimeData> window;
+    private              int             period;
+    private              double          sum;
 
 
     // ******************** Constructors **************************************
@@ -46,7 +46,7 @@ public class MovingAverage {
 
 
     // ******************** Methods *******************************************
-    public void addData(final Data DATA) {
+    public void addData(final TimeData DATA) {
         sum += DATA.getValue();
         window.add(DATA);
         if (window.size() > period) {
@@ -54,20 +54,20 @@ public class MovingAverage {
         }
     }
     public void addValue(final double VALUE) {
-        addData(new Data(VALUE));
+        addData(new TimeData(VALUE));
     }
-    public void addListOfData(final List<Data> LIST_OF_DATA) {
+    public void addListOfData(final List<TimeData> LIST_OF_DATA) {
         LIST_OF_DATA.forEach(data -> addData(data));
     }
 
-    public Queue<Data> getWindow() { return new LinkedList<>(window); }
+    public Queue<TimeData> getWindow() { return new LinkedList<>(window); }
 
-    public Data getFirstEntry() { return window.peek(); }
-    public Data getLastEntry() { return window.stream().reduce((first, second) -> second).orElse(null); }
+    public TimeData getFirstEntry() { return window.peek(); }
+    public TimeData getLastEntry() { return window.stream().reduce((first, second) -> second).orElse(null); }
 
     public Instant getTimeSpan() {
-        Data firstEntry = getFirstEntry();
-        Data lastEntry  = getLastEntry();
+        TimeData firstEntry = getFirstEntry();
+        TimeData lastEntry  = getLastEntry();
         if (null == firstEntry || null == lastEntry) return null;
         return lastEntry.getTimestamp().minusSeconds(firstEntry.getTimestamp().getEpochSecond());
     }
@@ -82,7 +82,7 @@ public class MovingAverage {
         Instant now     = Instant.now();
         return window.stream()
                      .filter(v -> v.getTimestamp().isAfter(now.minus(DURATION)))
-                     .mapToDouble(Data::getValue)
+                     .mapToDouble(TimeData::getValue)
                      .average()
                      .getAsDouble();
     }

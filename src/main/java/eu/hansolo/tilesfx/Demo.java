@@ -20,7 +20,7 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.tools.RadialChartData;
+import eu.hansolo.tilesfx.tools.ChartData;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
@@ -65,10 +65,10 @@ public class Demo extends Application {
     private LeaderBoardItem leaderBoardItem2;
     private LeaderBoardItem leaderBoardItem3;
     private LeaderBoardItem leaderBoardItem4;
-    private RadialChartData radialChartData1;
-    private RadialChartData radialChartData2;
-    private RadialChartData radialChartData3;
-    private RadialChartData radialChartData4;
+    private ChartData       chartData1;
+    private ChartData       chartData2;
+    private ChartData       chartData3;
+    private ChartData       chartData4;
     private Tile            percentageTile;
     private Tile            clockTile;
     private Tile            gaugeTile;
@@ -176,10 +176,10 @@ public class Demo extends Application {
         leaderBoardItem4 = new LeaderBoardItem("Anton", 8);
 
         // RadialChart Data
-        radialChartData1 = new RadialChartData("Item 1", 24.0, Tile.GREEN);
-        radialChartData2 = new RadialChartData("Item 2", 10.0, Tile.BLUE);
-        radialChartData3 = new RadialChartData("Item 3", 12.0, Tile.RED);
-        radialChartData4 = new RadialChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
+        chartData1 = new ChartData("Item 1", 24.0, Tile.GREEN);
+        chartData2 = new ChartData("Item 2", 10.0, Tile.BLUE);
+        chartData3 = new ChartData("Item 3", 12.0, Tile.RED);
+        chartData4 = new ChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
         //RadialChartData.animated = false;
 
 
@@ -381,7 +381,7 @@ public class Demo extends Application {
                                      .title("RadialChart")
                                      .text("Some text")
                                      .textVisible(false)
-                                     .radialChartData(radialChartData1, radialChartData2, radialChartData3, radialChartData4)
+                                     .radialChartData(chartData1, chartData2, chartData3, chartData4)
                                      .build();
 
         lastTimerCall = System.nanoTime();
@@ -400,10 +400,10 @@ public class Demo extends Application {
                     series2.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
                     series3.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
 
-                    radialChartData1.setValue(RND.nextDouble() * 50);
-                    radialChartData2.setValue(RND.nextDouble() * 50);
-                    radialChartData3.setValue(RND.nextDouble() * 50);
-                    radialChartData4.setValue(RND.nextDouble() * 50);
+                    chartData1.setValue(RND.nextDouble() * 50);
+                    chartData2.setValue(RND.nextDouble() * 50);
+                    chartData3.setValue(RND.nextDouble() * 50);
+                    chartData4.setValue(RND.nextDouble() * 50);
 
                     barChartTile.getBarChartItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
 

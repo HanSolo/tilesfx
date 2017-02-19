@@ -16,22 +16,22 @@
 
 package eu.hansolo.tilesfx.events;
 
-import eu.hansolo.tilesfx.tools.RadialChartData;
+import eu.hansolo.tilesfx.tools.ChartData;
 
 
 /**
  * Created by hansolo on 17.02.17.
  */
 public class ChartDataEvent {
-    private RadialChartData data;
+    private ChartData data;
 
 
     // ******************** Constructors **************************************
-    public ChartDataEvent(final RadialChartData DATA) {
+    public ChartDataEvent(final ChartData DATA) {
         data = DATA;
     }
 
 
     // ******************** Methods *******************************************
-    public RadialChartData getData() { return data; }
+    public ChartData getData() { return data; }
 }

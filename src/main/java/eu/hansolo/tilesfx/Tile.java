@@ -27,8 +27,8 @@ import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.*;
-import eu.hansolo.tilesfx.tools.RadialChartData;
-import eu.hansolo.tilesfx.tools.Data;
+import eu.hansolo.tilesfx.tools.ChartData;
+import eu.hansolo.tilesfx.tools.TimeData;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MovingAverage;
@@ -215,13 +215,13 @@ public class Tile extends Control {
     private              StringProperty                         text;
     private              LocalTime                              _duration;
     private              ObjectProperty<LocalTime>              duration;
-    private              ObservableList<BarChartItem>           barChartItems;
-    private              List<LeaderBoardItem>                  leaderBoardItems;
-    private              ObjectProperty<Node>                   graphic;
-    private              Location                               _currentLocation;
-    private              ObjectProperty<Location>               currentLocation;
-    private              ObservableList<Location>               poiList;
-    private              ObservableList<RadialChartData>        radialChartDataList;
+    private              ObservableList<BarChartItem> barChartItems;
+    private              List<LeaderBoardItem>        leaderBoardItems;
+    private              ObjectProperty<Node>         graphic;
+    private              Location                     _currentLocation;
+    private              ObjectProperty<Location>     currentLocation;
+    private              ObservableList<Location>     poiList;
+    private              ObservableList<ChartData>    chartDataList;
 
 
     // UI related
@@ -423,7 +423,7 @@ public class Tile extends Control {
                     currentValue.set(VALUE);
                     fireTileEvent(FINISHED_EVENT);
                 }
-                if (isAveragingEnabled()) { movingAverage.addData(new Data(VALUE)); }
+                if (isAveragingEnabled()) { movingAverage.addData(new TimeData(VALUE)); }
             }
             @Override protected void invalidated() { update(); }
             @Override public void set(final double VALUE) {
@@ -498,7 +498,7 @@ public class Tile extends Control {
         _duration                           = LocalTime.of(1, 0);
         _currentLocation                    = new Location(0, 0);
         poiList                             = FXCollections.observableArrayList();
-        radialChartDataList = FXCollections.observableArrayList();
+        chartDataList = FXCollections.observableArrayList();
         movingAverage                       = new MovingAverage(_averagingPeriod);
         sections                            = FXCollections.observableArrayList();
         series                              = FXCollections.observableArrayList();
@@ -1091,7 +1091,7 @@ public class Tile extends Control {
      * be used to calculate the moving average.
      * @return the current list of Data objects used for the moving average
      */
-    public Queue<Data> getAveragingWindow() { return movingAverage.getWindow(); }
+    public Queue<TimeData> getAveragingWindow() { return movingAverage.getWindow(); }
 
     /**
      * Returns the moving average over the number of values
@@ -1343,13 +1343,13 @@ public class Tile extends Control {
         fireTileEvent(DATA_EVENT);
     }
 
-    public ObservableList<RadialChartData> getRadialChartData() { return radialChartDataList; }
-    public void addRadialChartData(final RadialChartData... DATA) { radialChartDataList.addAll(DATA); }
-    public void addRadialChartData(final List<RadialChartData> DATA) { radialChartDataList.addAll(DATA); }
-    public void setRadialChartData(final RadialChartData... DATA) { radialChartDataList.setAll(DATA); }
-    public void setRadialChartData(final List<RadialChartData> DATA) { radialChartDataList.setAll(DATA); }
-    public void removeRadialChartData(final RadialChartData DATA) { radialChartDataList.remove(DATA); }
-    public void clearRadialChartData() { radialChartDataList.clear(); }
+    public ObservableList<ChartData> getRadialChartData() { return chartDataList; }
+    public void addRadialChartData(final ChartData... DATA) { chartDataList.addAll(DATA); }
+    public void addRadialChartData(final List<ChartData> DATA) { chartDataList.addAll(DATA); }
+    public void setRadialChartData(final ChartData... DATA) { chartDataList.setAll(DATA); }
+    public void setRadialChartData(final List<ChartData> DATA) { chartDataList.setAll(DATA); }
+    public void removeRadialChartData(final ChartData DATA) { chartDataList.remove(DATA); }
+    public void clearRadialChartData() { chartDataList.clear(); }
 
     /**
      * A convenient method to set the color of foreground elements like

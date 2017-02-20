@@ -122,6 +122,7 @@
                                      riseOffset : 250
                                    }).bindPopup('<p>-</p>').addTo(map);
 
+      var track                  = [];
       var poiArray               = new Array();
 
       var Poi                    = L.Class.extend({
@@ -136,8 +137,20 @@
       var poiIcon                = L.icon({
                                             iconUrl     : 'poi.png',
                                             iconSize    : [14, 14],   // size of the icon
-                                            iconAnchor  : [7, 7], // point of the icon which will correspond to marker's location
+                                            iconAnchor  : [7, 7],     // point of the icon which will correspond to marker's location
                                             popupAnchor : [0, -14]    // point from which the popup should open relative to the iconAnchor
+                                          });
+      var startIcon              = L.icon({
+                                            iconUrl    : 'start.png',
+                                            iconSize   : [14, 14],
+                                            iconAnchor : [7, 7],
+                                            popupAnchor: [7, -7]
+                                          });
+      var stopIcon               = L.icon({
+                                            iconUrl    : 'stop.png',
+                                            iconSize   : [14, 14],
+                                            iconAnchor : [7, 7],
+                                            popupAnchor: [7, -7]
                                           });
 
       document.setLocationColor  = function(color) {
@@ -230,6 +243,53 @@
       };
       document.clearPois         = function() {
         while(poiArray.length > 0) { poiArray.pop(); }
+      };
+
+      document.addToTrack        = function(x1, y1, x2, y2, name) {
+        if (x1 === 0 && y1 === 0 || x2 === 0 && y2 === 0) return;
+
+        var trackColor = '#37b3fc';
+        var segment    = L.polyline([[x1, y1], [x2, y2]], {
+          weight      : 5,
+          opacity     : 0.8,
+          color       : trackColor,
+          lineCap     : 'round',
+          lineJoin    : 'round',
+          smoothFactor: 5
+        }).addTo(map);
+        segment.on('click', function(e) {
+          var popup = L.popup().setLatLng(e.latlng)
+                       .setContent('<table>' +
+                                   '<tr><td>Name</td><td>' + name + '</td></tr>' +
+                                   '</table>')
+                       .openOn(map);
+        });
+        track.push(segment);
+      };
+      document.resetTrack        = function() {
+        while(track.length > 0) {
+          map.removeLayer(track.pop());
+        }
+      };
+      document.addStartPoiMarker = function(x, y, date, time) {
+        var startMarker = L.marker([x, y], {
+          icon       : startIcon,
+          draggable  : false,
+          riseOnHover: true,
+          riseOffset : 249,
+          title      : "Start:" + "\n" + date + "\n" + time
+        }).addTo(map);
+        poiArray.push(startMarker);
+      };
+      document.addStopPoiMarker  = function(x, y, date, time) {
+        var stopMarker = L.marker([x, y], {
+          icon       : stopIcon,
+          draggable  : false,
+          riseOnHover: true,
+          riseOffset : 249,
+          title      : "Stop:" + "\n" + date + "\n" + time
+        }).addTo(map);
+        poiArray.push(stopMarker);
       };
 
       document.addRain           = function() { document.addLayer(rain); };

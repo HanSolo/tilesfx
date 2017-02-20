@@ -2,3 +2,5 @@
 /.gradle
 .DS_Store
 /build
+/src/main/resources/eu/hansolo/tilesfx/poi.fw.png
+/src/main/resources/eu/hansolo/tilesfx/location.fw.png

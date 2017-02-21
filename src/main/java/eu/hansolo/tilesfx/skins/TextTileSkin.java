@@ -19,7 +19,6 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.text.Text;
@@ -106,7 +105,7 @@ public class TextTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        description.setPrefSize(width - size * 0.1, height - size * 0.215);
+        description.setPrefSize(width - size * 0.1, height - size * 0.255);
         description.relocate(size * 0.05, size * 0.15);
     };
 

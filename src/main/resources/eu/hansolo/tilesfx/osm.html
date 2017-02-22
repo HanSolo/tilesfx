@@ -18,7 +18,7 @@
 
     <script type="text/javascript">
       var map = L.map('map').setView([0, 0], 15);
-      map.on('move', function() { java.update(parseFloat(map.getCenter().lat), parseFloat(map.getCenter().lng)); });
+      //map.on('move', function() { java.update(parseFloat(map.getCenter().lat), parseFloat(map.getCenter().lng)); });
       map.attributionControl.setPrefix('');
       map.removeControl(map.zoomControl);
       map.scrollWheelZoom.disable();
@@ -180,13 +180,11 @@
         map.panTo([x, y]);
       };
 
-      document.goToLocation      = function(x, y, acc, follow) {
+      document.goToLocation      = function(x, y, follow) {
         accuracy = acc;
         document.showOnlineMarker();
         onlineMarker.setLatLng([x, y]);
         onlineMarker.update();
-        accuracyCircle.setLatLng([x, y]);
-        accuracyCircle.setRadius(accuracy);
         onlineMarker._icon.title = 'Tracked Object\nAccuracy: ' + accuracy.toFixed(1) + 'm';
         if (follow) map.panTo([x, y]);
       };

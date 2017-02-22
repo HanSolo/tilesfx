@@ -609,6 +609,15 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B track(final Location... LOCATIONS) {
+        properties.put("trackArray", new SimpleObjectProperty(LOCATIONS));
+        return (B)this;
+    }
+    public final B track(final List<Location> LOCATIONS) {
+        properties.put("trackList", new SimpleObjectProperty(LOCATIONS));
+        return (B)this;
+    }
+
     public final B gradientStops(final Stop... STOPS) {
         properties.put("gradientStopsArray", new SimpleObjectProperty(STOPS));
         return (B)this;
@@ -847,6 +856,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
         if (properties.keySet().contains("radialChartDataList")) {
             CONTROL.setRadialChartData(((ObjectProperty<List<ChartData>>) properties.get("radialChartDataList")).get());
+        }
+
+        if (properties.keySet().contains("trackArray")) {
+            CONTROL.setTrack(((ObjectProperty<Location[]>) properties.get("trackArray")).get());
+        }
+        if (properties.keySet().contains("trackList")) {
+            CONTROL.setTrack(((ObjectProperty<List<Location>>) properties.get("trackList")).get());
         }
 
         for (String key : properties.keySet()) {

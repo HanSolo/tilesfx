@@ -162,8 +162,8 @@ public class Tile extends Control {
     private        final TileEvent   FINISHED_EVENT        = new TileEvent(EventType.FINISHED);
     private        final TileEvent   GRAPHIC_EVENT         = new TileEvent(EventType.GRAPHIC);
     private        final TileEvent   AVERAGING_EVENT       = new TileEvent(EventType.AVERAGING);
-    private        final TileEvent   UPDATE_EVENT          = new TileEvent(EventType.UPDATE);
     private        final TileEvent   LOCATION_EVENT        = new TileEvent(EventType.LOCATION);
+    private        final TileEvent   TRACK_EVENT           = new TileEvent(EventType.TRACK);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
@@ -222,6 +222,7 @@ public class Tile extends Control {
     private              ObjectProperty<Location>               currentLocation;
     private              ObservableList<Location>               poiList;
     private              ObservableList<ChartData>              chartDataList;
+    private              List<Location>                         track;
 
 
     // UI related
@@ -498,14 +499,15 @@ public class Tile extends Control {
         _duration                           = LocalTime.of(1, 0);
         _currentLocation                    = new Location(0, 0);
         poiList                             = FXCollections.observableArrayList();
-        chartDataList = FXCollections.observableArrayList();
+        chartDataList                       = FXCollections.observableArrayList();
         movingAverage                       = new MovingAverage(_averagingPeriod);
         sections                            = FXCollections.observableArrayList();
         series                              = FXCollections.observableArrayList();
         timeSections                        = FXCollections.observableArrayList();
         alarms                              = FXCollections.observableArrayList();
         alarmsToRemove                      = new ArrayList<>();
-        barChartItems = FXCollections.observableArrayList();
+        barChartItems                       = FXCollections.observableArrayList();
+        track                               = new ArrayList<>();
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
 
@@ -1332,6 +1334,20 @@ public class Tile extends Control {
     public void clearPoiLocations() {
         poiList.clear();
         fireTileEvent(DATA_EVENT);
+    }
+
+    public List<Location> getTrack() { return track; }
+    public void setTrack(final Location... LOCATIONS) {
+        setTrack(Arrays.asList(LOCATIONS));
+    }
+    public void setTrack(final List<Location> LOCATIONS) {
+        track.clear();
+        track.addAll(LOCATIONS);
+        fireTileEvent(TRACK_EVENT);
+    }
+    public void clearTrack() {
+        track.clear();
+        fireTileEvent(TRACK_EVENT);
     }
 
     public ObservableList<ChartData> getRadialChartData() { return chartDataList; }

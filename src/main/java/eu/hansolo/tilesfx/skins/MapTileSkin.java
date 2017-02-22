@@ -22,8 +22,6 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
@@ -34,20 +32,24 @@ import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 
 /**
  * Created by hansolo on 12.02.17.
  */
 public class MapTileSkin extends TileSkin {
-    private Text                         titleText;
-    private Text                         text;
-    private WebView                      webView;
-    private WebEngine                    webEngine;
-    private boolean                      readyToGo;
-    private EventHandler<MouseEvent>     mouseHandler;
-    private LocationEventListener        locationListener;
-    private ListChangeListener<Location> poiListener;
+    private static final DateTimeFormatter            DF = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter            TF = DateTimeFormatter.ISO_LOCAL_TIME;
+    private              Text                         titleText;
+    private              Text                         text;
+    private              WebView                      webView;
+    private              WebEngine                    webEngine;
+    private              boolean                      readyToGo;
+    private              EventHandler<MouseEvent>     mouseHandler;
+    private              LocationEventListener        locationListener;
+    private              ListChangeListener<Location> poiListener;
 
 
     // ******************** Constructors **************************************
@@ -101,6 +103,7 @@ public class MapTileSkin extends TileSkin {
                 updateLocation();
                 updateLocationColor();
                 tile.getPoiList().forEach(poi -> addPoi(poi));
+                addTrack(tile.getTrack());
             }
         });
         URL maps = Tile.class.getResource("osm.html");
@@ -128,6 +131,8 @@ public class MapTileSkin extends TileSkin {
         } else if ("LOCATION".equals(EVENT_TYPE)) {
             tile.getCurrentLocation().addLocationEventListener(locationListener);
             updateLocation();
+        } else if ("TRACK".equals(EVENT_TYPE)) {
+            addTrack(tile.getTrack());
         }
     };
 
@@ -211,6 +216,84 @@ public class MapTileSkin extends TileSkin {
         }
     }
 
+    private void addTrack(final List<Location> LOCATIONS) {
+        if (LOCATIONS.isEmpty()) {
+            if (readyToGo) {
+                Platform.runLater(() -> {
+                    StringBuilder scriptCommand = new StringBuilder();
+                    scriptCommand.append("document.clearTrack();");
+                    webEngine.executeScript(scriptCommand.toString());
+                });
+                return;
+            }
+        }
+        int length = LOCATIONS.size();
+        if (length <= 4) return;
+        if (readyToGo) {
+            Platform.runLater(() -> {
+                StringBuilder scriptCommand = new StringBuilder();
+                double lat1;
+                double lon1;
+                double lat2;
+                double lon2;
+                String name;
+                String date;
+                String time;
+                for (int i = 0 ; i < length - 1 ; i++) {
+                    scriptCommand.setLength(0);
+
+                    lat1 = LOCATIONS.get(i).getLatitude();
+                    lon1 = LOCATIONS.get(i).getLongitude();
+                    lat2 = LOCATIONS.get(i + 1).getLatitude();
+                    lon2 = LOCATIONS.get(i + 1).getLongitude();
+                    name = LOCATIONS.get(i).getName();
+                    date = DF.format(LOCATIONS.get(i).getZonedDateTime());
+                    time = TF.format(LOCATIONS.get(i).getZonedDateTime());
+
+                    scriptCommand.append("window.lat1 = ").append(lat1).append(";")
+                                     .append("window.lon1 = ").append(lon1).append(";")
+                                     .append("window.lat2 = ").append(lat2).append(";")
+                                     .append("window.lon2 = ").append(lon2).append(";")
+                                     .append("window.locationName = \"").append(name).append("\";")
+                                     .append("window.locationDate = \"").append(date).append("\";")
+                                     .append("window.locationTime = \"").append(time).append("\";")
+                                     .append("document.addToTrack(window.lat1, window.lon1, window.lat2, window.lon2,window.locationName, window.locationDate, window.locationTime);");
+                    webEngine.executeScript(scriptCommand.toString());
+                }
+
+                // Start Marker
+                scriptCommand.setLength(0);
+                lat1 = LOCATIONS.get(0).getLatitude();
+                lon1 = LOCATIONS.get(0).getLongitude();
+                name = LOCATIONS.get(0).getName();
+                date = DF.format(LOCATIONS.get(0).getZonedDateTime());
+                time = TF.format(LOCATIONS.get(0).getZonedDateTime());
+                scriptCommand.append("window.lat1 = ").append(lat1).append(";")
+                             .append("window.lon1 = ").append(lon1).append(";")
+                             .append("window.locationName = \"").append(name).append("\";")
+                             .append("window.locationDate = \"").append(date).append("\";")
+                             .append("window.locationTime = \"").append(time).append("\";")
+                             .append("document.addStartPoiMarker(window.lat1, window.lon1, window.locationName, window.locationDate, window.locationTime);");
+                webEngine.executeScript(scriptCommand.toString());
+
+                // Stop Marker
+                scriptCommand.setLength(0);
+                lat1 = LOCATIONS.get(length - 1).getLatitude();
+                lon1 = LOCATIONS.get(length - 1).getLongitude();
+                name = LOCATIONS.get(length - 1).getName();
+                date = DF.format(LOCATIONS.get(length - 1).getZonedDateTime());
+                time = TF.format(LOCATIONS.get(length - 1).getZonedDateTime());
+                scriptCommand.append("window.lat1 = ").append(lat1).append(";")
+                             .append("window.lon1 = ").append(lon1).append(";")
+                             .append("window.locationName = \"").append(name).append("\";")
+                             .append("window.locationDate = \"").append(date).append("\";")
+                             .append("window.locationTime = \"").append(time).append("\";")
+                             .append("document.addStopPoiMarker(window.lat1, window.lon1, window.locationName, window.locationDate, window.locationTime);");
+                webEngine.executeScript(scriptCommand.toString());
+            });
+        }
+    }
+
 
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
@@ -233,7 +316,7 @@ public class MapTileSkin extends TileSkin {
         size   = width < height ? width : height;
 
         double containerWidth  = width - size * 0.1;
-        double containerHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double containerHeight = tile.isTextVisible() ? height - size * 0.27 : height - size * 0.205;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);

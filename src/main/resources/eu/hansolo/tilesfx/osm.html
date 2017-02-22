@@ -245,7 +245,7 @@
         while(poiArray.length > 0) { poiArray.pop(); }
       };
 
-      document.addToTrack        = function(x1, y1, x2, y2, name) {
+      document.addToTrack        = function(x1, y1, x2, y2, name, date, time) {
         if (x1 === 0 && y1 === 0 || x2 === 0 && y2 === 0) return;
 
         var trackColor = '#37b3fc';
@@ -266,28 +266,28 @@
         });
         track.push(segment);
       };
-      document.resetTrack        = function() {
+      document.clearTrack        = function() {
         while(track.length > 0) {
           map.removeLayer(track.pop());
         }
       };
-      document.addStartPoiMarker = function(x, y, date, time) {
+      document.addStartPoiMarker = function(x, y, name, date, time) {
         var startMarker = L.marker([x, y], {
           icon       : startIcon,
           draggable  : false,
           riseOnHover: true,
           riseOffset : 249,
-          title      : "Start:" + "\n" + date + "\n" + time
+          title      : "Start:" + "\n" + name + "\n" + date + "\n" + time
         }).addTo(map);
         poiArray.push(startMarker);
       };
-      document.addStopPoiMarker  = function(x, y, date, time) {
+      document.addStopPoiMarker  = function(x, y, name, date, time) {
         var stopMarker = L.marker([x, y], {
           icon       : stopIcon,
           draggable  : false,
           riseOnHover: true,
           riseOffset : 249,
-          title      : "Stop:" + "\n" + date + "\n" + time
+          title      : "Stop:" + "\n" + name + "\n" + date + "\n" + time
         }).addTo(map);
         poiArray.push(stopMarker);
       };

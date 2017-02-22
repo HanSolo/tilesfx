@@ -23,7 +23,7 @@ package eu.hansolo.tilesfx.events;
 public class TileEvent {
     public enum EventType { RECALC, REDRAW, RESIZE, VISIBILITY, SECTION, ALERT, VALUE,
                             THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN, FINISHED, SERIES,
-                            DATA, GRAPHIC, UPDATE, AVERAGING, LOCATION };
+                            DATA, GRAPHIC, UPDATE, AVERAGING, LOCATION, TRACK };
     private final EventType EVENT_TYPE;
 
 

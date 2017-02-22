@@ -26,7 +26,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -104,6 +103,7 @@ public class Location {
         latitude     = LATITUDE;
         longitude    = LONGITUDE;
         altitude     = ALTITUDE;
+        timestamp    = TIMESTAMP;
         accuracy     = 20;
         info         = INFO;
         color        = COLOR;

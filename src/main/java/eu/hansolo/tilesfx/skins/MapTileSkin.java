@@ -172,16 +172,18 @@ public class MapTileSkin extends TileSkin {
     private void addPoi(final Location POI) {
         if (readyToGo) {
             Platform.runLater(() -> {
-                double        lat           = POI.getLatitude();
-                double        lon           = POI.getLongitude();
-                String        name          = POI.getName();
-                String        info          = POI.getInfo();
+                double lat   = POI.getLatitude();
+                double lon   = POI.getLongitude();
+                String name  = POI.getName();
+                String info  = POI.getInfo();
+                String color = POI.getColor().styleName;
                 StringBuilder scriptCommand = new StringBuilder();
                 scriptCommand.append("window.lat = ").append(lat).append(";")
                              .append("window.lon = ").append(lon).append(";")
                              .append("window.locationName = \"").append(name).append("\";")
                              .append("window.locationInfo = \"").append(info.toString()).append("\";")
-                             .append("document.addPoi(window.locationName, window.locationInfo, window.lat, window.lon);");
+                             .append("window.poiColor = \"").append(color).append("\";")
+                             .append("document.addPoi(window.locationName, window.locationInfo, window.lat, window.lon, window.poiColor);");
                 webEngine.executeScript(scriptCommand.toString());
             });
         }

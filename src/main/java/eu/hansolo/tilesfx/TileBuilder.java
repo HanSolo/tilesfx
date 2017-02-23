@@ -610,6 +610,15 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B pointsOfInterest(final Location... LOCATIONS) {
+        properties.put("poiArray", new SimpleObjectProperty(LOCATIONS));
+        return (B)this;
+    }
+    public final B pointsOfInterest(final List<Location> LOCATIONS) {
+        properties.put("poiList", new SimpleObjectProperty(LOCATIONS));
+        return (B)this;
+    }
+
     public final B track(final Location... LOCATIONS) {
         properties.put("trackArray", new SimpleObjectProperty(LOCATIONS));
         return (B)this;
@@ -862,6 +871,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
         if (properties.keySet().contains("radialChartDataList")) {
             CONTROL.setRadialChartData(((ObjectProperty<List<ChartData>>) properties.get("radialChartDataList")).get());
+        }
+
+        if (properties.keySet().contains("poiArray")) {
+            CONTROL.setPoiLocations(((ObjectProperty<Location[]>) properties.get("poiArray")).get());
+        }
+        if (properties.keySet().contains("poiList")) {
+            CONTROL.setPoiList(((ObjectProperty<List<Location>>) properties.get("poiList")).get());
         }
 
         if (properties.keySet().contains("trackArray")) {

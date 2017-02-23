@@ -44,7 +44,7 @@ public class WeatherTileSkin extends TileSkin {
     private              Text          valueText;
     private              Text          unitText;
     private              WeatherSymbol weatherSymbol;
-    private              Text          summaryText;
+    private              Text          text;
     private              WeatherSymbol sunriseSymbol;
     private              WeatherSymbol sunsetSymbol;
     private              Text          sunriseText;
@@ -74,8 +74,8 @@ public class WeatherTileSkin extends TileSkin {
 
         unitText = new Text(darkSky.getUnit().temperatureUnitString);
 
-        summaryText = new Text("");
-        summaryText.setFill(tile.getTextColor());
+        text = new Text("");
+        text.setFill(tile.getTextColor());
 
         sunriseSymbol = new WeatherSymbol(ConditionAndIcon.SUNRISE, 22, tile.getForegroundColor());
         sunsetSymbol = new WeatherSymbol(ConditionAndIcon.SUNSET, 22, tile.getForegroundColor());
@@ -96,7 +96,7 @@ public class WeatherTileSkin extends TileSkin {
 
         weatherSymbol = new WeatherSymbol(ConditionAndIcon.NONE, 250, tile.getForegroundColor());
 
-        getPane().getChildren().addAll(titleText, valueText, unitText, weatherSymbol, summaryText, sunriseBox, sunsetBox);
+        getPane().getChildren().addAll(titleText, valueText, unitText, weatherSymbol, text, sunriseBox, sunsetBox);
     }
 
     @Override protected void registerListeners() {
@@ -137,10 +137,10 @@ public class WeatherTileSkin extends TileSkin {
 
         maxWidth = width - size * 0.1;
         fontSize = size * textSize.factor;
-        summaryText.setFont(Fonts.latoRegular(fontSize));
-        if (summaryText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(summaryText, maxWidth, fontSize); }
-        summaryText.setX((width - summaryText.getLayoutBounds().getWidth()) * 0.5);
-        summaryText.setY(height - size * 0.05);
+        text.setFont(Fonts.latoRegular(fontSize));
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        text.setX(size * 0.05);
+        text.setY(height - size * 0.05);
 
         maxWidth = width - size * 0.705;
         fontSize = size * 0.06;
@@ -198,7 +198,7 @@ public class WeatherTileSkin extends TileSkin {
         valueText.setText(String.format(Locale.US, "%.0f", today.getTemperature()));
         unitText.setText(unit.temperatureUnitString);
         weatherSymbol.setCondition(today.getCondition());
-        summaryText.setText(normalize(today.getSummary()));
+        text.setText(normalize(today.getSummary()));
         sunriseText.setText(TF.format(today.getSunriseTime()));
         sunsetText.setText(TF.format(today.getSunsetTime()));
         resizeDynamicText();
@@ -206,7 +206,7 @@ public class WeatherTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
         unitText.setFill(tile.getUnitColor());
-        summaryText.setFill(tile.getTextColor());
+        text.setFill(tile.getTextColor());
         weatherSymbol.setSymbolColor(tile.getForegroundColor());
         sunriseSymbol.setSymbolColor(tile.getForegroundColor());
         sunsetSymbol.setSymbolColor(tile.getForegroundColor());

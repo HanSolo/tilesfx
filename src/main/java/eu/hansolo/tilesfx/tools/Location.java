@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static eu.hansolo.tilesfx.tools.Helper.clamp;
+
 
 /**
  * Created by hansolo on 12.02.17.
@@ -61,15 +63,14 @@ public class Location {
             to        = TO;
         }
     }
-
     private String                      name;
     private Instant                     timestamp;
     private double                      latitude;
     private double                      longitude;
     private double                      altitude;
-    private double                      accuracy;
     private String                      info;
     private TileColor                   color;
+    private int                         zoomLevel;
     private List<LocationEventListener> listenerList;
 
 
@@ -104,9 +105,9 @@ public class Location {
         longitude    = LONGITUDE;
         altitude     = ALTITUDE;
         timestamp    = TIMESTAMP;
-        accuracy     = 20;
         info         = INFO;
         color        = COLOR;
+        zoomLevel    = 15;
         listenerList = new CopyOnWriteArrayList<>();
     }
 
@@ -137,9 +138,6 @@ public class Location {
         fireLocationEvent(new LocationEvent(Location.this));
     }
 
-    public double getAccuracy() { return accuracy; }
-    public void setAccuracy(final double ACCURACY) { accuracy = ACCURACY; }
-
     public String getInfo() { return info; }
     public void setInfo(final String INFO) { info = INFO; }
 
@@ -151,6 +149,12 @@ public class Location {
 
     public ZonedDateTime getZonedDateTime() { return getZonedDateTime(ZoneId.systemDefault()); }
     public ZonedDateTime getZonedDateTime(final ZoneId ZONE_ID) { return ZonedDateTime.ofInstant(timestamp, ZONE_ID); }
+
+    public int getZoomLevel() { return zoomLevel; }
+    public void setZoomLevel(final int LEVEL) {
+        zoomLevel = clamp(0, 17, LEVEL);
+        fireLocationEvent(new LocationEvent(Location.this));
+    }
 
     public void update(final double LATITUDE, final double LONGITUDE) { set(LATITUDE, LONGITUDE); }
 
@@ -167,12 +171,11 @@ public class Location {
         timestamp = TIMESTAMP;
         fireLocationEvent(new LocationEvent(Location.this));
     }
-    public void set(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final Instant TIMESTAMP, final double ACCURACY, final String INFO) {
+    public void set(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final Instant TIMESTAMP, final String INFO) {
         latitude    = LATITUDE;
         longitude   = LONGITUDE;
         altitude    = ALTITUDE;
         timestamp   = TIMESTAMP;
-        accuracy    = ACCURACY;
         info        = INFO;
         fireLocationEvent(new LocationEvent(Location.this));
     }
@@ -182,8 +185,9 @@ public class Location {
         longitude = LOCATION.getLongitude();
         altitude  = LOCATION.getAltitude();
         timestamp = LOCATION.getTimestamp();
-        accuracy  = LOCATION.getAccuracy();
         info      = LOCATION.info;
+        color     = LOCATION.getColor();
+        zoomLevel = LOCATION.getZoomLevel();
         fireLocationEvent(new LocationEvent(Location.this));
     }
 
@@ -281,8 +285,9 @@ public class Location {
         jsonObject.put("lat", new Double(latitude));
         jsonObject.put("lon", new Double(longitude));
         jsonObject.put("alt", new Double(altitude));
-        jsonObject.put("acc", new Double(accuracy));
         jsonObject.put("inf", new String(info));
+        jsonObject.put("col", new String(color.toString().replace("0x", "#")));
+        jsonObject.put("zml", new Integer(zoomLevel));
         return jsonObject;
     }
 
@@ -296,8 +301,9 @@ public class Location {
                                   .append("Latitude : ").append(latitude).append("\n")
                                   .append("Longitude: ").append(longitude).append("\n")
                                   .append("Altitude : ").append(String.format(Locale.US, "%.1f", altitude)).append(" m\n")
-                                  .append("Accuracy : ").append(String.format(Locale.US, "%.3f", accuracy)).append(" m\n")
                                   .append("Info     : ").append(info).append("\n")
+                                  .append("Color    : ").append(color.toString().replace("0x", "#")).append("\n")
+                                  .append("ZoomLevel: ").append(zoomLevel).append("\n")
                                   .toString();
     }
 

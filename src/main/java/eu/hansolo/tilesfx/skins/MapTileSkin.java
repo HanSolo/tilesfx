@@ -104,6 +104,7 @@ public class MapTileSkin extends TileSkin {
                 updateLocationColor();
                 tile.getPoiList().forEach(poi -> addPoi(poi));
                 addTrack(tile.getTrack());
+                updateTrackColor();
             }
         });
         URL maps = Tile.class.getResource("osm.html");
@@ -146,16 +147,19 @@ public class MapTileSkin extends TileSkin {
     private void updateLocation() {
         if (readyToGo) {
             Platform.runLater(() -> {
-                double        lat           = tile.getCurrentLocation().getLatitude();
-                double        lon           = tile.getCurrentLocation().getLongitude();
-                String        name          = tile.getCurrentLocation().getName();
-                String        info          = tile.getCurrentLocation().getInfo();
+                Location      location      = tile.getCurrentLocation();
+                double        lat           = location.getLatitude();
+                double        lon           = location.getLongitude();
+                String        name          = location.getName();
+                String        info          = location.getInfo();
+                int           zoomLevel     = location.getZoomLevel();
                 StringBuilder scriptCommand = new StringBuilder();
                 scriptCommand.append("window.lat = ").append(lat).append(";")
                              .append("window.lon = ").append(lon).append(";")
                              .append("window.locationName = \"").append(name).append("\";")
                              .append("window.locationInfo = \"").append(info.toString()).append("\";")
-                             .append("document.moveMarker(window.locationName, window.locationInfo, window.lat, window.lon);");
+                             .append("window.zoomLevel = ").append(zoomLevel).append(";")
+                             .append("document.moveMarker(window.locationName, window.locationInfo, window.lat, window.lon, window.zoomLevel);");
                 webEngine.executeScript(scriptCommand.toString());
             });
         }
@@ -206,11 +210,24 @@ public class MapTileSkin extends TileSkin {
         }
     }
 
+    private void updateTrackColor() {
+        if (readyToGo) {
+            Platform.runLater(() -> {
+                String trackColor = tile.getTrackColor().styleName;
+                StringBuilder scriptCommand = new StringBuilder();
+                scriptCommand.append("window.trackColor = '").append(trackColor).append("';")
+                             .append("document.setTrackColor(window.trackColor);");
+                webEngine.executeScript(scriptCommand.toString());
+            });
+        }
+    }
+
     private void centerLocation() {
         if (readyToGo) {
             Platform.runLater(() -> {
                 StringBuilder scriptCommand = new StringBuilder();
-                scriptCommand.append("document.zoomToLocation();");
+                scriptCommand.append("window.zoomLevel = ").append(tile.getCurrentLocation().getZoomLevel()).append(";");
+                scriptCommand.append("document.zoomToLocation(window.zoomLevel);");
                 webEngine.executeScript(scriptCommand.toString());
             });
         }
@@ -239,6 +256,7 @@ public class MapTileSkin extends TileSkin {
                 String name;
                 String date;
                 String time;
+                String trackColor = tile.getTrackColor().styleName;
                 for (int i = 0 ; i < length - 1 ; i++) {
                     scriptCommand.setLength(0);
 
@@ -257,7 +275,8 @@ public class MapTileSkin extends TileSkin {
                                      .append("window.locationName = \"").append(name).append("\";")
                                      .append("window.locationDate = \"").append(date).append("\";")
                                      .append("window.locationTime = \"").append(time).append("\";")
-                                     .append("document.addToTrack(window.lat1, window.lon1, window.lat2, window.lon2,window.locationName, window.locationDate, window.locationTime);");
+                                     .append("window.trackColor = \"").append(trackColor).append("\";")
+                                     .append("document.addToTrack(window.lat1, window.lon1, window.lat2, window.lon2,window.locationName, window.locationDate, window.locationTime, window.trackColor);");
                     webEngine.executeScript(scriptCommand.toString());
                 }
 
@@ -343,5 +362,6 @@ public class MapTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
 
         updateLocationColor();
+        updateTrackColor();
     };
 }

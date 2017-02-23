@@ -18,6 +18,7 @@ package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
+import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
@@ -618,6 +619,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B trackColor(final TileColor COLOR) {
+        properties.put("trackColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
     public final B gradientStops(final Stop... STOPS) {
         properties.put("gradientStopsArray", new SimpleObjectProperty(STOPS));
         return (B)this;
@@ -1082,6 +1088,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
             } else if ("currentLocation".equals(key)) {
                 CONTROL.setCurrentLocation(((ObjectProperty<Location>) properties.get(key)).get());
+            } else if ("trackColor".equals(key)) {
+                CONTROL.setTrackColor(((ObjectProperty<TileColor>) properties.get(key)).get());
             }
         }
         return CONTROL;

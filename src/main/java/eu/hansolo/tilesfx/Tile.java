@@ -223,6 +223,8 @@ public class Tile extends Control {
     private              ObservableList<Location>               poiList;
     private              ObservableList<ChartData>              chartDataList;
     private              List<Location>                         track;
+    private              TileColor                              _trackColor;
+    private              ObjectProperty<TileColor>              trackColor;
 
 
     // UI related
@@ -508,6 +510,7 @@ public class Tile extends Control {
         alarmsToRemove                      = new ArrayList<>();
         barChartItems                       = FXCollections.observableArrayList();
         track                               = new ArrayList<>();
+        _trackColor                         = TileColor.BLUE;
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
 
@@ -1349,6 +1352,28 @@ public class Tile extends Control {
         track.clear();
         fireTileEvent(TRACK_EVENT);
     }
+
+    public TileColor getTrackColor() { return null == trackColor ? _trackColor : trackColor.get(); }
+    public void setTrackColor(final TileColor COLOR) {
+        if (null == trackColor) {
+            _trackColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            trackColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<TileColor> trackColorProperty() {
+        if (null == trackColor) {
+            trackColor = new ObjectPropertyBase<TileColor>(_trackColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "trackColor"; }
+            };
+            _trackColor = null;
+        }
+        return trackColor;
+    }
+
 
     public ObservableList<ChartData> getRadialChartData() { return chartDataList; }
     public void addRadialChartData(final ChartData... DATA) { chartDataList.addAll(DATA); }

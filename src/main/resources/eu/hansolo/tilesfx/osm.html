@@ -176,6 +176,32 @@
         locationMarker.update();
       };
 
+      document.setTrackColor     = function(color) {
+        var trackColor;
+        if ('blue' === color) {
+          trackColor = "#37b3fc";
+        } else if ('gray' === color) {
+          trackColor = "#8b9092";
+        } else if ('green' === color) {
+          trackColor = "#8fc65e";
+        } else if ('magenta' === color) {
+          trackColor = "#c64be8";
+        } else if ('orange' === color) {
+          trackColor = "#eda239";
+        } else if ('red' === color) {
+          trackColor = "#e5504c";
+        } else if ('yellow-orange' === color) {
+          trackColor = "#e5c64c";
+        } else if ('yellow' === color) {
+          trackColor = "#e5e54c";
+        } else {
+          trackColor = "#37b3fc";
+        }
+        track.forEach(function(segment) {
+          segment.color = trackColor;
+        });
+      };
+
       document.panTo             = function(x, y) {
         map.panTo([x, y]);
       };
@@ -198,19 +224,20 @@
         document.hideOnlineMarker();
       };
 
-      document.moveMarker        = function(locationName, locationInfo, x, y) {
+      document.moveMarker        = function(locationName, locationInfo, x, y, zoomLevel) {
         locationMarker.setLatLng([x, y]);
         locationMarker.update();
         locationMarker.setTitle(locationName);
         locationMarker._popup.setContent('<p>'+ locationInfo + '</p>');
         map.panTo(locationMarker.getLatLng());
+        map.setZoom(zoomLevel);
       };
 
       document.clearMarkers      = function() {
         while(markerArray.length > 0) { markerArray.pop(); }
       };
-      document.zoomToLocation    = function() {
-        map.setZoom(17);
+      document.zoomToLocation    = function(zoomLevel) {
+        map.setZoom(zoomLevel);
         map.panTo(locationMarker.getLatLng());
       };
 
@@ -243,10 +270,29 @@
         while(poiArray.length > 0) { poiArray.pop(); }
       };
 
-      document.addToTrack        = function(x1, y1, x2, y2, name, date, time) {
+      document.addToTrack        = function(x1, y1, x2, y2, name, date, time, color) {
         if (x1 === 0 && y1 === 0 || x2 === 0 && y2 === 0) return;
 
-        var trackColor = '#37b3fc';
+        var trackColor;
+        if ('blue' === color) {
+          trackColor = "#37b3fc";
+        } else if ('gray' === color) {
+          trackColor = "#8b9092";
+        } else if ('green' === color) {
+          trackColor = "#8fc65e";
+        } else if ('magenta' === color) {
+          trackColor = "#c64be8";
+        } else if ('orange' === color) {
+          trackColor = "#eda239";
+        } else if ('red' === color) {
+          trackColor = "#e5504c";
+        } else if ('yellow-orange' === color) {
+          trackColor = "#e5c64c";
+        } else if ('yellow' === color) {
+          trackColor = "#e5e54c";
+        } else {
+          trackColor = "#37b3fc";
+        }
         var segment    = L.polyline([[x1, y1], [x2, y2]], {
           weight      : 5,
           opacity     : 0.8,
@@ -256,11 +302,13 @@
           smoothFactor: 5
         }).addTo(map);
         segment.on('click', function(e) {
-          var popup = L.popup().setLatLng(e.latlng)
-                       .setContent('<table>' +
-                                   '<tr><td>Name</td><td>' + name + '</td></tr>' +
-                                   '</table>')
-                       .openOn(map);
+          L.popup().setLatLng(e.latlng)
+                   .setContent('<table>' +
+                               '<tr><td>Name</td><td>' + name + '</td></tr>' +
+                               '<tr><td>Date</td><td>' + date + '</td></tr>' +
+                               '<tr><td>Time</td><td>' + time + '</td></tr>' +
+                               '</table>')
+                   .openOn(map);
         });
         track.push(segment);
       };

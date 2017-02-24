@@ -116,12 +116,13 @@
                                             popupAnchor : [0, -19]    // point from which the popup should open relative to the iconAnchor
                                           });
       var locationMarker           = L.marker([0, 0], {
-                                     icon       : locationIconBlue,
-                                     opacity    : 1.0,
-                                     draggable  : false,
-                                     title      : 'Current Location',
-                                     riseOnHover: true,
-                                     riseOffset : 250
+                                     icon        : locationIconBlue,
+                                     opacity     : 1.0,
+                                     draggable   : false,
+                                     title       : 'Current Location',
+                                     riseOnHover : true,
+                                     riseOffset  : 250,
+                                     zIndexOffset: 1000
                                    }).bindPopup('<p>-</p>').addTo(map);
 
       var track                  = [];

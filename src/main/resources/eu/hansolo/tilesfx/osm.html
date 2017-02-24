@@ -25,9 +25,10 @@
       new L.control.zoom({position: 'bottomright'}).addTo(map);
 
       // TileLayer
-      var mapnik             = L.tileLayer.provider('OpenStreetMap.Mapnik', {attribution: ''});
+      var mapnikBw           = L.tileLayer.provider('OpenStreetMap.BlackAndWhite', {attribution: ''});
+      var mapnikHot          = L.tileLayer.provider('OpenStreetMap.HOT', {attribution: ''});
+      //var mapnik             = L.tileLayer.provider('OpenStreetMap.Mapnik', {attribution: ''});
       //var openStreetMapDE    = L.tileLayer.provider('OpenStreetMap.DE', {attribution: ''});
-      //var openStreetMapBW    = L.tileLayer.provider('OpenStreetMap.BlackAndWhite', {attribution: ''});
       var hydda              = L.tileLayer.provider('Hydda.Full', {attribution: ''});
       //var mapQuestOpen       = L.tileLayer.provider('MapQuestOpen.OSM', {attribution: ''});
       //var esriWorldStreetMap = L.tileLayer.provider('Esri.WorldStreetMap', {attribution: ''});
@@ -58,9 +59,10 @@
       };
 
       L.control.layers({
-                         "OSM"       : mapnik,
+                         "OSM"       : mapnikHot,
+                         "OSM BW"    : mapnikBw,
                          "Hydda"     : hydda,
-                         "Satellite" : esriWorldImagery,
+                         "Satellite" : esriWorldImagery
                        }, {},{position:'topright'}).addTo(map);
 
       L.control.scale({metric: true, imperial: false}).addTo(map);

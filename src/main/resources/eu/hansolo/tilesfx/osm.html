@@ -26,14 +26,17 @@
 
       // TileLayer
       var mapnikBw           = L.tileLayer.provider('OpenStreetMap.BlackAndWhite', {attribution: ''});
-      var mapnikHot          = L.tileLayer.provider('OpenStreetMap.HOT', {attribution: ''});
+      //var mapnikHot          = L.tileLayer.provider('OpenStreetMap.HOT', {attribution: ''});
       //var mapnik             = L.tileLayer.provider('OpenStreetMap.Mapnik', {attribution: ''});
       //var openStreetMapDE    = L.tileLayer.provider('OpenStreetMap.DE', {attribution: ''});
       var hydda              = L.tileLayer.provider('Hydda.Full', {attribution: ''});
       //var mapQuestOpen       = L.tileLayer.provider('MapQuestOpen.OSM', {attribution: ''});
+      var cartoDBPositron    = L.tileLayer.provider('CartoDB.Positron', {attribution: ''});
+      var cartoDBDarkMatter  = L.tileLayer.provider('CartoDB.DarkMatter', {attribution: ''});
+      //var esriGray           = L.tileLayer.provider('Esri.WorldGrayCanvas', {attribution: ''});
       //var esriWorldStreetMap = L.tileLayer.provider('Esri.WorldStreetMap', {attribution: ''});
       var esriWorldImagery   = L.tileLayer.provider('Esri.WorldImagery', {attribution: ''});
-      //var esriWorldTopoMap   = L.tileLayer.provider('Esri.WorldTopoMap', {attribution: ''});
+      var esriWorldTopoMap   = L.tileLayer.provider('Esri.WorldTopoMap', {attribution: ''});
 
       mapnikBw.addTo(map);
 
@@ -59,10 +62,12 @@
       };
 
       L.control.layers({
-                         "OSM"       : mapnikHot,
-                         "OSM BW"    : mapnikBw,
-                         "Hydda"     : hydda,
-                         "Satellite" : esriWorldImagery
+                         "B&W"   : mapnikBw,
+                         "Street": hydda,
+                         "Bright": cartoDBPositron,
+                         "Dark"  : cartoDBDarkMatter,
+                         "Sat"   : esriWorldImagery,
+                         "Topo"  : esriWorldTopoMap
                        }, {},{position:'topright'}).addTo(map);
 
       L.control.scale({metric: true, imperial: false}).addTo(map);
@@ -405,14 +410,18 @@
       };
 
       document.changeMapProvider = function(provider) {
-        if (provider === 'hydda') {
-          hydda.addTo(map);
-        } else if (provider === 'mapnikBw') {
+        if (provider === 'mapnikBw') {
           mapnikBw.addTo(map);
-        } else if (provider === 'mapnikHot') {
-          mapnikHot.addTo(map);
+        } else if (provider === 'hydda') {
+          hydda.addTo(map);
+        } else if (provider === 'cartoDBPositron') {
+          cartoDBPositron.addTo(map);
+        } else if (provider === 'cartoDBDarkMatter') {
+          cartoDBDarkMatter.addTo(map);
         } else if (provider === 'esriWorldImagery') {
           esriWorldImagery.addTo(map);
+        } else if (provider === 'esriWorldTopoMap') {
+          esriWorldTopoMap.addTo(map);
         }
       };
 

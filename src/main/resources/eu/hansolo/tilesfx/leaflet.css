@@ -309,11 +309,11 @@
 
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out {
-	font: bold 18px 'Lucida Console', Monaco, monospace;
+	font: bold 16px 'Lucida Console', Monaco, monospace;
 	text-indent: 1px;
 	}
 .leaflet-control-zoom-out {
-	font-size: 20px;
+	font-size: 18px;
 	}
 
 .leaflet-touch .leaflet-control-zoom-in {
@@ -333,12 +333,12 @@
 	}
 .leaflet-control-layers-toggle {
 	background-image: url(images/layers.png);
-	width: 36px;
-	height: 36px;
+	width: 32px;
+	height: 32px;
 	}
 .leaflet-retina .leaflet-control-layers-toggle {
 	background-image: url(images/layers-2x.png);
-	background-size: 26px 26px;
+	background-size: 24px 24px;
 	}
 .leaflet-touch .leaflet-control-layers-toggle {
 	width: 44px;
@@ -353,7 +353,7 @@
 	position: relative;
 	}
 .leaflet-control-layers-expanded {
-	padding: 3px 3px 3px 3px;
+	padding: 2px 4px 2px 2px;
 	color: white;
 	background: rgba(0, 0, 0, 0.75);
 	}

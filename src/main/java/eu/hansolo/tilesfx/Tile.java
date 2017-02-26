@@ -133,10 +133,12 @@ public class Tile extends Control {
         }
     }
     public enum MapProvider {
-        BLACK_WHITE("mapnikBw"),
-        HOT("mapnikHot"),
-        HYDDA("hydda"),
-        SATELLITE("esriWorldImagery");
+        BW("mapnikBw"),
+        STREET("hydda"),
+        BRIGHT("cartoDBPositron"),
+        DARK("cartoDBDarkMatter"),
+        SAT("esriWorldImagery"),
+        TOPO("esriWorldTopoMap");
 
         public final String name;
 
@@ -525,7 +527,7 @@ public class Tile extends Control {
         barChartItems                       = FXCollections.observableArrayList();
         track                               = new ArrayList<>();
         _trackColor                         = TileColor.BLUE;
-        _mapProvider                        = MapProvider.BLACK_WHITE;
+        _mapProvider                        = MapProvider.BW;
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
 

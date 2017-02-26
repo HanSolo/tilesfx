@@ -101,12 +101,12 @@ public class MapTileSkin extends TileSkin {
                 JSObject jsObject = (JSObject) webEngine.executeScript("window");
                 jsObject.setMember("java", tile.getCurrentLocation());
                 readyToGo = true;
+                changeMapProvider(tile.getMapProvider());
                 updateLocation();
                 updateLocationColor();
                 tile.getPoiList().forEach(poi -> addPoi(poi));
                 addTrack(tile.getTrack());
                 updateTrackColor();
-                changeMapProvider(tile.getMapProvider());
             }
         });
         URL maps = Tile.class.getResource("osm.html");

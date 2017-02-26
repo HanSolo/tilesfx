@@ -377,7 +377,7 @@ public class Demo extends Application {
                              .pointsOfInterest(new Location(51.914405, 7.635732, "POI 1", TileColor.RED),
                                                new Location(51.912529, 7.631752, "POI 2", TileColor.BLUE),
                                                new Location(51.923993, 7.628906, "POI 3", TileColor.YELLOW_ORANGE))
-                             .mapProvider(MapProvider.SATELLITE)
+                             .mapProvider(MapProvider.TOPO)
                              .build();
 
         radialChartTile = TileBuilder.create()

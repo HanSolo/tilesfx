@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.Tile.TileColor;
@@ -633,6 +634,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B mapProvider(final MapProvider PROVIDER) {
+        properties.put("mapProvider", new SimpleObjectProperty(PROVIDER));
+        return (B)this;
+    }
+
     public final B gradientStops(final Stop... STOPS) {
         properties.put("gradientStopsArray", new SimpleObjectProperty(STOPS));
         return (B)this;
@@ -1106,6 +1112,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setCurrentLocation(((ObjectProperty<Location>) properties.get(key)).get());
             } else if ("trackColor".equals(key)) {
                 CONTROL.setTrackColor(((ObjectProperty<TileColor>) properties.get(key)).get());
+            } else if ("mapProvider".equals(key)) {
+                CONTROL.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
             }
         }
         return CONTROL;

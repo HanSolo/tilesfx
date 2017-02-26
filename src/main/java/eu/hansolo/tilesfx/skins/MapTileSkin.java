@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.events.LocationEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -105,6 +106,7 @@ public class MapTileSkin extends TileSkin {
                 tile.getPoiList().forEach(poi -> addPoi(poi));
                 addTrack(tile.getTrack());
                 updateTrackColor();
+                changeMapProvider(tile.getMapProvider());
             }
         });
         URL maps = Tile.class.getResource("osm.html");
@@ -134,6 +136,8 @@ public class MapTileSkin extends TileSkin {
             updateLocation();
         } else if ("TRACK".equals(EVENT_TYPE)) {
             addTrack(tile.getTrack());
+        } else if ("MAP_PROVIDER".equals(EVENT_TYPE)) {
+            changeMapProvider(tile.getMapProvider());
         }
     };
 
@@ -310,6 +314,17 @@ public class MapTileSkin extends TileSkin {
                              .append("window.locationDate = \"").append(date).append("\";")
                              .append("window.locationTime = \"").append(time).append("\";")
                              .append("document.addStopPoiMarker(window.lat1, window.lon1, window.locationName, window.locationDate, window.locationTime);");
+                webEngine.executeScript(scriptCommand.toString());
+            });
+        }
+    }
+
+    private void changeMapProvider(final MapProvider PROVIDER) {
+        if (readyToGo) {
+            Platform.runLater(() -> {
+                StringBuilder scriptCommand = new StringBuilder();
+                scriptCommand.append("window.provider = '").append(PROVIDER.name).append("';")
+                             .append("document.changeMapProvider(window.provider);");
                 webEngine.executeScript(scriptCommand.toString());
             });
         }

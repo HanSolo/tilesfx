@@ -35,7 +35,7 @@
       var esriWorldImagery   = L.tileLayer.provider('Esri.WorldImagery', {attribution: ''});
       //var esriWorldTopoMap   = L.tileLayer.provider('Esri.WorldTopoMap', {attribution: ''});
 
-      hydda.addTo(map);
+      mapnikBw.addTo(map);
 
       /*
        // Overlay
@@ -402,6 +402,18 @@
           title      : "Stop:" + "\n" + name + "\n" + date + "\n" + time
         }).addTo(map);
         poiArray.push(stopMarker);
+      };
+
+      document.changeMapProvider = function(provider) {
+        if (provider === 'hydda') {
+          hydda.addTo(map);
+        } else if (provider === 'mapnikBw') {
+          mapnikBw.addTo(map);
+        } else if (provider === 'mapnikHot') {
+          mapnikHot.addTo(map);
+        } else if (provider === 'esriWorldImagery') {
+          esriWorldImagery.addTo(map);
+        }
       };
 
       document.addRain           = function() { document.addLayer(rain); };

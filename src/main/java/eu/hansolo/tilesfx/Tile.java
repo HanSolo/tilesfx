@@ -132,6 +132,18 @@ public class Tile extends Control {
             styleName = STYLE_NAME;
         }
     }
+    public enum MapProvider {
+        BLACK_WHITE("mapnikBw"),
+        HOT("mapnikHot"),
+        HYDDA("hydda"),
+        SATELLITE("esriWorldImagery");
+
+        public final String name;
+
+        MapProvider(final String NAME) {
+            name = NAME;
+        }
+    }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -164,6 +176,7 @@ public class Tile extends Control {
     private        final TileEvent   AVERAGING_EVENT       = new TileEvent(EventType.AVERAGING);
     private        final TileEvent   LOCATION_EVENT        = new TileEvent(EventType.LOCATION);
     private        final TileEvent   TRACK_EVENT           = new TileEvent(EventType.TRACK);
+    private        final TileEvent   MAP_PROVIDER_EVENT    = new TileEvent(EventType.MAP_PROVIDER);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
@@ -225,7 +238,8 @@ public class Tile extends Control {
     private              List<Location>                         track;
     private              TileColor                              _trackColor;
     private              ObjectProperty<TileColor>              trackColor;
-
+    private              MapProvider                            _mapProvider;
+    private              ObjectProperty<MapProvider>            mapProvider;
 
     // UI related
     private              SkinType                               skinType;
@@ -511,6 +525,7 @@ public class Tile extends Control {
         barChartItems                       = FXCollections.observableArrayList();
         track                               = new ArrayList<>();
         _trackColor                         = TileColor.BLUE;
+        _mapProvider                        = MapProvider.BLACK_WHITE;
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
 
@@ -1374,6 +1389,26 @@ public class Tile extends Control {
         return trackColor;
     }
 
+    public MapProvider getMapProvider() { return null == mapProvider ? _mapProvider : mapProvider.get(); }
+    public void setMapProvider(final MapProvider PROVIDER) {
+        if (null == mapProvider) {
+            _mapProvider = PROVIDER;
+            fireTileEvent(MAP_PROVIDER_EVENT);
+        } else {
+            mapProvider.set(PROVIDER);
+        }
+    }
+    public ObjectProperty<MapProvider> mapProviderProperty() {
+        if (null == mapProvider) {
+            mapProvider = new ObjectPropertyBase<MapProvider>(_mapProvider) {
+                @Override protected void invalidated() { fireTileEvent(MAP_PROVIDER_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "mapProvider"; }
+            };
+            _mapProvider = null;
+        }
+        return mapProvider;
+    }
 
     public ObservableList<ChartData> getRadialChartData() { return chartDataList; }
     public void addRadialChartData(final ChartData... DATA) { chartDataList.addAll(DATA); }

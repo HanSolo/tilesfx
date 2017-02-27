@@ -97,7 +97,7 @@ public class Tile extends Control {
                            NUMBER("NumberTileSkin"), TEXT("TextTileSkin"),
                            WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
-                           MAP("MapTileSkin"), RADIAL_CHART("RadialChart");
+                           MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -4102,7 +4102,8 @@ public class Tile extends Control {
             case CUSTOM         : return new CustomTileSkin(Tile.this);
             case LEADER_BOARD   : return new LeaderBoardTileSkin(Tile.this);
             case MAP            : return new MapTileSkin(Tile.this);
-            case RADIAL_CHART: return new RadialChartTileSkin(Tile.this);
+            case RADIAL_CHART   : return new RadialChartTileSkin(Tile.this);
+            case DONUT_CHART    : return new DonutChartTileSkin(Tile.this);
             default             : return new TileSkin(Tile.this);
         }
     }
@@ -4172,6 +4173,8 @@ public class Tile extends Control {
             case MAP:
                 break;
             case RADIAL_CHART:
+                break;
+            case DONUT_CHART:
                 break;
             default:
                 break;

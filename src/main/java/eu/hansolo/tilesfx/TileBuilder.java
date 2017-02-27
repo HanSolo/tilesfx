@@ -803,6 +803,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case RADIAL_CHART:
                     break;
+                case DONUT_CHART:
+                    break;
                 default:
                     break;
             }

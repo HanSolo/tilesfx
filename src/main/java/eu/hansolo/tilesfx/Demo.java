@@ -91,6 +91,7 @@ public class Demo extends Application {
     private Tile            leaderBoardTile;
     private Tile            mapTile;
     private Tile            radialChartTile;
+    private Tile            donutChartTile;
     private long            lastTimerCall;
     private AnimationTimer  timer;
     private DoubleProperty  value;
@@ -389,6 +390,15 @@ public class Demo extends Application {
                                      .radialChartData(chartData1, chartData2, chartData3, chartData4)
                                      .build();
 
+        donutChartTile = TileBuilder.create()
+                                     .skinType(SkinType.DONUT_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("DonutChart")
+                                     .text("Some text")
+                                     .textVisible(false)
+                                     .radialChartData(chartData1, chartData2, chartData3, chartData4)
+                                     .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -422,10 +432,11 @@ public class Demo extends Application {
 
     @Override public void start(Stage stage) {
         FlowPane pane = new FlowPane(Orientation.HORIZONTAL, 5, 5,
-                                      percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
-                                      lineChartTile, timerControlTile, numberTile, textTile,
-                                      highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
-                                      barChartTile, customTile, leaderBoardTile, worldTile, mapTile, radialChartTile);//, weatherTile);
+                                     percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
+                                     lineChartTile, timerControlTile, numberTile, textTile,
+                                     highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
+                                     barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
+                                     radialChartTile, donutChartTile);//, weatherTile);
         pane.setPrefWrapLength(1);
         pane.setAlignment(Pos.CENTER);
         pane.setCenterShape(true);

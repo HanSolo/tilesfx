@@ -71,6 +71,7 @@ public class DonutChartTileSkin extends TileSkin {
                 }
             }
             drawChart();
+            drawLegend();
         };
 
         titleText = new Text();

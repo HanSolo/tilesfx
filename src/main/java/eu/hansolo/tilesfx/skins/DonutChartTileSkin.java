@@ -31,11 +31,8 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
-import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
 
 /**
@@ -44,8 +41,10 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 public class DonutChartTileSkin extends TileSkin {
     private Text                          titleText;
     private Text                          text;
-    private Canvas                        canvas;
-    private GraphicsContext               ctx;
+    private Canvas                        chartCanvas;
+    private GraphicsContext               chartCtx;
+    private Canvas                        legendCanvas;
+    private GraphicsContext               legendCtx;
     private ListChangeListener<ChartData> chartDataListener;
     private ChartDataEventListener        chartEventListener;
 
@@ -82,10 +81,13 @@ public class DonutChartTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
 
-        canvas = new Canvas(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
-        ctx    = canvas.getGraphicsContext2D();
+        chartCanvas = new Canvas(size * 0.9, tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205);
+        chartCtx    = chartCanvas.getGraphicsContext2D();
 
-        getPane().getChildren().addAll(titleText, canvas, text);
+        legendCanvas = new Canvas(size * 0.225, tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205);
+        legendCtx    = legendCanvas.getGraphicsContext2D();
+
+        getPane().getChildren().addAll(titleText, legendCanvas, chartCanvas, text);
     }
 
     @Override protected void registerListeners() {
@@ -101,8 +103,15 @@ public class DonutChartTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
-            canvas.setWidth(tile.isTextVisible() ? size * 0.68 : size * 0.795);
-            canvas.setHeight(tile.isTextVisible() ? size * 0.68 : size * 0.795);
+            double chartCanvasWidth   = width - size * 0.1;
+            double chartCanvasHeight  = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+            double chartCanvasSize    = chartCanvasWidth < chartCanvasHeight ? chartCanvasWidth : chartCanvasHeight;
+            double legendCanvasWidth  = width * 0.225;
+            double legendCanvasHeight = chartCanvasSize;
+            chartCanvas.setWidth(chartCanvasSize);
+            chartCanvas.setHeight(chartCanvasSize);
+            legendCanvas.setWidth(legendCanvasWidth);
+            legendCanvas.setHeight(legendCanvasHeight);
         }
     };
 
@@ -114,7 +123,7 @@ public class DonutChartTileSkin extends TileSkin {
 
     private void drawChart() {
         List<ChartData> dataList       = tile.getRadialChartData();
-        double          canvasSize     = canvas.getWidth();
+        double          canvasSize     = chartCanvas.getWidth();
         int             noOfItems      = dataList.size();
         double          center         = canvasSize * 0.5;
         double          innerRadius    = canvasSize * 0.275;
@@ -130,40 +139,65 @@ public class DonutChartTileSkin extends TileSkin {
         Color           bkgColor       = tile.getBackgroundColor();
         Color           textColor      = tile.getTextColor();
 
-        ctx.clearRect(0, 0, canvasSize, canvasSize);
-        ctx.setLineCap(StrokeLineCap.BUTT);
-        ctx.setFill(tile.getTextColor());
-        ctx.setTextAlign(TextAlignment.RIGHT);
-        ctx.setTextBaseline(VPos.CENTER);
-        ctx.setTextAlign(TextAlignment.CENTER);
+        chartCtx.clearRect(0, 0, canvasSize, canvasSize);
+        chartCtx.setLineCap(StrokeLineCap.BUTT);
+        chartCtx.setFill(tile.getTextColor());
+        chartCtx.setTextBaseline(VPos.CENTER);
+        chartCtx.setTextAlign(TextAlignment.CENTER);
 
-        // Name
-        ctx.setFont(Fonts.latoRegular(canvasSize * 0.15));
-        ctx.fillText(String.format(Locale.US, "%.0f", sum), center, center, canvasSize * 0.4);
+        // Sum
+        if (tile.isValueVisible()) {
+            chartCtx.setFont(Fonts.latoRegular(canvasSize * 0.15));
+            chartCtx.fillText(String.format(Locale.US, "%.0f", sum), center, center, canvasSize * 0.4);
+        }
 
-        ctx.setFont(Fonts.latoRegular(barWidth * 0.5));
+        chartCtx.setFont(Fonts.latoRegular(barWidth * 0.5));
         for (int i = 0 ; i < noOfItems ; i++) {
             ChartData data  = dataList.get(i);
             double    value = data.getValue();
             startAngle -= angle;
             angle = value * stepSize;
 
-            // DataBar
-            ctx.setLineWidth(barWidth);
-            ctx.setStroke(data.getColor());
-            ctx.strokeArc(xy, xy, wh, wh, startAngle, -angle, ArcType.OPEN);
+            // Segment
+            chartCtx.setLineWidth(barWidth);
+            chartCtx.setStroke(data.getColor());
+            chartCtx.strokeArc(xy, xy, wh, wh, startAngle, -angle, ArcType.OPEN);
 
             // Percentage
             double x = innerRadius * Math.cos(Math.toRadians(startAngle - (angle * 0.5)));
             double y = -innerRadius * Math.sin(Math.toRadians(startAngle - (angle * 0.5)));
-            ctx.setFill(textColor);
-            ctx.fillText(String.format(Locale.US, "%.0f%%", (value / sum * 100.0)), center  + x, center + y, barWidth);
+            chartCtx.setFill(textColor);
+            chartCtx.fillText(String.format(Locale.US, "%.0f%%", (value / sum * 100.0)), center + x, center + y, barWidth);
 
             // Value
             x = outerRadius * Math.cos(Math.toRadians(startAngle - (angle * 0.5)));
             y = -outerRadius * Math.sin(Math.toRadians(startAngle - (angle * 0.5)));
-            ctx.setFill(bkgColor);
-            ctx.fillText(String.format(Locale.US, "%.0f", value), center  + x, center + y, barWidth);
+            chartCtx.setFill(bkgColor);
+            chartCtx.fillText(String.format(Locale.US, "%.0f", value), center + x, center + y, barWidth);
+        }
+    }
+
+    private void drawLegend() {
+        List<ChartData> dataList     = tile.getRadialChartData();
+        double          canvasWidth  = legendCanvas.getWidth();
+        double          canvasHeight = legendCanvas.getHeight();
+        int             noOfItems    = dataList.size();
+        //List<ChartData> sortedDataList = dataList.stream().sorted(Comparator.comparingDouble(ChartData::getValue).reversed()).collect(Collectors.toList());
+        Color           textColor    = tile.getTextColor();
+        double          stepSize     = canvasHeight * 0.9 / (noOfItems + 1);
+
+        legendCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        legendCtx.setTextAlign(TextAlignment.LEFT);
+        legendCtx.setTextBaseline(VPos.CENTER);
+        legendCtx.setFont(Fonts.latoRegular(canvasHeight * 0.05));
+
+        for (int i = 0 ; i < noOfItems ; i++) {
+            ChartData data = dataList.get(i);
+
+            legendCtx.setFill(data.getColor());
+            legendCtx.fillOval(0, (i + 1) * stepSize, size * 0.0375, size * 0.0375);
+            legendCtx.setFill(textColor);
+            legendCtx.fillText(data.getName(), size * 0.05, (i + 1) * stepSize + canvasHeight * 0.025);
         }
     }
 
@@ -188,18 +222,37 @@ public class DonutChartTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double canvasWidth  = width - size * 0.1;
-        double canvasHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
-        double canvasSize   = canvasWidth < canvasHeight ? canvasWidth : canvasHeight;
+        double chartCanvasWidth   = width - size * 0.1;
+        double chartCanvasHeight  = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double chartCanvasSize    = chartCanvasWidth < chartCanvasHeight ? chartCanvasWidth : chartCanvasHeight;
+        double legendCanvasWidth  = width * 0.225;
+        double legendCanvasHeight = chartCanvasSize;
+
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            canvas.setWidth(canvasSize);
-            canvas.setHeight(canvasSize);
+            legendCanvas.setWidth(legendCanvasWidth);
+            legendCanvas.setHeight(legendCanvasHeight);
 
-            canvas.relocate((width - canvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - canvasSize) * 0.5);
+            legendCanvas.relocate(size * 0.05, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+            legendCanvas.setVisible(width > (height * 1.2));
+            
+            chartCanvas.setWidth(chartCanvasSize);
+            chartCanvas.setHeight(chartCanvasSize);
+
+            //chartCanvas.relocate((width - chartCanvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+
+            if (width > (height * 1.5)) {
+                chartCanvas.relocate((width - chartCanvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+            } else if (width > (height * 1.2)) {
+                chartCanvas.relocate((width - size * 0.05 - chartCanvasSize), height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+            } else {
+                chartCanvas.relocate((width - chartCanvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+            }
+
+            // 1.175
 
             resizeStaticText();
         }
@@ -211,6 +264,7 @@ public class DonutChartTileSkin extends TileSkin {
         text.setText(tile.getText());
 
         resizeStaticText();
+        drawLegend();
         drawChart();
 
         titleText.setFill(tile.getTitleColor());

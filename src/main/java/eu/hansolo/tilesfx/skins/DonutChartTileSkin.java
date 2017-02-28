@@ -242,9 +242,7 @@ public class DonutChartTileSkin extends TileSkin {
             
             chartCanvas.setWidth(chartCanvasSize);
             chartCanvas.setHeight(chartCanvasSize);
-
-            //chartCanvas.relocate((width - chartCanvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
-
+            
             if (width > (height * 1.5)) {
                 chartCanvas.relocate((width - chartCanvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
             } else if (width > (height * 1.2)) {
@@ -252,8 +250,6 @@ public class DonutChartTileSkin extends TileSkin {
             } else {
                 chartCanvas.relocate((width - chartCanvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
             }
-
-            // 1.175
 
             resizeStaticText();
         }

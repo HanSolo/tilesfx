@@ -133,12 +133,12 @@ public class Tile extends Control {
         }
     }
     public enum MapProvider {
-        BW("mapnikBw"),
-        STREET("hydda"),
-        BRIGHT("cartoDBPositron"),
-        DARK("cartoDBDarkMatter"),
-        SAT("esriWorldImagery"),
-        TOPO("esriWorldTopoMap");
+        BW("blackwhite"),
+        STREET("street"),
+        BRIGHT("bright"),
+        DARK("dark"),
+        SAT("sat"),
+        TOPO("topo");
 
         public final String name;
 

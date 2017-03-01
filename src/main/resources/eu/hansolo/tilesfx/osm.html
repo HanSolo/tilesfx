@@ -18,40 +18,40 @@
 
     <script type="text/javascript">
       var map = L.map('map').setView([0, 0], 15);
-      //map.on('move', function() { java.update(parseFloat(map.getCenter().lat), parseFloat(map.getCenter().lng)); });
       map.attributionControl.setPrefix('');
       map.removeControl(map.zoomControl);
       map.scrollWheelZoom.disable();
-      new L.control.zoom({position: 'bottomright'}).addTo(map);
 
       // TileLayer
       var mapnikBw           = L.tileLayer.provider('OpenStreetMap.BlackAndWhite', {attribution: ''});
+      var cartoDBPositron    = L.tileLayer.provider('CartoDB.Positron', {attribution: ''});
+      var cartoDBDarkMatter  = L.tileLayer.provider('CartoDB.DarkMatter', {attribution: ''});
+      var googleSat          = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{ maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'] });
+      var googleStreets      = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{ maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'] });
+      var googleTerrain      = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{ maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'] });
+      //var googleHybrid       = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{ maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'] });
+      //var hydda              = L.tileLayer.provider('Hydda.Full', {attribution: ''});
+      //var esriWorldTopoMap   = L.tileLayer.provider('Esri.WorldTopoMap', {attribution: ''});
+      //var esriWorldImagery   = L.tileLayer.provider('Esri.WorldImagery', {attribution: ''});
+      //var esriGray           = L.tileLayer.provider('Esri.WorldGrayCanvas', {attribution: ''});
+      //var esriWorldStreetMap = L.tileLayer.provider('Esri.WorldStreetMap', {attribution: ''});
+      //var mapQuestOpen       = L.tileLayer.provider('MapQuestOpen.OSM', {attribution: ''});
       //var mapnikHot          = L.tileLayer.provider('OpenStreetMap.HOT', {attribution: ''});
       //var mapnik             = L.tileLayer.provider('OpenStreetMap.Mapnik', {attribution: ''});
       //var openStreetMapDE    = L.tileLayer.provider('OpenStreetMap.DE', {attribution: ''});
-      var hydda              = L.tileLayer.provider('Hydda.Full', {attribution: ''});
-      //var mapQuestOpen       = L.tileLayer.provider('MapQuestOpen.OSM', {attribution: ''});
-      var cartoDBPositron    = L.tileLayer.provider('CartoDB.Positron', {attribution: ''});
-      var cartoDBDarkMatter  = L.tileLayer.provider('CartoDB.DarkMatter', {attribution: ''});
-      //var esriGray           = L.tileLayer.provider('Esri.WorldGrayCanvas', {attribution: ''});
-      //var esriWorldStreetMap = L.tileLayer.provider('Esri.WorldStreetMap', {attribution: ''});
-      var esriWorldImagery   = L.tileLayer.provider('Esri.WorldImagery', {attribution: ''});
-      var esriWorldTopoMap   = L.tileLayer.provider('Esri.WorldTopoMap', {attribution: ''});
 
       mapnikBw.addTo(map);
 
-      /*
-       // Overlay
-       var clouds         = L.tileLayer.provider('OpenWeatherMap.Clouds');
-       var precipitation  = L.tileLayer.provider('OpenWeatherMap.Precipitation');
-       var rain           = L.tileLayer.provider('OpenWeatherMap.Rain');
-       var wind           = L.tileLayer.provider('OpenWeatherMap.Wind');
-       var temperature    = L.tileLayer.provider('OpenWeatherMap.Temperature');
-       var pressure       = L.tileLayer.provider('OpenWeatherMap.Pressure');
-       var snow           = L.tileLayer.provider('OpenWeatherMap.Snow');
-       var relief         = L.tileLayer('http://{s}.tile.stamen.com/toposm-color-relief/{z}/{x}/{y}.jpg', {maxZoom: 16});
-       var openCycleMap   = L.tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png');
-       */
+      L.control.layers({
+                         "B&W"   : mapnikBw,
+                         "Street": googleStreets,
+                         "Bright": cartoDBPositron,
+                         "Dark"  : cartoDBDarkMatter,
+                         "Sat"   : googleSat,
+                         "Topo"  : googleTerrain
+                       }, {},{position:'topright'}).addTo(map);
+      L.control.scale({metric: true, imperial: false}).addTo(map);
+      L.control.zoom({position: 'bottomright'}).addTo(map);
 
       L.Marker.prototype.setTitle = function (title) {
         if (this._icon) {
@@ -60,17 +60,6 @@
           this.options.title = title;
         }
       };
-
-      L.control.layers({
-                         "B&W"   : mapnikBw,
-                         "Street": hydda,
-                         "Bright": cartoDBPositron,
-                         "Dark"  : cartoDBDarkMatter,
-                         "Sat"   : esriWorldImagery,
-                         "Topo"  : esriWorldTopoMap
-                       }, {},{position:'topright'}).addTo(map);
-
-      L.control.scale({metric: true, imperial: false}).addTo(map);
 
       var locationIconBlue         = L.icon({
                                     iconUrl     : 'location_blue.png',
@@ -410,36 +399,19 @@
       };
 
       document.changeMapProvider = function(provider) {
-        if (provider === 'mapnikBw') {
+        if (provider === 'blackwhite') {
           mapnikBw.addTo(map);
-        } else if (provider === 'hydda') {
-          hydda.addTo(map);
-        } else if (provider === 'cartoDBPositron') {
+        } else if (provider === 'street') {
+          googleStreets.addTo(map);
+        } else if (provider === 'bright') {
           cartoDBPositron.addTo(map);
-        } else if (provider === 'cartoDBDarkMatter') {
+        } else if (provider === 'dark') {
           cartoDBDarkMatter.addTo(map);
-        } else if (provider === 'esriWorldImagery') {
-          esriWorldImagery.addTo(map);
-        } else if (provider === 'esriWorldTopoMap') {
-          esriWorldTopoMap.addTo(map);
+        } else if (provider === 'sat') {
+          googleSat.addTo(map);
+        } else if (provider === 'topo') {
+          googleTerrain.addTo(map);
         }
-      };
-
-      document.addRain           = function() { document.addLayer(rain); };
-      document.removeRain        = function() { document.removeLayer(rain); };
-      document.addWind           = function() { document.addLayer(wind); };
-      document.removeWind        = function() { document.removeLayer(wind); };
-      document.addClouds         = function() { document.addLayer(clouds); };
-      document.removeClouds      = function() { document.removeLayer(clouds); };
-      document.addPressure       = function() { document.addLayer(pressure); };
-      document.removePressure    = function() { document.removeLayer(pressure); };
-      document.addTemperature    = function() { document.addLayer(temperature); };
-      document.removeTemperature = function() { document.removeLayer(temperature); };
-      document.addLayer          = function(overlay) {
-        overlay.addTo(map);
-      };
-      document.removeLayer       = function(overlay) {
-        map.removeLayer(overlay);
       };
     </script>
 

@@ -98,10 +98,8 @@ public class MapTileSkin extends TileSkin {
         webEngine = webView.getEngine();
         webEngine.getLoadWorker().stateProperty().addListener((ov, o, n) -> {
             if (Worker.State.SUCCEEDED == n) {
-                JSObject jsObject = (JSObject) webEngine.executeScript("window");
-                jsObject.setMember("java", tile.getCurrentLocation());
                 readyToGo = true;
-                changeMapProvider(tile.getMapProvider());
+                if (MapProvider.BW != tile.getMapProvider()) { changeMapProvider(tile.getMapProvider()); }
                 updateLocation();
                 updateLocationColor();
                 tile.getPoiList().forEach(poi -> addPoi(poi));

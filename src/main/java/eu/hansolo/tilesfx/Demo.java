@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.tools.ChartData;
+import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
@@ -56,8 +57,8 @@ import java.util.Random;
  */
 public class Demo extends Application {
     private static final    Random RND = new Random();
-    private static final    double TILE_WIDTH  = 150;
-    private static final    double TILE_HEIGHT = 150;
+    private static final    double TILE_WIDTH  = 250;
+    private static final    double TILE_HEIGHT = 250;
     private BarChartItem    barChartItem1;
     private BarChartItem    barChartItem2;
     private BarChartItem    barChartItem3;
@@ -443,17 +444,19 @@ public class Demo extends Application {
     }
 
     @Override public void start(Stage stage) {
-        FlowPane pane = new FlowPane(Orientation.HORIZONTAL, 5, 5,
-                                     percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
-                                     lineChartTile, timerControlTile, numberTile, textTile,
-                                     highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
-                                     barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
-                                     radialChartTile, donutChartTile, circularProgressTile);//, weatherTile);
-        pane.setPrefWrapLength(1);
+        FlowGridPane pane = new FlowGridPane(5, 5,
+                                         percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
+                                         lineChartTile, timerControlTile, numberTile, textTile,
+                                         highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
+                                         barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
+                                         radialChartTile, donutChartTile, circularProgressTile);//, weatherTile);
+
+        pane.setHgap(5);
+        pane.setVgap(5);
         pane.setAlignment(Pos.CENTER);
         pane.setCenterShape(true);
         pane.setPadding(new Insets(5));
-        pane.setPrefSize(1090, 470);
+        pane.setPrefSize(800, 600);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);

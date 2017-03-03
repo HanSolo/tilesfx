@@ -97,7 +97,8 @@ public class Tile extends Control {
                            NUMBER("NumberTileSkin"), TEXT("TextTileSkin"),
                            WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
-                           MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart");
+                           MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
+                           CIRCULAR_PROGRESS("CircularProgress");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -4082,29 +4083,30 @@ public class Tile extends Control {
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch (skinType) {
-            case AREA_CHART     : return new AreaChartTileSkin(Tile.this);
-            case BAR_CHART      : return new BarChartTileSkin(Tile.this);
-            case LINE_CHART     : return new LineChartTileSkin(Tile.this);
-            case CLOCK          : return new ClockTileSkin(Tile.this);
-            case GAUGE          : return new GaugeTileSkin(Tile.this);
-            case HIGH_LOW       : return new HighLowTileSkin(Tile.this);
-            case PERCENTAGE     : return new PercentageTileSkin(Tile.this);
-            case PLUS_MINUS     : return new PlusMinusTileSkin(Tile.this);
-            case SLIDER         : return new SliderTileSkin(Tile.this);
-            case SPARK_LINE     : return new SparkLineTileSkin(Tile.this);
-            case SWITCH         : return new SwitchTileSkin(Tile.this);
-            case WORLDMAP       : return new WorldMapTileSkin(Tile.this);
-            case TIMER_CONTROL  : return new TimerControlTileSkin(Tile.this);
-            case NUMBER         : return new NumberTileSkin(Tile.this);
-            case TEXT           : return new TextTileSkin(Tile.this);
-            case WEATHER        : return new WeatherTileSkin(Tile.this);
-            case TIME           : return new TimeTileSkin(Tile.this);
-            case CUSTOM         : return new CustomTileSkin(Tile.this);
-            case LEADER_BOARD   : return new LeaderBoardTileSkin(Tile.this);
-            case MAP            : return new MapTileSkin(Tile.this);
-            case RADIAL_CHART   : return new RadialChartTileSkin(Tile.this);
-            case DONUT_CHART    : return new DonutChartTileSkin(Tile.this);
-            default             : return new TileSkin(Tile.this);
+            case AREA_CHART       : return new AreaChartTileSkin(Tile.this);
+            case BAR_CHART        : return new BarChartTileSkin(Tile.this);
+            case LINE_CHART       : return new LineChartTileSkin(Tile.this);
+            case CLOCK            : return new ClockTileSkin(Tile.this);
+            case GAUGE            : return new GaugeTileSkin(Tile.this);
+            case HIGH_LOW         : return new HighLowTileSkin(Tile.this);
+            case PERCENTAGE       : return new PercentageTileSkin(Tile.this);
+            case PLUS_MINUS       : return new PlusMinusTileSkin(Tile.this);
+            case SLIDER           : return new SliderTileSkin(Tile.this);
+            case SPARK_LINE       : return new SparkLineTileSkin(Tile.this);
+            case SWITCH           : return new SwitchTileSkin(Tile.this);
+            case WORLDMAP         : return new WorldMapTileSkin(Tile.this);
+            case TIMER_CONTROL    : return new TimerControlTileSkin(Tile.this);
+            case NUMBER           : return new NumberTileSkin(Tile.this);
+            case TEXT             : return new TextTileSkin(Tile.this);
+            case WEATHER          : return new WeatherTileSkin(Tile.this);
+            case TIME             : return new TimeTileSkin(Tile.this);
+            case CUSTOM           : return new CustomTileSkin(Tile.this);
+            case LEADER_BOARD     : return new LeaderBoardTileSkin(Tile.this);
+            case MAP              : return new MapTileSkin(Tile.this);
+            case RADIAL_CHART     : return new RadialChartTileSkin(Tile.this);
+            case DONUT_CHART      : return new DonutChartTileSkin(Tile.this);
+            case CIRCULAR_PROGRESS: return new CircularProgressTileSkin(Tile.this);
+            default               : return new TileSkin(Tile.this);
         }
     }
 
@@ -4175,6 +4177,9 @@ public class Tile extends Control {
             case RADIAL_CHART:
                 break;
             case DONUT_CHART:
+                break;
+            case CIRCULAR_PROGRESS:
+                setBarBackgroundColor(getBackgroundColor().brighter());
                 break;
             default:
                 break;

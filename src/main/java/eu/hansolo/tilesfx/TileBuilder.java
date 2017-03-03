@@ -805,6 +805,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case DONUT_CHART:
                     break;
+                case CIRCULAR_PROGRESS:
+                    CONTROL.setBarBackgroundColor(CONTROL.getBackgroundColor().brighter());
+                    break;
                 default:
                     break;
             }

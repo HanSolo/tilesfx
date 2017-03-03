@@ -120,7 +120,7 @@ public class RadialChartTileSkin extends TileSkin {
         //List<RadialChartData> sortedDataList = tile.getRadialChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
         List<ChartData> dataList  = tile.getRadialChartData();
         int             noOfItems = dataList.size();
-        double          max       = dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+        double          max       = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
 
         double                nameX          = radius * 0.975;
         double                nameWidth      = radius * 0.95;

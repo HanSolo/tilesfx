@@ -92,6 +92,7 @@ public class Demo extends Application {
     private Tile            mapTile;
     private Tile            radialChartTile;
     private Tile            donutChartTile;
+    private Tile            circularProgressTile;
     private long            lastTimerCall;
     private AnimationTimer  timer;
     private DoubleProperty  value;
@@ -399,6 +400,15 @@ public class Demo extends Application {
                                      .radialChartData(chartData1, chartData2, chartData3, chartData4)
                                      .build();
 
+        circularProgressTile = TileBuilder.create()
+                                         .skinType(SkinType.CIRCULAR_PROGRESS)
+                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                         .title("CircularProgress")
+                                         .text("Some text")
+                                         .unit("\u0025")
+                                         .animated(true)
+                                         .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -424,6 +434,8 @@ public class Demo extends Application {
 
                     leaderBoardTile.getLeaderBoardItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
 
+                    circularProgressTile.setValue(RND.nextDouble() * 120);
+
                     lastTimerCall = now;
                 }
             }
@@ -436,7 +448,7 @@ public class Demo extends Application {
                                      lineChartTile, timerControlTile, numberTile, textTile,
                                      highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
                                      barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
-                                     radialChartTile, donutChartTile);//, weatherTile);
+                                     radialChartTile, donutChartTile, circularProgressTile);//, weatherTile);
         pane.setPrefWrapLength(1);
         pane.setAlignment(Pos.CENTER);
         pane.setCenterShape(true);

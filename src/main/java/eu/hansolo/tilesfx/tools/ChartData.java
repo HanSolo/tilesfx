@@ -129,7 +129,7 @@ public class ChartData {
                                   .append("  \"name\":").append(name).append(",\n")
                                   .append("  \"value\":").append(value).append(",\n")
                                   .append("  \"color\":").append(color.toString().replace("0x", "#")).append(",\n")
-                                  .append("  \"timestamp\":").append(timestamp.getEpochSecond()).append(",\n")
+                                  .append("  \"timestamp\":").append(timestamp.toEpochMilli()).append(",\n")
                                   .append("}")
                                   .toString();
     }

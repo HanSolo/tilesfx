@@ -111,7 +111,6 @@ public class SparkLineTileSkin extends TileSkin {
         movingAverage  = tile.getMovingAverage();
         noOfDatapoints = tile.getAveragingPeriod();
         dataList       = new LinkedList<>();
-        for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
 
         // To get smooth lines in the chart we need at least 4 values
         if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
@@ -235,44 +234,46 @@ public class SparkLineTileSkin extends TileSkin {
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        if (tile.isSmoothing()) {
-            smooth(dataList);
-        } else {
-            MoveTo begin = (MoveTo) pathElements.get(0);
-            begin.setX(minX);
-            begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
-            for (int i = 1; i < (noOfDatapoints - 1); i++) {
-                LineTo lineTo = (LineTo) pathElements.get(i);
-                lineTo.setX(minX + i * stepX);
-                lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
-            }
-            LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
-            end.setX(maxX);
-            end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
+        if (!dataList.isEmpty()) {
+            if (tile.isSmoothing()) {
+                smooth(dataList);
+            } else {
+                MoveTo begin = (MoveTo) pathElements.get(0);
+                begin.setX(minX);
+                begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+                for (int i = 1; i < (noOfDatapoints - 1); i++) {
+                    LineTo lineTo = (LineTo) pathElements.get(i);
+                    lineTo.setX(minX + i * stepX);
+                    lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+                }
+                LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
+                end.setX(maxX);
+                end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
 
-            dot.setCenterX(maxX);
-            dot.setCenterY(end.getY());
+                dot.setCenterX(maxX);
+                dot.setCenterY(end.getY());
 
-            if (tile.isStrokeWithGradient()) {
-                setupGradient();
-                dot.setFill(gradient);
-                sparkLine.setStroke(gradient);
+                if (tile.isStrokeWithGradient()) {
+                    setupGradient();
+                    dot.setFill(gradient);
+                    sparkLine.setStroke(gradient);
+                }
             }
+
+            double average  = tile.getAverage();
+            double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
+
+            averageLine.setStartX(minX);
+            averageLine.setEndX(maxX);
+            averageLine.setStartY(averageY);
+            averageLine.setEndY(averageY);
+
+            stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
+            stdDeviationArea.setHeight(stdDeviation * stepY);
+
+            averageText.setText(String.format(locale, formatString, average));
         }
-
-        double average = tile.getAverage();
-        double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
-
-        averageLine.setStartX(minX);
-        averageLine.setEndX(maxX);
-        averageLine.setStartY(averageY);
-        averageLine.setEndY(averageY);
-
-        stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
-        stdDeviationArea.setHeight(stdDeviation * stepY);
-
         valueText.setText(String.format(locale, formatString, VALUE));
-        averageText.setText(String.format(locale, formatString, average));
 
         highText.setText(String.format(locale, formatString, high));
         lowText.setText(String.format(locale, formatString, low));
@@ -285,6 +286,7 @@ public class SparkLineTileSkin extends TileSkin {
     }
 
     private void addData(final double VALUE) {
+        if (dataList.isEmpty()) { for (int i = 0 ; i < noOfDatapoints ;i ++) { dataList.add(VALUE); } }
         if (dataList.size() <= noOfDatapoints) {
             Collections.rotate(dataList, -1);
             dataList.set((noOfDatapoints - 1), VALUE);

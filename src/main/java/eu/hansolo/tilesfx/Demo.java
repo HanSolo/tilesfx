@@ -94,6 +94,7 @@ public class Demo extends Application {
     private Tile            radialChartTile;
     private Tile            donutChartTile;
     private Tile            circularProgressTile;
+    private Tile            stockTile;
     private long            lastTimerCall;
     private AnimationTimer  timer;
     private DoubleProperty  value;
@@ -407,8 +408,16 @@ public class Demo extends Application {
                                          .title("CircularProgress")
                                          .text("Some text")
                                          .unit("\u0025")
-                                         .animated(true)
                                          .build();
+
+        stockTile = TileBuilder.create()
+                               .skinType(SkinType.STOCK)
+                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                               .title("Stock")
+                               .minValue(0)
+                               .maxValue(1000)
+                               .averagingPeriod(100)
+                               .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -437,6 +446,8 @@ public class Demo extends Application {
 
                     circularProgressTile.setValue(RND.nextDouble() * 120);
 
+                    stockTile.setValue(RND.nextDouble() * 50 + 500);
+
                     lastTimerCall = now;
                 }
             }
@@ -449,7 +460,7 @@ public class Demo extends Application {
                                          lineChartTile, timerControlTile, numberTile, textTile,
                                          highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
                                          barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
-                                         radialChartTile, donutChartTile, circularProgressTile);//, weatherTile);
+                                         radialChartTile, donutChartTile, circularProgressTile, stockTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

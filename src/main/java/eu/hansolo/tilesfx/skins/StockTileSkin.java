@@ -18,18 +18,19 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.Statistics;
+import javafx.animation.FillTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.RotateTransition;
 import javafx.beans.InvalidationListener;
+import javafx.geometry.Insets;
 import javafx.geometry.VPos;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Circle;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -40,15 +41,13 @@ import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import javafx.util.Pair;
+import javafx.util.Duration;
 
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
@@ -62,12 +61,28 @@ public class StockTileSkin extends TileSkin {
     private static final long    HOUR            = 3_600;
     private static final long    MINUTE          = 60;
     private DateTimeFormatter    timeFormatter   = DateTimeFormatter.ofPattern("HH:mm");
+    private enum                 State {
+        INCREASE(Tile.GREEN, 0),
+        DECREASE(Tile.RED, 180),
+        CONSTANT(Tile.ORANGE, 90);
+
+        public final Color  color;
+        public final double angle;
+
+        State(final Color COLOR, final double ANGLE) {
+            color = COLOR;
+            angle = ANGLE;
+        }
+    }
+    private Path                 triangle;
+    private StackPane            indicatorPane;
     private Text                 titleText;
     private Text                 valueText;
-    private Text                 unitText;
     private TextFlow             valueUnitFlow;
     private Text                 highText;
     private Text                 lowText;
+    private Text                 referenceText;
+    private TextFlow             referenceUnitFlow;
     private Text                 text;
     private Text                 timeSpanText;
     private Rectangle            graphBounds;
@@ -79,6 +94,7 @@ public class StockTileSkin extends TileSkin {
     private List<Double>         dataList;
     private MovingAverage        movingAverage;
     private InvalidationListener averagingListener;
+    private State                state;
 
 
     // ******************** Constructors **************************************
@@ -94,6 +110,8 @@ public class StockTileSkin extends TileSkin {
         averagingListener = o -> handleEvents("AVERAGING_PERIOD");
 
         timeFormatter   = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
+
+        state = State.CONSTANT;
 
         if (tile.isAutoScale()) tile.calcAutoScale();
 
@@ -116,11 +134,7 @@ public class StockTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
-        unitText = new Text(tile.getUnit());
-        unitText.setFill(tile.getUnitColor());
-        Helper.enableNode(unitText, !tile.getUnit().isEmpty());
-
-        valueUnitFlow = new TextFlow(valueText, unitText);
+        valueUnitFlow = new TextFlow(valueText);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
         highText = new Text();
@@ -152,7 +166,18 @@ public class StockTileSkin extends TileSkin {
         sparkLine.setStrokeLineCap(StrokeLineCap.ROUND);
         sparkLine.setStrokeLineJoin(StrokeLineJoin.ROUND);
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, sparkLine, highText, lowText, timeSpanText, text);
+        triangle = new Path();
+        triangle.setStroke(null);
+        triangle.setFill(state.color);
+        indicatorPane = new StackPane(triangle);
+
+        referenceText = new Text(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getReferenceValue()));
+        referenceText.setFill(state.color);
+
+        referenceUnitFlow = new TextFlow(indicatorPane, referenceText);
+        referenceUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+
+        getPane().getChildren().addAll(titleText, valueUnitFlow, sparkLine, highText, lowText, timeSpanText, text, referenceUnitFlow);
     }
 
     @Override protected void registerListeners() {
@@ -169,7 +194,6 @@ public class StockTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             Helper.enableNode(timeSpanText, !tile.isTextVisible());
             redraw();
         } else if ("VALUE".equals(EVENT_TYPE)) {
@@ -219,6 +243,24 @@ public class StockTileSkin extends TileSkin {
             LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
             end.setX(maxX);
             end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
+
+            updateState(VALUE, tile.getReferenceValue());
+            referenceText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE / tile.getReferenceValue() * 100.0) - 100.0) + "\u0025");
+
+            RotateTransition rotateTransition = new RotateTransition(Duration.millis(100), triangle);
+            rotateTransition.setFromAngle(triangle.getRotate());
+            rotateTransition.setToAngle(state.angle);
+
+            FillTransition fillIndicatorTransition = new FillTransition(Duration.millis(100), triangle);
+            fillIndicatorTransition.setFromValue((Color) triangle.getFill());
+            fillIndicatorTransition.setToValue(state.color);
+
+            FillTransition fillReferenceTransition = new FillTransition(Duration.millis(100), referenceText);
+            fillReferenceTransition.setFromValue((Color) triangle.getFill());
+            fillReferenceTransition.setToValue(state.color);
+
+            ParallelTransition parallelTransition = new ParallelTransition(rotateTransition, fillIndicatorTransition, fillReferenceTransition);
+            parallelTransition.play();
         }
         valueText.setText(String.format(locale, formatString, VALUE));
 
@@ -233,13 +275,39 @@ public class StockTileSkin extends TileSkin {
     }
 
     private void addData(final double VALUE) {
-        if (dataList.isEmpty()) { for (int i = 0 ; i < noOfDatapoints ;i ++) { dataList.add(VALUE); } }
+        if (dataList.isEmpty()) {
+            for (int i = 0 ; i < noOfDatapoints ;i ++) { dataList.add(VALUE); }
+            tile.setReferenceValue(VALUE);
+        }
         if (dataList.size() <= noOfDatapoints) {
             Collections.rotate(dataList, -1);
             dataList.set((noOfDatapoints - 1), VALUE);
+            tile.setReferenceValue(dataList.get(0));
         } else {
             dataList.add(VALUE);
         }
+    }
+
+    private void updateState(final double VALUE, final double REFERENCE_VALUE) {
+        if (Double.compare(VALUE, REFERENCE_VALUE) > 0) {
+            state = State.INCREASE;
+        } else if (Double.compare(VALUE, REFERENCE_VALUE) < 0) {
+            state = State.DECREASE;
+        } else {
+            state = State.CONSTANT;
+        }
+    }
+
+    private void drawTriangle() {
+        MoveTo       moveTo        = new MoveTo(0.056 * size * 0.5, 0.032 * size * 0.5);
+        CubicCurveTo cubicCurveTo1 = new CubicCurveTo(0.060 * size * 0.5, 0.028 * size * 0.5, 0.064 * size * 0.5, 0.028 * size * 0.5, 0.068 * size * 0.5, 0.032 * size * 0.5);
+        CubicCurveTo cubicCurveTo2 = new CubicCurveTo(0.068 * size * 0.5, 0.032 * size * 0.5, 0.120 * size * 0.5, 0.080 * size * 0.5, 0.12 * size * 0.5,  0.080 * size * 0.5);
+        CubicCurveTo cubicCurveTo3 = new CubicCurveTo(0.128 * size * 0.5, 0.088 * size * 0.5, 0.124 * size * 0.5, 0.096 * size * 0.5, 0.112 * size * 0.5, 0.096 * size * 0.5);
+        CubicCurveTo cubicCurveTo4 = new CubicCurveTo(0.112 * size * 0.5, 0.096 * size * 0.5, 0.012 * size * 0.5, 0.096 * size * 0.5, 0.012 * size * 0.5, 0.096 * size * 0.5);
+        CubicCurveTo cubicCurveTo5 = new CubicCurveTo(0.0, 0.096 * size * 0.5, -0.004 * size * 0.5, 0.088 * size * 0.5, 0.004 * size * 0.5, 0.080 * size * 0.5);
+        CubicCurveTo cubicCurveTo6 = new CubicCurveTo(0.004 * size * 0.5, 0.080 * size * 0.5, 0.056 * size * 0.5, 0.032 * size * 0.5, 0.056 * size * 0.5, 0.032 * size * 0.5);
+        ClosePath    closePath     = new ClosePath();
+        triangle.getElements().setAll(moveTo, cubicCurveTo1, cubicCurveTo2, cubicCurveTo3, cubicCurveTo4, cubicCurveTo5, cubicCurveTo6, closePath);
     }
 
     private String createTimeSpanText() {
@@ -276,10 +344,15 @@ public class StockTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
+
+        maxWidth = width - size * 0.55;
+        fontSize = size * 0.06;
+        referenceText.setFont(Fonts.latoRegular(fontSize));
+        if (referenceText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(referenceText, maxWidth, fontSize); }
 
         maxWidth = width - size * 0.7;
         fontSize = size * 0.06;
@@ -312,11 +385,6 @@ public class StockTileSkin extends TileSkin {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = width - size * 0.85;
-        fontSize = size * 0.12;
-        unitText.setFont(Fonts.latoRegular(fontSize));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-
         highText.setX(size * 0.05);
         lowText.setX(size * 0.05);
     }
@@ -326,13 +394,19 @@ public class StockTileSkin extends TileSkin {
         graphBounds = new Rectangle(size * 0.05, size * 0.5, width - size * 0.1, height - size * 0.61);
 
         handleCurrentValue(tile.getValue());
-        sparkLine.setStrokeWidth(size * 0.01);
+        sparkLine.setStrokeWidth(tile.getAveragingPeriod() < 500 ? size * 0.01 : size * 0.005);
+
+        drawTriangle();
+        indicatorPane.setPadding(new Insets(0, size * 0.0175, 0, 0));
 
         resizeStaticText();
         resizeDynamicText();
 
+        referenceUnitFlow.setPrefWidth(0.5 * width - size * 0.1);
+        referenceUnitFlow.relocate(width - referenceUnitFlow.getPrefWidth() - size * 0.05, graphBounds.getY() - size * 0.085);
+
         valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.relocate(width - valueUnitFlow.getPrefWidth() - size * 0.05, size * 0.15);
     };
 
     @Override protected void redraw() {
@@ -340,6 +414,8 @@ public class StockTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
         if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
+        referenceText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() / tile.getReferenceValue() * 100.0) - 100.0));
+
         resizeStaticText();
 
         titleText.setFill(tile.getTitleColor());
@@ -349,5 +425,7 @@ public class StockTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
         sparkLine.setStroke(tile.getBarColor());
+        referenceText.setFill(state.color);
+        triangle.setFill(state.color);
     };
 }

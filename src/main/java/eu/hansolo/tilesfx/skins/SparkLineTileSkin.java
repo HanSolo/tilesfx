@@ -487,7 +487,7 @@ public class SparkLineTileSkin extends TileSkin {
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
         handleCurrentValue(tile.getValue());
-        sparkLine.setStrokeWidth(size * 0.01);
+        sparkLine.setStrokeWidth(tile.getAveragingPeriod() < 500 ? size * 0.01 : size * 0.05);
         dot.setRadius(size * 0.014);
 
         if (tile.isStrokeWithGradient()) { setupGradient(); }

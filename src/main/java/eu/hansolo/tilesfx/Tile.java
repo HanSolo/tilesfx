@@ -4190,6 +4190,7 @@ public class Tile extends Control {
                 setAveragingPeriod(720);
                 setAveragingEnabled(true);
                 setDecimals(0);
+                setTickLabelDecimals(2);
                 break;
             default:
                 break;

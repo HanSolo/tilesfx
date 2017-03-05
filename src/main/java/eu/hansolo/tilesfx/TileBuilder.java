@@ -815,6 +815,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setAveragingPeriod(720);
                     CONTROL.setAveragingEnabled(true);
                     CONTROL.setDecimals(0);
+                    CONTROL.setTickLabelDecimals(2);
                     break;
                 default:
                     break;

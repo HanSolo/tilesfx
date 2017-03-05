@@ -802,11 +802,19 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case MAP:
                     break;
                 case RADIAL_CHART:
+                    CONTROL.setAnimated(true);
                     break;
                 case DONUT_CHART:
+                    CONTROL.setAnimated(true);
                     break;
                 case CIRCULAR_PROGRESS:
                     CONTROL.setBarBackgroundColor(CONTROL.getBackgroundColor().brighter());
+                    break;
+                case STOCK:
+                    CONTROL.setAnimated(true);
+                    CONTROL.setAveragingPeriod(720);
+                    CONTROL.setAveragingEnabled(true);
+                    CONTROL.setDecimals(0);
                     break;
                 default:
                     break;

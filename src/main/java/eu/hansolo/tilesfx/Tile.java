@@ -4150,6 +4150,8 @@ public class Tile extends Control {
                 setAnimated(false);
                 setAveragingEnabled(true);
                 setAveragingPeriod(10);
+                setDecimals(0);
+                setTickLabelDecimals(0);
                 break;
             case SWITCH:
                 break;
@@ -4201,28 +4203,32 @@ public class Tile extends Control {
     public void setSkinType(final SkinType SKIN_TYPE) {
         skinType = SKIN_TYPE;
         switch (SKIN_TYPE) {
-            case AREA_CHART     : setSkin(new AreaChartTileSkin(Tile.this)); break;
-            case BAR_CHART      : setSkin(new BarChartTileSkin(Tile.this)); break;
-            case LINE_CHART     : setSkin(new LineChartTileSkin(Tile.this)); break;
-            case CLOCK          : setSkin(new ClockTileSkin(Tile.this)); break;
-            case GAUGE          : setSkin(new GaugeTileSkin(Tile.this)); break;
-            case HIGH_LOW       : setSkin(new HighLowTileSkin(Tile.this)); break;
-            case PERCENTAGE     : setSkin(new PercentageTileSkin(Tile.this)); break;
-            case PLUS_MINUS     : setSkin(new PlusMinusTileSkin(Tile.this)); break;
-            case SLIDER         : setSkin(new SliderTileSkin(Tile.this)); break;
-            case SPARK_LINE     : setSkin(new SparkLineTileSkin(Tile.this)); break;
-            case SWITCH         : setSkin(new SwitchTileSkin(Tile.this)); break;
-            case WORLDMAP       : setSkin(new WorldMapTileSkin(Tile.this)); break;
-            case TIMER_CONTROL  : setSkin(new TimerControlTileSkin(Tile.this)); break;
-            case NUMBER         : setSkin(new NumberTileSkin(Tile.this)); break;
-            case TEXT           : setSkin(new TextTileSkin(Tile.this)); break;
-            case WEATHER        : setSkin(new WeatherTileSkin(Tile.this)); break;
-            case TIME           : setSkin(new TimeTileSkin(Tile.this)); break;
-            case CUSTOM         : setSkin(new CustomTileSkin(Tile.this)); break;
-            case LEADER_BOARD   : setSkin(new LeaderBoardTileSkin(Tile.this)); break;
-            case RADIAL_CHART: setSkin(new RadialChartTileSkin(Tile.this)); break;
-            default             : setSkin(new TileSkin(Tile.this)); break;
+            case AREA_CHART       : setSkin(new AreaChartTileSkin(Tile.this)); break;
+            case BAR_CHART        : setSkin(new BarChartTileSkin(Tile.this)); break;
+            case LINE_CHART       : setSkin(new LineChartTileSkin(Tile.this)); break;
+            case CLOCK            : setSkin(new ClockTileSkin(Tile.this)); break;
+            case GAUGE            : setSkin(new GaugeTileSkin(Tile.this)); break;
+            case HIGH_LOW         : setSkin(new HighLowTileSkin(Tile.this)); break;
+            case PERCENTAGE       : setSkin(new PercentageTileSkin(Tile.this)); break;
+            case PLUS_MINUS       : setSkin(new PlusMinusTileSkin(Tile.this)); break;
+            case SLIDER           : setSkin(new SliderTileSkin(Tile.this)); break;
+            case SPARK_LINE       : setSkin(new SparkLineTileSkin(Tile.this)); break;
+            case SWITCH           : setSkin(new SwitchTileSkin(Tile.this)); break;
+            case WORLDMAP         : setSkin(new WorldMapTileSkin(Tile.this)); break;
+            case TIMER_CONTROL    : setSkin(new TimerControlTileSkin(Tile.this)); break;
+            case NUMBER           : setSkin(new NumberTileSkin(Tile.this)); break;
+            case TEXT             : setSkin(new TextTileSkin(Tile.this)); break;
+            case WEATHER          : setSkin(new WeatherTileSkin(Tile.this)); break;
+            case TIME             : setSkin(new TimeTileSkin(Tile.this)); break;
+            case CUSTOM           : setSkin(new CustomTileSkin(Tile.this)); break;
+            case LEADER_BOARD     : setSkin(new LeaderBoardTileSkin(Tile.this)); break;
+            case RADIAL_CHART     : setSkin(new RadialChartTileSkin(Tile.this)); break;
+            case DONUT_CHART      : setSkin(new DonutChartTileSkin(Tile.this)); break;
+            case CIRCULAR_PROGRESS: setSkin(new CircularProgressTileSkin(Tile.this)); break;
+            case STOCK            : setSkin(new StockTileSkin(Tile.this)); break;
+            default               : setSkin(new TileSkin(Tile.this)); break;
         }
+        fireTileEvent(RESIZE_EVENT);
         presetTileParameters(SKIN_TYPE);
     }
 }

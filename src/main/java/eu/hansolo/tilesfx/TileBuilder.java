@@ -776,6 +776,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setAnimated(false);
                     CONTROL.setAveragingEnabled(true);
                     CONTROL.setAveragingPeriod(10);
+                    CONTROL.setDecimals(0);
+                    CONTROL.setTickLabelDecimals(0);
                     break;
                 case SWITCH:
                     break;

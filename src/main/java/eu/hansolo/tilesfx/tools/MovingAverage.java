@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Created by hansolo on 01.11.16.
  */
 public class MovingAverage {
-    public  static final int         MAX_PERIOD     = 1000;
+    public  static final int         MAX_PERIOD     = 2_073_600; // 24h in seconds
     private static final int         DEFAULT_PERIOD = 10;
     private        final Queue<TimeData> window;
     private              int             period;

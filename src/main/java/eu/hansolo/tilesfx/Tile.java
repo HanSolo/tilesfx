@@ -98,7 +98,7 @@ public class Tile extends Control {
                            WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
-                           CIRCULAR_PROGRESS("CircularProgress");
+                           CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -447,11 +447,11 @@ public class Tile extends Control {
             }
             @Override protected void invalidated() { update(); }
             @Override public void set(final double VALUE) {
-                super.set(VALUE);
-                fireTileEvent(VALUE_EVENT);
                 // ATTENTION There is an optimization in the properties so that properties
                 // only get invalid if the the new value is different from the old value
                 if (Helper.equals(VALUE, getFormerValue())) { update(); }
+                super.set(VALUE);
+                fireTileEvent(VALUE_EVENT);
             }
             @Override public Object getBean() { return Tile.this; }
             @Override public String getName() { return "value"; }
@@ -4106,6 +4106,7 @@ public class Tile extends Control {
             case RADIAL_CHART     : return new RadialChartTileSkin(Tile.this);
             case DONUT_CHART      : return new DonutChartTileSkin(Tile.this);
             case CIRCULAR_PROGRESS: return new CircularProgressTileSkin(Tile.this);
+            case STOCK            : return new StockTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4175,11 +4176,20 @@ public class Tile extends Control {
             case MAP:
                 break;
             case RADIAL_CHART:
+                setAnimated(true);
                 break;
             case DONUT_CHART:
+                setAnimated(true);
                 break;
             case CIRCULAR_PROGRESS:
                 setBarBackgroundColor(getBackgroundColor().brighter());
+                setAnimated(true);
+                break;
+            case STOCK:
+                setAnimated(false);
+                setAveragingPeriod(720);
+                setAveragingEnabled(true);
+                setDecimals(0);
                 break;
             default:
                 break;

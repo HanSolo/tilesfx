@@ -487,7 +487,7 @@ public class SparkLineTileSkin extends TileSkin {
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
         handleCurrentValue(tile.getValue());
-        sparkLine.setStrokeWidth(tile.getAveragingPeriod() < 500 ? size * 0.01 : size * 0.05);
+        sparkLine.setStrokeWidth(tile.getAveragingPeriod() < 500 ? size * 0.01 : size * 0.005);
         dot.setRadius(size * 0.014);
 
         if (tile.isStrokeWithGradient()) { setupGradient(); }
@@ -503,6 +503,7 @@ public class SparkLineTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
+        unitText.setText(tile.getUnit());
         if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
         resizeStaticText();
 

@@ -29,6 +29,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.LineTo;
@@ -88,6 +89,7 @@ public class StockTileSkin extends TileSkin {
     private Rectangle            graphBounds;
     private List<PathElement>    pathElements;
     private Path                 sparkLine;
+    private Circle               dot;
     private double               low;
     private double               high;
     private int                  noOfDatapoints;
@@ -166,6 +168,9 @@ public class StockTileSkin extends TileSkin {
         sparkLine.setStrokeLineCap(StrokeLineCap.ROUND);
         sparkLine.setStrokeLineJoin(StrokeLineJoin.ROUND);
 
+        dot = new Circle();
+        dot.setFill(tile.getBarColor());
+
         triangle = new Path();
         triangle.setStroke(null);
         triangle.setFill(state.color);
@@ -177,7 +182,7 @@ public class StockTileSkin extends TileSkin {
         referenceUnitFlow = new TextFlow(indicatorPane, referenceText);
         referenceUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, sparkLine, highText, lowText, timeSpanText, text, referenceUnitFlow);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, sparkLine, dot, highText, lowText, timeSpanText, text, referenceUnitFlow);
     }
 
     @Override protected void registerListeners() {
@@ -244,18 +249,21 @@ public class StockTileSkin extends TileSkin {
             end.setX(maxX);
             end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
 
+            dot.setCenterX(maxX);
+            dot.setCenterY(end.getY());
+
             updateState(VALUE, tile.getReferenceValue());
             referenceText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE / tile.getReferenceValue() * 100.0) - 100.0) + "\u0025");
 
-            RotateTransition rotateTransition = new RotateTransition(Duration.millis(100), triangle);
+            RotateTransition rotateTransition = new RotateTransition(Duration.millis(200), triangle);
             rotateTransition.setFromAngle(triangle.getRotate());
             rotateTransition.setToAngle(state.angle);
 
-            FillTransition fillIndicatorTransition = new FillTransition(Duration.millis(100), triangle);
+            FillTransition fillIndicatorTransition = new FillTransition(Duration.millis(200), triangle);
             fillIndicatorTransition.setFromValue((Color) triangle.getFill());
             fillIndicatorTransition.setToValue(state.color);
 
-            FillTransition fillReferenceTransition = new FillTransition(Duration.millis(100), referenceText);
+            FillTransition fillReferenceTransition = new FillTransition(Duration.millis(200), referenceText);
             fillReferenceTransition.setFromValue((Color) triangle.getFill());
             fillReferenceTransition.setToValue(state.color);
 
@@ -394,7 +402,13 @@ public class StockTileSkin extends TileSkin {
         graphBounds = new Rectangle(size * 0.05, size * 0.5, width - size * 0.1, height - size * 0.61);
 
         handleCurrentValue(tile.getValue());
-        sparkLine.setStrokeWidth(tile.getAveragingPeriod() < 500 ? size * 0.01 : size * 0.005);
+        if (tile.getAveragingPeriod() < 500) {
+            sparkLine.setStrokeWidth(size * 0.01);
+            dot.setRadius(size * 0.014);
+        } else {
+            sparkLine.setStrokeWidth(size * 0.005);
+            dot.setRadius(size * 0.007);
+        }
 
         drawTriangle();
         indicatorPane.setPadding(new Insets(0, size * 0.0175, 0, 0));
@@ -425,6 +439,7 @@ public class StockTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
         sparkLine.setStroke(tile.getBarColor());
+        dot.setFill(tile.getBarColor());
         referenceText.setFill(state.color);
         triangle.setFill(state.color);
     };

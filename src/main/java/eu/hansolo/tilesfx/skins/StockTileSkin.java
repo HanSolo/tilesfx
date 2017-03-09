@@ -57,11 +57,11 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 05.03.17.
  */
 public class StockTileSkin extends TileSkin {
-    private static final long    MONTH           = 2_592_000;
-    private static final long    DAY             = 86_400;
-    private static final long    HOUR            = 3_600;
-    private static final long    MINUTE          = 60;
-    private DateTimeFormatter    timeFormatter   = DateTimeFormatter.ofPattern("HH:mm");
+    private static final long    MONTH         = 2_592_000;
+    private static final long    DAY           = 86_400;
+    private static final long    HOUR          = 3_600;
+    private static final long    MINUTE        = 60;
+    private DateTimeFormatter    timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
     private enum                 State {
         INCREASE(Tile.GREEN, 0),
         DECREASE(Tile.RED, 180),

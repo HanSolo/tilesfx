@@ -518,7 +518,12 @@ public class SparkLineTileSkin extends TileSkin {
         lowText.setFill(tile.getValueColor());
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
-        sparkLine.setStroke(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
+        if (tile.isStrokeWithGradient()) {
+            setupGradient();
+            sparkLine.setStroke(gradient);
+        } else {
+            sparkLine.setStroke(tile.getBarColor());
+        }
         stdDeviationArea.setFill(Helper.getTranslucentColorFrom(Tile.FOREGROUND, 0.1));
         dot.setFill(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
     };

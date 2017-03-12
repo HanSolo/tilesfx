@@ -1104,7 +1104,7 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the current list of Data objects that will
+     * Returns a deep copy of the current list of Data objects that will
      * be used to calculate the moving average.
      * @return the current list of Data objects used for the moving average
      */

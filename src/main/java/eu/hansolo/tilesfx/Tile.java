@@ -4228,6 +4228,7 @@ public class Tile extends Control {
                 setDecimals(2);
                 setTickLabelDecimals(2);
                 setShowPercentage(true);
+                setTextVisible(false);
                 break;
             default:
                 break;

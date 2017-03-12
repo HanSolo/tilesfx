@@ -571,6 +571,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B showPercentage(final boolean SHOW) {
+        properties.put("showPercentage", new SimpleBooleanProperty(SHOW));
+        return (B)this;
+    }
+
     public final B alarms(final Alarm... ALARMS) {
         properties.put("alarmsArray", new SimpleObjectProperty<>(ALARMS));
         return (B)this;
@@ -816,8 +821,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setAnimated(true);
                     CONTROL.setAveragingPeriod(720);
                     CONTROL.setAveragingEnabled(true);
-                    CONTROL.setDecimals(0);
+                    CONTROL.setDecimals(2);
                     CONTROL.setTickLabelDecimals(2);
+                    CONTROL.setShowPercentage(true);
                     break;
                 default:
                     break;
@@ -1130,6 +1136,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setTrackColor(((ObjectProperty<TileColor>) properties.get(key)).get());
             } else if ("mapProvider".equals(key)) {
                 CONTROL.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
+            } else if ("showPercentage".equals(key)) {
+                CONTROL.setShowPercentage(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

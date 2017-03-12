@@ -400,6 +400,8 @@ public class Tile extends Control {
     private              boolean                                _strokeWithGradient;
     private              BooleanProperty                        strokeWithGradient;
     private              DarkSky                                darkSky;
+    private              boolean                                _showPercentage;
+    private              BooleanProperty                        showPercentage;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -603,6 +605,7 @@ public class Tile extends Control {
         _minuteTickMarksVisible             = true;
         _alarmsEnabled                      = false;
         _alarmsVisible                      = false;
+        _showPercentage                     = true;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -3778,6 +3781,37 @@ public class Tile extends Control {
      */
     public void clearAlarms() { alarms.clear(); }
 
+    /**
+     * Returns true if percentage is used to visualize the increase/decrease of
+     * the value in the StockTileSkin
+     * @return true if percentage is used to visualize the increase/decrease in StockTileSkin
+     */
+    public boolean isShowPercentage() { return null == showPercentage ? _showPercentage : showPercentage.get(); }
+
+    /**
+     * Defines if percentage should be used to visualize the increase/decrease of
+     * the value in the StockTileSkin
+     * @param SHOW
+     */
+    public void setShowPercentage(final boolean SHOW) {
+        if (null == showPercentage) {
+            _showPercentage = SHOW;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            showPercentage.set(SHOW);
+        }
+    }
+    public BooleanProperty showPercentageProperty() {
+        if (null == showPercentage) {
+            showPercentage = new BooleanPropertyBase() {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "showPercentage"; }
+            };
+        }
+        return showPercentage;
+    }
+
     public double getIncrement() { return increment; }
     public void setIncrement(final double INCREMENT) { increment = clamp(0, 10, INCREMENT); }
 
@@ -4191,8 +4225,9 @@ public class Tile extends Control {
                 setAnimated(false);
                 setAveragingPeriod(720);
                 setAveragingEnabled(true);
-                setDecimals(0);
+                setDecimals(2);
                 setTickLabelDecimals(2);
+                setShowPercentage(true);
                 break;
             default:
                 break;

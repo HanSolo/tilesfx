@@ -111,7 +111,7 @@ public class StockTileSkin extends TileSkin {
 
         averagingListener = o -> handleEvents("AVERAGING_PERIOD");
 
-        timeFormatter   = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
+        timeFormatter = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
 
         state = State.CONSTANT;
 

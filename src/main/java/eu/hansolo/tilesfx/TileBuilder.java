@@ -576,6 +576,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B tooltipText(final String TEXT) {
+        properties.put("tooltipText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
     public final B alarms(final Alarm... ALARMS) {
         properties.put("alarmsArray", new SimpleObjectProperty<>(ALARMS));
         return (B)this;
@@ -1139,6 +1144,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
             } else if ("showPercentage".equals(key)) {
                 CONTROL.setShowPercentage(((BooleanProperty) properties.get(key)).get());
+            } else if ("tooltipText".equals(key)) {
+                CONTROL.setTooltipText(((StringProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

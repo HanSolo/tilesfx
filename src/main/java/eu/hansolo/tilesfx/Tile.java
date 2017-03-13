@@ -180,6 +180,7 @@ public class Tile extends Control {
     private        final TileEvent   LOCATION_EVENT        = new TileEvent(EventType.LOCATION);
     private        final TileEvent   TRACK_EVENT           = new TileEvent(EventType.TRACK);
     private        final TileEvent   MAP_PROVIDER_EVENT    = new TileEvent(EventType.MAP_PROVIDER);
+    private        final TileEvent   TOOLTIP_TEXT_EVENT    = new TileEvent(EventType.TOOLTIP_TEXT);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
@@ -402,6 +403,8 @@ public class Tile extends Control {
     private              DarkSky                                darkSky;
     private              boolean                                _showPercentage;
     private              BooleanProperty                        showPercentage;
+    private              String                                 _tooltipText;
+    private              StringProperty                         tooltipText;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -3803,13 +3806,42 @@ public class Tile extends Control {
     }
     public BooleanProperty showPercentageProperty() {
         if (null == showPercentage) {
-            showPercentage = new BooleanPropertyBase() {
+            showPercentage = new BooleanPropertyBase(_showPercentage) {
                 @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "showPercentage"; }
             };
         }
         return showPercentage;
+    }
+
+    /**
+     * Returns the text that will be shown in the Tile tooltip
+     * @return the text that will be shown in the Tile tooltip
+     */
+    public String getTooltipText() { return null == tooltipText ? _tooltipText : tooltipText.get(); }
+    /**
+     * Defines the text that will shown in the Tile tooltip
+     * @param TEXT
+     */
+    public void setTooltipText(final String TEXT) {
+        if (null == tooltipText) {
+            _tooltipText = TEXT;
+            fireTileEvent(TOOLTIP_TEXT_EVENT);
+        } else {
+            tooltipText.set(TEXT);
+        }
+    }
+    public StringProperty tooltipTextProperty() {
+        if (null == tooltipText) {
+            tooltipText = new StringPropertyBase(_tooltipText) {
+                @Override protected void invalidated() { fireTileEvent(TOOLTIP_TEXT_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "tooltipText"; }
+            };
+            _tooltipText = null;
+        }
+        return tooltipText;
     }
 
     public double getIncrement() { return increment; }

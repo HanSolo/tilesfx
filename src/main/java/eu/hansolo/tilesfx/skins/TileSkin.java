@@ -22,11 +22,10 @@ import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.InvalidationListener;
-import javafx.geometry.BoundingBox;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import javafx.scene.control.Tooltip;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Background;
@@ -37,9 +36,7 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 import java.util.Locale;
@@ -79,6 +76,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              InvalidationListener currentTimeListener;
     protected              InvalidationListener timeListener;
     protected              Tile                 tile;
+    protected              Tooltip              tooltip;
 
 
     // ******************** Constructors **************************************
@@ -101,6 +99,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         sizeListener         = o -> handleEvents("RESIZE");
         tileEventListener    = e -> handleEvents(e.getEventType().name());
         currentValueListener = o -> handleCurrentValue(tile.getCurrentValue());
+        tooltip              = new Tooltip(tile.getTooltipText());
 
         initGraphics();
         registerListeners();
@@ -124,6 +123,8 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         pane = new Pane();
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(tile.getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
+
+        Tooltip.install(pane, tooltip);
 
         getChildren().setAll(pane);
     }
@@ -165,6 +166,14 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             handleCurrentValue(tile.getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = tile.getSections();
+        } else if ("TOOLTIP_TEXT".equals(EVENT_TYPE)) {
+            System.out.println(tile.getTooltipText());
+            tooltip.setText(tile.getTooltipText());
+            if (tile.getTooltipText().isEmpty()) {
+                Tooltip.uninstall(pane, tooltip);
+            } else {
+                Tooltip.install(pane, tooltip);
+            }
         }
     };
 

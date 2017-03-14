@@ -18,6 +18,7 @@ package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.Section;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -120,6 +121,13 @@ public class Helper {
     }
 
     public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, double fontSize) {
+        final String FONT_NAME = TEXT.getFont().getName();
+        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && fontSize > 0) {
+            fontSize -= 0.005;
+            TEXT.setFont(new Font(FONT_NAME, fontSize));
+        }
+    }
+    public static final void adjustTextSize(final Label TEXT, final double MAX_WIDTH, double fontSize) {
         final String FONT_NAME = TEXT.getFont().getName();
         while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && fontSize > 0) {
             fontSize -= 0.005;

@@ -571,11 +571,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B showPercentage(final boolean SHOW) {
-        properties.put("showPercentage", new SimpleBooleanProperty(SHOW));
-        return (B)this;
-    }
-
     public final B tooltipText(final String TEXT) {
         properties.put("tooltipText", new SimpleStringProperty(TEXT));
         return (B)this;
@@ -828,7 +823,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setAveragingEnabled(true);
                     CONTROL.setDecimals(2);
                     CONTROL.setTickLabelDecimals(2);
-                    CONTROL.setShowPercentage(true);
                     CONTROL.setTextVisible(false);
                     break;
                 default:
@@ -1142,8 +1136,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setTrackColor(((ObjectProperty<TileColor>) properties.get(key)).get());
             } else if ("mapProvider".equals(key)) {
                 CONTROL.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
-            } else if ("showPercentage".equals(key)) {
-                CONTROL.setShowPercentage(((BooleanProperty) properties.get(key)).get());
             } else if ("tooltipText".equals(key)) {
                 CONTROL.setTooltipText(((StringProperty) properties.get(key)).get());
             }

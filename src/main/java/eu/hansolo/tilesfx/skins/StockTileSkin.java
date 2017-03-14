@@ -29,6 +29,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -43,6 +44,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextBoundsType;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
@@ -136,6 +138,7 @@ public class StockTileSkin extends TileSkin {
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, tile.getValue()));
+        valueText.setBoundsType(TextBoundsType.VISUAL);
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
@@ -434,7 +437,10 @@ public class StockTileSkin extends TileSkin {
         changePercentageFlow.setPrefWidth(0.6 * width - size * 0.1);
         changePercentageFlow.relocate(width - changePercentageFlow.getPrefWidth() - size * 0.05, graphBounds.getY() - size * 0.085);
 
+        valueUnitFlow.setMaxWidth(width - size * 0.1);
+        valueUnitFlow.setMinWidth(width - size * 0.1);
         valueUnitFlow.setPrefWidth(width - size * 0.1);
+        //valueUnitFlow.setPrefWidth(Region.USE_COMPUTED_SIZE);
         valueUnitFlow.relocate(width - valueUnitFlow.getPrefWidth() - size * 0.05, size * 0.15);
     };
 

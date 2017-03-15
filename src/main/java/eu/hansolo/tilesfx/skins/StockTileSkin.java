@@ -29,7 +29,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -440,7 +439,6 @@ public class StockTileSkin extends TileSkin {
         valueUnitFlow.setMaxWidth(width - size * 0.1);
         valueUnitFlow.setMinWidth(width - size * 0.1);
         valueUnitFlow.setPrefWidth(width - size * 0.1);
-        //valueUnitFlow.setPrefWidth(Region.USE_COMPUTED_SIZE);
         valueUnitFlow.relocate(width - valueUnitFlow.getPrefWidth() - size * 0.05, size * 0.15);
     };
 

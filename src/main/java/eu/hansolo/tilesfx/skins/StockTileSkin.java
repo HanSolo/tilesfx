@@ -445,8 +445,15 @@ public class StockTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
-        text.setText(tile.getText());
         if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
+
+        if (tile.isTextVisible()) {
+            text.setText(tile.getText());
+        } else if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
+            timeSpanText.setText(createTimeSpanText());
+            text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
+        }
+
 
         changeText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() - tile.getReferenceValue())));
         changePercentageText.setText(new StringBuilder().append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() / tile.getReferenceValue() * 100.0) - 100.0)).append("\u0025").toString());

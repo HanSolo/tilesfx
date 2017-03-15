@@ -167,7 +167,6 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = tile.getSections();
         } else if ("TOOLTIP_TEXT".equals(EVENT_TYPE)) {
-            System.out.println(tile.getTooltipText());
             tooltip.setText(tile.getTooltipText());
             if (tile.getTooltipText().isEmpty()) {
                 Tooltip.uninstall(pane, tooltip);

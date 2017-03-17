@@ -331,7 +331,7 @@ public class StockTileSkin extends TileSkin {
 
     private String createTimeSpanText() {
         long          timeSpan        = movingAverage.getTimeSpan().getEpochSecond();
-        StringBuilder timeSpanBuilder = new StringBuilder("\u2190 ");
+        StringBuilder timeSpanBuilder = new StringBuilder(movingAverage.isFilling() ? "\u22a2 " : "\u2190 ");
         if (timeSpan > MONTH) { // 1 Month (30 days)
             long   months = (timeSpan / MONTH);
             double days   = timeSpan % MONTH;

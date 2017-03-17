@@ -305,9 +305,8 @@ public class SparkLineTileSkin extends TileSkin {
     }
 
     private String createTimeSpanText() {
-        long   timeSpan = movingAverage.getTimeSpan().getEpochSecond();
-        ZoneId zoneId   = tile.getZoneId();
-        StringBuilder timeSpanBuilder = new StringBuilder("\u2190 ");
+        long          timeSpan        = movingAverage.getTimeSpan().getEpochSecond();
+        StringBuilder timeSpanBuilder = new StringBuilder(movingAverage.isFilling() ? "\u22a2 " : "\u2190 ");
         if (timeSpan > MONTH) { // 1 Month (30 days)
             int    months = (int)(timeSpan / MONTH);
             double days   = timeSpan % MONTH;
@@ -510,6 +509,14 @@ public class SparkLineTileSkin extends TileSkin {
         text.setText(tile.getText());
         unitText.setText(tile.getUnit());
         if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
+
+        if (tile.isTextVisible()) {
+            text.setText(tile.getText());
+        } else if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
+            timeSpanText.setText(createTimeSpanText());
+            text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
+        }
+
         resizeStaticText();
 
         titleText.setFill(tile.getTitleColor());

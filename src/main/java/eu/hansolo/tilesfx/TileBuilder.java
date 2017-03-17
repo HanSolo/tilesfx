@@ -106,6 +106,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B autoReferenceValue(final boolean AUTO_REFERENCE_VALUE) {
+        properties.put("autoReferenceValue", new SimpleBooleanProperty(AUTO_REFERENCE_VALUE));
+        return (B)this;
+    }
+
     public final B decimals(final int DECIMALS) {
         properties.put("decimals", new SimpleIntegerProperty(DECIMALS));
         return (B) this;
@@ -1060,6 +1065,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setThreshold(((DoubleProperty) properties.get(key)).get());
             } else if ("referenceValue".equals(key)) {
                 CONTROL.setReferenceValue(((DoubleProperty) properties.get(key)).get());
+            } else if ("autoReferenceValue".equals(key)) {
+                CONTROL.setAutoReferenceValue(((BooleanProperty) properties.get(key)).get());
             } else if ("customFontEnabled".equals(key)) {
                 CONTROL.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("customFont".equals(key)) {

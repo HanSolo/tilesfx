@@ -203,6 +203,8 @@ public class Tile extends Control {
     private              DoubleProperty                         threshold;
     private              double                                 _referenceValue;
     private              DoubleProperty                         referenceValue;
+    private              boolean                                _autoReferenceValue;
+    private              BooleanProperty                        autoReferenceValue;
     private              String                                 _title;
     private              StringProperty                         title;
     private              String                                 _description;
@@ -486,6 +488,7 @@ public class Tile extends Control {
         _range                              = _maxValue - _minValue;
         _threshold                          = _maxValue;
         _referenceValue                     = _minValue;
+        _autoReferenceValue                 = true;
         time                                = new ObjectPropertyBase<ZonedDateTime>(TIME) {
             @Override protected void invalidated() {
                 if (!isRunning() && isAnimated()) {
@@ -853,7 +856,6 @@ public class Tile extends Control {
      * @return the reference value that will be used in the HighLowTileSkin
      */
     public double getReferenceValue() { return null == referenceValue ? _referenceValue : referenceValue.get(); }
-
     /**
      * Defines the reference value that will be used in the HighLowTileSkin
      * @param VALUE
@@ -875,6 +877,32 @@ public class Tile extends Control {
             };
         }
         return referenceValue;
+    }
+
+    /**
+     * Returns true if the reference value for the StockTileSkin will be calculated automatically
+     * @return true if the reference value for the StockTileSkin will be calculated automatically
+     */
+    public boolean isAutoReferenceValue() { return null == autoReferenceValue ? _autoReferenceValue : autoReferenceValue.get(); }
+    /**
+     * Defines if the reference value for the StockTileSkin should be calculated automatically
+     * @param AUTO_REFERENCE_VALUE
+     */
+    public void setAutoReferenceValue(final boolean AUTO_REFERENCE_VALUE) {
+        if (null == autoReferenceValue) {
+            _autoReferenceValue = AUTO_REFERENCE_VALUE;
+        } else {
+            autoReferenceValue.set(AUTO_REFERENCE_VALUE);
+        }
+    }
+    public BooleanProperty autoReferenceValueProperty() {
+        if (null == autoReferenceValue) {
+            autoReferenceValue = new BooleanPropertyBase(_autoReferenceValue) {
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "autoReferenceValue"; }
+            };
+        }
+        return autoReferenceValue;
     }
 
     /**

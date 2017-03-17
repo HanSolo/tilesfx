@@ -296,12 +296,12 @@ public class StockTileSkin extends TileSkin {
     private void addData(final double VALUE) {
         if (dataList.isEmpty()) {
             for (int i = 0 ; i < noOfDatapoints ;i ++) { dataList.add(VALUE); }
-            tile.setReferenceValue(VALUE);
+            if (tile.isAutoReferenceValue()) { tile.setReferenceValue(VALUE); }
         }
         if (dataList.size() <= noOfDatapoints) {
             Collections.rotate(dataList, -1);
             dataList.set((noOfDatapoints - 1), VALUE);
-            tile.setReferenceValue(dataList.get(0));
+            if (tile.isAutoReferenceValue()) { tile.setReferenceValue(dataList.get(0)); }
         } else {
             dataList.add(VALUE);
         }

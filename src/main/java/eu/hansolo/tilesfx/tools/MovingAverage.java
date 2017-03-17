@@ -41,8 +41,8 @@ public class MovingAverage {
         this(DEFAULT_PERIOD);
     }
     public MovingAverage(final int PERIOD) {
-        period = Helper.clamp(0, MAX_PERIOD, PERIOD);
-        window = new ConcurrentLinkedQueue<>();
+        period         = Helper.clamp(0, MAX_PERIOD, PERIOD);
+        window         = new ConcurrentLinkedQueue<>();
     }
 
 
@@ -97,6 +97,8 @@ public class MovingAverage {
         period = Helper.clamp(0, MAX_PERIOD, PERIOD);
         reset();
     }
+
+    public boolean isFilling() { return window.size() < period; }
 
     public void reset() { window.clear(); }
 }

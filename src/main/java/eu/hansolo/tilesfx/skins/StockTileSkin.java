@@ -417,10 +417,10 @@ public class StockTileSkin extends TileSkin {
 
         handleCurrentValue(tile.getValue());
         if (tile.getAveragingPeriod() < 500) {
-            sparkLine.setStrokeWidth(size * 0.005);
+            sparkLine.setStrokeWidth(size * 0.01);
             dot.setRadius(size * 0.014);
         } else {
-            sparkLine.setStrokeWidth(size * 0.001);
+            sparkLine.setStrokeWidth(size * 0.005);
             dot.setRadius(size * 0.007);
         }
 

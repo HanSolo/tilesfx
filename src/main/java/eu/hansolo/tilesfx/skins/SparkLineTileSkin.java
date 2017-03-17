@@ -486,9 +486,12 @@ public class SparkLineTileSkin extends TileSkin {
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
         handleCurrentValue(tile.getValue());
-        if (tile.getAveragingPeriod() < 500) {
+        if (tile.getAveragingPeriod() < 250) {
             sparkLine.setStrokeWidth(size * 0.01);
             dot.setRadius(size * 0.014);
+        } else if (tile.getAveragingPeriod() < 500) {
+            sparkLine.setStrokeWidth(size * 0.0075);
+            dot.setRadius(size * 0.0105);
         } else {
             sparkLine.setStrokeWidth(size * 0.005);
             dot.setRadius(size * 0.007);

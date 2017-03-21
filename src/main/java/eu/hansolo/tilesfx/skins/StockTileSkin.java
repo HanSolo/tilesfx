@@ -34,6 +34,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -91,6 +92,7 @@ public class StockTileSkin extends TileSkin {
     private Text                 text;
     private Text                 timeSpanText;
     private Rectangle            graphBounds;
+    private Line                 referenceLine;
     private List<PathElement>    pathElements;
     private Path                 sparkLine;
     private Circle               dot;
@@ -161,6 +163,8 @@ public class StockTileSkin extends TileSkin {
         timeSpanText.setFill(tile.getTextColor());
         Helper.enableNode(timeSpanText, !tile.isTextVisible());
 
+        referenceLine = new Line();
+
         pathElements = new ArrayList<>(noOfDatapoints);
         pathElements.add(0, new MoveTo());
         for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
@@ -191,7 +195,7 @@ public class StockTileSkin extends TileSkin {
         changePercentageFlow = new TextFlow(indicatorPane, changePercentageText);
         changePercentageFlow.setTextAlignment(TextAlignment.RIGHT);
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, sparkLine, dot, highText, lowText, timeSpanText, text, changeText, changePercentageFlow);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, sparkLine, dot, referenceLine, highText, lowText, timeSpanText, text, changeText, changePercentageFlow);
     }
 
     @Override protected void registerListeners() {
@@ -238,12 +242,13 @@ public class StockTileSkin extends TileSkin {
         }
         range = high - low;
 
-        double minX  = graphBounds.getX();
-        double maxX  = minX + graphBounds.getWidth();
-        double minY  = graphBounds.getY();
-        double maxY  = minY + graphBounds.getHeight();
-        double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
-        double stepY = graphBounds.getHeight() / range;
+        double minX           = graphBounds.getX();
+        double maxX           = minX + graphBounds.getWidth();
+        double minY           = graphBounds.getY();
+        double maxY           = minY + graphBounds.getHeight();
+        double stepX          = graphBounds.getWidth() / (noOfDatapoints - 1);
+        double stepY          = graphBounds.getHeight() / range;
+        double referenceValue = tile.getReferenceValue();
 
         if(!dataList.isEmpty()) {
             MoveTo begin = (MoveTo) pathElements.get(0);
@@ -261,10 +266,13 @@ public class StockTileSkin extends TileSkin {
             dot.setCenterX(maxX);
             dot.setCenterY(end.getY());
 
-            updateState(VALUE, tile.getReferenceValue());
+            updateState(VALUE, referenceValue);
 
-            changeText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE - tile.getReferenceValue())));
-            changePercentageText.setText(new StringBuilder().append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE / tile.getReferenceValue() * 100.0) - 100.0)).append("\u0025").toString());
+            referenceLine.setStartY(maxY - Math.abs(low - referenceValue) * stepY);
+            referenceLine.setEndY(maxY - Math.abs(low - referenceValue) * stepY);
+
+            changeText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE - referenceValue)));
+            changePercentageText.setText(new StringBuilder().append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE / referenceValue * 100.0) - 100.0)).append("\u0025").toString());
 
             RotateTransition rotateTransition = new RotateTransition(Duration.millis(200), triangle);
             rotateTransition.setFromAngle(triangle.getRotate());
@@ -415,6 +423,9 @@ public class StockTileSkin extends TileSkin {
         super.resize();
         graphBounds = new Rectangle(size * 0.05, size * 0.6, width - size * 0.1, height - size * 0.71);
 
+        referenceLine.setStartX(graphBounds.getX());
+        referenceLine.setEndX(graphBounds.getX() + graphBounds.getWidth());
+
         handleCurrentValue(tile.getValue());
         if (tile.getAveragingPeriod() < 250) {
             sparkLine.setStrokeWidth(size * 0.01);
@@ -457,7 +468,6 @@ public class StockTileSkin extends TileSkin {
             text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
         }
 
-
         changeText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() - tile.getReferenceValue())));
         changePercentageText.setText(new StringBuilder().append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() / tile.getReferenceValue() * 100.0) - 100.0)).append("\u0025").toString());
 
@@ -469,6 +479,7 @@ public class StockTileSkin extends TileSkin {
         lowText.setFill(tile.getValueColor());
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
+        referenceLine.setStroke(Tile.LIGHT_RED);
         sparkLine.setStroke(tile.getBarColor());
         dot.setFill(tile.getBarColor());
         changeText.setTextFill(state.color);

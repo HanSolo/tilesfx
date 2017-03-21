@@ -118,8 +118,11 @@ public class Tile extends Control {
     public enum TileColor {
         GRAY(Color.rgb(139,144,146), "gray"),
         RED(Color.rgb(229, 80, 76), "red"),
+        LIGHT_RED(Color.rgb(255, 84, 56), "light-red"),
         GREEN(Color.rgb(143, 198, 94), "green"),
+        LIGHT_GREEN(Color.rgb(132, 228, 50), "light-green"),
         BLUE(Color.rgb(55, 179, 252), "blue"),
+        DARK_BLUE(Color.rgb(55, 94, 252), "dark-blue"),
         ORANGE(Color.rgb(237, 162, 57), "orange"),
         YELLOW_ORANGE(Color.rgb(229, 198, 76), "yellow-orange"),
         YELLOW(Color.rgb(229, 229, 76), "yellow"),
@@ -152,8 +155,11 @@ public class Tile extends Control {
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
     public  static final Color       GRAY                  = TileColor.GRAY.color;
     public  static final Color       RED                   = TileColor.RED.color;
+    public  static final Color       LIGHT_RED             = TileColor.LIGHT_RED.color;
     public  static final Color       GREEN                 = TileColor.GREEN.color;
+    public  static final Color       LIGHT_GREEN           = TileColor.LIGHT_GREEN.color;
     public  static final Color       BLUE                  = TileColor.BLUE.color;
+    public  static final Color       DARK_BLUE             = TileColor.DARK_BLUE.color;
     public  static final Color       ORANGE                = TileColor.ORANGE.color;
     public  static final Color       YELLOW_ORANGE         = TileColor.YELLOW_ORANGE.color;
     public  static final Color       YELLOW                = TileColor.YELLOW.color;

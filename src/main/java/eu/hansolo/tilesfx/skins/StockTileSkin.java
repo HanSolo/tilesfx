@@ -303,8 +303,11 @@ public class StockTileSkin extends TileSkin {
 
     private void addData(final double VALUE) {
         if (dataList.isEmpty()) {
-            for (int i = 0 ; i < noOfDatapoints ;i ++) { dataList.add(VALUE); }
-            if (tile.isAutoReferenceValue()) { tile.setReferenceValue(VALUE); }
+            double referenceValue = tile.getReferenceValue() != 0 ? tile.getReferenceValue() : VALUE;
+            for (int i = 0 ; i < noOfDatapoints ; i ++) {
+                dataList.add(referenceValue);
+            }
+            if (tile.isAutoReferenceValue()) { tile.setReferenceValue(referenceValue); }
         }
         if (dataList.size() <= noOfDatapoints) {
             Collections.rotate(dataList, -1);
@@ -323,6 +326,9 @@ public class StockTileSkin extends TileSkin {
         } else {
             state = State.CONSTANT;
         }
+        changeText.setTextFill(state.color);
+        changePercentageText.setFill(state.color);
+        triangle.setFill(state.color);
     }
 
     private void drawTriangle() {

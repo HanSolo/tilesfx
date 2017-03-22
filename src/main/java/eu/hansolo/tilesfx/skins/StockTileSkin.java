@@ -164,6 +164,7 @@ public class StockTileSkin extends TileSkin {
         Helper.enableNode(timeSpanText, !tile.isTextVisible());
 
         referenceLine = new Line();
+        referenceLine.getStrokeDashArray().addAll(3d, 3d);
 
         pathElements = new ArrayList<>(noOfDatapoints);
         pathElements.add(0, new MoveTo());
@@ -485,7 +486,7 @@ public class StockTileSkin extends TileSkin {
         lowText.setFill(tile.getValueColor());
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
-        referenceLine.setStroke(Tile.LIGHT_RED);
+        referenceLine.setStroke(Tile.GRAY);
         sparkLine.setStroke(tile.getBarColor());
         dot.setFill(tile.getBarColor());
         changeText.setTextFill(state.color);

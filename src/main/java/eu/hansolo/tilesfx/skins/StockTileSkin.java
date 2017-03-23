@@ -298,6 +298,7 @@ public class StockTileSkin extends TileSkin {
         if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
             timeSpanText.setText(createTimeSpanText());
             text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
+
         }
         resizeDynamicText();
     }
@@ -486,7 +487,7 @@ public class StockTileSkin extends TileSkin {
         lowText.setFill(tile.getValueColor());
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
-        referenceLine.setStroke(Tile.GRAY);
+        referenceLine.setStroke(tile.getThresholdColor());
         sparkLine.setStroke(tile.getBarColor());
         dot.setFill(tile.getBarColor());
         changeText.setTextFill(state.color);

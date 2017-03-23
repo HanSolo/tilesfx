@@ -821,14 +821,15 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case CIRCULAR_PROGRESS:
                     CONTROL.setBarBackgroundColor(CONTROL.getBackgroundColor().brighter());
+                    CONTROL.setAnimated(true);
                     break;
                 case STOCK:
-                    CONTROL.setAnimated(true);
+                    CONTROL.setAnimated(false);
                     CONTROL.setAveragingPeriod(720);
                     CONTROL.setAveragingEnabled(true);
                     CONTROL.setDecimals(2);
                     CONTROL.setTickLabelDecimals(2);
-                    CONTROL.setTextVisible(false);
+                    CONTROL.setThresholdColor(Tile.GRAY);
                     break;
                 default:
                     break;

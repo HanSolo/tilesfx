@@ -4259,7 +4259,7 @@ public class Tile extends Control {
                 setAveragingEnabled(true);
                 setDecimals(2);
                 setTickLabelDecimals(2);
-                setTextVisible(false);
+                setThresholdColor(GRAY);
                 break;
             default:
                 break;

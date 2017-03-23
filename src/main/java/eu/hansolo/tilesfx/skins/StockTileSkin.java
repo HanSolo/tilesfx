@@ -211,7 +211,6 @@ public class StockTileSkin extends TileSkin {
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
-            Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(timeSpanText, !tile.isTextVisible());
             redraw();

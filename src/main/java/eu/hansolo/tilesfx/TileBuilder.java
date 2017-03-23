@@ -830,6 +830,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setDecimals(2);
                     CONTROL.setTickLabelDecimals(2);
                     CONTROL.setThresholdColor(Tile.GRAY);
+                    CONTROL.setTextVisible(false);
                     break;
                 default:
                     break;

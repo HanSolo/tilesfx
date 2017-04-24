@@ -91,6 +91,8 @@ public class SparkLineTileSkin extends TileSkin {
     private InvalidationListener averagingListener;
     private NiceScale            niceScaleY;
     private List<Line>           horizontalTickLines;
+    private double               horizontalLineOffset;
+    private double               tickLabelFontSize;
     private List<Text>           tickLabelsY;
     private Color                tickLineColor;
 
@@ -107,18 +109,18 @@ public class SparkLineTileSkin extends TileSkin {
 
         averagingListener = o -> handleEvents("AVERAGING_PERIOD");
 
-        timeFormatter   = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
+        timeFormatter = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
 
         if (tile.isAutoScale()) tile.calcAutoScale();
 
         niceScaleY = new NiceScale(tile.getMinValue(), tile.getMaxValue());
         niceScaleY.setMaxTicks(5);
-        tickLineColor = Color.color(Tile.FOREGROUND.getRed(), Tile.FOREGROUND.getGreen(), Tile.FOREGROUND.getBlue(), 0.25);
+        tickLineColor = Color.color(Tile.FOREGROUND.getRed(), Tile.FOREGROUND.getGreen(), Tile.FOREGROUND.getBlue(), 0.50);
         horizontalTickLines = new ArrayList<>(5);
         tickLabelsY = new ArrayList<>(5);
         for (int i = 0 ; i < 5 ; i++) {
             Line hLine = new Line(0, 0, 0, 0);
-            hLine.getStrokeDashArray().addAll(2.0, 2.0);
+            hLine.getStrokeDashArray().addAll(1.0, 2.0);
             hLine.setStroke(Color.TRANSPARENT);
             horizontalTickLines.add(hLine);
             Text tickLabelY = new Text("");
@@ -198,9 +200,9 @@ public class SparkLineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(tile.getBarColor());
 
+        getPane().getChildren().addAll(titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
-        getPane().getChildren().addAll(titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
     }
 
     @Override protected void registerListeners() {
@@ -269,7 +271,6 @@ public class SparkLineTileSkin extends TileSkin {
             tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
             tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
         }
-        double horizontalLineOffset = graphBounds.getHeight() * 0.1 >= 6 ? graphBounds.getHeight() * 0.15 : 1;
 
         horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
         tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
@@ -277,17 +278,20 @@ public class SparkLineTileSkin extends TileSkin {
             Line line  = horizontalTickLines.get(lineCountY);
             Text label = tickLabelsY.get(lineCountY);
             label.setText(String.format(locale, "%.0f", (tickSpacingY * (lineCountY + tickLabelOffsetY))));
-            label.setX(minX);
             label.setY(y + graphBounds.getHeight() * 0.03);
             label.setFill(tickLineColor);
-            line.setStartX(minX + horizontalLineOffset);
-            line.setEndX(maxX);
+            horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
+
+            line.setStartX(minX);
             line.setStartY(y);
             line.setEndY(y);
             line.setStroke(tickLineColor);
             lineCountY++;
             lineCountY = clamp(0, 4, lineCountY);
         }
+        if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
+        horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
+        tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth()));
 
         if (!dataList.isEmpty()) {
             if (tile.isSmoothing()) {
@@ -535,13 +539,13 @@ public class SparkLineTileSkin extends TileSkin {
         super.resize();
         graphBounds = new Rectangle(size * 0.05, size * 0.5, width - size * 0.1, height - size * 0.61);
 
-        double tickLabelFontSize = graphBounds.getHeight() * 0.1;
-        Font   tickLabelFont     = Fonts.latoRegular(tickLabelFontSize);
+        tickLabelFontSize  = graphBounds.getHeight() * 0.1;
+        Font tickLabelFont = Fonts.latoRegular(tickLabelFontSize);
         tickLabelsY.forEach(label -> {
             enableNode(label, tickLabelFontSize >= 6);
             label.setFont(tickLabelFont);
+            horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
         });
-        tickLabelsY.forEach(label -> label.setFont(Fonts.latoRegular(graphBounds.getHeight() * 0.1)));
         horizontalTickLines.forEach(line -> line.setStrokeWidth(0.5));
 
         stdDeviationArea.setX(graphBounds.getX());

@@ -274,6 +274,7 @@ public class SparkLineTileSkin extends TileSkin {
 
         horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
         tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+        horizontalLineOffset = 0;
         for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
             Line line  = horizontalTickLines.get(lineCountY);
             Text label = tickLabelsY.get(lineCountY);
@@ -544,7 +545,6 @@ public class SparkLineTileSkin extends TileSkin {
         tickLabelsY.forEach(label -> {
             enableNode(label, tickLabelFontSize >= 6);
             label.setFont(tickLabelFont);
-            horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
         });
         horizontalTickLines.forEach(line -> line.setStrokeWidth(0.5));
 

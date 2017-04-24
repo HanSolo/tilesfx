@@ -21,9 +21,11 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
+import eu.hansolo.tilesfx.tools.NiceScale;
 import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.VPos;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
@@ -37,12 +39,12 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Pair;
 
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
+import static eu.hansolo.tilesfx.tools.Helper.enableNode;
 
 
 /**
@@ -86,6 +89,10 @@ public class SparkLineTileSkin extends TileSkin {
     private List<Double>         dataList;
     private MovingAverage        movingAverage;
     private InvalidationListener averagingListener;
+    private NiceScale            niceScaleY;
+    private List<Line>           horizontalTickLines;
+    private List<Text>           tickLabelsY;
+    private Color                tickLineColor;
 
 
     // ******************** Constructors **************************************
@@ -103,6 +110,21 @@ public class SparkLineTileSkin extends TileSkin {
         timeFormatter   = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
 
         if (tile.isAutoScale()) tile.calcAutoScale();
+
+        niceScaleY = new NiceScale(tile.getMinValue(), tile.getMaxValue());
+        niceScaleY.setMaxTicks(5);
+        tickLineColor = Color.color(Tile.FOREGROUND.getRed(), Tile.FOREGROUND.getGreen(), Tile.FOREGROUND.getBlue(), 0.25);
+        horizontalTickLines = new ArrayList<>(5);
+        tickLabelsY = new ArrayList<>(5);
+        for (int i = 0 ; i < 5 ; i++) {
+            Line hLine = new Line(0, 0, 0, 0);
+            hLine.getStrokeDashArray().addAll(2.0, 2.0);
+            hLine.setStroke(Color.TRANSPARENT);
+            horizontalTickLines.add(hLine);
+            Text tickLabelY = new Text("");
+            tickLabelY.setFill(Color.TRANSPARENT);
+            tickLabelsY.add(tickLabelY);
+        }
 
         gradientLookup = new GradientLookup(tile.getGradientStops());
         low            = tile.getMaxValue();
@@ -176,6 +198,8 @@ public class SparkLineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(tile.getBarColor());
 
+        getPane().getChildren().addAll(horizontalTickLines);
+        getPane().getChildren().addAll(tickLabelsY);
         getPane().getChildren().addAll(titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
     }
 
@@ -207,6 +231,7 @@ public class SparkLineTileSkin extends TileSkin {
             handleCurrentValue(value);
         } else if ("AVERAGING".equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
+
             // To get smooth lines in the chart we need at least 4 values
             if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
             for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
@@ -233,6 +258,36 @@ public class SparkLineTileSkin extends TileSkin {
         double maxY  = minY + graphBounds.getHeight();
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
+
+        niceScaleY.setMinMax(low, high);
+        int    lineCountY       = 0;
+        int    tickLabelOffsetY = 1;
+        double tickSpacingY     = niceScaleY.getTickSpacing();
+        double tickStepY        = tickSpacingY * stepY;
+        double tickStartY       = maxY - (tickSpacingY - low) * stepY;
+        if (tickSpacingY < low) {
+            tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
+            tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+        }
+        double horizontalLineOffset = graphBounds.getHeight() * 0.1 >= 6 ? graphBounds.getHeight() * 0.15 : 1;
+
+        horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
+        tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+        for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
+            Line line  = horizontalTickLines.get(lineCountY);
+            Text label = tickLabelsY.get(lineCountY);
+            label.setText(String.format(locale, "%.0f", (tickSpacingY * (lineCountY + tickLabelOffsetY))));
+            label.setX(minX);
+            label.setY(y + graphBounds.getHeight() * 0.03);
+            label.setFill(tickLineColor);
+            line.setStartX(minX + horizontalLineOffset);
+            line.setEndX(maxX);
+            line.setStartY(y);
+            line.setEndY(y);
+            line.setStroke(tickLineColor);
+            lineCountY++;
+            lineCountY = clamp(0, 4, lineCountY);
+        }
 
         if (!dataList.isEmpty()) {
             if (tile.isSmoothing()) {
@@ -479,6 +534,15 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
         graphBounds = new Rectangle(size * 0.05, size * 0.5, width - size * 0.1, height - size * 0.61);
+
+        double tickLabelFontSize = graphBounds.getHeight() * 0.1;
+        Font   tickLabelFont     = Fonts.latoRegular(tickLabelFontSize);
+        tickLabelsY.forEach(label -> {
+            enableNode(label, tickLabelFontSize >= 6);
+            label.setFont(tickLabelFont);
+        });
+        tickLabelsY.forEach(label -> label.setFont(Fonts.latoRegular(graphBounds.getHeight() * 0.1)));
+        horizontalTickLines.forEach(line -> line.setStrokeWidth(0.5));
 
         stdDeviationArea.setX(graphBounds.getX());
         stdDeviationArea.setWidth(graphBounds.getWidth());

@@ -259,6 +259,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         triangle.getElements().setAll(moveTo, lineTo1, lineTo2, lineTo3, closePath);
     }
 
+
     // ******************** Resizing ******************************************
     private void resize() {
         width  = getWidth() - getInsets().getLeft() - getInsets().getRight();

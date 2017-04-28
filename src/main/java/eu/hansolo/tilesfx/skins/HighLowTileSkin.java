@@ -204,13 +204,23 @@ public class HighLowTileSkin extends TileSkin {
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
-        titleText.relocate(size * 0.05, size * 0.05);
+        switch(tile.getTitleAlignment()) {
+            default    :
+            case LEFT  : titleText.relocate(size * 0.05, size * 0.05); break;
+            case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
+            case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
+        }
 
         fontSize = size * textSize.factor;
         text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
-        text.setX(size * 0.05);
+        switch(tile.getTextAlignment()) {
+            default    :
+            case LEFT  : text.setX(size * 0.05); break;
+            case CENTER: text.setX((width - text.getLayoutBounds().getWidth()) * 0.5); break;
+            case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
+        }
         text.setY(height - size * 0.05);
 
         maxWidth = width - size * 0.85;

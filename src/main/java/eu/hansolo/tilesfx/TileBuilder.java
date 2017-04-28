@@ -51,6 +51,7 @@ import javafx.scene.chart.XYChart.Series;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 
 import java.text.NumberFormat;
 import java.time.LocalTime;
@@ -123,6 +124,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B title(final String TITLE) {
         properties.put("title", new SimpleStringProperty(TITLE));
+        return (B)this;
+    }
+
+    public final B titleAlignment(final TextAlignment ALIGNMENT) {
+        properties.put("titleAlignment", new SimpleObjectProperty(ALIGNMENT));
         return (B)this;
     }
 
@@ -468,6 +474,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B text(final String TEXT) {
         properties.put("text", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
+    public final B textAlignment(final TextAlignment ALIGNMENT) {
+        properties.put("textAlignment", new SimpleObjectProperty(ALIGNMENT));
         return (B)this;
     }
 
@@ -971,6 +982,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
             } else if("title".equals(key)) {
                 CONTROL.setTitle(((StringProperty) properties.get(key)).get());
+            } else if("titleAlignment".equals(key)) {
+                CONTROL.setTitleAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
             } else if("description".equals(key)) {
                 CONTROL.setDescription(((StringProperty) properties.get(key)).get());
             } else if ("descriptionAlignment".equals(key)) {
@@ -1081,6 +1094,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
             } else if ("text".equals(key)) {
                 CONTROL.setText(((StringProperty) properties.get(key)).get());
+            } else if ("textAlignment".equals(key)) {
+                CONTROL.setTextAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
             } else if ("discreteSeconds".equals(key)) {
                 CONTROL.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
             } else if ("discreteMinutes".equals(key)) {

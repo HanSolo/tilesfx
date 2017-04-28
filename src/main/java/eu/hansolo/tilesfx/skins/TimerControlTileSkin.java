@@ -57,25 +57,25 @@ import java.util.Map;
  */
 public class TimerControlTileSkin extends TileSkin {
     private static final double                CLOCK_SCALE_FACTOR = 0.75;
-    private              DateTimeFormatter     dateFormatter;
-    private              double                clockSize;
-    private              Pane                  sectionsPane;
-    private              Path                  minuteTickMarks;
-    private              Path                  hourTickMarks;
-    private              Rectangle             hour;
-    private              Rectangle             minute;
-    private              Rectangle             second;
-    private              Circle                knob;
-    private              Text                  title;
-    private              Text                  amPmText;
-    private              Text                  dateText;
-    private              Text                  text;
-    private              Rotate                hourRotate;
-    private              Rotate                minuteRotate;
-    private              Rotate                secondRotate;
-    private              Group                 shadowGroupHour;
-    private              Group                 shadowGroupMinute;
-    private              Group                 shadowGroupSecond;
+    private              DateTimeFormatter dateFormatter;
+    private              double            clockSize;
+    private              Pane              sectionsPane;
+    private              Path              minuteTickMarks;
+    private              Path              hourTickMarks;
+    private              Rectangle         hour;
+    private              Rectangle         minute;
+    private              Rectangle         second;
+    private              Circle            knob;
+    private              Text              titleText;
+    private              Text              amPmText;
+    private              Text              dateText;
+    private              Text              text;
+    private              Rotate            hourRotate;
+    private              Rotate            minuteRotate;
+    private              Rotate            secondRotate;
+    private              Group             shadowGroupHour;
+    private              Group             shadowGroupMinute;
+    private              Group             shadowGroupSecond;
     private              DropShadow            dropShadow;
     private              Map<TimeSection, Arc> sectionMap;
 
@@ -155,9 +155,9 @@ public class TimerControlTileSkin extends TileSkin {
         shadowGroupMinute.setEffect(tile.isShadowsEnabled() ? dropShadow : null);
         shadowGroupSecond.setEffect(tile.isShadowsEnabled() ? dropShadow : null);
 
-        title = new Text("");
-        title.setTextOrigin(VPos.TOP);
-        Helper.enableNode(title, !tile.getTitle().isEmpty());
+        titleText = new Text("");
+        titleText.setTextOrigin(VPos.TOP);
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
         amPmText = new Text(tile.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
 
@@ -167,7 +167,7 @@ public class TimerControlTileSkin extends TileSkin {
         text = new Text("");
         Helper.enableNode(text, tile.isTextVisible());
 
-        getPane().getChildren().addAll(sectionsPane, hourTickMarks, minuteTickMarks, title, amPmText, dateText, text, shadowGroupHour, shadowGroupMinute, shadowGroupSecond);
+        getPane().getChildren().addAll(sectionsPane, hourTickMarks, minuteTickMarks, titleText, amPmText, dateText, text, shadowGroupHour, shadowGroupMinute, shadowGroupSecond);
     }
 
     @Override protected void registerListeners() {
@@ -185,7 +185,7 @@ public class TimerControlTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(title, !tile.getTitle().isEmpty());
+            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(dateText, tile.isDateVisible());
             Helper.enableNode(second, tile.isSecondsVisible());
@@ -342,11 +342,16 @@ public class TimerControlTileSkin extends TileSkin {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
-        title.setFont(Fonts.latoRegular(fontSize));
-        title.setText(tile.getTitle());
-        if (title.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(title, maxWidth, fontSize); }
-        title.setX(size * 0.05);
-        title.setY(size * 0.05);
+        titleText.setFont(Fonts.latoRegular(fontSize));
+        titleText.setText(tile.getTitle());
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
+        switch(tile.getTitleAlignment()) {
+            default    :
+            case LEFT  : titleText.relocate(size * 0.05, size * 0.05); break;
+            case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
+            case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
+        }
+        titleText.setY(size * 0.05);
 
         maxWidth = width - size * 0.8;
         fontSize = size * textSize.factor;
@@ -367,7 +372,12 @@ public class TimerControlTileSkin extends TileSkin {
         text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
-        text.setX(size * 0.05);
+        switch(tile.getTextAlignment()) {
+            default    :
+            case LEFT  : text.setX(size * 0.05); break;
+            case CENTER: text.setX((width - text.getLayoutBounds().getWidth()) * 0.5); break;
+            case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
+        }
         text.setY(height - size * 0.05);
     };
 
@@ -453,7 +463,7 @@ public class TimerControlTileSkin extends TileSkin {
 
         resizeDynamicText();
 
-        title.setFill(tile.getTitleColor());
+        titleText.setFill(tile.getTitleColor());
         amPmText.setFill(tile.getTitleColor());
         dateText.setFill(tile.getDateColor());
         text.setFill(tile.getTextColor());

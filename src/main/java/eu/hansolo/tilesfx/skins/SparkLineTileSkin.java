@@ -524,7 +524,12 @@ public class SparkLineTileSkin extends TileSkin {
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
-        titleText.relocate(size * 0.05, size * 0.05);
+        switch(tile.getTitleAlignment()) {
+            default    :
+            case LEFT  : titleText.relocate(size * 0.05, size * 0.05); break;
+            case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
+            case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
+        }
 
         maxWidth = width - size * 0.85;
         fontSize = size * 0.12;

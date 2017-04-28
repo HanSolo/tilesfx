@@ -55,6 +55,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -213,12 +214,18 @@ public class Tile extends Control {
     private              BooleanProperty                        autoReferenceValue;
     private              String                                 _title;
     private              StringProperty                         title;
+    private              TextAlignment                          _titleAlignment;
+    private              ObjectProperty<TextAlignment>          titleAlignment;
     private              String                                 _description;
     private              StringProperty                         description;
     private              Pos                                    _descriptionAlignment;
     private              ObjectProperty<Pos>                    descriptionAlignment;
     private              String                                 _unit;
     private              StringProperty                         unit;
+    private              String                                 _text;
+    private              StringProperty                         text;
+    private              TextAlignment                          _textAlignment;
+    private              ObjectProperty<TextAlignment>          textAlignment;
     private              boolean                                _selected;
     private              BooleanProperty                        selected;
     private              boolean                                _averagingEnabled;
@@ -236,8 +243,6 @@ public class Tile extends Control {
     private              ZoneId                                 zoneId;
     private              int                                    updateInterval;
     private              ObservableList<TimeSection>            timeSections;
-    private              String                                 _text;
-    private              StringProperty                         text;
     private              LocalTime                              _duration;
     private              ObjectProperty<LocalTime>              duration;
     private              ObservableList<BarChartItem>           barChartItems;
@@ -520,11 +525,13 @@ public class Tile extends Control {
         };
         zoneId                              = time.get().getZone();
         _title                              = "";
+        _titleAlignment                     = TextAlignment.LEFT;
         _description                        = "";
         _descriptionAlignment               = Pos.TOP_RIGHT;
         _unit                               = "";
         _selected                           = false;
         _text                               = "";
+        _textAlignment                      = TextAlignment.LEFT;
         _averagingEnabled                   = false;
         _averagingPeriod                    = 10;
         _duration                           = LocalTime.of(1, 0);
@@ -943,6 +950,40 @@ public class Tile extends Control {
         }
         return title;
     }
+
+    /**
+     * Returns the alignment that will be used to align the title
+     * in the Tile. Keep in mind that this property will not be used
+     * by every skin
+     * @return the alignment of the title
+     */
+    public TextAlignment getTitleAlignment() { return null == titleAlignment ? _titleAlignment : titleAlignment.get(); }
+    /**
+     * Defines the alignment that will be used to align the title
+     * in the Tile. Keep in mind that this property will not be used
+     * by every skin.
+     * @param ALIGNMENT
+     */
+    public void setTitleAlignment(final TextAlignment ALIGNMENT) {
+        if (null == titleAlignment) {
+            _titleAlignment = ALIGNMENT;
+            fireTileEvent(RESIZE_EVENT);
+        } else {
+            titleAlignment.set(ALIGNMENT);
+        }
+    }
+    public ObjectProperty<TextAlignment> titleAlignmentProperty() {
+        if (null == titleAlignment) {
+            titleAlignment = new ObjectPropertyBase<TextAlignment>(_titleAlignment) {
+                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "titleAlignment"; }
+            };
+            _titleAlignment = null;
+        }
+        return titleAlignment;
+    }
+
 
     /**
      * Returns the description text of the gauge. This description text will usually
@@ -3158,6 +3199,39 @@ public class Tile extends Control {
             _text = null;
         }
         return text;
+    }
+
+    /**
+     * Returns the alignment that will be used to align the text
+     * in the Tile. Keep in mind that this property will not be used
+     * by every skin
+     * @return the alignment of the text
+     */
+    public TextAlignment getTextAlignment() { return null == textAlignment ? _textAlignment : textAlignment.get(); }
+    /**
+     * Defines the alignment that will be used to align the text
+     * in the Tile. Keep in mind that this property will not be used
+     * by every skin.
+     * @param ALIGNMENT
+     */
+    public void setTextAlignment(final TextAlignment ALIGNMENT) {
+        if (null == textAlignment) {
+            _textAlignment = ALIGNMENT;
+            fireTileEvent(RESIZE_EVENT);
+        } else {
+            textAlignment.set(ALIGNMENT);
+        }
+    }
+    public ObjectProperty<TextAlignment> textAlignmentProperty() {
+        if (null == textAlignment) {
+            textAlignment = new ObjectPropertyBase<TextAlignment>(_textAlignment) {
+                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "textAlignment"; }
+            };
+            _textAlignment = null;
+        }
+        return textAlignment;
     }
 
     /**

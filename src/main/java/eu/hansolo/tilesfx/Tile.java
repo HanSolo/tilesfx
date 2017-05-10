@@ -1380,7 +1380,10 @@ public class Tile extends Control {
     public ObjectProperty<Node> graphicProperty() {
         if (null == graphic) {
             graphic = new ObjectPropertyBase<Node>() {
-                @Override protected void invalidated() { fireTileEvent(GRAPHIC_EVENT); }
+                @Override protected void invalidated() {
+                	fireTileEvent(GRAPHIC_EVENT);
+                	fireTileEvent(RESIZE_EVENT);
+                }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "graphic"; }
             };

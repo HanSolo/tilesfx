@@ -145,8 +145,7 @@ public class CustomTileSkin extends TileSkin {
 		                    double scale;
 		                    if (width - containerWidth > height - containerHeight) {
 			                    scale = containerWidth / width;
-		                    }
-		                    else scale = containerHeight / height;
+		                    } else scale = containerHeight / height;
 
 		                    graphic.setScaleX(scale);
 		                    graphic.setScaleY(scale);

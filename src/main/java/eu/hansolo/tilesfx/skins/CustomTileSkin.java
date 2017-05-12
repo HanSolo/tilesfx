@@ -141,21 +141,16 @@ public class CustomTileSkin extends TileSkin {
                         double width   = graphic.getBoundsInLocal().getWidth();
                         double height  = graphic.getBoundsInLocal().getHeight();
 
-                        if (width > containerWidth || height > containerHeight) {
-                            double aspect = height / width;
-                            if (aspect * width > height) {
-                                width = 1 / (aspect / height);
-                                graphic.setScaleX(containerWidth / width);
-                                graphic.setScaleY(containerWidth / width);
-                            } else if (1 / (aspect / height) > width) {
-                                height = aspect * width;
-                                graphic.setScaleX(containerHeight / height);
-                                graphic.setScaleY(containerHeight / height);
-                            } else {
-                                graphic.setScaleX(containerHeight / height);
-                                graphic.setScaleY(containerHeight / height);
-                            }
-                        }
+	                    if (width > containerWidth || height > containerHeight) {
+		                    double scale;
+		                    if (width - containerWidth > height - containerHeight) {
+			                    scale = containerWidth / width;
+		                    }
+		                    else scale = containerHeight / height;
+
+		                    graphic.setScaleX( scale );
+		                    graphic.setScaleY( scale );
+	                    }
                     } else if (tile.getGraphic() instanceof ImageView) {
                         ((ImageView) graphic).setFitWidth(containerWidth);
                         ((ImageView) graphic).setFitHeight(containerHeight);

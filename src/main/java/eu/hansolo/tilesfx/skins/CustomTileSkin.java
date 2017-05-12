@@ -148,8 +148,8 @@ public class CustomTileSkin extends TileSkin {
 		                    }
 		                    else scale = containerHeight / height;
 
-		                    graphic.setScaleX( scale );
-		                    graphic.setScaleY( scale );
+		                    graphic.setScaleX(scale);
+		                    graphic.setScaleY(scale);
 	                    }
                     } else if (tile.getGraphic() instanceof ImageView) {
                         ((ImageView) graphic).setFitWidth(containerWidth);

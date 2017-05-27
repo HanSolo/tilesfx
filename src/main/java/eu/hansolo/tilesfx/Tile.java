@@ -99,7 +99,8 @@ public class Tile extends Control {
                            WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
-                           CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock");
+                           CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
+                           GAUGE_SPARK_LINE("GaugeSparkLine");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -4250,6 +4251,7 @@ public class Tile extends Control {
             case DONUT_CHART      : return new DonutChartTileSkin(Tile.this);
             case CIRCULAR_PROGRESS: return new CircularProgressTileSkin(Tile.this);
             case STOCK            : return new StockTileSkin(Tile.this);
+            case GAUGE_SPARK_LINE: return new GaugeSparkLineTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4338,6 +4340,10 @@ public class Tile extends Control {
                 setTickLabelDecimals(2);
                 setThresholdColor(GRAY);
                 setTextVisible(false);
+                break;
+            case GAUGE_SPARK_LINE:
+                setBarColor(Tile.BLUE);
+                setAngleRange(270);
                 break;
             default:
                 break;

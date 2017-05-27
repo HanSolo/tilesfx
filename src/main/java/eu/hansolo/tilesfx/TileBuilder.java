@@ -843,6 +843,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setThresholdColor(Tile.GRAY);
                     CONTROL.setTextVisible(false);
                     break;
+                case GAUGE_SPARK_LINE:
+                    CONTROL.setBarColor(Tile.BLUE);
+                    CONTROL.setAngleRange(270);
+                    break;
                 default:
                     break;
             }

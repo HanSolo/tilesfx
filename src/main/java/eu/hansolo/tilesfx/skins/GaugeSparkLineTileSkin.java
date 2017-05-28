@@ -251,11 +251,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
         } else if ("VALUE".equals(EVENT_TYPE)) {
-            if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
-            double value = clamp(minValue, maxValue, tile.getValue());
-            addData(value);
-            handleCurrentValue(value);
+            addData(clamp(minValue, maxValue, tile.getValue()));
         } else if ("AVERAGING".equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
 
@@ -323,7 +320,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         }
         if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
         horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-        tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth()));
+        tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02));
 
         if (!dataList.isEmpty()) {
             if (tile.isSmoothing()) {

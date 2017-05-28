@@ -52,6 +52,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
@@ -188,7 +189,6 @@ public class Tile extends Control {
     private        final TileEvent   LOCATION_EVENT        = new TileEvent(EventType.LOCATION);
     private        final TileEvent   TRACK_EVENT           = new TileEvent(EventType.TRACK);
     private        final TileEvent   MAP_PROVIDER_EVENT    = new TileEvent(EventType.MAP_PROVIDER);
-    private        final TileEvent   TOOLTIP_TEXT_EVENT    = new TileEvent(EventType.TOOLTIP_TEXT);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
@@ -417,6 +417,7 @@ public class Tile extends Control {
     private              DarkSky                                darkSky;
     private              String                                 _tooltipText;
     private              StringProperty                         tooltipText;
+    private              Tooltip                                tooltip;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -623,6 +624,8 @@ public class Tile extends Control {
         _minuteTickMarksVisible             = true;
         _alarmsEnabled                      = false;
         _alarmsVisible                      = false;
+        _strokeWithGradient                 = false;
+        tooltip                             = new Tooltip(null);
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -3899,21 +3902,33 @@ public class Tile extends Control {
      */
     public String getTooltipText() { return null == tooltipText ? _tooltipText : tooltipText.get(); }
     /**
-     * Defines the text that will shown in the Tile tooltip
+     * Defines the text that will be shown in the Tile tooltip
      * @param TEXT
      */
     public void setTooltipText(final String TEXT) {
         if (null == tooltipText) {
-            _tooltipText = TEXT;
-            fireTileEvent(TOOLTIP_TEXT_EVENT);
+        tooltip.setText(TEXT);
+            if (null == TEXT || TEXT.isEmpty()) {
+                setTooltip(null);
+            } else {
+                setTooltip(tooltip);
+            }
         } else {
             tooltipText.set(TEXT);
         }
+
     }
     public StringProperty tooltipTextProperty() {
         if (null == tooltipText) {
-            tooltipText = new StringPropertyBase(_tooltipText) {
-                @Override protected void invalidated() { fireTileEvent(TOOLTIP_TEXT_EVENT); }
+            tooltipText = new StringPropertyBase() {
+                @Override protected void invalidated() {
+                    tooltip.setText(get());
+                    if (null == get() || get().isEmpty()) {
+                        setTooltip(null);
+                    } else {
+                        setTooltip(tooltip);
+                    }
+                }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "tooltipText"; }
             };

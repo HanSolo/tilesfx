@@ -1069,6 +1069,7 @@ public class Tile extends Control {
         if (null == unit) {
             _unit = UNIT;
             fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvent(REDRAW_EVENT);
         } else {
             unit.set(UNIT);
         }

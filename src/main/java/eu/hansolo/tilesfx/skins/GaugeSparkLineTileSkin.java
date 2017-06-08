@@ -86,6 +86,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     private Line                 averageLine;
     private LinearGradient       gradient;
     private GradientLookup       gradientLookup;
+    private Text                 minValueText;
+    private Text                 maxValueText;
     private double               low;
     private double               high;
     private double               stdDeviation;
@@ -224,7 +226,10 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         bar.setStrokeLineCap(StrokeLineCap.BUTT);
         bar.setFill(null);
 
-        getPane().getChildren().addAll(sectionCanvas, highlightSectionCanvas, barBackground, bar, titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, timeSpanText, text);
+        minValueText = new Text();
+        maxValueText = new Text();
+
+        getPane().getChildren().addAll(sectionCanvas, highlightSectionCanvas, barBackground, bar, minValueText, maxValueText, titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
     }
@@ -638,6 +643,17 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
         averageText.setX(size * 0.05);
+
+        fontSize = size * 0.04;
+        minValueText.setFont(Fonts.latoRegular(fontSize));
+        minValueText.setText(String.format(locale, "%.0f", tile.getMinValue()));
+        minValueText.setX(width * 0.5 - size * 0.2);
+        minValueText.setY(height * 0.5 + size * 0.25);
+
+        maxValueText.setFont(Fonts.latoRegular(fontSize));
+        maxValueText.setText(String.format(locale, "%.0f", tile.getMaxValue()));
+        maxValueText.setX(width * 0.5 + size * 0.2 - maxValueText.getLayoutBounds().getWidth());
+        maxValueText.setY(height * 0.5 + size * 0.25);
     }
 
     private void drawBackground() {
@@ -763,6 +779,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
+        minValueText.setFill(tile.getTextColor());
+        maxValueText.setFill(tile.getTextColor());
         if (tile.isStrokeWithGradient()) {
             setupGradient();
             sparkLine.setStroke(gradient);

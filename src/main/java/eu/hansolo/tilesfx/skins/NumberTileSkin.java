@@ -19,7 +19,6 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
@@ -98,6 +97,7 @@ public class NumberTileSkin extends TileSkin {
 
     @Override protected void handleCurrentValue(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
+	    unitText.setText(tile.getUnit());
         resizeDynamicText();
     };
 

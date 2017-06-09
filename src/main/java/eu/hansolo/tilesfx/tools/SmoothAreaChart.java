@@ -62,6 +62,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.util.Locale;
+import static eu.hansolo.tilesfx.tools.Helper.*;
 
 
 /**
@@ -71,24 +72,26 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
     private static final StyleablePropertyFactory<SmoothAreaChart> FACTORY              = new StyleablePropertyFactory<>(Region.getClassCssMetaData());
     private static final CssMetaData<SmoothAreaChart, Color>       SELECTOR_COLOR       = FACTORY.createColorCssMetaData("-selector-color", s -> s.selectorColor, Color.web("#2468ea"), false);
     private static final CssMetaData<SmoothAreaChart, Color>       SELECTOR_CIRCLE_FILL = FACTORY.createColorCssMetaData("-selector-circle-fill", s -> s.selectorCircleFill, Color.TRANSPARENT, false);
-    private        final StyleableProperty<Color> selectorColor;
-    private        final StyleableProperty<Color> selectorCircleFill;
-    private              BooleanProperty          selectorEnabled;
-    private              DoubleProperty           selectedValue;
-    private              IntegerProperty          selectedValueDecimals;
-    private              BooleanProperty          areaVisible;
-    private              String                   valueFormatString;
-    private              double                   lowerBound;
-    private              double                   upperBound;
-    private              double                   range;
-    private              EventHandler<MouseEvent> mousePressHandler;
-    private              EventHandler<MouseEvent> mouseReleaseHandler;
-    private              Timeline                 timeline;
+    private        final StyleableProperty<Color>                  selectorColor;
+    private        final StyleableProperty<Color>                  selectorCircleFill;
+    private              BooleanProperty                           selectorEnabled;
+    private              DoubleProperty                            selectedValue;
+    private              IntegerProperty                           selectedValueDecimals;
+    private              BooleanProperty                           areaVisible;
+    private              String                                    valueFormatString;
+    private              double                                    lowerBound;
+    private              double                                    upperBound;
+    private              double                                    range;
+    private              EventHandler<MouseEvent>                  mousePressHandler;
+    private              EventHandler<MouseEvent>                  mouseReleaseHandler;
+    private              Timeline                                  timeline;
 
-    private Region chartPlotBackground;
-    private Line   selector;
-    private Circle selectorCircle;
-    private Text   selectedValueText;
+    private              Region                                    chartPlotBackground;
+    private              Line                                      selector;
+    private              Circle                                    selectorCircle;
+    private              Text                                      selectedValueText;
+    private              double                                    _selectorRadius;
+    private              DoubleProperty                            selectorRadius;
 
 
     // ******************** Constructors **************************************
@@ -149,6 +152,8 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
         mousePressHandler         = evt -> selectData(evt);
         mouseReleaseHandler       = evt -> timeline.play();
 
+        _selectorRadius           = 5;
+
         // Add additional nodes
         selector = new Line();
         selector.setStroke(getSelectorColor());
@@ -205,9 +210,13 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
         for (Node node : lookupAll(".chart-plot-background")) {
             if (node instanceof Region) { return (Region) node; }
         }
-        //for (Node node : lookupAll(".chart-series-area-fill series0 default-color0")) {
-        //    if (node instanceof Path) return (Path) node;
-        //}
+        return null;
+    }
+
+    public Group getPlotContent() {
+        for (Node node : lookupAll(".plot-content")) {
+            if (node instanceof Group) { return (Group) node; }
+        }
         return null;
     }
 
@@ -233,6 +242,30 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
     public boolean isAreaVisible() { return areaVisible.get(); }
     public void setAreaVisible(final boolean VISIBLE) { areaVisible.set(VISIBLE); }
     public BooleanProperty areaVisibleProperty() { return areaVisible; }
+
+    public double getSelectorRadius() { return null == selectorRadius ? _selectorRadius : selectorRadius.get(); }
+    public void setSelectorRadius(final double RADIUS) {
+        if (null == selectorRadius) {
+            _selectorRadius = RADIUS;
+            selectorCircle.setRadius(RADIUS);
+        } else {
+            selectorRadius.set(RADIUS);
+        }
+    }
+    public DoubleProperty selectorRadiusProperty() {
+        if (null == selectorRadius) {
+            selectorRadius = new DoublePropertyBase(_selectorRadius) {
+                @Override protected void invalidated() { selectorCircle.setRadius(get()); }
+                @Override public Object getBean() { return SmoothAreaChart.this; }
+                @Override public String getName() { return "selectorRadius"; }
+            };
+        }
+        return selectorRadius;
+    }
+
+    public void enableLegend(final boolean ENABLE) {
+        getLegend().setManaged(ENABLE);
+    }
 
     @Override protected void layoutPlotChildren() {
         super.layoutPlotChildren();
@@ -278,7 +311,7 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
         fillElements.add(new MoveTo(dataPoints[0].getX(), zeroY));
         fillElements.add(new LineTo(dataPoints[0].getX(), dataPoints[0].getY()));
         // add curves
-        for (int i = 1; i < dataPoints.length; i++) {
+        for (int i = 2; i < dataPoints.length; i++) {
             final int ci = i - 1;
             strokeElements.add(new CubicCurveTo(
                 firstControlPoints[ci].getX(), firstControlPoints[ci].getY(),
@@ -522,16 +555,5 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
         selectedValueText.setOpacity(1);
         selector.setOpacity(1);
         selectorCircle.setOpacity(1);
-    }
-
-    private double clamp(final double MIN, final double MAX, final double VALUE) {
-        if (VALUE < MIN) return MIN;
-        if (VALUE > MAX) return MAX;
-        return VALUE;
-    }
-    private int clamp(final int MIN, final int MAX, final int VALUE) {
-        if (VALUE < MIN) return MIN;
-        if (VALUE > MAX) return MAX;
-        return VALUE;
     }
 }

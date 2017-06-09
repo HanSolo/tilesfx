@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.SmoothAreaChart;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
+import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.text.Text;
@@ -33,8 +34,8 @@ import javafx.scene.text.Text;
 public class AreaChartTileSkin extends TileSkin {
     private Text                            titleText;
     private SmoothAreaChart<String, Number> chart;
-    private CategoryAxis                    xAxis;
-    private NumberAxis                      yAxis;
+    private Axis                            xAxis;
+    private Axis                            yAxis;
 
 
     // ******************** Constructors **************************************
@@ -50,8 +51,8 @@ public class AreaChartTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        xAxis = new CategoryAxis();
-        yAxis = new NumberAxis();
+        xAxis = tile.getXAxis();
+        yAxis = tile.getYAxis();
 
         chart = new SmoothAreaChart<>(xAxis, yAxis);
         chart.getData().addAll(tile.getSeries());

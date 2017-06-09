@@ -47,6 +47,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.chart.Axis;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
@@ -684,6 +685,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B xAxis(final Axis AXIS) {
+        properties.put("xAxis", new SimpleObjectProperty(AXIS));
+        return (B)this;
+    }
+
+    public final B yAxis(final Axis AXIS) {
+        properties.put("yAxis", new SimpleObjectProperty(AXIS));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -846,6 +857,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case GAUGE_SPARK_LINE:
                     CONTROL.setBarColor(Tile.BLUE);
                     CONTROL.setAngleRange(270);
+                    break;
+                case SMOOTH_AREA_CHART:
                     break;
                 default:
                     break;
@@ -1166,6 +1179,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
             } else if ("tooltipText".equals(key)) {
                 CONTROL.setTooltipText(((StringProperty) properties.get(key)).get());
+            } else if ("xAxis".equals(key)) {
+                CONTROL.setXAxis(((ObjectProperty<Axis>) properties.get(key)).get());
+            } else if ("yAxis".equals(key)) {
+                CONTROL.setYAxis(((ObjectProperty<Axis>) properties.get(key)).get());
             }
         }
         return CONTROL;

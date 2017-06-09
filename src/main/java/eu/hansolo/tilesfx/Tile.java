@@ -49,6 +49,9 @@ import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.chart.Axis;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -101,7 +104,7 @@ public class Tile extends Control {
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
                            CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
-                           GAUGE_SPARK_LINE("GaugeSparkLine");
+                           GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -364,7 +367,6 @@ public class Tile extends Control {
     private              StringProperty                         alertMessage;
     private              boolean                                _smoothing;
     private              BooleanProperty                        smoothing;
-    // others
     private              double                                 increment;
     private              double                                 originalMinValue;
     private              double                                 originalMaxValue;
@@ -418,6 +420,10 @@ public class Tile extends Control {
     private              String                                 _tooltipText;
     private              StringProperty                         tooltipText;
     private              Tooltip                                tooltip;
+    private              Axis                                   _xAxis;
+    private              ObjectProperty<Axis>                   xAxis;
+    private              Axis                                   _yAxis;
+    private              ObjectProperty<Axis>                   yAxis;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -626,6 +632,8 @@ public class Tile extends Control {
         _alarmsVisible                      = false;
         _strokeWithGradient                 = false;
         tooltip                             = new Tooltip(null);
+        _xAxis                              = new CategoryAxis();
+        _yAxis                              = new NumberAxis();
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -3938,6 +3946,50 @@ public class Tile extends Control {
         return tooltipText;
     }
 
+    public Axis getXAxis() { return null == xAxis ? _xAxis : xAxis.get(); }
+    public void setXAxis(final Axis AXIS) {
+        if (null == xAxis) {
+            _xAxis = AXIS;
+            fireTileEvent(RESIZE_EVENT);
+        } else {
+            xAxis.set(AXIS);
+        }
+    }
+    public ObjectProperty<Axis> xAxisProperty() {
+        if (null == xAxis) {
+            xAxis = new ObjectPropertyBase<Axis>(_xAxis) {
+                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() {
+                    return "xAxis";
+                }
+            };
+            _xAxis = null;
+        }
+        return xAxis;
+    }
+
+    public Axis getYAxis() { return null == yAxis ? _yAxis : yAxis.get(); }
+    public void setYAxis(final Axis AXIS) {
+        if (null == yAxis) {
+            _yAxis = AXIS;
+            fireTileEvent(RESIZE_EVENT);
+        } else {
+            yAxis.set(AXIS);
+        }
+    }
+    public ObjectProperty<Axis> yAxisProperty() {
+        if (null == yAxis) {
+            yAxis = new ObjectPropertyBase<Axis>(_yAxis) {
+                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "yAxis"; }
+            };
+            _yAxis = null;
+        }
+        return yAxis;
+    }
+
     public double getIncrement() { return increment; }
     public void setIncrement(final double INCREMENT) { increment = clamp(0, 10, INCREMENT); }
 
@@ -4267,7 +4319,8 @@ public class Tile extends Control {
             case DONUT_CHART      : return new DonutChartTileSkin(Tile.this);
             case CIRCULAR_PROGRESS: return new CircularProgressTileSkin(Tile.this);
             case STOCK            : return new StockTileSkin(Tile.this);
-            case GAUGE_SPARK_LINE: return new GaugeSparkLineTileSkin(Tile.this);
+            case GAUGE_SPARK_LINE : return new GaugeSparkLineTileSkin(Tile.this);
+            case SMOOTH_AREA_CHART: return new SmoothAreaChartTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4361,6 +4414,8 @@ public class Tile extends Control {
                 setBarColor(Tile.BLUE);
                 setAngleRange(270);
                 break;
+            case SMOOTH_AREA_CHART:
+                break;
             default:
                 break;
         }
@@ -4393,6 +4448,8 @@ public class Tile extends Control {
             case DONUT_CHART      : setSkin(new DonutChartTileSkin(Tile.this)); break;
             case CIRCULAR_PROGRESS: setSkin(new CircularProgressTileSkin(Tile.this)); break;
             case STOCK            : setSkin(new StockTileSkin(Tile.this)); break;
+            case GAUGE_SPARK_LINE : setSkin(new GaugeSparkLineTileSkin(Tile.this)); break;
+            case SMOOTH_AREA_CHART: setSkin(new SmoothAreaChartTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

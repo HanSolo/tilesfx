@@ -30,7 +30,7 @@
 }
 
 .tile .chart {
-    -fx-padding: 10px;
+    -fx-padding: 0px;
 }
 
 .tile .chart-content {
@@ -93,6 +93,7 @@
 }
 .tile .axis:left > .axis-label {
     -fx-padding: 0 0 4px 0;
+
 }
 .tile .axis:bottom > .axis-label {
     -fx-padding: 4px 0 0 0;

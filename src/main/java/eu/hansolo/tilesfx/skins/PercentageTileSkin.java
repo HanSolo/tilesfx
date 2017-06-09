@@ -21,7 +21,6 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -232,8 +231,8 @@ public class PercentageTileSkin extends TileSkin {
         barClip.setY(height - size * 0.05);
         barClip.setWidth(width);
         barClip.setHeight(size * 0.05);
-        barClip.setArcWidth(tile.getRoundedCorners() ? size * 0.025 : 0.0);
-        barClip.setArcHeight(tile.getRoundedCorners() ? size * 0.025 : 0.0);
+        barClip.setArcWidth(tile.getRoundedCorners() ? size * 0.05 : 0.0);
+        barClip.setArcHeight(tile.getRoundedCorners() ? size * 0.05 : 0.0);
 
         bar.setX(0);
         bar.setY(height - size * 0.035);

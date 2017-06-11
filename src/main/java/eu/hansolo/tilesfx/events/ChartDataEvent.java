@@ -16,7 +16,7 @@
 
 package eu.hansolo.tilesfx.events;
 
-import eu.hansolo.tilesfx.tools.ChartData;
+import eu.hansolo.tilesfx.chart.ChartData;
 
 
 /**

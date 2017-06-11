@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.hansolo.tilesfx.tools;
+package eu.hansolo.tilesfx.chart;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -55,6 +55,7 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -273,6 +274,7 @@ public class SmoothAreaChart<X, Y> extends AreaChart<X, Y> {
             final XYChart.Series<X, Y> series     = getData().get(seriesIndex);
             final Path                 seriesLine = (Path) ((Group) series.getNode()).getChildren().get(1);
             final Path                 fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
+            seriesLine.setStrokeLineCap(StrokeLineCap.BUTT);
             fillPath.setVisible(isAreaVisible());
             fillPath.setManaged(isAreaVisible());
             smooth(seriesLine.getElements(), fillPath.getElements());

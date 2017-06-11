@@ -16,6 +16,8 @@
 
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.chart.RadarChart;
+import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
@@ -27,7 +29,7 @@ import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.*;
-import eu.hansolo.tilesfx.tools.ChartData;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.TimeData;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
@@ -104,7 +106,8 @@ public class Tile extends Control {
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
                            CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
-                           GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin");
+                           GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
+                           RADAR_CHART("RadarChart");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -122,17 +125,17 @@ public class Tile extends Control {
         }
     }
     public enum TileColor {
-        GRAY(Color.rgb(139,144,146), "gray"),
-        RED(Color.rgb(229, 80, 76), "red"),
-        LIGHT_RED(Color.rgb(255, 84, 56), "light-red"),
-        GREEN(Color.rgb(143, 198, 94), "green"),
-        LIGHT_GREEN(Color.rgb(132, 228, 50), "light-green"),
-        BLUE(Color.rgb(55, 179, 252), "blue"),
-        DARK_BLUE(Color.rgb(55, 94, 252), "dark-blue"),
-        ORANGE(Color.rgb(237, 162, 57), "orange"),
-        YELLOW_ORANGE(Color.rgb(229, 198, 76), "yellow-orange"),
-        YELLOW(Color.rgb(229, 229, 76), "yellow"),
-        MAGENTA(Color.rgb(198, 75, 232), "magenta");
+        GRAY(Color.rgb(139,144,146), "GRAY"),
+        RED(Color.rgb(229, 80, 76), "RED"),
+        LIGHT_RED(Color.rgb(255, 84, 56), "LIGHT_RED"),
+        GREEN(Color.rgb(143, 198, 94), "GREEN"),
+        LIGHT_GREEN(Color.rgb(132, 228, 50), "LIGHT_GREEN"),
+        BLUE(Color.rgb(55, 179, 252), "BLUE"),
+        DARK_BLUE(Color.rgb(55, 94, 252), "DARK_BLUE"),
+        ORANGE(Color.rgb(237, 162, 57), "ORANGE"),
+        YELLOW_ORANGE(Color.rgb(229, 198, 76), "YELLOW_ORANGE"),
+        YELLOW(Color.rgb(229, 229, 76), "YELLOW"),
+        MAGENTA(Color.rgb(198, 75, 232), "MAGENTA");
 
         public final Color  color;
         public final String styleName;
@@ -424,6 +427,10 @@ public class Tile extends Control {
     private              ObjectProperty<Axis>                   xAxis;
     private              Axis                                   _yAxis;
     private              ObjectProperty<Axis>                   yAxis;
+    private              RadarChart.Mode                        _radarChartMode;
+    private              ObjectProperty<RadarChart.Mode>        radarChartMode;
+    private              Color                                  _chartGridColor;
+    private              ObjectProperty<Color>                  chartGridColor;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -634,6 +641,8 @@ public class Tile extends Control {
         tooltip                             = new Tooltip(null);
         _xAxis                              = new CategoryAxis();
         _yAxis                              = new NumberAxis();
+        _radarChartMode                     = Mode.POLYGON;
+        _chartGridColor                     = Tile.GRAY;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -1507,13 +1516,13 @@ public class Tile extends Control {
         return mapProvider;
     }
 
-    public ObservableList<ChartData> getRadialChartData() { return chartDataList; }
-    public void addRadialChartData(final ChartData... DATA) { chartDataList.addAll(DATA); }
-    public void addRadialChartData(final List<ChartData> DATA) { chartDataList.addAll(DATA); }
-    public void setRadialChartData(final ChartData... DATA) { chartDataList.setAll(DATA); }
-    public void setRadialChartData(final List<ChartData> DATA) { chartDataList.setAll(DATA); }
-    public void removeRadialChartData(final ChartData DATA) { chartDataList.remove(DATA); }
-    public void clearRadialChartData() { chartDataList.clear(); }
+    public ObservableList<ChartData> getChartData() { return chartDataList; }
+    public void addChartData(final ChartData... DATA) { chartDataList.addAll(DATA); }
+    public void addChartData(final List<ChartData> DATA) { chartDataList.addAll(DATA); }
+    public void setChartData(final ChartData... DATA) { chartDataList.setAll(DATA); }
+    public void setChartData(final List<ChartData> DATA) { chartDataList.setAll(DATA); }
+    public void removeChartData(final ChartData DATA) { chartDataList.remove(DATA); }
+    public void clearChartData() { chartDataList.clear(); }
 
     /**
      * A convenient method to set the color of foreground elements like
@@ -3990,6 +3999,48 @@ public class Tile extends Control {
         return yAxis;
     }
 
+    public RadarChart.Mode getRadarChartMode() { return null == radarChartMode ? _radarChartMode : radarChartMode.get(); }
+    public void setRadarChartMode(final RadarChart.Mode MODE) {
+        if (null == radarChartMode) {
+            _radarChartMode = MODE;
+            fireTileEvent(RECALC_EVENT);
+        } else {
+            radarChartMode.set(MODE);
+        }
+    }
+    public ObjectProperty<RadarChart.Mode> radarChartModeProperty() {
+        if (null == radarChartMode) {
+            radarChartMode = new ObjectPropertyBase<Mode>(_radarChartMode) {
+                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "radarChartMode"; }
+            };
+            _radarChartMode = null;
+        }
+        return radarChartMode;
+    }
+
+    public Color getChartGridColor() { return null == chartGridColor ? _chartGridColor : chartGridColor.get(); }
+    public void setChartGridColor(final Color COLOR) {
+        if (null == chartGridColor) {
+            _chartGridColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            chartGridColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> chartGridColorProperty() {
+        if (null == chartGridColor) {
+            chartGridColor = new ObjectPropertyBase<Color>(_chartGridColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "chartGridColor"; }
+            };
+            _chartGridColor = null;
+        }
+        return chartGridColor;
+    }
+
     public double getIncrement() { return increment; }
     public void setIncrement(final double INCREMENT) { increment = clamp(0, 10, INCREMENT); }
 
@@ -4321,6 +4372,7 @@ public class Tile extends Control {
             case STOCK            : return new StockTileSkin(Tile.this);
             case GAUGE_SPARK_LINE : return new GaugeSparkLineTileSkin(Tile.this);
             case SMOOTH_AREA_CHART: return new SmoothAreaChartTileSkin(Tile.this);
+            case RADAR_CHART: return new RadarChartTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4416,6 +4468,8 @@ public class Tile extends Control {
                 break;
             case SMOOTH_AREA_CHART:
                 break;
+            case RADAR_CHART:
+                break;
             default:
                 break;
         }
@@ -4450,6 +4504,7 @@ public class Tile extends Control {
             case STOCK            : setSkin(new StockTileSkin(Tile.this)); break;
             case GAUGE_SPARK_LINE : setSkin(new GaugeSparkLineTileSkin(Tile.this)); break;
             case SMOOTH_AREA_CHART: setSkin(new SmoothAreaChartTileSkin(Tile.this)); break;
+            case RADAR_CHART      : setSkin(new RadarChartTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

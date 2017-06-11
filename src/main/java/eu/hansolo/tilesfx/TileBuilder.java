@@ -873,6 +873,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case RADAR_CHART:
                     break;
+                case COUNTRY:
+                    break;
                 default:
                     break;
             }

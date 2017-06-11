@@ -107,7 +107,7 @@ public class Tile extends Control {
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
                            CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
                            GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
-                           RADAR_CHART("RadarChart");
+                           RADAR_CHART("RadarChart"), COUNTRY("Country");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -4372,7 +4372,8 @@ public class Tile extends Control {
             case STOCK            : return new StockTileSkin(Tile.this);
             case GAUGE_SPARK_LINE : return new GaugeSparkLineTileSkin(Tile.this);
             case SMOOTH_AREA_CHART: return new SmoothAreaChartTileSkin(Tile.this);
-            case RADAR_CHART: return new RadarChartTileSkin(Tile.this);
+            case RADAR_CHART      : return new RadarChartTileSkin(Tile.this);
+            case COUNTRY          : return new CountryTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4470,6 +4471,8 @@ public class Tile extends Control {
                 break;
             case RADAR_CHART:
                 break;
+            case COUNTRY:
+                break;
             default:
                 break;
         }
@@ -4505,6 +4508,7 @@ public class Tile extends Control {
             case GAUGE_SPARK_LINE : setSkin(new GaugeSparkLineTileSkin(Tile.this)); break;
             case SMOOTH_AREA_CHART: setSkin(new SmoothAreaChartTileSkin(Tile.this)); break;
             case RADAR_CHART      : setSkin(new RadarChartTileSkin(Tile.this)); break;
+            case COUNTRY          : setSkin(new CountryTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

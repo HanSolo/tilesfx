@@ -222,4 +222,8 @@ public class Helper {
     public static Color getContrastColor(final Color COLOR) {
         return COLOR.getBrightness() > 0.5 ? Color.BLACK : Color.WHITE;
     }
+
+    public static Color getColorWithOpacity(final Color COLOR, final double OPACITY) {
+        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), OPACITY);
+    }
 }

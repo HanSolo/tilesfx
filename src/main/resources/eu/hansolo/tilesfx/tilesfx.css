@@ -19,8 +19,11 @@
     -FOREGROUND      : rgb(223, 223, 223);
     -GRAY            : rgb(139,144,146);
     -RED             : rgb(229, 80, 76);
+    -LIGHT_RED       : rgb(255, 84, 56);
     -GREEN           : rgb(143, 198, 94);
+    -LIGHT_GREEN     : rgb(132, 228, 50);
     -BLUE            : rgb(55, 179, 252);
+    -DARK_BLUE       : rgb(55, 94, 252);
     -ORANGE          : rgb(237, 162, 57);
     -YELLOW_ORANGE   : rgb(229, 198, 76);
     -YELLOW          : rgb(229, 229, 76);

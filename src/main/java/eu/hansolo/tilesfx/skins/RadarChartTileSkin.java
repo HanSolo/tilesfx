@@ -19,16 +19,11 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart;
-import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.scene.text.Text;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**

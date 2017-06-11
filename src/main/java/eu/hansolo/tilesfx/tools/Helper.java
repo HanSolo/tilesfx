@@ -218,4 +218,8 @@ public class Helper {
     public static final boolean equals(final double A, final double B) { return A == B || Math.abs(A - B) < EPSILON; }
     public static final boolean biggerThan(final double A, final double B) { return (A - B) > EPSILON; }
     public static final boolean lessThan(final double A, final double B) { return (B - A) > EPSILON; }
+
+    public static Color getContrastColor(final Color COLOR) {
+        return COLOR.getBrightness() > 0.5 ? Color.BLACK : Color.WHITE;
+    }
 }

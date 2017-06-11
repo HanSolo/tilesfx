@@ -21,7 +21,7 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.tools.ChartData;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
@@ -32,14 +32,12 @@ import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
@@ -390,7 +388,7 @@ public class Demo extends Application {
                                      .title("RadialChart")
                                      .text("Some text")
                                      .textVisible(false)
-                                     .radialChartData(chartData1, chartData2, chartData3, chartData4)
+                                     .ChartData(chartData1, chartData2, chartData3, chartData4)
                                      .build();
 
         donutChartTile = TileBuilder.create()
@@ -399,7 +397,7 @@ public class Demo extends Application {
                                      .title("DonutChart")
                                      .text("Some text")
                                      .textVisible(false)
-                                     .radialChartData(chartData1, chartData2, chartData3, chartData4)
+                                     .ChartData(chartData1, chartData2, chartData3, chartData4)
                                      .build();
 
         circularProgressTile = TileBuilder.create()

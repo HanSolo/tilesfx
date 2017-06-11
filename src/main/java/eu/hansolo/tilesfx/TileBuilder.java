@@ -20,12 +20,13 @@ import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.Tile.TileColor;
+import eu.hansolo.tilesfx.chart.RadarChart;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.tools.ChartData;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.beans.InvalidationListener;
@@ -343,12 +344,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B radialChartData(final ChartData... DATA) {
+    public final B ChartData(final ChartData... DATA) {
         properties.put("radialChartDataArray", new SimpleObjectProperty(DATA));
         return (B)this;
     }
 
-    public final B radialChartData(final List<ChartData> DATA) {
+    public final B ChartData(final List<ChartData> DATA) {
         properties.put("radialChartDataList", new SimpleObjectProperty(DATA));
         return (B)this;
     }
@@ -695,6 +696,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B radarChartMode(final RadarChart.Mode MODE) {
+       properties.put("radarChartMode", new SimpleObjectProperty(MODE));
+       return (B)this;
+    }
+
+    public final B chartGridColor(final Color COLOR) {
+        properties.put("chartGridColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -860,6 +871,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case SMOOTH_AREA_CHART:
                     break;
+                case RADAR_CHART:
+                    break;
                 default:
                     break;
             }
@@ -930,10 +943,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
 
         if (properties.keySet().contains("radialChartDataArray")) {
-            CONTROL.setRadialChartData(((ObjectProperty<ChartData[]>) properties.get("radialChartDataArray")).get());
+            CONTROL.setChartData(((ObjectProperty<ChartData[]>) properties.get("radialChartDataArray")).get());
         }
         if (properties.keySet().contains("radialChartDataList")) {
-            CONTROL.setRadialChartData(((ObjectProperty<List<ChartData>>) properties.get("radialChartDataList")).get());
+            CONTROL.setChartData(((ObjectProperty<List<ChartData>>) properties.get("radialChartDataList")).get());
         }
 
         if (properties.keySet().contains("poiArray")) {
@@ -1183,6 +1196,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setXAxis(((ObjectProperty<Axis>) properties.get(key)).get());
             } else if ("yAxis".equals(key)) {
                 CONTROL.setYAxis(((ObjectProperty<Axis>) properties.get(key)).get());
+            } else if ("radarChartMode".equals(key)) {
+                CONTROL.setRadarChartMode(((ObjectProperty<RadarChart.Mode>) properties.get(key)).get());
+            } else if ("chartGridColor".equals(key)) {
+                CONTROL.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
             }
         }
         return CONTROL;

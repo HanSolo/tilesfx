@@ -19,12 +19,10 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.SmoothAreaChart;
+import eu.hansolo.tilesfx.chart.SmoothAreaChart;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.text.Text;
 
 

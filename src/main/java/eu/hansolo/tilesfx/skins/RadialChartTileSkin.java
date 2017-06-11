@@ -20,7 +20,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.ChartData;
+import eu.hansolo.tilesfx.chart.ChartData;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -61,7 +61,7 @@ public class RadialChartTileSkin extends TileSkin {
         super.initGraphics();
 
         chartEventListener = e -> drawChart();
-        tile.getRadialChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
+        tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
 
         chartDataListener  = c -> {
             while (c.next()) {
@@ -90,7 +90,7 @@ public class RadialChartTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.getRadialChartData().addListener(chartDataListener);
+        tile.getChartData().addListener(chartDataListener);
     }
 
 
@@ -107,8 +107,8 @@ public class RadialChartTileSkin extends TileSkin {
     };
 
     @Override public void dispose() {
-        tile.getRadialChartData().removeListener(chartDataListener);
-        tile.getRadialChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        tile.getChartData().removeListener(chartDataListener);
+        tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
         super.dispose();
     }
 
@@ -116,9 +116,9 @@ public class RadialChartTileSkin extends TileSkin {
         double                canvasSize     = canvas.getWidth();
         double                radius         = canvasSize * 0.5;
         double                innerSpacer    = radius * 0.18;
-        double                barWidth       = (radius - innerSpacer) / tile.getRadialChartData().size();
-        //List<RadialChartData> sortedDataList = tile.getRadialChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
-        List<ChartData> dataList  = tile.getRadialChartData();
+        double                barWidth       = (radius - innerSpacer) / tile.getChartData().size();
+        //List<RadialChartData> sortedDataList = tile.getChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
+        List<ChartData> dataList  = tile.getChartData();
         int             noOfItems = dataList.size();
         double          max       = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
 

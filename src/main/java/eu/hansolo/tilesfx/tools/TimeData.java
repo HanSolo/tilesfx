@@ -16,6 +16,8 @@
 
 package eu.hansolo.tilesfx.tools;
 
+import eu.hansolo.tilesfx.chart.ChartData;
+
 import java.time.Instant;
 
 

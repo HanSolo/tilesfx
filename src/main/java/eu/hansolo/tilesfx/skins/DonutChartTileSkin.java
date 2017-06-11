@@ -19,7 +19,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.ChartData;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.VPos;
@@ -60,7 +60,7 @@ public class DonutChartTileSkin extends TileSkin {
         super.initGraphics();
 
         chartEventListener = e -> drawChart();
-        tile.getRadialChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
+        tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
 
         chartDataListener  = c -> {
             while (c.next()) {
@@ -93,7 +93,7 @@ public class DonutChartTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.getRadialChartData().addListener(chartDataListener);
+        tile.getChartData().addListener(chartDataListener);
     }
 
 
@@ -117,13 +117,13 @@ public class DonutChartTileSkin extends TileSkin {
     };
 
     @Override public void dispose() {
-        tile.getRadialChartData().removeListener(chartDataListener);
-        tile.getRadialChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        tile.getChartData().removeListener(chartDataListener);
+        tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
         super.dispose();
     }
 
     private void drawChart() {
-        List<ChartData> dataList       = tile.getRadialChartData();
+        List<ChartData> dataList       = tile.getChartData();
         double          canvasSize     = chartCanvas.getWidth();
         int             noOfItems      = dataList.size();
         double          center         = canvasSize * 0.5;
@@ -179,7 +179,7 @@ public class DonutChartTileSkin extends TileSkin {
     }
 
     private void drawLegend() {
-        List<ChartData> dataList     = tile.getRadialChartData();
+        List<ChartData> dataList     = tile.getChartData();
         double          canvasWidth  = legendCanvas.getWidth();
         double          canvasHeight = legendCanvas.getHeight();
         int             noOfItems    = dataList.size();

@@ -388,7 +388,7 @@ public class Demo extends Application {
                                      .title("RadialChart")
                                      .text("Some text")
                                      .textVisible(false)
-                                     .ChartData(chartData1, chartData2, chartData3, chartData4)
+                                     .chartData(chartData1, chartData2, chartData3, chartData4)
                                      .build();
 
         donutChartTile = TileBuilder.create()
@@ -397,7 +397,7 @@ public class Demo extends Application {
                                      .title("DonutChart")
                                      .text("Some text")
                                      .textVisible(false)
-                                     .ChartData(chartData1, chartData2, chartData3, chartData4)
+                                     .chartData(chartData1, chartData2, chartData3, chartData4)
                                      .build();
 
         circularProgressTile = TileBuilder.create()

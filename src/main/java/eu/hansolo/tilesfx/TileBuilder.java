@@ -706,6 +706,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B country(final Country COUNTRY) {
+        properties.put("country", new SimpleObjectProperty(COUNTRY));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -1202,6 +1207,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setRadarChartMode(((ObjectProperty<RadarChart.Mode>) properties.get(key)).get());
             } else if ("chartGridColor".equals(key)) {
                 CONTROL.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("country".equals(key)) {
+                CONTROL.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
             }
         }
         return CONTROL;

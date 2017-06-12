@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx.skins;
 
+import eu.hansolo.tilesfx.Country;
 import eu.hansolo.tilesfx.CountryPath;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
@@ -23,10 +24,7 @@ import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.SVGPath;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -43,8 +41,10 @@ public class CountryTileSkin extends TileSkin {
     private Text              valueText;
     private Text              unitText;
     private TextFlow          valueUnitFlow;
+    private Country           country;
     private StackPane         countryContainer;
-    private ChangeListener    localeListener;
+    private Group             countryGroup;
+    private ChangeListener    countryListener;
     private List<CountryPath> countryPaths;
 
 
@@ -58,25 +58,38 @@ public class CountryTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        localeListener = (o, ov, nv) -> {
-            if (nv != null) { countryPaths.forEach(path -> path.setLocale(tile.getLocale())); }
+        country = null == tile.getCountry() ? Country.DE : tile.getCountry();
+        countryListener = (o, ov, nv) -> {
+            if (nv != null) {
+                country = null == tile.getCountry() ? Country.DE : tile.getCountry();
+                countryPaths.clear();
+                countryPaths.addAll(Helper.getHiresCountryPaths().get(country.name()));
+                countryGroup.getChildren().setAll(countryPaths);
+                text.setText(tile.getCountry().getDisplayName());
+                resize();
+                redraw();
+            }
         };
-        countryPaths = tile.getCountryPaths().get(tile.getLocale().getCountry());
+        countryPaths = Helper.getHiresCountryPaths().get(country.name());
         countryPaths.forEach(path -> path.setFill(tile.getBarColor()));
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        text = new Text(tile.getText());
+        text = new Text(tile.getCountry().getDisplayName());
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
+
+        countryGroup = new Group();
+        countryGroup.getChildren().setAll(countryPaths);
 
         countryContainer = new StackPane();
         countryContainer.setMinSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
         countryContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
         countryContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
-        countryContainer.getChildren().setAll(countryPaths);
+        countryContainer.getChildren().setAll(countryGroup);
+
 
         valueText = new Text(String.format(locale, formatString, ((tile.getValue() - minValue) / range * 100)));
         valueText.setFill(tile.getValueColor());
@@ -96,7 +109,7 @@ public class CountryTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.localeProperty().addListener(localeListener);
+        tile.countryProperty().addListener(countryListener);
     }
 
 
@@ -118,7 +131,7 @@ public class CountryTileSkin extends TileSkin {
     };
 
     @Override public void dispose() {
-        tile.localeProperty().removeListener(localeListener);
+        tile.countryProperty().removeListener(countryListener);
         super.dispose();
     }
 
@@ -166,6 +179,10 @@ public class CountryTileSkin extends TileSkin {
         double containerHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
         double containerSize   = containerWidth < containerHeight ? containerWidth : containerHeight;
 
+        double countryWidth    = countryGroup.getLayoutBounds().getWidth();
+        double countryHeight   = countryGroup.getLayoutBounds().getHeight();
+        double countrySize     = countryWidth < countryHeight ? countryWidth : countryHeight;
+
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
@@ -175,29 +192,9 @@ public class CountryTileSkin extends TileSkin {
                 countryContainer.setMaxSize(containerWidth, containerHeight);
                 countryContainer.setPrefSize(containerWidth, containerHeight);
                 countryContainer.relocate(size * 0.05, size * 0.15);
-
-
-                if (null != tile) {
-                    countryPaths.forEach(path -> {
-                        double pathWidth  = path.getBoundsInLocal().getWidth();
-                        double pathHeight = path.getBoundsInLocal().getHeight();
-                        double pathSize   = pathWidth < pathHeight ? pathWidth : pathHeight;
-
-                        if (pathWidth > containerWidth || pathHeight > containerHeight) {
-                            double scale;
-                            if (pathWidth - containerWidth > pathHeight - containerHeight) {
-                                scale = containerWidth / pathWidth;
-                            } else scale = containerHeight / pathHeight;
-
-                            path.setScaleX(scale);
-                            path.setScaleY(scale);
-                        } else {
-                            double scaleFactor = (containerSize * 0.6) / pathSize;
-                            path.setScaleX(scaleFactor);
-                            path.setScaleY(scaleFactor);
-                        }
-                    });
-                }
+                double scaleFactor = (containerSize * 0.6) / countrySize;
+                countryGroup.setScaleX(scaleFactor);
+                countryGroup.setScaleY(scaleFactor);
             }
             resizeStaticText();
         }
@@ -206,7 +203,7 @@ public class CountryTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
-        text.setText(tile.getText());
+        text.setText(tile.getCountry().getDisplayName());
         valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
         unitText.setText(tile.getUnit());
 
@@ -217,7 +214,7 @@ public class CountryTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         valueText.setFill(tile.getValueColor());
         unitText.setFill(tile.getUnitColor());
-        countryPaths.forEach(path -> path.setFill(tile.getBarColor()));
+        countryPaths.forEach(path -> path.setFill(Helper.getColorWithOpacity(tile.getBarColor(), 0.5)));
     };
 }
 

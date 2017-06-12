@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx.tools;
 
+import eu.hansolo.tilesfx.CountryPath;
 import eu.hansolo.tilesfx.Section;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -23,10 +24,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 
@@ -35,7 +42,14 @@ import java.util.concurrent.ThreadFactory;
  * Created by hansolo on 11.12.15.
  */
 public class Helper {
-    private static final double EPSILON = 1E-6;
+    private static final double                         EPSILON                  = 1E-6;
+    private static final String                         COUNTRY_PROPERTIES       = "eu/hansolo/tilesfx/lowres.properties";
+    private static final String                         HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
+    private static       Properties                     countryProperties;
+    private static       Map<String, List<CountryPath>> countryPaths;
+    private static       Properties                     hiresCountryProperties;
+    private static       Map<String, List<CountryPath>> hiresCountryPaths;
+
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;
@@ -225,5 +239,42 @@ public class Helper {
 
     public static Color getColorWithOpacity(final Color COLOR, final double OPACITY) {
         return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), OPACITY);
+    }
+
+    public static Map<String, List<CountryPath>> getCountryPaths() {
+        if (null == countryProperties) { countryProperties = readProperties(COUNTRY_PROPERTIES); }
+        if (null == countryPaths) {
+            countryPaths = new HashMap<>();
+            countryProperties.forEach((key, value) -> {
+                String            name     = key.toString();
+                List<CountryPath> pathList = new ArrayList<>();
+                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+                countryPaths.put(name, pathList);
+            });
+        }
+        return countryPaths;
+    }
+    public static Map<String, List<CountryPath>> getHiresCountryPaths() {
+        if (null == hiresCountryProperties) { hiresCountryProperties = readProperties(HIRES_COUNTRY_PROPERTIES); }
+        if (null == hiresCountryPaths) {
+            hiresCountryPaths = new HashMap<>();
+            hiresCountryProperties.forEach((key, value) -> {
+                String            name     = key.toString();
+                List<CountryPath> pathList = new ArrayList<>();
+                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+                hiresCountryPaths.put(name, pathList);
+            });
+        }
+        return hiresCountryPaths;
+    }
+    private static Properties readProperties(final String FILE_NAME) {
+        final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();
+        final Properties  PROPERTIES = new Properties();
+        try(InputStream resourceStream = LOADER.getResourceAsStream(FILE_NAME)) {
+            PROPERTIES.load(resourceStream);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return PROPERTIES;
     }
 }

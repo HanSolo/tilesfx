@@ -54,7 +54,7 @@ public class WorldMapTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
-        countryPaths = tile.getCountryPaths();
+        countryPaths = Helper.getCountryPaths();
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());

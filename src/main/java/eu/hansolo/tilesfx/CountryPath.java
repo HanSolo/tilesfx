@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.tools.Helper;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.SVGPath;
 
@@ -40,8 +41,8 @@ public class CountryPath extends SVGPath {
     }
     public CountryPath(final String NAME, final String CONTENT) {
         super();
-        name = NAME;
-        locale = new Locale("", NAME);
+        name    = NAME;
+        locale  = new Locale("", NAME);
         tooltip = new Tooltip(locale.getDisplayCountry());
         Tooltip.install(CountryPath.this, tooltip);
         if (null == CONTENT) return;

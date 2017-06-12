@@ -176,7 +176,6 @@ public class Tile extends Control {
     public  static final int         SHORT_INTERVAL        = 20;
     public  static final int         LONG_INTERVAL         = 1000;
     private static final int         MAX_NO_OF_DECIMALS    = 3;
-    private static final String      COUNTRY_PROPERTIES    = "eu/hansolo/tilesfx/lowres.properties";
                     
     private        final TileEvent   EXCEEDED_EVENT        = new TileEvent(EventType.THRESHOLD_EXCEEDED);
     private        final TileEvent   UNDERRUN_EVENT        = new TileEvent(EventType.THRESHOLD_UNDERRUN);
@@ -242,8 +241,6 @@ public class Tile extends Control {
     private              MovingAverage                          movingAverage;
     private              ObservableList<Section>                sections;
     private              ObservableList<Series<String, Number>> series;
-    private              Properties                             countryProperties;
-    private              Map<String, List<CountryPath>>         countryPaths;
     private              List<Stop>                             gradientStops;
     private              ObjectProperty<ZonedDateTime>          time;
     private              LongProperty                           currentTime;
@@ -431,6 +428,8 @@ public class Tile extends Control {
     private              ObjectProperty<RadarChart.Mode>        radarChartMode;
     private              Color                                  _chartGridColor;
     private              ObjectProperty<Color>                  chartGridColor;
+    private              Country                                _country;
+    private              ObjectProperty<Country>                country;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -643,6 +642,7 @@ public class Tile extends Control {
         _yAxis                              = new NumberAxis();
         _radarChartMode                     = Mode.POLYGON;
         _chartGridColor                     = Tile.GRAY;
+        _country                            = Country.DE;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -3999,7 +3999,18 @@ public class Tile extends Control {
         return yAxis;
     }
 
+    /**
+     * Returns the mode of the RadarChartTileSkin.
+     * There are Mode.POLYGON and Mode.SECTOR.
+     * @return the mode of the RadarChartTileSkin
+     */
     public RadarChart.Mode getRadarChartMode() { return null == radarChartMode ? _radarChartMode : radarChartMode.get(); }
+    /**
+     * Defines the mode that is used in the RadarChartTileSkin
+     * to visualize the data in the RadarChart.
+     * There are Mode.POLYGON and Mode.SECTOR.
+     * @param MODE
+     */
     public void setRadarChartMode(final RadarChart.Mode MODE) {
         if (null == radarChartMode) {
             _radarChartMode = MODE;
@@ -4020,7 +4031,17 @@ public class Tile extends Control {
         return radarChartMode;
     }
 
+    /**
+     * Returns the color that will be used to colorize lines in
+     * charts e.g. the grid in the RadarChartTileSkin
+     * @return the color that will be used to colorize lines in charts
+     */
     public Color getChartGridColor() { return null == chartGridColor ? _chartGridColor : chartGridColor.get(); }
+    /**
+     * Defines the color that will be used to colorize lines in
+     * charts e.g. the grid in the RadarChartTileSkin
+     * @param COLOR
+     */
     public void setChartGridColor(final Color COLOR) {
         if (null == chartGridColor) {
             _chartGridColor = COLOR;
@@ -4039,6 +4060,37 @@ public class Tile extends Control {
             _chartGridColor = null;
         }
         return chartGridColor;
+    }
+
+    /**
+     * Returns the Locale that will be used to visualize the country
+     * in the CountryTileSkin
+     * @return the Locale that will be used to visualize the country in the CountryTileSkin
+     */
+    public Country getCountry() { return null == country ? _country : country.get(); }
+    /**
+     * Defines the Locale that will be used to visualize the country
+     * in the CountryTileSkin
+     * @param COUNTRY
+     */
+    public void setCountry(final Country COUNTRY) {
+        if (null == country) {
+            _country = COUNTRY;
+            fireTileEvent(RECALC_EVENT);
+        } else {
+            country.set(COUNTRY);
+        }
+    }
+    public ObjectProperty<Country> countryProperty() {
+        if (null == country) {
+            country = new ObjectPropertyBase<Country>(_country) {
+                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "country"; }
+            };
+            _country = null;
+        }
+        return country;
     }
 
     public double getIncrement() { return increment; }
@@ -4105,24 +4157,6 @@ public class Tile extends Control {
             _customFont = null;
         }
         return customFont;
-    }
-
-    /**
-     * Returns a list of path elements that define the countries
-     * @return a list of path elements that define the countries
-     */
-    public Map<String, List<CountryPath>> getCountryPaths() {
-        if (null == countryProperties) { countryProperties = readProperties(COUNTRY_PROPERTIES); }
-        if (null == countryPaths) {
-            countryPaths = new HashMap<>();
-            countryProperties.forEach((key, value) -> {
-                String            name     = key.toString();
-                List<CountryPath> pathList = new ArrayList<>();
-                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
-                countryPaths.put(name, pathList);
-            });
-        }
-        return countryPaths;
     }
 
     /**

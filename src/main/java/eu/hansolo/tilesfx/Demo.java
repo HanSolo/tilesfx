@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
+import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.chart.ChartData;
@@ -55,8 +56,8 @@ import java.util.Random;
  */
 public class Demo extends Application {
     private static final    Random RND = new Random();
-    private static final    double TILE_WIDTH  = 250;
-    private static final    double TILE_HEIGHT = 250;
+    private static final    double TILE_WIDTH  = 150;
+    private static final    double TILE_HEIGHT = 150;
     private BarChartItem    barChartItem1;
     private BarChartItem    barChartItem2;
     private BarChartItem    barChartItem3;
@@ -69,6 +70,11 @@ public class Demo extends Application {
     private ChartData       chartData2;
     private ChartData       chartData3;
     private ChartData       chartData4;
+    private ChartData       chartData5;
+    private ChartData       chartData6;
+    private ChartData       chartData7;
+    private ChartData       chartData8;
+
     private Tile            percentageTile;
     private Tile            clockTile;
     private Tile            gaugeTile;
@@ -93,6 +99,13 @@ public class Demo extends Application {
     private Tile            donutChartTile;
     private Tile            circularProgressTile;
     private Tile            stockTile;
+    private Tile            gaugeSparkLineTile;
+    private Tile            radarChartTile1;
+    private Tile            radarChartTile2;
+    private Tile            smoothAreaChartTile;
+    private Tile            countryTile;
+
+
     private long            lastTimerCall;
     private AnimationTimer  timer;
     private DoubleProperty  value;
@@ -178,12 +191,16 @@ public class Demo extends Application {
         leaderBoardItem3 = new LeaderBoardItem("Lilli", 12);
         leaderBoardItem4 = new LeaderBoardItem("Anton", 8);
 
-        // RadialChart Data
+        // Chart Data
         chartData1 = new ChartData("Item 1", 24.0, Tile.GREEN);
         chartData2 = new ChartData("Item 2", 10.0, Tile.BLUE);
         chartData3 = new ChartData("Item 3", 12.0, Tile.RED);
         chartData4 = new ChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
-        //RadialChartData.animated = false;
+        chartData5 = new ChartData("Item 5", 13.0, Tile.BLUE);
+        chartData6 = new ChartData("Item 6", 13.0, Tile.BLUE);
+        chartData7 = new ChartData("Item 7", 13.0, Tile.BLUE);
+        chartData8 = new ChartData("Item 8", 13.0, Tile.BLUE);
+        //ChartData.animated = false;
 
 
         // Creating Tiles
@@ -417,6 +434,103 @@ public class Demo extends Application {
                                .averagingPeriod(100)
                                .build();
 
+        gaugeSparkLineTile = TileBuilder.create()
+                                        .skinType(SkinType.GAUGE_SPARK_LINE)
+                                        .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                        .title("GaugeSparkLine")
+                                        .animated(true)
+                                        .textVisible(false)
+                                        .averagingPeriod(25)
+                                        .autoReferenceValue(true)
+                                        .barColor(Tile.YELLOW_ORANGE)
+                                        .barBackgroundColor(Color.rgb(255, 255, 255, 0.1))
+                                        .sections(new eu.hansolo.tilesfx.Section(0, 33, Tile.LIGHT_GREEN),
+                                                  new eu.hansolo.tilesfx.Section(33, 67, Tile.YELLOW),
+                                                  new eu.hansolo.tilesfx.Section(67, 100, Tile.LIGHT_RED))
+                                        .sectionsVisible(true)
+                                        .highlightSections(true)
+                                        .strokeWithGradient(true)
+                                        .gradientStops(new Stop(0.0, Tile.LIGHT_GREEN),
+                                                       new Stop(0.33, Tile.LIGHT_GREEN),
+                                                       new Stop(0.33,Tile.YELLOW),
+                                                       new Stop(0.67, Tile.YELLOW),
+                                                       new Stop(0.67, Tile.LIGHT_RED),
+                                                       new Stop(1.0, Tile.LIGHT_RED))
+                                        .build();
+
+        radarChartTile1 = TileBuilder.create().skinType(SkinType.RADAR_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .minValue(0)
+                                     .maxValue(50)
+                                     .title("RadarChart Sector")
+                                     .unit("Unit")
+                                     .radarChartMode(Mode.SECTOR)
+                                     .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
+                                                    new Stop(0.00001, Color.web("#3552a0")),
+                                                    new Stop(0.09090, Color.web("#456acf")),
+                                                    new Stop(0.27272, Color.web("#45a1cf")),
+                                                    new Stop(0.36363, Color.web("#30c8c9")),
+                                                    new Stop(0.45454, Color.web("#30c9af")),
+                                                    new Stop(0.50909, Color.web("#56d483")),
+                                                    new Stop(0.72727, Color.web("#9adb49")),
+                                                    new Stop(0.81818, Color.web("#efd750")),
+                                                    new Stop(0.90909, Color.web("#ef9850")),
+                                                    new Stop(1.00000, Color.web("#ef6050")))
+                                     .text("Test")
+                                     .chartData(chartData1, chartData2, chartData3, chartData4,
+                                                chartData5, chartData6, chartData7, chartData8)
+                                     .tooltipText("")
+                                     .animated(true)
+                                     .build();
+
+        radarChartTile2 = TileBuilder.create().skinType(SkinType.RADAR_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .minValue(0)
+                                     .maxValue(50)
+                                     .title("RadarChart Polygon")
+                                     .unit("Unit")
+                                     .radarChartMode(Mode.POLYGON)
+                                     .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
+                                                    new Stop(0.00001, Color.web("#3552a0")),
+                                                    new Stop(0.09090, Color.web("#456acf")),
+                                                    new Stop(0.27272, Color.web("#45a1cf")),
+                                                    new Stop(0.36363, Color.web("#30c8c9")),
+                                                    new Stop(0.45454, Color.web("#30c9af")),
+                                                    new Stop(0.50909, Color.web("#56d483")),
+                                                    new Stop(0.72727, Color.web("#9adb49")),
+                                                    new Stop(0.81818, Color.web("#efd750")),
+                                                    new Stop(0.90909, Color.web("#ef9850")),
+                                                    new Stop(1.00000, Color.web("#ef6050")))
+                                     .text("Test")
+                                     .chartData(chartData1, chartData2, chartData3, chartData4,
+                                                chartData5, chartData6, chartData7, chartData8)
+                                     .tooltipText("")
+                                     .animated(true)
+                                     .build();
+
+        smoothAreaChartTile = TileBuilder.create().skinType(SkinType.SMOOTH_AREA_CHART)
+                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                         .minValue(0)
+                                         .maxValue(40)
+                                         .title("SmoothAreaChart")
+                                         .unit("Unit")
+                                         .text("Test")
+                                         .chartData(chartData1, chartData2, chartData3, chartData4)
+                                         .tooltipText("")
+                                         .animated(true)
+                                         .build();
+
+        countryTile = TileBuilder.create().skinType(SkinType.COUNTRY)
+                                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                          .minValue(0)
+                                          .maxValue(40)
+                                          .title("Country")
+                                          .unit("Unit")
+                                          .country(Country.DE)
+                                          .tooltipText("")
+                                          .animated(true)
+                                          .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -437,6 +551,10 @@ public class Demo extends Application {
                     chartData2.setValue(RND.nextDouble() * 50);
                     chartData3.setValue(RND.nextDouble() * 50);
                     chartData4.setValue(RND.nextDouble() * 50);
+                    chartData5.setValue(RND.nextDouble() * 50);
+                    chartData6.setValue(RND.nextDouble() * 50);
+                    chartData7.setValue(RND.nextDouble() * 50);
+                    chartData8.setValue(RND.nextDouble() * 50);
 
                     barChartTile.getBarChartItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
 
@@ -446,6 +564,10 @@ public class Demo extends Application {
 
                     stockTile.setValue(RND.nextDouble() * 50 + 500);
 
+                    gaugeSparkLineTile.setValue(RND.nextDouble() * 100);
+
+                    countryTile.setValue(RND.nextDouble() * 100);
+
                     lastTimerCall = now;
                 }
             }
@@ -453,19 +575,21 @@ public class Demo extends Application {
     }
 
     @Override public void start(Stage stage) {
-        FlowGridPane pane = new FlowGridPane(5, 5,
+        FlowGridPane pane = new FlowGridPane(7, 4,
                                          percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                          lineChartTile, timerControlTile, numberTile, textTile,
                                          highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
                                          barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
-                                         radialChartTile, donutChartTile, circularProgressTile, stockTile);//, weatherTile);
+                                         radialChartTile, donutChartTile, circularProgressTile, stockTile,
+                                         gaugeSparkLineTile, radarChartTile1, radarChartTile2,
+                                         smoothAreaChartTile, countryTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);
         pane.setAlignment(Pos.CENTER);
         pane.setCenterShape(true);
         pane.setPadding(new Insets(5));
-        pane.setPrefSize(800, 600);
+        //pane.setPrefSize(800, 600);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);

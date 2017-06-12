@@ -70,10 +70,10 @@ public class RadarChart extends Region {
     public  enum Mode { SECTOR, POLYGON };
     private static final int                       MIN_NO_OF_SECTORS = 4;
     private static final int                       MAX_NO_OF_SECTORS = 128;
-    private static final double                    PREFERRED_WIDTH   = 400;
-    private static final double                    PREFERRED_HEIGHT  = 400;
-    private static final double                    MINIMUM_WIDTH     = 100;
-    private static final double                    MINIMUM_HEIGHT    = 100;
+    private static final double                    PREFERRED_WIDTH   = 120;
+    private static final double                    PREFERRED_HEIGHT  = 120;
+    private static final double                    MINIMUM_WIDTH     = 10;
+    private static final double                    MINIMUM_HEIGHT    = 10;
     private static final double                    MAXIMUM_WIDTH     = 1024;
     private static final double                    MAXIMUM_HEIGHT    = 1024;
     private              double                    size;

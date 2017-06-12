@@ -344,13 +344,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B ChartData(final ChartData... DATA) {
-        properties.put("radialChartDataArray", new SimpleObjectProperty(DATA));
+    public final B chartData(final ChartData... DATA) {
+        properties.put("chartDataArray", new SimpleObjectProperty(DATA));
         return (B)this;
     }
 
-    public final B ChartData(final List<ChartData> DATA) {
-        properties.put("radialChartDataList", new SimpleObjectProperty(DATA));
+    public final B chartData(final List<ChartData> DATA) {
+        properties.put("chartDataList", new SimpleObjectProperty(DATA));
         return (B)this;
     }
 
@@ -949,11 +949,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
             CONTROL.setGradientStops(((ObjectProperty<List<Stop>>) properties.get("gradientStopsList")).get());
         }
 
-        if (properties.keySet().contains("radialChartDataArray")) {
-            CONTROL.setChartData(((ObjectProperty<ChartData[]>) properties.get("radialChartDataArray")).get());
+        if (properties.keySet().contains("chartDataArray")) {
+            CONTROL.setChartData(((ObjectProperty<ChartData[]>) properties.get("chartDataArray")).get());
         }
-        if (properties.keySet().contains("radialChartDataList")) {
-            CONTROL.setChartData(((ObjectProperty<List<ChartData>>) properties.get("radialChartDataList")).get());
+        if (properties.keySet().contains("chartDataList")) {
+            CONTROL.setChartData(((ObjectProperty<List<ChartData>>) properties.get("chartDataList")).get());
         }
 
         if (properties.keySet().contains("poiArray")) {

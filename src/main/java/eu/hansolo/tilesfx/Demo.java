@@ -133,7 +133,7 @@ public class Demo extends Application {
         series3.getData().add(new XYChart.Data("SU", 5));
 
         // WorldMap Data
-        for (int i = 0 ; i < Country.values().length ; i++) {
+        for (int i = 0; i < Country.values().length ; i++) {
             double value = RND.nextInt(10);
             Color  color;
             if (value > 8) {

@@ -152,7 +152,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     };
 
     private void handleData() {
-        List<ChartData>     data = tile.getChartData();
+        List<ChartData> data = tile.getChartData();
+        if (null == data || data.isEmpty()) { return; }
         Optional<ChartData> lastDataEntry = data.stream().reduce((first, second) -> second);
         if (lastDataEntry.isPresent()) { tile.setValue(lastDataEntry.get().getValue()); }
         dataSize  = data.size();

@@ -43,10 +43,7 @@ import java.util.concurrent.ThreadFactory;
  */
 public class Helper {
     private static final double                         EPSILON                  = 1E-6;
-    private static final String                         COUNTRY_PROPERTIES       = "eu/hansolo/tilesfx/lowres.properties";
     private static final String                         HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
-    private static       Properties                     countryProperties;
-    private static       Map<String, List<CountryPath>> countryPaths;
     private static       Properties                     hiresCountryProperties;
     private static       Map<String, List<CountryPath>> hiresCountryPaths;
 
@@ -241,19 +238,6 @@ public class Helper {
         return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), OPACITY);
     }
 
-    public static Map<String, List<CountryPath>> getCountryPaths() {
-        if (null == countryProperties) { countryProperties = readProperties(COUNTRY_PROPERTIES); }
-        if (null == countryPaths) {
-            countryPaths = new HashMap<>();
-            countryProperties.forEach((key, value) -> {
-                String            name     = key.toString();
-                List<CountryPath> pathList = new ArrayList<>();
-                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
-                countryPaths.put(name, pathList);
-            });
-        }
-        return countryPaths;
-    }
     public static Map<String, List<CountryPath>> getHiresCountryPaths() {
         if (null == hiresCountryProperties) { hiresCountryProperties = readProperties(HIRES_COUNTRY_PROPERTIES); }
         if (null == hiresCountryPaths) {

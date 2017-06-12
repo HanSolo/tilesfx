@@ -217,4 +217,3 @@ public class CountryTileSkin extends TileSkin {
         countryPaths.forEach(path -> path.setFill(Helper.getColorWithOpacity(tile.getBarColor(), 0.5)));
     };
 }
-

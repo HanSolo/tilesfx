@@ -1,19 +1,3 @@
-/*
- * Copyright (c) 2016 by Gerrit Grunwald
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package eu.hansolo.tilesfx;
 
 import javafx.scene.paint.Color;
@@ -30,9 +14,9 @@ public enum Country {
     AI("Anguilla"),
     AL("Albania"),
     AM("Armenia"),
-    AN("Netherlands Antilles"),
+    //AN("Netherlands Antilles"),
     AO("Angola"),
-    AQ("Antarctica"),
+    //AQ("Antarctica"),
     AR("Argentina"),
     AS("American Samoa"),
     AT("Austria"),
@@ -110,6 +94,7 @@ public enum Country {
     GL("Greenland"),
     GM("Gambia"),
     GN("Guinea"),
+    GO(""),
     GP("Guadeloupe"),
     GQ("Equatorial Guinea"),
     GR("Greece"),
@@ -138,6 +123,7 @@ public enum Country {
     JM("Jamaica"),
     JO("Jordan"),
     JP("Japan"),
+    JU(""),
     KE("Kenya"),
     KG("Kyrgyzstan"),
     KH("Cambodia"),
@@ -146,6 +132,7 @@ public enum Country {
     KN("Saint Kitts And Nevis"),
     KP("North Korea"),
     KR("South Korea"),
+    XK(""),
     KW("Kuwait"),
     KY("Cayman Islands"),
     KZ("Kazakhstan"),
@@ -256,6 +243,11 @@ public enum Country {
     UA("Ukraine"),
     UG("Uganda"),
     UM("United States Minor Outlying Islands"),
+    UM_DQ(""),
+    UM_FQ(""),
+    UM_HQ(""),
+    UM_JQ(""),
+    UM_MQ(""),
     US("United States"),
     UY("Uruguay"),
     UZ("Uzbekistan"),

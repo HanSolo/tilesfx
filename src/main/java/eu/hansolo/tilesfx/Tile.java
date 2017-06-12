@@ -176,7 +176,8 @@ public class Tile extends Control {
     public  static final int         SHORT_INTERVAL        = 20;
     public  static final int         LONG_INTERVAL         = 1000;
     private static final int         MAX_NO_OF_DECIMALS    = 3;
-                    
+    private static final String      COUNTRY_PROPERTIES    = "eu/hansolo/tilesfx/lowres.properties";
+
     private        final TileEvent   EXCEEDED_EVENT        = new TileEvent(EventType.THRESHOLD_EXCEEDED);
     private        final TileEvent   UNDERRUN_EVENT        = new TileEvent(EventType.THRESHOLD_UNDERRUN);
     private        final TileEvent   RECALC_EVENT          = new TileEvent(EventType.RECALC);
@@ -241,6 +242,8 @@ public class Tile extends Control {
     private              MovingAverage                          movingAverage;
     private              ObservableList<Section>                sections;
     private              ObservableList<Series<String, Number>> series;
+    private              Properties                             countryProperties;
+    private              Map<String, List<CountryPath>>         countryPaths;
     private              List<Stop>                             gradientStops;
     private              ObjectProperty<ZonedDateTime>          time;
     private              LongProperty                           currentTime;
@@ -4157,6 +4160,24 @@ public class Tile extends Control {
             _customFont = null;
         }
         return customFont;
+    }
+
+    /**
+     * Returns a list of path elements that define the countries
+     * @return a list of path elements that define the countries
+     */
+    public Map<String, List<CountryPath>> getCountryPaths() {
+        if (null == countryProperties) { countryProperties = readProperties(COUNTRY_PROPERTIES); }
+        if (null == countryPaths) {
+            countryPaths = new HashMap<>();
+            countryProperties.forEach((key, value) -> {
+                String            name     = key.toString();
+                List<CountryPath> pathList = new ArrayList<>();
+                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+                countryPaths.put(name, pathList);
+            });
+        }
+        return countryPaths;
     }
 
     /**

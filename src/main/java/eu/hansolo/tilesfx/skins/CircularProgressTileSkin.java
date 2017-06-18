@@ -233,13 +233,7 @@ public class CircularProgressTileSkin extends TileSkin {
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
-        if (graphicContainer.isVisible()) {
-            maxWidth = chartSize * 0.08;
-            fontSize = chartSize * 0.07;
-        } else {
-            maxWidth = chartSize * 0.1;
-            fontSize = chartSize * 0.08;
-        }
+        fontSize = graphicContainer.isVisible() ? chartSize * 0.07 : chartSize * 0.08;
         unitText.setFont(Fonts.latoLight(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
     }

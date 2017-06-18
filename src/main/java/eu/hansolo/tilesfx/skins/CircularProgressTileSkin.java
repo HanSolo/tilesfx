@@ -21,11 +21,16 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -33,6 +38,8 @@ import javafx.scene.text.TextFlow;
 
 import java.util.List;
 import java.util.Locale;
+
+import static eu.hansolo.tilesfx.tools.Helper.enableNode;
 
 
 /**
@@ -57,6 +64,8 @@ public class CircularProgressTileSkin extends TileSkin {
     private List<Section>        sections;
     private String               formatString;
     private Locale               locale;
+    private StackPane            graphicContainer;
+    private ChangeListener       graphicListener;
     private InvalidationListener currentValueListener;
 
 
@@ -82,13 +91,15 @@ public class CircularProgressTileSkin extends TileSkin {
         locale               = tile.getLocale();
         currentValueListener = o -> setBar(tile.getCurrentValue());
 
+        graphicListener      = (o, ov, nv) -> { if (nv != null) { graphicContainer.getChildren().setAll(tile.getGraphic()); }};
+
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
-        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+        enableNode(titleText, !tile.getTitle().isEmpty());
 
         text = new Text(tile.getText());
         text.setFill(tile.getTextColor());
-        Helper.enableNode(text, tile.isTextVisible());
+        enableNode(text, tile.isTextVisible());
 
         barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.468, PREFERRED_HEIGHT * 0.468, 90, 360);
         barBackground.setType(ArcType.OPEN);
@@ -112,22 +123,33 @@ public class CircularProgressTileSkin extends TileSkin {
         valueText.setFont(Fonts.latoRegular(PREFERRED_WIDTH * 0.27333));
         valueText.setFill(tile.getValueColor());
         valueText.setTextOrigin(VPos.CENTER);
-        Helper.enableNode(valueText, tile.isValueVisible());
+        enableNode(valueText, tile.isValueVisible());
 
         unitText = new Text(tile.getUnit());
         unitText.setFont(Fonts.latoLight(PREFERRED_WIDTH * 0.08));
         unitText.setFill(tile.getUnitColor());
-        Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+        enableNode(unitText, !tile.getUnit().isEmpty());
 
         valueUnitFlow = new TextFlow(valueText, unitText);
         valueUnitFlow.setTextAlignment(TextAlignment.CENTER);
 
-        getPane().getChildren().addAll(barBackground, bar, separator, titleText, text, valueUnitFlow);
+        graphicContainer = new StackPane();
+        graphicContainer.setMinSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
+        graphicContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
+        graphicContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
+        if (null == tile.getGraphic()) {
+            enableNode(graphicContainer, false);
+        } else {
+            graphicContainer.getChildren().setAll(tile.getGraphic());
+        }
+
+        getPane().getChildren().addAll(barBackground, bar, separator, titleText, text, graphicContainer, valueUnitFlow);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
         tile.currentValueProperty().addListener(currentValueListener);
+        tile.graphicProperty().addListener(graphicListener);
     }
 
 
@@ -143,10 +165,10 @@ public class CircularProgressTileSkin extends TileSkin {
             redraw();
             setBar(tile.getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !tile.getTitle().isEmpty());
-            Helper.enableNode(text, tile.isTextVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
-            Helper.enableNode(valueText, tile.isValueVisible());
+            enableNode(titleText, !tile.getTitle().isEmpty());
+            enableNode(text, tile.isTextVisible());
+            enableNode(unitText, !tile.getUnit().isEmpty());
+            enableNode(valueText, tile.isValueVisible());
         }
     };
 
@@ -176,6 +198,7 @@ public class CircularProgressTileSkin extends TileSkin {
 
     @Override public void dispose() {
         tile.currentValueProperty().removeListener(currentValueListener);
+        tile.graphicProperty().removeListener(graphicListener);
         super.dispose();
     }
 
@@ -206,12 +229,17 @@ public class CircularProgressTileSkin extends TileSkin {
     };
     @Override protected void resizeDynamicText() {
         double maxWidth = unitText.isVisible() ? chartSize * 0.7 : chartSize * 0.8;
-        double fontSize = chartSize * 0.2;
+        double fontSize = graphicContainer.isVisible() ? chartSize * 0.15 : chartSize * 0.2;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
-        maxWidth = chartSize * 0.1;
-        fontSize = chartSize * 0.08;
+        if (graphicContainer.isVisible()) {
+            maxWidth = chartSize * 0.08;
+            fontSize = chartSize * 0.07;
+        } else {
+            maxWidth = chartSize * 0.1;
+            fontSize = chartSize * 0.08;
+        }
         unitText.setFont(Fonts.latoLight(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
     }
@@ -222,13 +250,17 @@ public class CircularProgressTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double chartWidth  = width - size * 0.1;
-        double chartHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
-        chartSize = chartWidth < chartHeight ? chartWidth : chartHeight;
-
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
+
+            double chartWidth  = width - size * 0.1;
+            double chartHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+            chartSize = chartWidth < chartHeight ? chartWidth : chartHeight;
+
+            double maxContainerSize = chartSize * 0.5;
+            double containerWidth   = maxContainerSize - size * 0.1;
+            double containerHeight  = tile.isTextVisible() ? height - maxContainerSize * 0.28 : height - maxContainerSize * 0.205;
 
             double x = (width - chartSize) * 0.5;
             double y = height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartSize) * 0.5;
@@ -250,10 +282,38 @@ public class CircularProgressTileSkin extends TileSkin {
             separator.setEndX(x + chartSize * 0.5);
             separator.setEndY(y + chartSize * 0.1365);
 
-            resizeStaticText();
+            if (graphicContainer.isVisible() && containerWidth > 0 && containerHeight > 0) {
+                graphicContainer.setMinSize(containerWidth, containerHeight);
+                graphicContainer.setMaxSize(containerWidth, containerHeight);
+                graphicContainer.setPrefSize(containerWidth, containerHeight);
+                graphicContainer.relocate((width - containerWidth) * 0.5, (height - containerHeight) * 0.35);
 
+                if (null != tile) {
+                    Node graphic = tile.getGraphic();
+                    if (tile.getGraphic() instanceof Shape) {
+                        double graphicWidth  = graphic.getBoundsInLocal().getWidth();
+                        double graphicHeight = graphic.getBoundsInLocal().getHeight();
+
+                        if (graphicWidth > containerWidth || graphicHeight > containerHeight) {
+                            double scale;
+                            if (graphicWidth - containerWidth > graphicHeight - containerHeight) {
+                                scale = containerWidth / graphicWidth;
+                            } else {
+                                scale = containerHeight / graphicHeight;
+                            }
+
+                            graphic.setScaleX(scale);
+                            graphic.setScaleY(scale);
+                        }
+                    } else if (tile.getGraphic() instanceof ImageView) {
+                        ((ImageView) graphic).setFitWidth(containerWidth);
+                        ((ImageView) graphic).setFitHeight(containerHeight);
+                    }
+                }
+            }
+            resizeStaticText();
             valueUnitFlow.setPrefWidth(width * 0.9);
-            valueUnitFlow.relocate(width * 0.05, bar.getCenterY() - chartSize * 0.12);
+            valueUnitFlow.relocate(width * 0.05, graphicContainer.isVisible() ? bar.getCenterY() + chartSize * 0.12 : bar.getCenterY() - chartSize * 0.12);
         }
     }
 
@@ -275,7 +335,7 @@ public class CircularProgressTileSkin extends TileSkin {
         text.setText(tile.getText());
         unitText.setText(tile.getUnit());
 
-        resizeDynamicText();
         resizeStaticText();
+        resizeDynamicText();
     }
 }

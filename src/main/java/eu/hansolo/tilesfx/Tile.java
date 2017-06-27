@@ -180,6 +180,9 @@ public class Tile extends Control {
 
     private        final TileEvent   EXCEEDED_EVENT        = new TileEvent(EventType.THRESHOLD_EXCEEDED);
     private        final TileEvent   UNDERRUN_EVENT        = new TileEvent(EventType.THRESHOLD_UNDERRUN);
+    private        final TileEvent   MAX_VALUE_EXCEEDED    = new TileEvent(EventType.MAX_VALUE_EXCEEDED);
+    private        final TileEvent   MIN_VALUE_UNDERRUN    = new TileEvent(EventType.MIN_VALUE_UNDERRUN);
+    private        final TileEvent   VALUE_IN_RANGE        = new TileEvent(EventType.VALUE_IN_RANGE);
     private        final TileEvent   RECALC_EVENT          = new TileEvent(EventType.RECALC);
     private        final TileEvent   REDRAW_EVENT          = new TileEvent(EventType.REDRAW);
     private        final TileEvent   RESIZE_EVENT          = new TileEvent(EventType.RESIZE);
@@ -667,6 +670,16 @@ public class Tile extends Control {
     private void registerListeners() {
         disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1));
         valueProperty().addListener((o, ov, nv) -> oldValue.set(ov.doubleValue()));
+        currentValueProperty().addListener(o -> {
+            double currentValue = getCurrentValue();
+            if (currentValue > getMaxValue()) {
+                fireTileEvent(MAX_VALUE_EXCEEDED);
+            } else if (currentValue < getMinValue()) {
+                fireTileEvent(MIN_VALUE_UNDERRUN);
+            } else {
+                fireTileEvent(VALUE_IN_RANGE);
+            }
+        });
     }
 
 

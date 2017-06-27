@@ -19,10 +19,10 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
@@ -34,6 +34,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
@@ -42,7 +43,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
-import javafx.scene.Scene;
 
 import java.time.LocalTime;
 import java.util.Locale;
@@ -418,12 +418,13 @@ public class Demo extends Application {
                                      .build();
 
         circularProgressTile = TileBuilder.create()
-                                         .skinType(SkinType.CIRCULAR_PROGRESS)
-                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                         .title("CircularProgress")
-                                         .text("Some text")
-                                         .unit("\u0025")
-                                         .build();
+                                          .skinType(SkinType.CIRCULAR_PROGRESS)
+                                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                          .title("CircularProgress")
+                                          .text("Some text")
+                                          .unit("\u0025")
+                                          //.graphic(new WeatherSymbol(ConditionAndIcon.CLEAR_DAY, 48, Color.WHITE))
+                                          .build();
 
         stockTile = TileBuilder.create()
                                .skinType(SkinType.STOCK)

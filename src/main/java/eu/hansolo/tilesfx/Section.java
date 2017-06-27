@@ -35,9 +35,9 @@ import javafx.scene.paint.Color;
  * Created by hansolo on 19.12.16.
  */
 public class Section implements Comparable<Section> {
-    public final SectionEvent ENTERED_EVENT = new SectionEvent(this, null, SectionEvent.SECTION_ENTERED);
-    public final SectionEvent LEFT_EVENT    = new SectionEvent(this, null, SectionEvent.SECTION_LEFT);
-    public final SectionEvent UPDATE_EVENT  = new SectionEvent(this, null, SectionEvent.SECTION_UPDATE);
+    public final SectionEvent ENTERED_EVENT = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_ENTERED);
+    public final SectionEvent LEFT_EVENT    = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_LEFT);
+    public final SectionEvent UPDATE_EVENT  = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_UPDATE);
     private double                _start;
     private DoubleProperty        start;
     private double                _stop;
@@ -390,11 +390,11 @@ public class Section implements Comparable<Section> {
     public void fireSectionEvent(final SectionEvent EVENT) {
         final EventHandler<SectionEvent> HANDLER;
         final EventType                  TYPE = EVENT.getEventType();
-        if (SectionEvent.SECTION_ENTERED == TYPE) {
+        if (SectionEvent.TILES_FX_SECTION_ENTERED == TYPE) {
             HANDLER = getOnSectionEntered();
-        } else if (SectionEvent.SECTION_LEFT == TYPE) {
+        } else if (SectionEvent.TILES_FX_SECTION_LEFT == TYPE) {
             HANDLER = getOnSectionLeft();
-        } else if (SectionEvent.SECTION_UPDATE == TYPE) {
+        } else if (SectionEvent.TILES_FX_SECTION_UPDATE == TYPE) {
             HANDLER = getOnSectionUpdate();
         } else {
             HANDLER = null;
@@ -408,9 +408,9 @@ public class Section implements Comparable<Section> {
 
     // ******************** Inner Classes *************************************
     public static class SectionEvent extends Event {
-        public static final EventType<SectionEvent> SECTION_ENTERED = new EventType<>(ANY, "SECTION_ENTERED");
-        public static final EventType<SectionEvent> SECTION_LEFT    = new EventType<>(ANY, "SECTION_LEFT");
-        public static final EventType<SectionEvent> SECTION_UPDATE  = new EventType<>(ANY, "SECTION_UPDATE");
+        public static final EventType<SectionEvent> TILES_FX_SECTION_ENTERED = new EventType<>(ANY, "TILES_FX_SECTION_ENTERED");
+        public static final EventType<SectionEvent> TILES_FX_SECTION_LEFT    = new EventType<>(ANY, "TILES_FX_SECTION_LEFT");
+        public static final EventType<SectionEvent> TILES_FX_SECTION_UPDATE  = new EventType<>(ANY, "TILES_FX_SECTION_UPDATE");
 
 
         // ******************** Constructors **************************************

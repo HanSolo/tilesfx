@@ -25,7 +25,7 @@ public class TileEvent {
                             THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN,
                             MAX_VALUE_EXCEEDED, MIN_VALUE_UNDERRUN, VALUE_IN_RANGE,
                             FINISHED, SERIES, DATA, GRAPHIC, UPDATE, AVERAGING, LOCATION, TRACK, MAP_PROVIDER,
-                            TOOLTIP_TEXT };
+                            TOOLTIP_TEXT, VALUE_CHANGING, VALUE_CHANGED };
     private final EventType EVENT_TYPE;
 
 

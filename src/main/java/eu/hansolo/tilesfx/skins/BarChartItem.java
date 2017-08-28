@@ -222,6 +222,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         valueText.setText(String.format(locale, formatString, getValue()));
     }
 
+    public String getFormatString() { return formatString; }
     public void setFormatString(final String FORMAT_STRING) {
         formatString = FORMAT_STRING;
         valueText.setText(String.format(locale, formatString, getValue()));
@@ -233,6 +234,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     }
 
     private void updateBar(final double VALUE) {
+        System.out.println(formatString);
         valueText.setText(String.format(locale, formatString, VALUE));
         valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
         bar.setWidth(VALUE * stepSize);

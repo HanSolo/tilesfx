@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
@@ -39,21 +40,23 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  */
 public class SliderTileSkin extends TileSkin {
 
-    private Text titleText;
-    private Text text;
-    private Text valueText;
-    private Text unitText;
-    private TextFlow valueUnitFlow;
-    private Label description;
-    private Circle thumb;
-    private Rectangle barBackground;
-    private Rectangle bar;
-    private Point2D dragStart;
-    private double centerX;
-    private double centerY;
-    private double formerThumbPos;
-    private double trackStart;
-    private double trackLength;
+    private final TileEvent VALUE_CHANGING = new TileEvent(TileEvent.EventType.VALUE_CHANGING);
+    private final TileEvent VALUE_CHANGED  = new TileEvent(TileEvent.EventType.VALUE_CHANGED);
+    private Text                     titleText;
+    private Text                     text;
+    private Text                     valueText;
+    private Text                     unitText;
+    private TextFlow                 valueUnitFlow;
+    private Label                    description;
+    private Circle                   thumb;
+    private Rectangle                barBackground;
+    private Rectangle                bar;
+    private Point2D                  dragStart;
+    private double                   centerX;
+    private double                   centerY;
+    private double                   formerThumbPos;
+    private double                   trackStart;
+    private double                   trackLength;
     private EventHandler<MouseEvent> mouseEventHandler;
 
 
@@ -73,13 +76,13 @@ public class SliderTileSkin extends TileSkin {
             if (MouseEvent.MOUSE_PRESSED == TYPE) {
                 dragStart = thumb.localToParent(e.getX(), e.getY());
                 formerThumbPos = (tile.getCurrentValue() - minValue) / range;
+                tile.fireTileEvent(VALUE_CHANGING);
             } else if (MouseEvent.MOUSE_DRAGGED == TYPE) {
                 Point2D currentPos = thumb.localToParent(e.getX(), e.getY());
                 double dragPos = currentPos.getX() - dragStart.getX();
                 thumbDragged((formerThumbPos + dragPos / trackLength));
-                tile.setValueChanging(true);
             } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
-                tile.setValueChanging(false);
+                tile.fireTileEvent(VALUE_CHANGED);
             }
         };
 
@@ -124,6 +127,7 @@ public class SliderTileSkin extends TileSkin {
         super.registerListeners();
         thumb.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
         thumb.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseEventHandler);
+        thumb.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
     }
 
 
@@ -168,6 +172,7 @@ public class SliderTileSkin extends TileSkin {
     public void dispose() {
         thumb.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
         thumb.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseEventHandler);
+        thumb.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
         super.dispose();
     }
 
@@ -230,8 +235,9 @@ public class SliderTileSkin extends TileSkin {
         }
         text.setY(height - size * 0.05);
 
-        maxWidth = width - size * 0.85;
+        maxWidth = width - size * 0.275;
         fontSize = size * 0.12;
+        unitText.setText(tile.getUnit());
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) {
             Helper.adjustTextSize(unitText, maxWidth, fontSize);
@@ -288,7 +294,6 @@ public class SliderTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        unitText.setText(tile.getUnit());
         description.setText(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
 

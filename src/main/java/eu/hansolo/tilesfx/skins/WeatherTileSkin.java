@@ -164,7 +164,7 @@ public class WeatherTileSkin extends TileSkin {
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
 
-        maxWidth = width - size * 0.85;
+        maxWidth = width - size * 0.275;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }

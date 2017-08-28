@@ -64,7 +64,9 @@ public class BarChartTileSkin extends TileSkin {
         tile.getBarChartItems().forEach(item -> {
             item.addEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);
             item.setMaxValue(tile.getMaxValue());
-            item.setFormatString(formatString);
+            if (null == item.getFormatString() || item.getFormatString().isEmpty()) {
+                item.setFormatString(formatString);
+            }
             item.valueProperty().addListener(new WeakInvalidationListener(o -> updateChart()));
         });
         barChartPane = new Pane();

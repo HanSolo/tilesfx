@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
@@ -38,6 +39,8 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class SliderTileSkin extends TileSkin {
+    private final TileEvent VALUE_CHANGING = new TileEvent(TileEvent.EventType.VALUE_CHANGING);
+    private final TileEvent VALUE_CHANGED  = new TileEvent(TileEvent.EventType.VALUE_CHANGED);
     private Text                     titleText;
     private Text                     text;
     private Text                     valueText;
@@ -71,10 +74,13 @@ public class SliderTileSkin extends TileSkin {
             if (MouseEvent.MOUSE_PRESSED == TYPE) {
                 dragStart      = thumb.localToParent(e.getX(), e.getY());
                 formerThumbPos = (tile.getCurrentValue() - minValue) / range;
+                tile.fireTileEvent(VALUE_CHANGING);
             } else if (MouseEvent.MOUSE_DRAGGED == TYPE) {
                 Point2D currentPos = thumb.localToParent(e.getX(), e.getY());
                 double  dragPos    = currentPos.getX() - dragStart.getX();
                 thumbDragged((formerThumbPos + dragPos / trackLength));
+            } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
+                tile.fireTileEvent(VALUE_CHANGED);
             }
         };
 
@@ -117,6 +123,7 @@ public class SliderTileSkin extends TileSkin {
         super.registerListeners();
         thumb.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
         thumb.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseEventHandler);
+        thumb.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
     }
 
 
@@ -149,6 +156,7 @@ public class SliderTileSkin extends TileSkin {
     @Override public void dispose() {
         thumb.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
         thumb.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseEventHandler);
+        thumb.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
         super.dispose();
     }
 

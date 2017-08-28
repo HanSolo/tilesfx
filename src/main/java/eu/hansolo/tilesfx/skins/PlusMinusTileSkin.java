@@ -202,7 +202,7 @@ public class PlusMinusTileSkin extends TileSkin {
         }
         text.setY(height - size * 0.05);
 
-        maxWidth = width - size * 0.85;
+        maxWidth = width - size * 0.275;
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }

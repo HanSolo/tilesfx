@@ -186,8 +186,9 @@ public class SliderTileSkin extends TileSkin {
         }
         text.setY(height - size * 0.05);
 
-        maxWidth = width - size * 0.85;
+        maxWidth = width - size * 0.275;
         fontSize = size * 0.12;
+        unitText.setText(tile.getUnit());
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
@@ -232,7 +233,6 @@ public class SliderTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        unitText.setText(tile.getUnit());
         description.setText(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
 

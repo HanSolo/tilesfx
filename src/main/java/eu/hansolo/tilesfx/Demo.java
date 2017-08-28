@@ -185,7 +185,7 @@ public class Demo extends Application {
         barChartItem3 = new BarChartItem("Lilli", 12, Tile.GREEN);
         barChartItem4 = new BarChartItem("Anton", 8, Tile.ORANGE);
 
-        barChartItem1.setFormatString("");
+        barChartItem1.setFormatString("%.1f kWh");
 
         // LeaderBoard Items
         leaderBoardItem1 = new LeaderBoardItem("Gerrit", 47);

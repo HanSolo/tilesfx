@@ -39,6 +39,7 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class SliderTileSkin extends TileSkin {
+
     private final TileEvent VALUE_CHANGING = new TileEvent(TileEvent.EventType.VALUE_CHANGING);
     private final TileEvent VALUE_CHANGED  = new TileEvent(TileEvent.EventType.VALUE_CHANGED);
     private Text                     titleText;
@@ -66,18 +67,19 @@ public class SliderTileSkin extends TileSkin {
 
 
     // ******************** Initialization ************************************
-    @Override protected void initGraphics() {
+    @Override
+    protected void initGraphics() {
         super.initGraphics();
 
         mouseEventHandler = e -> {
             final EventType TYPE = e.getEventType();
             if (MouseEvent.MOUSE_PRESSED == TYPE) {
-                dragStart      = thumb.localToParent(e.getX(), e.getY());
+                dragStart = thumb.localToParent(e.getX(), e.getY());
                 formerThumbPos = (tile.getCurrentValue() - minValue) / range;
                 tile.fireTileEvent(VALUE_CHANGING);
             } else if (MouseEvent.MOUSE_DRAGGED == TYPE) {
                 Point2D currentPos = thumb.localToParent(e.getX(), e.getY());
-                double  dragPos    = currentPos.getX() - dragStart.getX();
+                double dragPos = currentPos.getX() - dragStart.getX();
                 thumbDragged((formerThumbPos + dragPos / trackLength));
             } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
                 tile.fireTileEvent(VALUE_CHANGED);
@@ -119,7 +121,9 @@ public class SliderTileSkin extends TileSkin {
         getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, barBackground, bar, thumb);
     }
 
-    @Override protected void registerListeners() {
+
+    @Override
+    protected void registerListeners() {
         super.registerListeners();
         thumb.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
         thumb.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseEventHandler);
@@ -128,7 +132,8 @@ public class SliderTileSkin extends TileSkin {
 
 
     // ******************** Methods *******************************************
-    @Override protected void handleEvents(final String EVENT_TYPE) {
+    @Override
+    protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
         if ("VISIBILITY".equals(EVENT_TYPE)) {
@@ -138,22 +143,33 @@ public class SliderTileSkin extends TileSkin {
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
-    };
+    }
 
-    @Override protected void handleCurrentValue(final double VALUE) {
+
+    ;
+
+
+    @Override
+    protected void handleCurrentValue(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
         resizeDynamicText();
         centerX = trackStart + (trackLength * ((VALUE - minValue) / range));
         thumb.setCenterX(clamp(trackStart, (trackStart + trackLength), centerX));
         thumb.setFill(Double.compare(VALUE, tile.getMinValue()) != 0 ? tile.getBarColor() : tile.getForegroundColor());
         bar.setWidth(thumb.getCenterX() - trackStart);
-    };
+    }
+
+
+    ;
+
 
     private void thumbDragged(final double POSITION) {
         tile.setValue(clamp(minValue, maxValue, (POSITION * range) + minValue));
     }
 
-    @Override public void dispose() {
+
+    @Override
+    public void dispose() {
         thumb.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
         thumb.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseEventHandler);
         thumb.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
@@ -162,35 +178,60 @@ public class SliderTileSkin extends TileSkin {
 
 
     // ******************** Resizing ******************************************
-    @Override protected void resizeDynamicText() {
+    @Override
+    protected void resizeDynamicText() {
         double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-    };
-    @Override protected void resizeStaticText() {
+        if (valueText.getLayoutBounds().getWidth() > maxWidth) {
+            Helper.adjustTextSize(valueText, maxWidth, fontSize);
+        }
+    }
+
+
+    ;
+
+
+    @Override
+    protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
-        switch(tile.getTitleAlignment()) {
-            default    :
-            case LEFT  : titleText.relocate(size * 0.05, size * 0.05); break;
-            case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
-            case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) {
+            Helper.adjustTextSize(titleText, maxWidth, fontSize);
+        }
+        switch (tile.getTitleAlignment()) {
+            default:
+            case LEFT:
+                titleText.relocate(size * 0.05, size * 0.05);
+                break;
+            case CENTER:
+                titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05);
+                break;
+            case RIGHT:
+                titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05);
+                break;
         }
 
         //maxWidth = size * 0.9;
         fontSize = size * textSize.factor;
         text.setText(tile.getText());
         text.setFont(Fonts.latoRegular(fontSize));
-        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
-        switch(tile.getTextAlignment()) {
-            default    :
-            case LEFT  : text.setX(size * 0.05); break;
-            case CENTER: text.setX((width - text.getLayoutBounds().getWidth()) * 0.5); break;
-            case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
+        if (text.getLayoutBounds().getWidth() > maxWidth) {
+            Helper.adjustTextSize(text, maxWidth, fontSize);
+        }
+        switch (tile.getTextAlignment()) {
+            default:
+            case LEFT:
+                text.setX(size * 0.05);
+                break;
+            case CENTER:
+                text.setX((width - text.getLayoutBounds().getWidth()) * 0.5);
+                break;
+            case RIGHT:
+                text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth());
+                break;
         }
         text.setY(height - size * 0.05);
 
@@ -198,22 +239,29 @@ public class SliderTileSkin extends TileSkin {
         fontSize = size * 0.12;
         unitText.setText(tile.getUnit());
         unitText.setFont(Fonts.latoRegular(fontSize));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) {
+            Helper.adjustTextSize(unitText, maxWidth, fontSize);
+        }
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
-    };
+    }
 
-    @Override protected void resize() {
+
+    ;
+
+
+    @Override
+    protected void resize() {
         super.resize();
 
         description.setPrefSize(width - size * 0.1, size * 0.43);
         description.relocate(size * 0.05, height * 0.42);
 
-        trackStart  = size * 0.14;
+        trackStart = size * 0.14;
         trackLength = width - size * 0.28;
-        centerX     = trackStart + (trackLength * ((tile.getCurrentValue() - minValue) / range));
-        centerY     = height * 0.71;
+        centerX = trackStart + (trackLength * ((tile.getCurrentValue() - minValue) / range));
+        centerY = height * 0.71;
 
         barBackground.setWidth(trackLength);
         barBackground.setHeight(size * 0.0275);
@@ -235,9 +283,14 @@ public class SliderTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
-    };
+    }
 
-    @Override protected void redraw() {
+
+    ;
+
+
+    @Override
+    protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
@@ -252,6 +305,10 @@ public class SliderTileSkin extends TileSkin {
         unitText.setFill(tile.getUnitColor());
         barBackground.setFill(tile.getBarBackgroundColor());
         bar.setFill(tile.getBarColor());
-        thumb.setFill(Double.compare(tile.getValue(), tile.getMinValue()) != 0 ? tile.getBarColor() : tile.getForegroundColor());
-    };
+        thumb.setFill(Double.compare(tile.getValue(), tile.getMinValue()) != 0 ? tile.getBarColor() :
+                tile.getForegroundColor());
+    }
+
+
+    ;
 }

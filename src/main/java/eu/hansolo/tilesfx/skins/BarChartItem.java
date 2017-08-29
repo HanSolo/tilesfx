@@ -234,7 +234,6 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     }
 
     private void updateBar(final double VALUE) {
-        System.out.println(formatString);
         valueText.setText(String.format(locale, formatString, VALUE));
         valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
         bar.setWidth(VALUE * stepSize);

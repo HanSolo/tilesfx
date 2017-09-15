@@ -41,6 +41,8 @@ import javafx.scene.text.Text;
 
 import java.util.Locale;
 
+import static eu.hansolo.tilesfx.tools.Helper.clamp;
+
 
 /**
  * User: hansolo
@@ -273,7 +275,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
             bar.setX(size * 0.075);
             bar.setY(size * 0.09666667);
-            bar.setWidth(getValue() * stepSize);
+            bar.setWidth(clamp(0, (width - size * 0.15), getValue() * stepSize));
             bar.setHeight(size * 0.02333333);
 
             redraw();

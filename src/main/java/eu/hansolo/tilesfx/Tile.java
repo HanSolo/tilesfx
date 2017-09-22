@@ -107,7 +107,7 @@ public class Tile extends Control {
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
                            CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
                            GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
-                           RADAR_CHART("RadarChart"), COUNTRY("Country");
+                           RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -522,6 +522,8 @@ public class Tile extends Control {
         _autoReferenceValue                 = true;
         time                                = new ObjectPropertyBase<ZonedDateTime>(TIME) {
             @Override protected void invalidated() {
+                zoneId = get().getZone();
+                fireTileEvent(RECALC_EVENT);
                 if (!isRunning() && isAnimated()) {
                     long animationDuration = getAnimationDuration();
                     timeline.stop();
@@ -3195,7 +3197,9 @@ public class Tile extends Control {
      * Defines the current time of the clock.
      * @param TIME
      */
-    public void setTime(final ZonedDateTime TIME) { time.set(TIME); }
+    public void setTime(final ZonedDateTime TIME) {
+        time.set(TIME);
+    }
     public void setTime(final long EPOCH_SECONDS) {
         time.set(ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), getZoneId()));
     }
@@ -4324,7 +4328,6 @@ public class Tile extends Control {
         ZonedDateTime now = time.get();
         if (isAlarmsEnabled()) checkAlarms(now);
         if (getCheckSectionsForValue()) {
-            int listSize = timeSections.size();
             for (TimeSection timeSection : timeSections) { timeSection.checkForTimeAndDate(now); }
         }
 
@@ -4442,6 +4445,7 @@ public class Tile extends Control {
             case SMOOTH_AREA_CHART: return new SmoothAreaChartTileSkin(Tile.this);
             case RADAR_CHART      : return new RadarChartTileSkin(Tile.this);
             case COUNTRY          : return new CountryTileSkin(Tile.this);
+            case EPHEMERIS        : return new EphemerisTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4577,6 +4581,7 @@ public class Tile extends Control {
             case SMOOTH_AREA_CHART: setSkin(new SmoothAreaChartTileSkin(Tile.this)); break;
             case RADAR_CHART      : setSkin(new RadarChartTileSkin(Tile.this)); break;
             case COUNTRY          : setSkin(new CountryTileSkin(Tile.this)); break;
+            case EPHEMERIS        : setSkin(new EphemerisTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

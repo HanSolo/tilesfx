@@ -880,6 +880,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case COUNTRY:
                     break;
+                case EPHEMERIS:
+                    break;
                 default:
                     break;
             }

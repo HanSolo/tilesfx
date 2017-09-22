@@ -17,9 +17,18 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.TextSize;
+import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.SunMoonCalculator;
+import eu.hansolo.tilesfx.weather.DarkSky.ConditionAndIcon;
+import eu.hansolo.tilesfx.weather.WeatherSymbol;
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.time.LocalDate;
@@ -29,17 +38,51 @@ import java.time.format.DateTimeFormatter;
 
 
 public class EphemerisTileSkin extends TileSkin {
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     private SunMoonCalculator smc;
     private Text              titleText;
     private Text              text;
+    
+    private Circle            blueHourDotMorning;
+    private Text              blueHourTitleMorning;
     private Text              blueHourSunriseText;
+    private VBox              blueHourSunriseTextBox;
+    private HBox              blueHourSunriseBox;
+
+    private WeatherSymbol     sunriseSymbol;
+    private Text              sunriseTitle;
     private Text              sunriseText;
+    private VBox              sunriseTextBox;
+    private HBox              sunriseBox;
+
+    private Circle            goldenHourDotMorning;
+    private Text              goldenHourTitleMorning;
     private Text              goldenHourSunriseText;
+    private VBox              goldenHourSunriseTextBox;
+    private HBox              goldenHourSunriseBox;
+
+    private Circle            goldenHourDotEvening;
+    private Text              goldenHourTitleEvening;
     private Text              goldenHourSunsetText;
+    private VBox              goldenHourSunsetTextBox;
+    private HBox              goldenHourSunsetBox;
+
+    private WeatherSymbol     sunsetSymbol;
+    private Text              sunsetTitle;
     private Text              sunsetText;
+    private VBox              sunsetTextBox;
+    private HBox              sunsetBox;
+
+    private Circle            blueHourDotEvening;
+    private Text              blueHourTitleEvening;
     private Text              blueHourSunsetText;
+    private VBox              blueHourSunsetTextBox;
+    private HBox              blueHourSunsetBox;
+    
+    private VBox              infoBoxMorning;
+    private VBox              infoBoxEvening;
+    private HBox              infoBox;
 
 
     // ******************** Constructors **************************************
@@ -65,17 +108,56 @@ public class EphemerisTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        blueHourSunriseText   = new Text();
-        sunriseText           = new Text();
-        goldenHourSunriseText = new Text();
-        goldenHourSunsetText  = new Text();
-        sunsetText            = new Text();
-        blueHourSunsetText    = new Text();
+        blueHourDotMorning       = new Circle(14, TileColor.BLUE.color);
+        blueHourTitleMorning     = new Text("Blue Hour");
+        blueHourSunriseText      = new Text("--:--");
+        blueHourSunriseTextBox   = new VBox(blueHourTitleMorning, blueHourSunriseText);
+        blueHourSunriseBox       = new HBox(blueHourDotMorning, blueHourSunriseTextBox);
+        blueHourSunriseBox.setAlignment(Pos.CENTER_LEFT);
+
+        sunriseSymbol            = new WeatherSymbol(ConditionAndIcon.SUNRISE, 22, tile.getForegroundColor());
+        sunriseTitle             = new Text("Sunrise");
+        sunriseText              = new Text("--:--");
+        sunriseTextBox           = new VBox(sunriseTitle, sunriseText);
+        sunriseBox               = new HBox(sunriseSymbol, sunriseTextBox);
+        sunriseBox.setAlignment(Pos.CENTER_LEFT);
+
+        goldenHourDotMorning     = new Circle(14, TileColor.ORANGE.color);
+        goldenHourTitleMorning   = new Text("Golden Hour");
+        goldenHourSunriseText    = new Text("--:--");
+        goldenHourSunriseTextBox = new VBox(goldenHourTitleMorning, goldenHourSunriseText);
+        goldenHourSunriseBox     = new HBox(goldenHourDotMorning, goldenHourSunriseTextBox);
+        goldenHourSunriseBox.setAlignment(Pos.CENTER_LEFT);
+
+        goldenHourDotEvening     = new Circle(14, TileColor.ORANGE.color);
+        goldenHourTitleEvening   = new Text("Golden Hour");
+        goldenHourSunsetText     = new Text("--:--");
+        goldenHourSunsetTextBox  = new VBox(goldenHourTitleEvening, goldenHourSunsetText);
+        goldenHourSunsetBox      = new HBox(goldenHourDotEvening, goldenHourSunsetTextBox);
+        goldenHourSunsetBox.setAlignment(Pos.CENTER_LEFT);
+
+        sunsetSymbol             = new WeatherSymbol(ConditionAndIcon.SUNSET, 22, tile.getForegroundColor());
+        sunsetTitle              = new Text("Sunset");
+        sunsetText               = new Text("--:--");
+        sunsetTextBox            = new VBox(sunsetTitle, sunsetText);
+        sunsetBox                = new HBox(sunsetSymbol, sunsetTextBox);
+        sunsetBox.setAlignment(Pos.CENTER_LEFT);
+
+        blueHourDotEvening       = new Circle(14, TileColor.BLUE.color);
+        blueHourTitleEvening     = new Text("Blue Hour");
+        blueHourSunsetText       = new Text("--:--");
+        blueHourSunsetTextBox    = new VBox(blueHourTitleEvening, blueHourSunsetText);
+        blueHourSunsetBox        = new HBox(blueHourDotEvening, blueHourSunsetTextBox);
+        blueHourSunsetBox.setAlignment(Pos.CENTER_LEFT);
+
+        infoBoxMorning = new VBox(blueHourSunriseBox, sunriseBox, goldenHourSunriseBox);
+        infoBoxEvening = new VBox(goldenHourSunsetBox, sunsetBox, blueHourSunsetBox);
+        infoBox        = new HBox(infoBoxMorning, infoBoxEvening);
 
         text = new Text(tile.getText());
         Helper.enableNode(text, tile.isTextVisible());
 
-        getPane().getChildren().addAll(titleText, text, blueHourSunriseText, sunriseText, goldenHourSunriseText, goldenHourSunsetText, sunsetText, blueHourSunsetText);
+        getPane().getChildren().addAll(titleText, text, infoBox);
     }
 
     @Override protected void registerListeners() {
@@ -107,34 +189,28 @@ public class EphemerisTileSkin extends TileSkin {
         blueHourSunsetText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunsetBlueHour()), TIME_FORMATTER.format(smc.getSunsetCivil())));
     }
 
+
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = width - size * 0.1;
-        double fontSize = size * textSize.factor;
+        double fontSize = size * TextSize.SMALL.factor;
+        Font   font     = Fonts.latoRegular(fontSize);
 
-        blueHourSunriseText.setFont(Fonts.latoRegular(fontSize));
-        if (blueHourSunriseText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(blueHourSunriseText, maxWidth, fontSize); }
-        blueHourSunriseText.relocate(size * 0.05, size * 0.175);
+        blueHourSunriseText.setFont(font);
+        sunriseText.setFont(font);
+        goldenHourSunriseText.setFont(font);
+        goldenHourSunsetText.setFont(font);
+        sunsetText.setFont(font);
+        blueHourSunsetText.setFont(font);
 
-        sunriseText.setFont(Fonts.latoRegular(fontSize));
-        if (sunriseText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(sunriseText, maxWidth, fontSize); }
-        sunriseText.relocate(size * 0.05, size * 0.275);
+        fontSize = size * TextSize.SMALLER.factor;
+        font = Fonts.latoRegular(fontSize);
 
-        goldenHourSunriseText.setFont(Fonts.latoRegular(fontSize));
-        if (goldenHourSunriseText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(goldenHourSunriseText, maxWidth, fontSize); }
-        goldenHourSunriseText.relocate(size * 0.05, size * 0.375);
-
-        goldenHourSunsetText.setFont(Fonts.latoRegular(fontSize));
-        if (goldenHourSunsetText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(goldenHourSunsetText, maxWidth, fontSize); }
-        goldenHourSunsetText.relocate(size * 0.05, size * 0.575);
-
-        sunsetText.setFont(Fonts.latoRegular(fontSize));
-        if (sunsetText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(sunsetText, maxWidth, fontSize); }
-        sunsetText.relocate(size * 0.05, size * 0.675);
-
-        blueHourSunsetText.setFont(Fonts.latoRegular(fontSize));
-        if (blueHourSunsetText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(blueHourSunsetText, maxWidth, fontSize); }
-        blueHourSunsetText.relocate(size * 0.05, size * 0.775);
+        blueHourTitleMorning.setFont(font);
+        sunriseTitle.setFont(font);
+        goldenHourTitleMorning.setFont(font);
+        goldenHourTitleEvening.setFont(font);
+        sunsetTitle.setFont(font);
+        blueHourTitleEvening.setFont(font);
     };
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
@@ -164,6 +240,29 @@ public class EphemerisTileSkin extends TileSkin {
 
     @Override protected void resize() {
         super.resize();
+
+        blueHourDotMorning.setRadius(size * 0.03);
+        goldenHourDotMorning.setRadius(size * 0.03);
+        blueHourDotEvening.setRadius(size * 0.03);
+        goldenHourDotEvening.setRadius(size * 0.03);
+
+        sunriseSymbol.setPrefSize(size * 0.07, size * 0.07);
+        sunsetSymbol.setPrefSize(size * 0.07, size * 0.07);
+
+        blueHourSunriseBox.setSpacing(size * 0.025);
+        sunriseBox.setSpacing(size * 0.025);
+        goldenHourSunriseBox.setSpacing(size * 0.025);
+        goldenHourSunsetBox.setSpacing(size * 0.025);
+        sunsetBox.setSpacing(size * 0.025);
+        blueHourSunsetBox.setSpacing(size * 0.025);
+        infoBoxMorning.setSpacing(height * 0.1);
+        infoBoxEvening.setSpacing(height * 0.1);
+        infoBox.setSpacing(width * 0.15);
+
+        double infoBoxHeight = infoBox.getLayoutBounds().getHeight();
+        double posY = infoBoxHeight == 0.0 ? size * 0.25 : (height - infoBox.getLayoutBounds().getHeight()) * 0.5;
+
+        infoBox.relocate(size * 0.05, posY);
     };
 
     @Override protected void redraw() {
@@ -181,11 +280,29 @@ public class EphemerisTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
+
+        blueHourDotMorning.setFill(TileColor.BLUE.color);
+        blueHourTitleMorning.setFill(tile.getTextColor());
         blueHourSunriseText.setFill(tile.getTextColor());
+
+        sunriseSymbol.setSymbolColor(tile.getTextColor());
+        sunriseTitle.setFill(tile.getTextColor());
         sunriseText.setFill(tile.getTextColor());
+
+        goldenHourDotMorning.setFill(TileColor.ORANGE.color);
+        goldenHourTitleMorning.setFill(tile.getTextColor());
         goldenHourSunriseText.setFill(tile.getTextColor());
+
+        goldenHourDotEvening.setFill(TileColor.ORANGE.color);
+        goldenHourTitleEvening.setFill(tile.getTextColor());
         goldenHourSunsetText.setFill(tile.getTextColor());
+
+        sunsetSymbol.setSymbolColor(tile.getTextColor());
+        sunsetTitle.setFill(tile.getTextColor());
         sunsetText.setFill(tile.getTextColor());
+
+        blueHourDotEvening.setFill(TileColor.BLUE.color);
+        blueHourTitleEvening.setFill(tile.getTextColor());
         blueHourSunsetText.setFill(tile.getTextColor());
     };
 }

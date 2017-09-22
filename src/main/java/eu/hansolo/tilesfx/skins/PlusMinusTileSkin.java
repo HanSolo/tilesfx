@@ -223,7 +223,8 @@ public class PlusMinusTileSkin extends TileSkin {
         minusLabel.setPrefSize(buttonSize, buttonSize);
         minusLabel.setMinSize(buttonSize, buttonSize);
         minusLabel.setMaxSize(buttonSize, buttonSize);
-        minusLabel.setPadding(new Insets(-0.055 * size, 0, 0, 0));
+        //minusLabel.setPadding(new Insets(-0.055 * size, 0, 0, 0));
+        minusLabel.setPadding(new Insets(-0.0625 * size, 0, 0, 0));
         minusLabel.setBorder(new Border(new BorderStroke(tile.getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
         minusLabel.relocate(size * 0.05, height - size * 0.20 - buttonSize);
         

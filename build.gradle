@@ -9,7 +9,7 @@ buildscript {
     }
 }
 
-// Medusa main build file
+// TilesFX main build file
 plugins {
     id 'com.gradle.build-scan' version '1.5'
     id 'idea'

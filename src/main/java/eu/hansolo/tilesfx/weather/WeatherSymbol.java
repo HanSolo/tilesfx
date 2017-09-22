@@ -33,7 +33,7 @@ public class WeatherSymbol extends Region {
     private static final double                                  MAXIMUM_WIDTH    = 1024;
     private static final double                                  MAXIMUM_HEIGHT   = 1024;
     private static final StyleablePropertyFactory<WeatherSymbol> FACTORY          = new StyleablePropertyFactory<>(Region.getClassCssMetaData());
-    private static final CssMetaData<WeatherSymbol, Color>       SYMBOL_COLOR     = FACTORY.createColorCssMetaData("-symbol-symbolColor", s -> s.symbolColor, Color.WHITE, false);
+    private static final CssMetaData<WeatherSymbol, Color>       SYMBOL_COLOR     = FACTORY.createColorCssMetaData("-symbol-color", s -> s.symbolColor, Color.WHITE, false);
     private              ObjectProperty<ConditionAndIcon>        condition;
     private              StyleableProperty<Color>                symbolColor;
     private              double                                  size;

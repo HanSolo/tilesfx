@@ -338,7 +338,7 @@ public class CircularProgressTileSkin extends TileSkin {
             percentageFlow.relocate(width * 0.05, graphicContainer.isVisible() ? bar.getCenterY() + chartSize * 0.12 : bar.getCenterY() - chartSize * 0.12);
 
             valueUnitFlow.setPrefWidth(width * 0.9);
-            valueUnitFlow.relocate(width * 0.05, graphicContainer.isVisible() ? bar.getCenterY() - chartSize * 0.32 : bar.getCenterY() + chartSize * 0.32);
+            valueUnitFlow.relocate(width * 0.05, graphicContainer.isVisible() ? bar.getCenterY() - chartSize * 0.32 : bar.getCenterY() + chartSize * 0.15);
         }
     }
 

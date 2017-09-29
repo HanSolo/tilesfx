@@ -130,7 +130,9 @@ public class BarChartTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     private void updateChart() {
         Platform.runLater(() -> {
-            tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());
+            if (tile.isSortedData()) {
+                tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());
+            }
             List<BarChartItem> items     = tile.getBarChartItems();
             int                noOfItems = items.size();
             if (noOfItems == 0) return;

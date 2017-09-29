@@ -438,6 +438,8 @@ public class Tile extends Control {
     private              ObjectProperty<Color>                  chartGridColor;
     private              Country                                _country;
     private              ObjectProperty<Country>                country;
+    private              boolean                                _sortedData;
+    private              BooleanProperty                        sortedData;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -653,6 +655,7 @@ public class Tile extends Control {
         _radarChartMode                     = Mode.POLYGON;
         _chartGridColor                     = Tile.GRAY;
         _country                            = Country.DE;
+        _sortedData                         = true;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -4113,6 +4116,26 @@ public class Tile extends Control {
             _country = null;
         }
         return country;
+    }
+
+    public boolean isSortedData() { return null == sortedData ? _sortedData : sortedData.get(); }
+    public void setSortedData(final boolean SORTED) {
+        if (null == sortedData) {
+            _sortedData = SORTED;
+            fireTileEvent(DATA_EVENT);
+        } else {
+            sortedData.set(SORTED);
+        }
+    }
+    public BooleanProperty sortedDataProperty() {
+        if (null == sortedData) {
+            sortedData = new BooleanPropertyBase(_sortedData) {
+                @Override protected void invalidated() { fireTileEvent(DATA_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "sortedData"; }
+            };
+        }
+        return sortedData;
     }
 
     public double getIncrement() { return increment; }

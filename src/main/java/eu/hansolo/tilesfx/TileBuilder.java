@@ -711,6 +711,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B sortedData(final boolean SORTED) {
+        properties.put("sortedData", new SimpleBooleanProperty(SORTED));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -1211,6 +1216,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("country".equals(key)) {
                 CONTROL.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
+            } else if ("sortedData".equals(key)) {
+                CONTROL.setSortedData(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

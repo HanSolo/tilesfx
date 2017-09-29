@@ -115,7 +115,7 @@ public class SparkLineTileSkin extends TileSkin {
 
         niceScaleY = new NiceScale(tile.getMinValue(), tile.getMaxValue());
         niceScaleY.setMaxTicks(5);
-        tickLineColor = Color.color(Tile.FOREGROUND.getRed(), Tile.FOREGROUND.getGreen(), Tile.FOREGROUND.getBlue(), 0.50);
+        tickLineColor = Color.color(tile.getChartGridColor().getRed(), tile.getChartGridColor().getGreen(), tile.getChartGridColor().getBlue(), 0.5);
         horizontalTickLines = new ArrayList<>(5);
         tickLabelsY = new ArrayList<>(5);
         for (int i = 0 ; i < 5 ; i++) {

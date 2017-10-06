@@ -23,7 +23,6 @@ import javafx.animation.FillTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -62,10 +61,11 @@ public class HighLowTileSkin extends TileSkin {
     private Text      unitText;
     private TextFlow  valueUnitFlow;
     private Label     description;
-    private Text      referenceText;
-    private Text      referenceUnitText;
+    private Text      deviationText;
+    private Text      deviationUnitText;
     private TextFlow  referenceUnitFlow;
     private State     state;
+    private double    oldValue;
 
 
     // ******************** Constructors **************************************
@@ -78,7 +78,9 @@ public class HighLowTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateState(tile.getValue(), tile.getReferenceValue());
+        oldValue = tile.getValue();
+        double deviation = calculateDeviation();
+        updateState(deviation);
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -109,14 +111,14 @@ public class HighLowTileSkin extends TileSkin {
         triangle.setStroke(null);
         triangle.setFill(state.color);
         indicatorPane = new StackPane(triangle);
-        
-        referenceText = new Text(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getReferenceValue()));
-        referenceText.setFill(state.color);
 
-        referenceUnitText = new Text(tile.getUnit());
-        referenceUnitText.setFill(Tile.FOREGROUND);
+        deviationText = new Text(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", deviation));
+        deviationText.setFill(state.color);
 
-        referenceUnitFlow = new TextFlow(indicatorPane, referenceText, referenceUnitText);
+        deviationUnitText = new Text("%");
+        deviationUnitText.setFill(Tile.FOREGROUND);
+
+        referenceUnitFlow = new TextFlow(indicatorPane, deviationText, deviationUnitText);
         referenceUnitFlow.setTextAlignment(TextAlignment.LEFT);
 
         getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, referenceUnitFlow);
@@ -143,10 +145,10 @@ public class HighLowTileSkin extends TileSkin {
     };
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        updateState(VALUE, tile.getReferenceValue());
+        double deviation = calculateDeviation(VALUE);
+        updateState(deviation);
         valueText.setText(String.format(locale, formatString, VALUE));
-        referenceText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getReferenceValue()));
-        resizeDynamicText();
+        deviationText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", deviation));
 
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(200), triangle);
         rotateTransition.setFromAngle(triangle.getRotate());
@@ -156,11 +158,11 @@ public class HighLowTileSkin extends TileSkin {
         fillIndicatorTransition.setFromValue((Color) triangle.getFill());
         fillIndicatorTransition.setToValue(state.color);
 
-        FillTransition fillReferenceTransition = new FillTransition(Duration.millis(200), referenceText);
+        FillTransition fillReferenceTransition = new FillTransition(Duration.millis(200), deviationText);
         fillReferenceTransition.setFromValue((Color) triangle.getFill());
         fillReferenceTransition.setToValue(state.color);
 
-        FillTransition fillReferenceUnitTransition = new FillTransition(Duration.millis(200), referenceUnitText);
+        FillTransition fillReferenceUnitTransition = new FillTransition(Duration.millis(200), deviationUnitText);
         fillReferenceUnitTransition.setFromValue((Color) triangle.getFill());
         fillReferenceUnitTransition.setToValue(state.color);
 
@@ -168,10 +170,17 @@ public class HighLowTileSkin extends TileSkin {
         parallelTransition.play();
     };
 
-    private void updateState(final double VALUE, final double REFERENCE_VALUE) {
-        if (Double.compare(VALUE, REFERENCE_VALUE) > 0) {
+    private double calculateDeviation() { return calculateDeviation(tile.getValue()); }
+    private double calculateDeviation(final double VALUE) {
+        double deviation = Double.compare(0, oldValue) == 0 ? VALUE : -((oldValue - VALUE) / oldValue) * 100.0;
+        oldValue = VALUE;
+        return deviation;
+    }
+
+    private void updateState(final double DEVIATION) {
+        if (DEVIATION > 0) {
             state = State.INCREASE;
-        } else if (Double.compare(VALUE, REFERENCE_VALUE) < 0) {
+        } else if (DEVIATION < 0) {
             state = State.DECREASE;
         } else {
             state = State.CONSTANT;
@@ -197,6 +206,16 @@ public class HighLowTileSkin extends TileSkin {
         double fontSize = 0.24 * size;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
+
+        maxWidth = width - size * 0.55;
+        fontSize = size * 0.18;
+        deviationText.setFont(Fonts.latoRegular(fontSize));
+        if (deviationText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(deviationText, maxWidth, fontSize); }
+
+        maxWidth = width - size * 0.9;
+        fontSize = size * 0.12;
+        deviationUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (deviationUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(deviationUnitText, maxWidth, fontSize); }
     };
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
@@ -228,16 +247,6 @@ public class HighLowTileSkin extends TileSkin {
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
-        maxWidth = width - size * 0.55;
-        fontSize = size * 0.18;
-        referenceText.setFont(Fonts.latoRegular(fontSize));
-        if (referenceText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(referenceText, maxWidth, fontSize); }
-
-        maxWidth = width - size * 0.9;
-        fontSize = size * 0.12;
-        referenceUnitText.setFont(Fonts.latoRegular(fontSize));
-        if (referenceUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(referenceUnitText, maxWidth, fontSize); }
-
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
     };
@@ -264,7 +273,7 @@ public class HighLowTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        referenceText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getReferenceValue()));
+        deviationText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", calculateDeviation()));
         unitText.setText(tile.getUnit());
         description.setText(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
@@ -276,8 +285,8 @@ public class HighLowTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         unitText.setFill(tile.getUnitColor());
         description.setTextFill(tile.getDescriptionColor());
-        referenceText.setFill(state.color);
-        referenceUnitText.setFill(state.color);
+        deviationText.setFill(state.color);
+        deviationUnitText.setFill(state.color);
         triangle.setFill(state.color);
     };
 }

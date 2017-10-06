@@ -75,6 +75,11 @@ public class Demo extends Application {
     private ChartData       chartData7;
     private ChartData       chartData8;
 
+    private ChartData       smoothChartData1;
+    private ChartData       smoothChartData2;
+    private ChartData       smoothChartData3;
+    private ChartData       smoothChartData4;
+
     private Tile            percentageTile;
     private Tile            clockTile;
     private Tile            gaugeTile;
@@ -204,6 +209,10 @@ public class Demo extends Application {
         chartData8 = new ChartData("Item 8", 13.0, Tile.BLUE);
         //ChartData.animated = false;
 
+        smoothChartData1 = new ChartData("Item 1", RND.nextDouble() * 25, Tile.BLUE);
+        smoothChartData2 = new ChartData("Item 2", RND.nextDouble() * 25, Tile.BLUE);
+        smoothChartData3 = new ChartData("Item 3", RND.nextDouble() * 25, Tile.BLUE);
+        smoothChartData4 = new ChartData("Item 4", RND.nextDouble() * 25, Tile.BLUE);
 
         // Creating Tiles
         percentageTile = TileBuilder.create()
@@ -264,7 +273,7 @@ public class Demo extends Application {
                                  .skinType(SkinType.HIGH_LOW)
                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                  .title("HighLow Tile")
-                                 .unit("\u0025")
+                                 .unit("€")
                                  .description("Test")
                                  .text("Whatever text")
                                  .referenceValue(6.7)
@@ -518,7 +527,7 @@ public class Demo extends Application {
                                          .title("SmoothAreaChart")
                                          .unit("Unit")
                                          .text("Test")
-                                         .chartData(chartData1, chartData2, chartData3, chartData4)
+                                         .chartData(smoothChartData1, smoothChartData2, smoothChartData3, smoothChartData4)
                                          .tooltipText("")
                                          .animated(true)
                                          .build();
@@ -570,6 +579,11 @@ public class Demo extends Application {
                     gaugeSparkLineTile.setValue(RND.nextDouble() * 100);
 
                     countryTile.setValue(RND.nextDouble() * 100);
+
+                    smoothChartData1.setValue(smoothChartData2.getValue());
+                    smoothChartData2.setValue(smoothChartData3.getValue());
+                    smoothChartData3.setValue(smoothChartData4.getValue());
+                    smoothChartData4.setValue(RND.nextDouble() * 25);
 
                     lastTimerCall = now;
                 }

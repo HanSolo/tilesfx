@@ -164,15 +164,19 @@ public class DonutChartTileSkin extends TileSkin {
             chartCtx.setStroke(data.getColor());
             chartCtx.strokeArc(xy, xy, wh, wh, startAngle, -angle, ArcType.OPEN);
 
+            double radValue = Math.toRadians(startAngle - (angle * 0.5));
+            double cosValue = Math.cos(radValue);
+            double sinValue = Math.sin(radValue);
+
             // Percentage
-            double x = innerRadius * Math.cos(Math.toRadians(startAngle - (angle * 0.5)));
-            double y = -innerRadius * Math.sin(Math.toRadians(startAngle - (angle * 0.5)));
+            double x = innerRadius * cosValue;
+            double y = -innerRadius * sinValue;
             chartCtx.setFill(textColor);
             chartCtx.fillText(String.format(Locale.US, "%.0f%%", (value / sum * 100.0)), center + x, center + y, barWidth);
 
             // Value
-            x = outerRadius * Math.cos(Math.toRadians(startAngle - (angle * 0.5)));
-            y = -outerRadius * Math.sin(Math.toRadians(startAngle - (angle * 0.5)));
+            x = outerRadius * cosValue;
+            y = -outerRadius * sinValue;
             chartCtx.setFill(bkgColor);
             chartCtx.fillText(String.format(Locale.US, "%.0f", value), center + x, center + y, barWidth);
         }

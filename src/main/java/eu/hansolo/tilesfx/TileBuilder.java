@@ -1035,7 +1035,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
             } else if("unit".equals(key)) {
                 CONTROL.setUnit(((StringProperty) properties.get(key)).get());
             } else if ("selected".equals(key)) {
-                CONTROL.setSelected(((BooleanProperty) properties.get(key)).get());
+                CONTROL.setActive(((BooleanProperty) properties.get(key)).get());
             } else if("averagingEnabled".equals(key)) {
                 CONTROL.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
             } else if("averagingPeriod".equals(key)) {

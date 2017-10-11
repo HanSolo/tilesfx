@@ -26,7 +26,6 @@ import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
@@ -39,8 +38,8 @@ import javafx.util.Duration;
  * Created by hansolo on 19.12.16.
  */
 public class SwitchTileSkin extends TileSkin {
-    private static final SwitchEvent SWITCH_PRESSED  = new SwitchEvent(SwitchEvent.SWITCH_PRESSED);
-    private static final SwitchEvent SWITCH_RELEASED = new SwitchEvent(SwitchEvent.SWITCH_RELEASED);
+    private static final SwitchEvent SWITCH_ACTIVE   = new SwitchEvent(SwitchEvent.ACTIVE);
+    private static final SwitchEvent SWITCH_INACTIVE = new SwitchEvent(SwitchEvent.INACTIVE);
     private Text                     titleText;
     private Text                     text;
     private Label                    description;
@@ -65,10 +64,10 @@ public class SwitchTileSkin extends TileSkin {
         mouseEventHandler = e -> {
             final EventType TYPE = e.getEventType();
             if (MouseEvent.MOUSE_PRESSED == TYPE) {
-                tile.setSelected(!tile.isSelected());
-                tile.fireEvent(SWITCH_PRESSED);
+                tile.setActive(!tile.isActive());
+                tile.fireEvent(SWITCH_ACTIVE);
             } else if(MouseEvent.MOUSE_RELEASED == TYPE) {
-                tile.fireEvent(SWITCH_RELEASED);
+                tile.fireEvent(SWITCH_INACTIVE);
             }
         };
         selectedListener = o -> moveThumb();
@@ -93,7 +92,7 @@ public class SwitchTileSkin extends TileSkin {
 
         switchBackground = new Rectangle();
         switchBackground.setMouseTransparent(true);
-        switchBackground.setFill(tile.isSelected() ? tile.getActiveColor() : tile.getBackgroundColor());
+        switchBackground.setFill(tile.isActive() ? tile.getActiveColor() : tile.getBackgroundColor());
 
         thumb = new Circle();
         thumb.setMouseTransparent(true);
@@ -106,7 +105,7 @@ public class SwitchTileSkin extends TileSkin {
         super.registerListeners();
         switchBorder.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
         switchBorder.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
-        tile.selectedProperty().addListener(selectedListener);
+        tile.activeProperty().addListener(selectedListener);
     }
 
 
@@ -126,7 +125,7 @@ public class SwitchTileSkin extends TileSkin {
         KeyValue thumbRightX                = new KeyValue(thumb.centerXProperty(), switchBackground.getLayoutX() + switchBackground.getWidth() - size * 0.1);
         KeyValue switchBackgroundLeftColor  = new KeyValue(switchBackground.fillProperty(), tile.getBackgroundColor());
         KeyValue switchBackgroundRightColor = new KeyValue(switchBackground.fillProperty(), tile.getActiveColor());
-        if (tile.isSelected()) {
+        if (tile.isActive()) {
             // move thumb from left to the right
             KeyFrame kf0 = new KeyFrame(Duration.ZERO, thumbLeftX, switchBackgroundLeftColor);
             KeyFrame kf1 = new KeyFrame(Duration.millis(200), thumbRightX, switchBackgroundRightColor);
@@ -143,7 +142,7 @@ public class SwitchTileSkin extends TileSkin {
     @Override public void dispose() {
         switchBorder.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
         switchBorder.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandler);
-        tile.selectedProperty().removeListener(selectedListener);
+        tile.activeProperty().removeListener(selectedListener);
         super.dispose();
     }
 
@@ -197,8 +196,8 @@ public class SwitchTileSkin extends TileSkin {
         switchBackground.relocate((width - switchBackground.getWidth()) * 0.5, tile.getDescription().isEmpty() ? (height - switchBackground.getHeight()) * 0.5 : height - size * 0.39);
 
         thumb.setRadius(size * 0.09);
-        thumb.setCenterX(tile.isSelected() ? width * 0.6125 : width * 0.3875);
-        thumb.setCenterX(tile.isSelected() ? switchBackground.getLayoutX() + switchBackground.getWidth() - size * 0.1 : switchBackground.getLayoutX() + size * 0.1);
+        thumb.setCenterX(tile.isActive() ? width * 0.6125 : width * 0.3875);
+        thumb.setCenterX(tile.isActive() ? switchBackground.getLayoutX() + switchBackground.getWidth() - size * 0.1 : switchBackground.getLayoutX() + size * 0.1);
         thumb.setCenterY(tile.getDescription().isEmpty() ? height * 0.5 : height - size * 0.29);
     };
 

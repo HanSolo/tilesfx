@@ -56,7 +56,7 @@ import java.util.Map;
  * Created by hansolo on 20.12.16.
  */
 public class TimerControlTileSkin extends TileSkin {
-    private static final double                CLOCK_SCALE_FACTOR = 0.75;
+    private static final double            CLOCK_SCALE_FACTOR = 0.75;
     private              DateTimeFormatter dateFormatter;
     private              double            clockSize;
     private              Pane              sectionsPane;

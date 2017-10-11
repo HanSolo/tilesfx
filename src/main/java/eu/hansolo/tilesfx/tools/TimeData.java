@@ -41,7 +41,7 @@ public class TimeData extends ChartData {
     @Override public String toString() {
         return new StringBuilder().append("{\n")
                                   .append("  \"timestamp\":").append(super.getTimestamp().toEpochMilli()).append(",\n")
-                                  .append("  \"value\":").append(super.getValue()).append(",\n")
+                                  .append("  \"value\":").append(super.getValue()).append("\n")
                                   .append("}")
                                   .toString();
     }

@@ -238,8 +238,8 @@ public class Tile extends Control {
     private              StringProperty                         text;
     private              TextAlignment                          _textAlignment;
     private              ObjectProperty<TextAlignment>          textAlignment;
-    private              boolean                                _selected;
-    private              BooleanProperty                        selected;
+    private              boolean                                _active;
+    private              BooleanProperty                        active;
     private              boolean                                _averagingEnabled;
     private              BooleanProperty                        averagingEnabled;
     private              int                                    _averagingPeriod;
@@ -555,7 +555,7 @@ public class Tile extends Control {
         _description                        = "";
         _descriptionAlignment               = Pos.TOP_RIGHT;
         _unit                               = "";
-        _selected                           = false;
+        _active                             = false;
         _text                               = "";
         _textAlignment                      = TextAlignment.LEFT;
         _averagingEnabled                   = false;
@@ -1127,31 +1127,31 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns true if the switch in the SwitchTileSkin is selected
-     * @return true if the switch in the SwitchTileSkin is selected
+     * Returns true if the switch in the SwitchTileSkin is active
+     * @return true if the switch in the SwitchTileSkin is active
      */
-    public boolean isSelected() { return null == selected ? _selected : selected.get(); }
+    public boolean isActive() { return null == active ? _active : active.get(); }
     /**
-     * Defines if the switch in the SwitchTileSkin is selected
+     * Defines if the switch in the SwitchTileSkin is active
      * @param SELECTED
      */
-    public void setSelected(final boolean SELECTED) {
-        if (null == selected) {
-            _selected = SELECTED;
+    public void setActive(final boolean SELECTED) {
+        if (null == active) {
+            _active = SELECTED;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            selected.set(SELECTED);
+            active.set(SELECTED);
         }
     }
-    public BooleanProperty selectedProperty() {
-        if (null == selected) {
-            selected = new BooleanPropertyBase(_selected) {
+    public BooleanProperty activeProperty() {
+        if (null == active) {
+            active = new BooleanPropertyBase(_active) {
                 @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
-                @Override public String getName() { return "selected"; }
+                @Override public String getName() { return "active"; }
             };
         }
-        return selected;
+        return active;
     }
 
     /**
@@ -4437,6 +4437,12 @@ public class Tile extends Control {
 
     public void setOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
     public void removeOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
+
+    public void setOnSwitchActive(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.ACTIVE, HANDLER); }
+    public void removeOnSwitchActive(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.ACTIVE, HANDLER); }
+
+    public void setOnSwitchInactive(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.INACTIVE, HANDLER); }
+    public void removeOnSwitchInactive(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.INACTIVE, HANDLER); }
 
 
     // ******************** Style related *************************************

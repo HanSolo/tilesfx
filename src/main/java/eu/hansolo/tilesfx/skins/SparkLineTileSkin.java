@@ -107,7 +107,7 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        averagingListener = o -> handleEvents("AVERAGING_PERIOD");
+        averagingListener = o -> handleEvents("AVERAGING");
 
         timeFormatter = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
 
@@ -324,8 +324,8 @@ public class SparkLineTileSkin extends TileSkin {
             double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
 
             averageLine.setStartX(minX);
-            averageLine.setEndX(maxX);
             averageLine.setStartY(averageY);
+            averageLine.setEndX(maxX);
             averageLine.setEndY(averageY);
 
             stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
@@ -544,7 +544,6 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
         graphBounds = new Rectangle(size * 0.05, size * 0.5, width - size * 0.1, height - size * 0.61);
-
         tickLabelFontSize  = graphBounds.getHeight() * 0.1;
         Font tickLabelFont = Fonts.latoRegular(tickLabelFontSize);
         tickLabelsY.forEach(label -> {

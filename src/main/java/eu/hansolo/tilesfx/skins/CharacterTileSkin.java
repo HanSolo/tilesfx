@@ -24,7 +24,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import sun.tools.jstat.Alignment;
 
 
 public class CharacterTileSkin extends TileSkin {

@@ -887,6 +887,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case EPHEMERIS:
                     break;
+                case CHARACTER:
+                    break;
                 default:
                     break;
             }
@@ -1014,7 +1016,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
             } else if ("padding".equals(key)) {
                 CONTROL.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
             } else if("styleClass".equals(key)) {
-                CONTROL.getStyleClass().setAll("gauge");
+                CONTROL.getStyleClass().setAll("tile");
                 CONTROL.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
             } else if ("autoScale".equals(key)) {
                 CONTROL.setAutoScale(((BooleanProperty) properties.get(key)).get());

@@ -107,7 +107,8 @@ public class Tile extends Control {
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
                            CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
                            GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
-                           RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris");
+                           RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris"),
+                           CHARACTER("Character");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -1046,6 +1047,7 @@ public class Tile extends Control {
         if (null == description) {
             _description = DESCRIPTION;
             fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvent(REDRAW_EVENT);
         } else {
             description.set(DESCRIPTION);
         }
@@ -1053,7 +1055,10 @@ public class Tile extends Control {
     public StringProperty descriptionProperty() {
         if (null == description) {
             description = new StringPropertyBase(_description) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() {
+                    fireTileEvent(VISIBILITY_EVENT);
+                    fireTileEvent(REDRAW_EVENT);
+                }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "description"; }
             };
@@ -4477,6 +4482,7 @@ public class Tile extends Control {
             case RADAR_CHART      : return new RadarChartTileSkin(Tile.this);
             case COUNTRY          : return new CountryTileSkin(Tile.this);
             case EPHEMERIS        : return new EphemerisTileSkin(Tile.this);
+            case CHARACTER        : return new CharacterTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4613,6 +4619,7 @@ public class Tile extends Control {
             case RADAR_CHART      : setSkin(new RadarChartTileSkin(Tile.this)); break;
             case COUNTRY          : setSkin(new CountryTileSkin(Tile.this)); break;
             case EPHEMERIS        : setSkin(new EphemerisTileSkin(Tile.this)); break;
+            case CHARACTER        : setSkin(new CharacterTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

@@ -23,7 +23,6 @@ import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
@@ -138,7 +137,7 @@ public class SliderTileSkin extends TileSkin {
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
@@ -147,7 +146,7 @@ public class SliderTileSkin extends TileSkin {
         thumb.setCenterX(clamp(trackStart, (trackStart + trackLength), centerX));
         thumb.setFill(Double.compare(VALUE, tile.getMinValue()) != 0 ? tile.getBarColor() : tile.getForegroundColor());
         bar.setWidth(thumb.getCenterX() - trackStart);
-    };
+    }
 
     private void thumbDragged(final double POSITION) {
         tile.setValue(clamp(minValue, maxValue, (POSITION * range) + minValue));
@@ -167,7 +166,7 @@ public class SliderTileSkin extends TileSkin {
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-    };
+    }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
@@ -202,7 +201,7 @@ public class SliderTileSkin extends TileSkin {
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -235,7 +234,7 @@ public class SliderTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -253,5 +252,5 @@ public class SliderTileSkin extends TileSkin {
         barBackground.setFill(tile.getBarBackgroundColor());
         bar.setFill(tile.getBarColor());
         thumb.setFill(Double.compare(tile.getValue(), tile.getMinValue()) != 0 ? tile.getBarColor() : tile.getForegroundColor());
-    };
+    }
 }

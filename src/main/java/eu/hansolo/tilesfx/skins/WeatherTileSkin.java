@@ -113,7 +113,7 @@ public class WeatherTileSkin extends TileSkin {
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
         }
-    };
+    }
 
 
     // ******************** Resizing ******************************************
@@ -150,7 +150,7 @@ public class WeatherTileSkin extends TileSkin {
 
         sunsetText.setFont(Fonts.latoRegular(fontSize));
         if (sunsetText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(sunsetText, maxWidth, fontSize); }
-    };
+    }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
@@ -169,7 +169,7 @@ public class WeatherTileSkin extends TileSkin {
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate(width - size * 0.05 - unitText.getLayoutBounds().getWidth(), size * 0.27);
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -189,7 +189,7 @@ public class WeatherTileSkin extends TileSkin {
         sunsetSymbol.setPrefSize(size * 0.1, size * 0.1);
 
         redraw();
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -215,5 +215,5 @@ public class WeatherTileSkin extends TileSkin {
         weatherSymbol.setSymbolColor(tile.getForegroundColor());
         sunriseSymbol.setSymbolColor(tile.getForegroundColor());
         sunsetSymbol.setSymbolColor(tile.getForegroundColor());
-    };
+    }
 }

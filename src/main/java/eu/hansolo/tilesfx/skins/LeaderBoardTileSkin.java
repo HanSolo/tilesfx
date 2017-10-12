@@ -93,7 +93,7 @@ public class LeaderBoardTileSkin extends TileSkin {
         } else if ("DATA".equals(EVENT_TYPE)) {
             registerItemListeners();
         }
-    };
+    }
 
     private void registerItemListeners() {
         tile.getLeaderBoardItems().forEach(item -> {
@@ -159,7 +159,7 @@ public class LeaderBoardTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     private void resizeItems() {
         leaderBoardPane.getChildren().forEach(node -> {
@@ -184,7 +184,7 @@ public class LeaderBoardTileSkin extends TileSkin {
                 item.setVisible(false);
             }
         }
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -201,5 +201,5 @@ public class LeaderBoardTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
-    };
+    }
 }

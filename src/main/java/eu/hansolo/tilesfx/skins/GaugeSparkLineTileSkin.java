@@ -276,7 +276,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             highlightSectionCanvas.setVisible(isHighlightSections);
             highlightSectionCanvas.setManaged(isHighlightSections);
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         low  = Statistics.getMin(dataList);
@@ -755,7 +755,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         bar.setRadiusX(size * 0.3);
         bar.setRadiusY(size * 0.3);
         bar.setStrokeWidth(size * 0.07);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -789,5 +789,5 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         }
         stdDeviationArea.setFill(Helper.getTranslucentColorFrom(Tile.FOREGROUND, 0.1));
         dot.setFill(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
-    };
+    }
 }

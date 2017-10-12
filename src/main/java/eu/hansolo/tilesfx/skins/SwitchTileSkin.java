@@ -118,7 +118,7 @@ public class SwitchTileSkin extends TileSkin {
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
-    };
+    }
 
     private void moveThumb() {
         KeyValue thumbLeftX                 = new KeyValue(thumb.centerXProperty(), switchBackground.getLayoutX() + size * 0.1);
@@ -175,7 +175,7 @@ public class SwitchTileSkin extends TileSkin {
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -199,7 +199,7 @@ public class SwitchTileSkin extends TileSkin {
         thumb.setCenterX(tile.isActive() ? width * 0.6125 : width * 0.3875);
         thumb.setCenterX(tile.isActive() ? switchBackground.getLayoutX() + switchBackground.getWidth() - size * 0.1 : switchBackground.getLayoutX() + size * 0.1);
         thumb.setCenterY(tile.getDescription().isEmpty() ? height * 0.5 : height - size * 0.29);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -215,5 +215,5 @@ public class SwitchTileSkin extends TileSkin {
         description.setTextFill(tile.getDescriptionColor());
         switchBorder.setFill(tile.getForegroundColor());
         thumb.setFill(tile.getForegroundColor());
-    };
+    }
 }

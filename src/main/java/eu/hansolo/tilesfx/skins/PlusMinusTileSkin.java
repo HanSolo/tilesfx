@@ -140,12 +140,12 @@ public class PlusMinusTileSkin extends TileSkin {
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
         resizeDynamicText();
-    };
+    }
 
     private void increment() {
         plusLabel.setTextFill(tile.getActiveColor());
@@ -175,7 +175,7 @@ public class PlusMinusTileSkin extends TileSkin {
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-    };
+    }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
@@ -209,7 +209,7 @@ public class PlusMinusTileSkin extends TileSkin {
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -238,7 +238,7 @@ public class PlusMinusTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -256,5 +256,5 @@ public class PlusMinusTileSkin extends TileSkin {
         unitText.setFill(tile.getUnitColor());
         plusLabel.setTextFill(tile.getForegroundColor());
         minusLabel.setTextFill(tile.getForegroundColor());
-    };
+    }
 }

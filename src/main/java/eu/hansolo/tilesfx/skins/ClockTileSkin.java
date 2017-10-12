@@ -98,7 +98,7 @@ public class ClockTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
         }
-    };
+    }
 
     public void updateTime(final ZonedDateTime TIME) {
         timeText.setText(timeFormatter.format(tile.getTime()));
@@ -147,7 +147,7 @@ public class ClockTileSkin extends TileSkin {
         dateText.setX(size * 0.05);
         dateText.setY(height - size * 0.15);
         dateText.setY(timeRect.getLayoutBounds().getMaxY() + size * 0.235);
-    };
+    }
     @Override protected void resizeStaticText() {
         double maxWidth = size * 0.9;
         double fontSize = size * textSize.factor;
@@ -173,7 +173,7 @@ public class ClockTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -182,7 +182,7 @@ public class ClockTileSkin extends TileSkin {
         timeRect.setHeight(height * 0.4);
         timeRect.setX(0);
         timeRect.setY(height * 0.2);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -206,5 +206,5 @@ public class ClockTileSkin extends TileSkin {
         timeText.setFill(tile.getTitleColor());
         dateText.setFill(tile.getDateColor());
         dayOfWeekText.setFill(tile.getDateColor());
-    };
+    }
 }

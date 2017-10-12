@@ -175,7 +175,7 @@ public class EphemerisTileSkin extends TileSkin {
         } else if ("RECALC".equals(EVENT_TYPE)) {
             calcEphemeris();
         }
-    };
+    }
 
     private void calcEphemeris() {
         try { smc.setDate(LocalDate.now()); } catch (Exception e) {}
@@ -211,7 +211,7 @@ public class EphemerisTileSkin extends TileSkin {
         goldenHourTitleEvening.setFont(font);
         sunsetTitle.setFont(font);
         blueHourTitleEvening.setFont(font);
-    };
+    }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
@@ -236,7 +236,7 @@ public class EphemerisTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -263,7 +263,7 @@ public class EphemerisTileSkin extends TileSkin {
         double posY = infoBoxHeight == 0.0 ? size * 0.25 : (height - infoBox.getLayoutBounds().getHeight()) * 0.5;
 
         infoBox.relocate(size * 0.05, posY);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -304,5 +304,5 @@ public class EphemerisTileSkin extends TileSkin {
         blueHourDotEvening.setFill(TileColor.BLUE.color);
         blueHourTitleEvening.setFill(tile.getTextColor());
         blueHourSunsetText.setFill(tile.getTextColor());
-    };
+    }
 }

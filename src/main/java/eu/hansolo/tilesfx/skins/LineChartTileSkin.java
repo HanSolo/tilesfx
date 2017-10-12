@@ -70,7 +70,7 @@ public class LineChartTileSkin extends TileSkin {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
-    };
+    }
 
 
     // ******************** Resizing ******************************************
@@ -86,7 +86,7 @@ public class LineChartTileSkin extends TileSkin {
             case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -96,7 +96,7 @@ public class LineChartTileSkin extends TileSkin {
         chart.setMaxSize(width - size * 0.1, height - size * 0.1);
         chart.setPadding(new Insets(titleText.getLayoutBounds().getHeight() + size * 0.05, 0, 0, 0));
         chart.relocate(size * 0.05, size * 0.05);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -105,5 +105,5 @@ public class LineChartTileSkin extends TileSkin {
         resizeStaticText();
 
         titleText.setFill(tile.getTitleColor());
-    };
+    }
 }

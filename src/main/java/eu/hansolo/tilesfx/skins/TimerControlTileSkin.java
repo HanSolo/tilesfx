@@ -197,7 +197,7 @@ public class TimerControlTileSkin extends TileSkin {
             resize();
             redraw();
         }
-    };
+    }
 
     private void drawTicks() {
         minuteTickMarks.setCache(false);
@@ -379,7 +379,7 @@ public class TimerControlTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -442,7 +442,7 @@ public class TimerControlTileSkin extends TileSkin {
         hourRotate.setPivotY(hour.getHeight());
         secondRotate.setPivotX(second.getWidth() * 0.5);
         secondRotate.setPivotY(second.getHeight());
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -467,5 +467,5 @@ public class TimerControlTileSkin extends TileSkin {
         amPmText.setFill(tile.getTitleColor());
         dateText.setFill(tile.getDateColor());
         text.setFill(tile.getTextColor());
-    };
+    }
 }

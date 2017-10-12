@@ -137,7 +137,7 @@ public class MapTileSkin extends TileSkin {
         } else if ("MAP_PROVIDER".equals(EVENT_TYPE)) {
             changeMapProvider(tile.getMapProvider());
         }
-    };
+    }
 
     @Override public void dispose() {
         pane.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseHandler);
@@ -352,7 +352,7 @@ public class MapTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     @Override protected void resize() {
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
@@ -374,7 +374,7 @@ public class MapTileSkin extends TileSkin {
             }
             resizeStaticText();
         }
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -388,5 +388,5 @@ public class MapTileSkin extends TileSkin {
 
         updateLocationColor();
         updateTrackColor();
-    };
+    }
 }

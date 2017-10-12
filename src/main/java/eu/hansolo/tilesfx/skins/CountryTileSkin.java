@@ -123,12 +123,12 @@ public class CountryTileSkin extends TileSkin {
             countryContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
             countryContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
         resizeDynamicText();
-    };
+    }
 
     @Override public void dispose() {
         tile.countryProperty().removeListener(countryListener);
@@ -165,7 +165,7 @@ public class CountryTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     @Override protected void resize() {
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
@@ -198,7 +198,7 @@ public class CountryTileSkin extends TileSkin {
             }
             resizeStaticText();
         }
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -215,5 +215,5 @@ public class CountryTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         unitText.setFill(tile.getUnitColor());
         countryPaths.forEach(path -> path.setFill(Helper.getColorWithOpacity(tile.getBarColor(), 0.5)));
-    };
+    }
 }

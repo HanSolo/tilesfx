@@ -243,7 +243,7 @@ public class SparkLineTileSkin extends TileSkin {
             sparkLine.getElements().setAll(pathElements);
             redraw();
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         low  = Statistics.getMin(dataList);
@@ -576,7 +576,7 @@ public class SparkLineTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -608,5 +608,5 @@ public class SparkLineTileSkin extends TileSkin {
         }
         stdDeviationArea.setFill(Helper.getTranslucentColorFrom(Tile.FOREGROUND, 0.1));
         dot.setFill(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
-    };
+    }
 }

@@ -187,7 +187,7 @@ public class CircularProgressTileSkin extends TileSkin {
             enableNode(unitText, !tile.getUnit().isEmpty());
             enableNode(valueText, tile.isValueVisible());
         }
-    };
+    }
 
     private void setBar(final double VALUE) {
         if (minValue > 0) {
@@ -245,7 +245,7 @@ public class CircularProgressTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
     @Override protected void resizeDynamicText() {
         double maxWidth = percentageUnitText.isVisible() ? chartSize * 0.7 : chartSize * 0.8;
         double fontSize = graphicContainer.isVisible() ? chartSize * 0.15 : chartSize * 0.2;

@@ -231,7 +231,7 @@ public class StockTileSkin extends TileSkin {
             sparkLine.getElements().setAll(pathElements);
             redraw();
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         low  = Statistics.getMin(dataList);
@@ -466,7 +466,7 @@ public class StockTileSkin extends TileSkin {
         valueUnitFlow.setMinWidth(width - size * 0.1);
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(width - valueUnitFlow.getPrefWidth() - size * 0.05, size * 0.15);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -497,5 +497,5 @@ public class StockTileSkin extends TileSkin {
         changeText.setTextFill(state.color);
         changePercentageText.setFill(state.color);
         triangle.setFill(state.color);
-    };
+    }
 }

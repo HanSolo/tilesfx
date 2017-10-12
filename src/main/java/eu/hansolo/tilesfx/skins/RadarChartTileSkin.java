@@ -104,7 +104,7 @@ public class RadarChartTileSkin extends TileSkin {
             radarChart.setThresholdColor(tile.getThresholdColor());
             radarChart.setGradientStops(tile.getGradientStops());
         }
-    };
+    }
 
     @Override public void dispose() {
         radarChart.dispose();
@@ -137,7 +137,7 @@ public class RadarChartTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     @Override protected void resize() {
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
@@ -157,7 +157,7 @@ public class RadarChartTileSkin extends TileSkin {
 
             resizeStaticText();
         }
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -178,6 +178,6 @@ public class RadarChartTileSkin extends TileSkin {
         radarChart.setThresholdColor(tile.getThresholdColor());
         radarChart.setGradientStops(tile.getGradientStops());
         radarChart.setGridColor(tile.getChartGridColor());
-    };
+    }
 }
 

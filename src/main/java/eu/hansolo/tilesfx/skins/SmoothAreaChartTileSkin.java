@@ -144,12 +144,12 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
         resizeDynamicText();
-    };
+    }
 
     private void handleData() {
         List<ChartData> data = tile.getChartData();
@@ -321,7 +321,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -350,7 +350,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         strokeClip.setHeight(tile.getHeight());
         strokeClip.setArcWidth(cornerRadius);
         strokeClip.setArcHeight(cornerRadius);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -371,5 +371,5 @@ public class SmoothAreaChartTileSkin extends TileSkin {
                                             new Stop(0, fillPathColor1),
                                             new Stop(1, fillPathColor2)));
         strokePath.setStroke(tile.getBarColor());
-    };
+    }
 }

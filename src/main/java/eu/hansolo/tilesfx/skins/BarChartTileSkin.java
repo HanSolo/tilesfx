@@ -118,7 +118,7 @@ public class BarChartTileSkin extends TileSkin {
         } else if ("DATA".equals(EVENT_TYPE)) {
             updateChart();
         }
-    };
+    }
 
     @Override public void dispose() {
         pane.widthProperty().removeListener(paneSizeListener);
@@ -174,7 +174,7 @@ public class BarChartTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     private void resizeItems() {
         barChartPane.getChildren().forEach(node -> {
@@ -188,7 +188,7 @@ public class BarChartTileSkin extends TileSkin {
         barChartPane.setPrefSize(pane.getPrefWidth(), pane.getPrefHeight());
 
         updateChart();
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -205,5 +205,5 @@ public class BarChartTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
-    };
+    }
 }

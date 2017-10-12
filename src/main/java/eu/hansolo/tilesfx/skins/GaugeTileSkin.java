@@ -195,7 +195,7 @@ public class GaugeTileSkin extends TileSkin {
             Helper.enableNode(alertIcon, tile.isAlert());
             alertTooltip.setText(tile.getAlertMessage());
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         double needleStartAngle = angleRange * 0.5;
@@ -509,7 +509,7 @@ public class GaugeTileSkin extends TileSkin {
         thresholdRect.setY(centerY + size * 0.35);
         thresholdRect.setArcWidth(size * 0.025);
         thresholdRect.setArcHeight(size * 0.025);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -536,5 +536,5 @@ public class GaugeTileSkin extends TileSkin {
 
         drawSections();
         highlightSections(tile.getValue());
-    };
+    }
 }

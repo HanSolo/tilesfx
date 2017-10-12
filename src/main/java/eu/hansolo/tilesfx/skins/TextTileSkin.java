@@ -78,14 +78,14 @@ public class TextTileSkin extends TileSkin {
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
-    };
+    }
 
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
         double fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
-    };
+    }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
@@ -110,14 +110,14 @@ public class TextTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
 
         description.setPrefSize(width - size * 0.1, height - size * 0.255);
         description.relocate(size * 0.05, size * 0.15);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -132,5 +132,5 @@ public class TextTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
         description.setTextFill(tile.getTextColor());
-    };
+    }
 }

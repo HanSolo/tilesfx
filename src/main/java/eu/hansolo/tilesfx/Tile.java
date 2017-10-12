@@ -78,6 +78,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -270,6 +271,7 @@ public class Tile extends Control {
     private              ObjectProperty<TileColor>              trackColor;
     private              MapProvider                            _mapProvider;
     private              ObjectProperty<MapProvider>            mapProvider;
+    private              List<String>                           characterList;
 
     // UI related
     private              SkinType                               skinType;
@@ -575,6 +577,7 @@ public class Tile extends Control {
         track                               = new ArrayList<>();
         _trackColor                         = TileColor.BLUE;
         _mapProvider                        = MapProvider.BW;
+        characterList                       = new ArrayList<>();
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
 
@@ -1542,6 +1545,15 @@ public class Tile extends Control {
             _mapProvider = null;
         }
         return mapProvider;
+    }
+
+    public List<String> getCharacterList() { return characterList; }
+    public void setCharacters(final String... CHARACTERS) {
+        characterList.clear();
+        Arrays.stream(CHARACTERS)
+              .filter(Objects::nonNull)
+              .filter(character -> !character.isEmpty())
+              .forEach(character -> characterList.add(character.substring(0, 1)));
     }
 
     public ObservableList<ChartData> getChartData() { return chartDataList; }

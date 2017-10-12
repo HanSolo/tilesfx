@@ -131,7 +131,7 @@ public class PercentageTileSkin extends TileSkin {
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         double targetValue = (clamp(minValue, maxValue, VALUE) - minValue) * stepSize;
@@ -141,7 +141,7 @@ public class PercentageTileSkin extends TileSkin {
         maxValueRect.setFill(Double.compare(VALUE, maxValue) >= 0 ? barColor : tile.getThresholdColor());
         resizeDynamicText();
         if (sectionsVisible && !sections.isEmpty()) { setBarColor(VALUE); }
-    };
+    }
 
     private void setBarColor(final double VALUE) {
         Color color = barColor;
@@ -165,7 +165,7 @@ public class PercentageTileSkin extends TileSkin {
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
         percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, height - size * 0.25);
-    };
+    }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
@@ -216,7 +216,7 @@ public class PercentageTileSkin extends TileSkin {
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -248,7 +248,7 @@ public class PercentageTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -279,5 +279,5 @@ public class PercentageTileSkin extends TileSkin {
         maxValueRect.setFill(Double.compare(tile.getCurrentValue(), maxValue) >= 0 ? barColor : tile.getThresholdColor());
         valueText.setFill(tile.getValueColor());
         unitText.setFill(tile.getUnitColor());
-    };
+    }
 }

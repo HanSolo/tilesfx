@@ -162,9 +162,9 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = tile.getSections();
         }
-    };
+    }
 
-    protected void handleCurrentValue(final double VALUE) {};
+    protected void handleCurrentValue(final double VALUE) {}
 
     @Override public void dispose() {
         tile.widthProperty().removeListener(sizeListener);
@@ -176,8 +176,8 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     
 
     // ******************** Resizing ******************************************
-    protected void resizeDynamicText() {};
-    protected void resizeStaticText() {};
+    protected void resizeDynamicText() {}
+    protected void resizeStaticText() {}
 
     protected void resize() {
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
@@ -197,7 +197,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             resizeStaticText();
             resizeDynamicText();
         }
-    };
+    }
 
     protected void redraw() {
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, tile.getRoundedCorners() ? new CornerRadii(size * 0.025) : CornerRadii.EMPTY, new BorderWidths(tile.getBorderWidth() / PREFERRED_WIDTH * size))));
@@ -207,5 +207,5 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         formatString    = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();
         sectionsVisible = tile.getSectionsVisible();
         textSize        = tile.getTextSize();
-    };
+    }
 }

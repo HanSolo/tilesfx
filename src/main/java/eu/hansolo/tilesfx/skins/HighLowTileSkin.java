@@ -142,7 +142,7 @@ public class HighLowTileSkin extends TileSkin {
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
-    };
+    }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         double deviation = calculateDeviation(VALUE);
@@ -168,7 +168,7 @@ public class HighLowTileSkin extends TileSkin {
 
         ParallelTransition parallelTransition = new ParallelTransition(rotateTransition, fillIndicatorTransition, fillReferenceTransition, fillReferenceUnitTransition);
         parallelTransition.play();
-    };
+    }
 
     private double calculateDeviation() { return calculateDeviation(tile.getValue()); }
     private double calculateDeviation(final double VALUE) {
@@ -216,7 +216,7 @@ public class HighLowTileSkin extends TileSkin {
         fontSize = size * 0.12;
         deviationUnitText.setFont(Fonts.latoRegular(fontSize));
         if (deviationUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(deviationUnitText, maxWidth, fontSize); }
-    };
+    }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
@@ -249,7 +249,7 @@ public class HighLowTileSkin extends TileSkin {
 
         fontSize = size * 0.1;
         description.setFont(Fonts.latoRegular(fontSize));
-    };
+    }
 
     @Override protected void resize() {
         super.resize();
@@ -267,7 +267,7 @@ public class HighLowTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, size * 0.15);
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -288,5 +288,5 @@ public class HighLowTileSkin extends TileSkin {
         deviationText.setFill(state.color);
         deviationUnitText.setFill(state.color);
         triangle.setFill(state.color);
-    };
+    }
 }

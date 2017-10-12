@@ -97,7 +97,7 @@ public class WorldMapTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
         }
-    };
+    }
 
     private void setFillAndStroke() {
         countryPaths.keySet().forEach(name -> {
@@ -139,7 +139,7 @@ public class WorldMapTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
-    };
+    }
 
     @Override protected void resize() {
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
@@ -170,7 +170,7 @@ public class WorldMapTileSkin extends TileSkin {
 
             worldPane.setCache(false);
         }
-    };
+    }
 
     @Override protected void redraw() {
         super.redraw();
@@ -181,5 +181,5 @@ public class WorldMapTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
-    };
+    }
 }

@@ -11,12 +11,12 @@ buildscript {
 
 // TilesFX main build file
 plugins {
-    id 'com.gradle.build-scan' version '1.5'
+    id 'com.gradle.build-scan' version '1.9'
     id 'idea'
     id 'java'
     id 'maven-publish'
-    id 'net.nemerosa.versioning' version '1.6.0'
-    id 'com.jfrog.bintray' version '1.6'
+    id 'net.nemerosa.versioning' version '2.0.0'
+    id 'com.jfrog.bintray' version '1.7.3'
 }
 
 apply plugin: 'biz.aQute.bnd.builder'

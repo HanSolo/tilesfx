@@ -81,7 +81,7 @@ public class CharacterTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double fontSize = size * 0.5;
+        double fontSize = size * 0.65;
         description.setFont(Fonts.latoLight(fontSize));
     }
     @Override protected void resizeStaticText() {

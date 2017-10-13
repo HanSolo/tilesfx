@@ -237,6 +237,7 @@ public class Tile extends Control {
     private              ObjectProperty<Pos>                    descriptionAlignment;
     private              String                                 _unit;
     private              StringProperty                         unit;
+    private              String                                 oldFlipText;
     private              String                                 _flipText;
     private              StringProperty                         flipText;
     private              String                                 _text;
@@ -562,6 +563,7 @@ public class Tile extends Control {
         _description                        = "";
         _descriptionAlignment               = Pos.TOP_RIGHT;
         _unit                               = "";
+        oldFlipText                         = "";
         _flipText                           = "";
         _active                             = false;
         _text                               = "";
@@ -1151,7 +1153,8 @@ public class Tile extends Control {
     public void setFlipText(final String TEXT) {
         if (null == flipText) {
             _flipText = TEXT;
-            fireTileEvent(FLIP_START_EVENT);
+            if (!oldFlipText.equals(_flipText)) { fireTileEvent(FLIP_START_EVENT); }
+            oldFlipText = _flipText;
         } else {
             flipText.set(TEXT);
         }
@@ -1159,7 +1162,10 @@ public class Tile extends Control {
     public StringProperty flipTextProperty() {
         if (null == flipText) {
             flipText = new StringPropertyBase(_flipText) {
-                @Override protected void invalidated() { fireTileEvent(FLIP_START_EVENT); }
+                @Override protected void invalidated() {
+                    if (!oldFlipText.equals(get())) { fireTileEvent(FLIP_START_EVENT); }
+                    oldFlipText = get();
+                }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "flipText"; }
             };

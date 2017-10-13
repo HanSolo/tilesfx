@@ -24,6 +24,7 @@ import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
+import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import eu.hansolo.tilesfx.weather.DarkSky.Language;
@@ -34,6 +35,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
@@ -42,6 +44,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.time.LocalTime;
@@ -109,6 +112,9 @@ public class Demo extends Application {
     private Tile            radarChartTile2;
     private Tile            smoothAreaChartTile;
     private Tile            countryTile;
+    private Tile            ephemerisTile;
+    private Tile            characterTile;
+    private Tile            flipTile;
 
 
     private long            lastTimerCall;
@@ -543,6 +549,27 @@ public class Demo extends Application {
                                           .animated(true)
                                           .build();
 
+        ephemerisTile = TileBuilder.create().skinType(SkinType.EPHEMERIS)
+                                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                            .title("Ephemeris")
+                                            .currentLocation(new Location(51.911515,7.6340026, "Hiltrup"))
+                                            .text("Hiltrup")
+                                            .build();
+
+        characterTile = TileBuilder.create().skinType(SkinType.CHARACTER)
+                                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                            .title("Character")
+                                            .titleAlignment(TextAlignment.CENTER)
+                                            .description("G")
+                                            .build();
+
+        flipTile      = TileBuilder.create().skinType(SkinType.FLIP)
+                                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                            .characters(Helper.TIME_0_TO_5)
+                                            .flipTimeInMS(500)
+                                            .flipText(" ")
+                                            .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -585,6 +612,10 @@ public class Demo extends Application {
                     smoothChartData3.setValue(smoothChartData4.getValue());
                     smoothChartData4.setValue(RND.nextDouble() * 25);
 
+                    characterTile.setDescription(Helper.ALPHANUMERIC[RND.nextInt(Helper.ALPHANUMERIC.length - 1)]);
+
+                    flipTile.setFlipText(Helper.TIME_0_TO_5[RND.nextInt(Helper.TIME_0_TO_5.length - 1)]);
+
                     lastTimerCall = now;
                 }
             }
@@ -592,14 +623,14 @@ public class Demo extends Application {
     }
 
     @Override public void start(Stage stage) {
-        FlowGridPane pane = new FlowGridPane(7, 4,
+        FlowGridPane pane = new FlowGridPane(7, 5,
                                          percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                          lineChartTile, timerControlTile, numberTile, textTile,
                                          highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
                                          barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
                                          radialChartTile, donutChartTile, circularProgressTile, stockTile,
                                          gaugeSparkLineTile, radarChartTile1, radarChartTile2,
-                                         smoothAreaChartTile, countryTile);//, weatherTile);
+                                         smoothAreaChartTile, countryTile, ephemerisTile, characterTile, flipTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);
@@ -609,7 +640,11 @@ public class Demo extends Application {
         //pane.setPrefSize(800, 600);
         pane.setBackground(new Background(new BackgroundFill(Color.web("#101214"), CornerRadii.EMPTY, Insets.EMPTY)));
 
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.setFieldOfView(10);
+
         Scene scene = new Scene(pane);
+        scene.setCamera(camera);
 
         stage.setTitle("TilesFX");
         stage.setScene(scene);

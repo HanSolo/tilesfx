@@ -43,7 +43,6 @@ import java.util.List;
 public class FlipTileSkin extends TileSkin {
     private final TileEvent       FLIP_FINISHED = new TileEvent(EventType.FLIP_FINISHED);
     private       List<String>    characters;
-    private       int             lastSelectionIndex;
     private       int             currentSelectionIndex;
     private       int             nextSelectionIndex;
     private       double          flapHeight;
@@ -80,9 +79,8 @@ public class FlipTileSkin extends TileSkin {
 
         timeline              = new Timeline();
         characters            = tile.getCharacterList();
-        lastSelectionIndex    = 0;
-        currentSelectionIndex = 1;
-        nextSelectionIndex    = 2;
+        currentSelectionIndex = 0;
+        nextSelectionIndex    = 1;
 
         centerX    = PREFERRED_WIDTH * 0.5;
         centerY    = PREFERRED_HEIGHT * 0.5;
@@ -155,8 +153,7 @@ public class FlipTileSkin extends TileSkin {
                 flapTextBack.setOpacity(0);
                 flapTextFront.setOpacity(1);
                 drawText();
-                flipForward();
-                //if (!tile.getFlipText().equals(characters.get(currentSelectionIndex))) { flipForward(); }
+                if (!tile.getFlipText().equals(characters.get(currentSelectionIndex))) { flipForward(); }
             } else if(Double.compare(rotateFlap.getAngle(), 0) == 0) {
                 rotateFlap.setAngle(180);
             }
@@ -168,33 +165,16 @@ public class FlipTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
         if (EVENT_TYPE.equals("FLIP_START")) {
-            prepareText();
             flipForward();
-        }
-    }
-
-    private void prepareText() {
-        final String TEXT  = tile.getFlipText();
-        List<String> characters = tile.getCharacterList();
-        if(characters.contains(TEXT)) {
-            currentSelectionIndex = characters.indexOf(TEXT);
-            nextSelectionIndex    = currentSelectionIndex + 1 > characters.size() ? 0 : currentSelectionIndex + 1;
-        } else {
-            currentSelectionIndex = 0;
-            nextSelectionIndex    = currentSelectionIndex + 1 > characters.size() ? 0 : currentSelectionIndex + 1;
         }
     }
 
     private void flipForward() {
         timeline.stop();
 
-        if (tile.getFlipText().equals(characters.get(lastSelectionIndex))) { return; }
-
         flap.setCache(true);
         flap.setCacheHint(CacheHint.ROTATE);
         //flap.setCacheHint(CacheHint.SPEED);
-
-        lastSelectionIndex = currentSelectionIndex;
 
         currentSelectionIndex++;
         if (currentSelectionIndex >= characters.size()) {
@@ -244,8 +224,8 @@ public class FlipTileSkin extends TileSkin {
 
     private void drawText() {
         if (characters.isEmpty()) { return; }
-        final String CURRENT_TEXT = characters.get(lastSelectionIndex);
-        final String NEXT_TEXT    = characters.get(currentSelectionIndex);
+        final String CURRENT_TEXT = characters.get(currentSelectionIndex);
+        final String NEXT_TEXT    = characters.get(nextSelectionIndex);
         final Color  TEXT_COLOR   = tile.getForegroundColor();
 
         // set the text on the upper background

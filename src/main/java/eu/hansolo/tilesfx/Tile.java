@@ -109,7 +109,7 @@ public class Tile extends Control {
                            CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
                            GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
                            RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris"),
-                           CHARACTER("Character");
+                           CHARACTER("Character"), FLIP("Flip");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -202,6 +202,7 @@ public class Tile extends Control {
     private        final TileEvent   LOCATION_EVENT        = new TileEvent(EventType.LOCATION);
     private        final TileEvent   TRACK_EVENT           = new TileEvent(EventType.TRACK);
     private        final TileEvent   MAP_PROVIDER_EVENT    = new TileEvent(EventType.MAP_PROVIDER);
+    private        final TileEvent   FLIP_START_EVENT      = new TileEvent(EventType.FLIP_START);
     
     // Tile events
     private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
@@ -236,6 +237,8 @@ public class Tile extends Control {
     private              ObjectProperty<Pos>                    descriptionAlignment;
     private              String                                 _unit;
     private              StringProperty                         unit;
+    private              String                                 _flipText;
+    private              StringProperty                         flipText;
     private              String                                 _text;
     private              StringProperty                         text;
     private              TextAlignment                          _textAlignment;
@@ -272,6 +275,7 @@ public class Tile extends Control {
     private              MapProvider                            _mapProvider;
     private              ObjectProperty<MapProvider>            mapProvider;
     private              List<String>                           characterList;
+    private              long                                   flipTimeInMS;
 
     // UI related
     private              SkinType                               skinType;
@@ -558,6 +562,7 @@ public class Tile extends Control {
         _description                        = "";
         _descriptionAlignment               = Pos.TOP_RIGHT;
         _unit                               = "";
+        _flipText                           = "";
         _active                             = false;
         _text                               = "";
         _textAlignment                      = TextAlignment.LEFT;
@@ -578,6 +583,7 @@ public class Tile extends Control {
         _trackColor                         = TileColor.BLUE;
         _mapProvider                        = MapProvider.BW;
         characterList                       = new ArrayList<>();
+        flipTimeInMS                        = 500;
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
 
@@ -1032,7 +1038,6 @@ public class Tile extends Control {
         return titleAlignment;
     }
 
-
     /**
      * Returns the description text of the gauge. This description text will usually
      * only be visible if it is not empty.
@@ -1132,6 +1137,35 @@ public class Tile extends Control {
             _unit = null;
         }
         return unit;
+    }
+
+    /**
+     * Returns the text that will be used to visualized the FlipTileSkin
+     * @return the text that will be used to visualize the FlipTileSkin
+     */
+    public String getFlipText() { return null == flipText ? _flipText : flipText.get(); }
+    /**
+     * Defines the text that will be used to visualize the FlipTileSkin
+     * @param TEXT
+     */
+    public void setFlipText(final String TEXT) {
+        if (null == flipText) {
+            _flipText = TEXT;
+            fireTileEvent(FLIP_START_EVENT);
+        } else {
+            flipText.set(TEXT);
+        }
+    }
+    public StringProperty flipTextProperty() {
+        if (null == flipText) {
+            flipText = new StringPropertyBase(_flipText) {
+                @Override protected void invalidated() { fireTileEvent(FLIP_START_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "flipText"; }
+            };
+            _flipText = null;
+        }
+        return flipText;
     }
 
     /**
@@ -1553,8 +1587,11 @@ public class Tile extends Control {
         Arrays.stream(CHARACTERS)
               .filter(Objects::nonNull)
               .filter(character -> !character.isEmpty())
-              .forEach(character -> characterList.add(character.substring(0, 1)));
+              .forEach(character -> characterList.add(character) /*characterList.add(character.substring(0, 1)) */);
     }
+
+    public long getFlipTimeInMS() { return flipTimeInMS; }
+    public void setFlipTimeInMS(final long FLIP_TIME) { flipTimeInMS = Helper.clamp(0, 2000, FLIP_TIME); }
 
     public ObservableList<ChartData> getChartData() { return chartDataList; }
     public void addChartData(final ChartData... DATA) { chartDataList.addAll(DATA); }
@@ -4495,6 +4532,7 @@ public class Tile extends Control {
             case COUNTRY          : return new CountryTileSkin(Tile.this);
             case EPHEMERIS        : return new EphemerisTileSkin(Tile.this);
             case CHARACTER        : return new CharacterTileSkin(Tile.this);
+            case FLIP             : return new FlipTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4594,6 +4632,12 @@ public class Tile extends Control {
                 break;
             case COUNTRY:
                 break;
+            case EPHEMERIS:
+                break;
+            case CHARACTER:
+                break;
+            case FLIP:
+                break;
             default:
                 break;
         }
@@ -4632,6 +4676,7 @@ public class Tile extends Control {
             case COUNTRY          : setSkin(new CountryTileSkin(Tile.this)); break;
             case EPHEMERIS        : setSkin(new EphemerisTileSkin(Tile.this)); break;
             case CHARACTER        : setSkin(new CharacterTileSkin(Tile.this)); break;
+            case FLIP             : setSkin(new FlipTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

@@ -354,6 +354,21 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B characters(final String... CHARACTERS) {
+        properties.put("characterArray", new SimpleObjectProperty<>(CHARACTERS));
+        return (B)this;
+    }
+
+    public final B flipTimeInMS(final long TIME) {
+        properties.put("flipTimeInMS", new SimpleLongProperty(TIME));
+        return (B)this;
+    }
+
+    public final B flipText(final String TEXT) {
+        properties.put("flipText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
     public final B titleColor(final Color COLOR) {
         properties.put("titleColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -889,6 +904,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case CHARACTER:
                     break;
+                case FLIP:
+                    break;
                 default:
                     break;
             }
@@ -902,6 +919,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
         if(properties.keySet().contains("sectionsList")) {
             CONTROL.setSections(((ObjectProperty<List<Section>>) properties.get("sectionsList")).get());
+        }
+
+        if (properties.keySet().contains("characterArray")) {
+            CONTROL.setCharacters(((ObjectProperty<String[]>) properties.get("characterArray")).get());
         }
 
         if(properties.keySet().contains("foregroundBaseColor")) {
@@ -1220,6 +1241,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
             } else if ("sortedData".equals(key)) {
                 CONTROL.setSortedData(((BooleanProperty) properties.get(key)).get());
+            } else if ("flipTimeInMS".equals(key)) {
+                CONTROL.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
+            } else if ("flipText".equals(key)) {
+                CONTROL.setFlipText(((StringProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

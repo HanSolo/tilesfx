@@ -165,6 +165,7 @@ public class StockTileSkin extends TileSkin {
 
         referenceLine = new Line();
         referenceLine.getStrokeDashArray().addAll(3d, 3d);
+        referenceLine.setVisible(false);
 
         pathElements = new ArrayList<>(noOfDatapoints);
         pathElements.add(0, new MoveTo());
@@ -180,6 +181,7 @@ public class StockTileSkin extends TileSkin {
 
         dot = new Circle();
         dot.setFill(tile.getBarColor());
+        dot.setVisible(false);
 
         triangle = new Path();
         triangle.setStroke(null);
@@ -303,6 +305,10 @@ public class StockTileSkin extends TileSkin {
     }
 
     private void addData(final double VALUE) {
+        if (!dot.isVisible()) {
+            dot.setVisible(true);
+            referenceLine.setVisible(true);
+        }
         if (dataList.isEmpty()) {
             double referenceValue = tile.getReferenceValue() != 0 ? tile.getReferenceValue() : VALUE;
             for (int i = 0 ; i < noOfDatapoints ; i ++) {
@@ -433,6 +439,7 @@ public class StockTileSkin extends TileSkin {
 
     @Override protected void resize() {
         super.resize();
+
         graphBounds = new Rectangle(size * 0.05, size * 0.6, width - size * 0.1, height - size * 0.71);
 
         referenceLine.setStartX(graphBounds.getX());
@@ -481,7 +488,14 @@ public class StockTileSkin extends TileSkin {
         }
 
         changeText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() - tile.getReferenceValue())));
-        changePercentageText.setText(new StringBuilder().append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() / tile.getReferenceValue() * 100.0) - 100.0)).append("\u0025").toString());
+        StringBuilder changePercentageTextBuilder = new StringBuilder();
+        if (Double.compare(tile.getReferenceValue(), 0.0) == 0) {
+            changePercentageTextBuilder.append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", 0.0));
+        } else {
+            changePercentageTextBuilder.append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() / tile.getReferenceValue() * 100.0) - 100.0));
+        }
+        changePercentageTextBuilder.append("\u0025");
+        changePercentageText.setText(changePercentageTextBuilder.toString());
 
         resizeStaticText();
 

@@ -906,6 +906,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case FLIP:
                     break;
+                case SWITCH_SLIDER:
+                    CONTROL.setBarBackgroundColor(Tile.FOREGROUND);
+                    break;
                 default:
                     break;
             }

@@ -109,7 +109,7 @@ public class Tile extends Control {
                            CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
                            GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
                            RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris"),
-                           CHARACTER("Character"), FLIP("Flip");
+                           CHARACTER("Character"), FLIP("Flip"), SWITCH_SLIDER("SwitchSlider");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -4539,6 +4539,7 @@ public class Tile extends Control {
             case EPHEMERIS        : return new EphemerisTileSkin(Tile.this);
             case CHARACTER        : return new CharacterTileSkin(Tile.this);
             case FLIP             : return new FlipTileSkin(Tile.this);
+            case SWITCH_SLIDER    : return new SwitchSliderTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4644,6 +4645,9 @@ public class Tile extends Control {
                 break;
             case FLIP:
                 break;
+            case SWITCH_SLIDER:
+                setBarBackgroundColor(Tile.FOREGROUND);
+                break;
             default:
                 break;
         }
@@ -4683,6 +4687,7 @@ public class Tile extends Control {
             case EPHEMERIS        : setSkin(new EphemerisTileSkin(Tile.this)); break;
             case CHARACTER        : setSkin(new CharacterTileSkin(Tile.this)); break;
             case FLIP             : setSkin(new FlipTileSkin(Tile.this)); break;
+            case SWITCH_SLIDER    : setSkin(new SwitchSliderTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

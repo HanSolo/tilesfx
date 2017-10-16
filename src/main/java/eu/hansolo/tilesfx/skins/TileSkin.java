@@ -183,6 +183,9 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
+        if (size < 0) {
+            size = 0;
+        }
 
         stepSize = width / range;
         shadow.setRadius(size * 0.012);

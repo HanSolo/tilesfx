@@ -266,7 +266,7 @@ public class SparkLineTileSkin extends TileSkin {
         int    tickLabelOffsetY = 1;
         double tickSpacingY     = niceScaleY.getTickSpacing();
         double tickStepY        = tickSpacingY * stepY;
-        double tickStartY       = maxY - (tickSpacingY - low) * stepY;
+        double tickStartY       = maxY - tickStepY;
         if (tickSpacingY < low) {
             tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
             tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
@@ -278,7 +278,7 @@ public class SparkLineTileSkin extends TileSkin {
         for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
             Line line  = horizontalTickLines.get(lineCountY);
             Text label = tickLabelsY.get(lineCountY);
-            label.setText(String.format(locale, "%.0f", (tickSpacingY * (lineCountY + tickLabelOffsetY))));
+            label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
             label.setY(y + graphBounds.getHeight() * 0.03);
             label.setFill(tickLineColor);
             horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);

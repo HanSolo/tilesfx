@@ -115,6 +115,7 @@ public class Demo extends Application {
     private Tile            ephemerisTile;
     private Tile            characterTile;
     private Tile            flipTile;
+    private Tile            switchSliderTile;
 
 
     private long            lastTimerCall;
@@ -570,6 +571,13 @@ public class Demo extends Application {
                                             .flipText(" ")
                                             .build();
 
+        switchSliderTile = TileBuilder.create()
+                          .skinType(SkinType.SWITCH_SLIDER)
+                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                          .title("SwitchSlider")
+                          .text("Test")
+                          .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -624,13 +632,14 @@ public class Demo extends Application {
 
     @Override public void start(Stage stage) {
         FlowGridPane pane = new FlowGridPane(7, 5,
-                                         percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
-                                         lineChartTile, timerControlTile, numberTile, textTile,
-                                         highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
-                                         barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
-                                         radialChartTile, donutChartTile, circularProgressTile, stockTile,
-                                         gaugeSparkLineTile, radarChartTile1, radarChartTile2,
-                                         smoothAreaChartTile, countryTile, ephemerisTile, characterTile, flipTile);//, weatherTile);
+                                             percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
+                                             lineChartTile, timerControlTile, numberTile, textTile,
+                                             highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
+                                             barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
+                                             radialChartTile, donutChartTile, circularProgressTile, stockTile,
+                                             gaugeSparkLineTile, radarChartTile1, radarChartTile2,
+                                             smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
+                                             flipTile, switchSliderTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

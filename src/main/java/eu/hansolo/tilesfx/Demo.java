@@ -46,6 +46,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import sun.java2d.jules.TileWorker;
 
 import java.time.LocalTime;
 import java.util.Locale;
@@ -116,6 +117,8 @@ public class Demo extends Application {
     private Tile            characterTile;
     private Tile            flipTile;
     private Tile            switchSliderTile;
+    private Tile            dateTile;
+    private Tile            calendarTile;
 
 
     private long            lastTimerCall;
@@ -578,6 +581,16 @@ public class Demo extends Application {
                           .text("Test")
                           .build();
 
+        dateTile = TileBuilder.create()
+                              .skinType(SkinType.DATE)
+                              .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                              .build();
+
+        calendarTile = TileBuilder.create()
+                                  .skinType(SkinType.CALENDAR)
+                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                  .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -639,7 +652,7 @@ public class Demo extends Application {
                                              radialChartTile, donutChartTile, circularProgressTile, stockTile,
                                              gaugeSparkLineTile, radarChartTile1, radarChartTile2,
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
-                                             flipTile, switchSliderTile);//, weatherTile);
+                                             flipTile, switchSliderTile, dateTile, calendarTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

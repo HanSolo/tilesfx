@@ -909,6 +909,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case SWITCH_SLIDER:
                     CONTROL.setBarBackgroundColor(Tile.FOREGROUND);
                     break;
+                case DATE:
+                    CONTROL.setTitleAlignment(TextAlignment.CENTER);
+                    CONTROL.setTextAlignment(TextAlignment.CENTER);
+                    break;
                 default:
                     break;
             }

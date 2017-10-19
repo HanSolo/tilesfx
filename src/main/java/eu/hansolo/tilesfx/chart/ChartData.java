@@ -75,6 +75,9 @@ public class ChartData {
         this(NAME, VALUE, COLOR, Instant.now());
     }
     public ChartData(final String NAME, final double VALUE, final Color COLOR, final Instant TIMESTAMP) {
+        this(NAME, VALUE, COLOR, TIMESTAMP, true, 800);
+    }
+    public ChartData(final String NAME, final double VALUE, final Color COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
         name              = NAME;
         value             = VALUE;
         color             = COLOR;
@@ -88,8 +91,8 @@ public class ChartData {
             @Override public String getName() { return "currentValue"; }
         };
         timeline          = new Timeline();
-        animated          = true;
-        animationDuration = 800;
+        animated          = ANIMATED;
+        animationDuration = ANIMATION_DURATION;
 
         timeline.setOnFinished(e -> fireChartDataEvent(FINISHED_EVENT));
     }

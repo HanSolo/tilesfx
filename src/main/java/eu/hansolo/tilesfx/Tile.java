@@ -110,7 +110,7 @@ public class Tile extends Control {
                            GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
                            RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris"),
                            CHARACTER("Character"), FLIP("Flip"), SWITCH_SLIDER("SwitchSlider"),
-                           DATE("Date");
+                           DATE("Date"), CALENDAR("Calendar");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -4561,6 +4561,7 @@ public class Tile extends Control {
             case FLIP             : return new FlipTileSkin(Tile.this);
             case SWITCH_SLIDER    : return new SwitchSliderTileSkin(Tile.this);
             case DATE             : return new DateTileSkin(Tile.this);
+            case CALENDAR         : return new CalendarTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4673,6 +4674,10 @@ public class Tile extends Control {
                 setTitleAlignment(TextAlignment.CENTER);
                 setTextAlignment(TextAlignment.CENTER);
                 break;
+            case CALENDAR:
+                setTitleAlignment(TextAlignment.CENTER);
+                setTextAlignment(TextAlignment.CENTER);
+                break;
             default:
                 break;
         }
@@ -4714,6 +4719,7 @@ public class Tile extends Control {
             case FLIP             : setSkin(new FlipTileSkin(Tile.this)); break;
             case SWITCH_SLIDER    : setSkin(new SwitchSliderTileSkin(Tile.this)); break;
             case DATE             : setSkin(new DateTileSkin(Tile.this)); break;
+            case CALENDAR         : setSkin(new CalendarTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

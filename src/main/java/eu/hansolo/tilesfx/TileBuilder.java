@@ -913,6 +913,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setTitleAlignment(TextAlignment.CENTER);
                     CONTROL.setTextAlignment(TextAlignment.CENTER);
                     break;
+                case CALENDAR:
+                    CONTROL.setTitleAlignment(TextAlignment.CENTER);
+                    CONTROL.setTextAlignment(TextAlignment.CENTER);
+                    break;
                 default:
                     break;
             }

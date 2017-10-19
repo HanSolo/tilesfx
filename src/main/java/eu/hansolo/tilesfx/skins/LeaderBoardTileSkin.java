@@ -17,13 +17,12 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.UpdateEvent;
+import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
+import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.event.EventHandler;
-import javafx.event.WeakEventHandler;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
@@ -36,11 +35,11 @@ import java.util.stream.Collectors;
  * Created by hansolo on 19.12.16.
  */
 public class LeaderBoardTileSkin extends TileSkin {
-    private Text                      titleText;
-    private Text                      text;
-    private Pane                      leaderBoardPane;
-    private EventHandler<UpdateEvent> updateHandler;
-    private InvalidationListener      paneSizeListener;
+    private Text                   titleText;
+    private Text                   text;
+    private Pane                   leaderBoardPane;
+    private ChartDataEventListener updateHandler;
+    private InvalidationListener   paneSizeListener;
 
 
     // ******************** Constructors **************************************
@@ -53,7 +52,17 @@ public class LeaderBoardTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateHandler    = e -> updateChart();
+        updateHandler    = e -> {
+            final EventType TYPE = e.getType();
+            switch (TYPE) {
+                case UPDATE:
+                    updateChart();
+                    break;
+                case FINISHED:
+                    sortItems();
+                    break;
+            }
+        };
         paneSizeListener = o -> resizeItems();
 
         List<LeaderBoardItem> leaderBoardItems = tile.getLeaderBoardItems().stream()
@@ -98,8 +107,7 @@ public class LeaderBoardTileSkin extends TileSkin {
     private void registerItemListeners() {
         tile.getLeaderBoardItems().forEach(item -> {
             item.setFormatString(formatString);
-            item.addEventFilter(UpdateEvent.UPDATE_LEADER_BOARD, new WeakEventHandler<>(updateHandler));
-            item.valueProperty().addListener((o, ov, nv) -> sortItems());
+            item.addChartDataEventListener(updateHandler);
         });
     }
 

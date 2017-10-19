@@ -18,6 +18,7 @@ package eu.hansolo.tilesfx.chart;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
+import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -34,17 +35,21 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static eu.hansolo.tilesfx.tools.Helper.clamp;
+
 
 /**
  * Created by hansolo on 17.02.17.
  */
 public class ChartData {
-    public  static boolean               animated     = true;
-    private final ChartDataEvent         UPDATE_EVENT = new ChartDataEvent(ChartData.this);
+    private final ChartDataEvent         UPDATE_EVENT = new ChartDataEvent(EventType.UPDATE, ChartData.this);
+    private final ChartDataEvent         FINISHED_EVENT = new ChartDataEvent(EventType.FINISHED, ChartData.this);
     private String                       name;
     private double                       value;
     private Color                        color;
     private Instant                      timestamp;
+    private boolean                      animated;
+    private long                         animationDuration;
     private List<ChartDataEventListener> listenerList = new CopyOnWriteArrayList<>();
     private DoubleProperty               currentValue;
     private Timeline                     timeline;
@@ -70,11 +75,11 @@ public class ChartData {
         this(NAME, VALUE, COLOR, Instant.now());
     }
     public ChartData(final String NAME, final double VALUE, final Color COLOR, final Instant TIMESTAMP) {
-        name         = NAME;
-        value        = VALUE;
-        color        = COLOR;
-        timestamp    = TIMESTAMP;
-        currentValue = new DoublePropertyBase(value) {
+        name              = NAME;
+        value             = VALUE;
+        color             = COLOR;
+        timestamp         = TIMESTAMP;
+        currentValue      = new DoublePropertyBase(value) {
             @Override protected void invalidated() {
                 value = get();
                 fireChartDataEvent(UPDATE_EVENT);
@@ -82,8 +87,11 @@ public class ChartData {
             @Override public Object getBean() { return ChartData.this; }
             @Override public String getName() { return "currentValue"; }
         };
-        timeline     = new Timeline();
-        animated     = true;
+        timeline          = new Timeline();
+        animated          = true;
+        animationDuration = 800;
+
+        timeline.setOnFinished(e -> fireChartDataEvent(FINISHED_EVENT));
     }
 
 
@@ -101,12 +109,12 @@ public class ChartData {
             KeyValue kv1 = new KeyValue(currentValue, value, Interpolator.EASE_BOTH);
             KeyValue kv2 = new KeyValue(currentValue, VALUE, Interpolator.EASE_BOTH);
             KeyFrame kf1 = new KeyFrame(Duration.ZERO, kv1);
-            KeyFrame kf2 = new KeyFrame(Duration.millis(800), kv2);
+            KeyFrame kf2 = new KeyFrame(Duration.millis(animationDuration), kv2);
             timeline.getKeyFrames().setAll(kf1, kf2);
             timeline.play();
         } else {
             value = VALUE;
-            fireChartDataEvent(UPDATE_EVENT);
+            fireChartDataEvent(FINISHED_EVENT);
         }
     }
 
@@ -123,6 +131,12 @@ public class ChartData {
     }
 
     public ZonedDateTime getTimestampAsDateTime(final ZoneId ZONE_ID) { return ZonedDateTime.ofInstant(timestamp, ZONE_ID); }
+
+    public boolean isAnimated() { return animated; }
+    public void setAnimated(final boolean ANIMATED) { animated = ANIMATED; }
+
+    public long getAnimationDuration() { return animationDuration; }
+    public void setAnimationDuration(final long DURATION) { animationDuration = clamp(10, 10000, DURATION); }
 
     @Override public String toString() {
         return new StringBuilder().append("{\n")

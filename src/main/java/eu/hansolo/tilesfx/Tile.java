@@ -1601,12 +1601,24 @@ public class Tile extends Control {
     public void setFlipTimeInMS(final long FLIP_TIME) { flipTimeInMS = Helper.clamp(0, 2000, FLIP_TIME); }
 
     public ObservableList<ChartData> getChartData() { return chartDataList; }
-    public void addChartData(final ChartData... DATA) { chartDataList.addAll(DATA); }
-    public void addChartData(final List<ChartData> DATA) { chartDataList.addAll(DATA); }
-    public void setChartData(final ChartData... DATA) { chartDataList.setAll(DATA); }
-    public void setChartData(final List<ChartData> DATA) { chartDataList.setAll(DATA); }
+    public void addChartData(final ChartData... DATA) { addChartData(Arrays.asList(DATA)); }
+    public void addChartData(final List<ChartData> DATA) {
+        chartDataList.addAll(DATA);
+        updateChartData();
+    }
+    public void setChartData(final ChartData... DATA) { setChartData(Arrays.asList(DATA)); }
+    public void setChartData(final List<ChartData> DATA) {
+        chartDataList.setAll(DATA);
+        updateChartData();
+    }
     public void removeChartData(final ChartData DATA) { chartDataList.remove(DATA); }
     public void clearChartData() { chartDataList.clear(); }
+    private void updateChartData() {
+        chartDataList.forEach(chartData -> {
+            chartData.setAnimated(isAnimated());
+            chartData.setAnimationDuration(getAnimationDuration());
+        });
+    }
 
     /**
      * A convenient method to set the color of foreground elements like
@@ -2149,12 +2161,19 @@ public class Tile extends Control {
     public void setAnimated(final boolean ANIMATED) {
         if (null == animated) {
             _animated = ANIMATED;
+            updateChartData();
         } else {
             animated.set(ANIMATED);
         }
     }
     public BooleanProperty animatedProperty() {
-        if (null == animated) { animated = new SimpleBooleanProperty(Tile.this, "animated", _animated); }
+        if (null == animated) {
+            animated = new BooleanPropertyBase(_animated) {
+                @Override protected void invalidated() { updateChartData(); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "animated"; }
+            };
+        }
         return animated;
     }
 

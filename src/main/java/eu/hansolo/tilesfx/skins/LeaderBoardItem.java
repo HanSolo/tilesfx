@@ -17,15 +17,12 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.UpdateEvent;
+import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import javafx.beans.DefaultProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.StringPropertyBase;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -73,7 +70,6 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     private static final double                MAXIMUM_WIDTH    = 1024;
     private static final double                MAXIMUM_HEIGHT   = 1024;
     private static final double                ASPECT_RATIO     = PREFERRED_HEIGHT / PREFERRED_WIDTH;
-    private static final UpdateEvent           UPDATE_EVENT     = new UpdateEvent(UpdateEvent.UPDATE_LEADER_BOARD);
     private              double                width;
     private              double                height;
     private              double                size;
@@ -84,8 +80,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     private              Path                  triangle;
     private              Line                  separator;
     private              Pane                  pane;
-    private              StringProperty        name;
-    private              DoubleProperty        value;
+    private              ChartData             chartData;
     private              ObjectProperty<Color> nameColor;
     private              ObjectProperty<Color> valueColor;
     private              ObjectProperty<Color> separatorColor;
@@ -105,19 +100,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         this(NAME, 0);
     }
     public LeaderBoardItem(final String NAME, final double VALUE) {
-        name           = new StringPropertyBase(NAME) {
-            @Override protected void invalidated() { nameText.setText(get()); }
-            @Override public Object getBean() { return LeaderBoardItem.this; }
-            @Override public String getName() { return "name"; }
-        };
-        value          = new DoublePropertyBase(VALUE) {
-            @Override protected void invalidated() {
-                valueText.setText(String.format(locale, formatString, get()));
-                valueText.setX((width * 0.95) - valueText.getLayoutBounds().getWidth());
-            }
-            @Override public Object getBean() { return LeaderBoardItem.this; }
-            @Override public String getName() { return "value"; }
-        };
+        chartData      = new ChartData(NAME, VALUE);
         nameColor      = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
             @Override public Object getBean() { return LeaderBoardItem.this; }
@@ -193,13 +176,11 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
 
     @Override public ObservableList<Node> getChildren() { return super.getChildren(); }
 
-    public String getName() { return name.get(); }
-    public void setName(final String NAME) { name.set(NAME); }
-    public StringProperty nameProperty() { return name; }
+    public String getName() { return chartData.getName(); }
+    public void setName(final String NAME) { chartData.setName(NAME); }
 
-    public double getValue() { return value.get(); }
-    public void setValue(final double VALUE) { value.set(VALUE); }
-    public DoubleProperty valueProperty() { return value; }
+    public double getValue() { return chartData.getValue(); }
+    public void setValue(final double VALUE) { chartData.setValue(VALUE); }
 
     public Color getNameColor() { return nameColor.get(); }
     public void setNameColor(final Color COLOR) { nameColor.set(COLOR); }
@@ -226,7 +207,9 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         }
         triangle.setFill(state.color);
         triangle.setRotate(state.angle);
-        fireEvent(UPDATE_EVENT);
+
+        valueText.setText(String.format(locale, formatString, getValue()));
+        valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
     }
 
     public int getLastIndex() { return lastIndex; }
@@ -258,6 +241,12 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         ClosePath closePath = new ClosePath();
         triangle.getElements().setAll(moveTo, lineTo1, lineTo2, lineTo3, closePath);
     }
+
+
+    // ******************** Event Handling ************************************
+    public void setOnChartDataEvent(final ChartDataEventListener LISTENER) { chartData.addChartDataEventListener(LISTENER); }
+    public void addChartDataEventListener(final ChartDataEventListener LISTENER) { chartData.addChartDataEventListener(LISTENER); }
+    public void removeChartDataEventListener(final ChartDataEventListener LISTENER) { chartData.removeChartDataEventListener(LISTENER); }
 
 
     // ******************** Resizing ******************************************

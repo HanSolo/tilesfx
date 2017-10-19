@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
+import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import javafx.beans.DefaultProperty;
@@ -174,7 +175,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     public ChartData getChartData() { return chartData; }
     public void setChartData(final ChartData DATA) {
         chartData = DATA;
-        chartData.fireChartDataEvent(new ChartDataEvent(chartData));
+        chartData.fireChartDataEvent(new ChartDataEvent(EventType.UPDATE, chartData));
     }
 
     public Color getBarBackgroundColor() { return barBackgroundColor.get(); }

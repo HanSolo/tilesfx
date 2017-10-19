@@ -23,15 +23,21 @@ import eu.hansolo.tilesfx.chart.ChartData;
  * Created by hansolo on 17.02.17.
  */
 public class ChartDataEvent {
+    public enum EventType { UPDATE, FINISHED }
+
     private ChartData data;
+    private EventType type;
 
 
     // ******************** Constructors **************************************
-    public ChartDataEvent(final ChartData DATA) {
+    public ChartDataEvent(final EventType TYPE, final ChartData DATA) {
+        type = TYPE;
         data = DATA;
     }
 
 
     // ******************** Methods *******************************************
+    public EventType getType() { return type; }
+
     public ChartData getData() { return data; }
 }

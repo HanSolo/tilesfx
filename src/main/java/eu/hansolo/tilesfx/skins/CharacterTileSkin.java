@@ -114,7 +114,7 @@ public class CharacterTileSkin extends TileSkin {
         super.resize();
 
         description.setPrefSize(width - size * 0.1, height - size * 0.255);
-        description.relocate(size * 0.05, size * 0.15);
+        description.relocate(size * 0.05, height * 0.1125);
     }
 
     @Override protected void redraw() {

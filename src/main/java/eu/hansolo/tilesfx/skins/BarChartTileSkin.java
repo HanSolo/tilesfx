@@ -17,6 +17,8 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.ChartDataEvent;
+import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.events.UpdateEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -40,7 +42,7 @@ public class BarChartTileSkin extends TileSkin {
     private Text                      titleText;
     private Text                      text;
     private Pane                      barChartPane;
-    private EventHandler<UpdateEvent> updateHandler;
+    private ChartDataEventListener    updateHandler;
     private InvalidationListener      paneSizeListener;
 
 
@@ -62,12 +64,11 @@ public class BarChartTileSkin extends TileSkin {
                                                          .collect(Collectors.toList());
 
         tile.getBarChartItems().forEach(item -> {
-            item.addEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);
+            item.addChartDataEventListener(updateHandler);
             item.setMaxValue(tile.getMaxValue());
             if (null == item.getFormatString() || item.getFormatString().isEmpty()) {
                 item.setFormatString(formatString);
             }
-            item.valueProperty().addListener(new WeakInvalidationListener(o -> updateChart()));
         });
         barChartPane = new Pane();
         barChartPane.getChildren().addAll(barChartItems);
@@ -90,12 +91,12 @@ public class BarChartTileSkin extends TileSkin {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(addedItem -> {
                         barChartPane.getChildren().add(addedItem);
-                        addedItem.addEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);
+                        addedItem.addChartDataEventListener(updateHandler);
                     });
                     updateChart();
                 } else if (change.wasRemoved()) {
                     change.getRemoved().forEach(removedItem -> {
-                        removedItem.removeEventHandler(UpdateEvent.UPDATE_BAR_CHART, updateHandler);
+                        removedItem.removeChartDataEventListener(updateHandler);
                         barChartPane.getChildren().remove(removedItem);
                     });
                     updateChart();

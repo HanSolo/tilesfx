@@ -17,15 +17,13 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.UpdateEvent;
+import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.events.ChartDataEvent;
+import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import javafx.beans.DefaultProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.StringPropertyBase;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -58,7 +56,6 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     private static final double                MAXIMUM_WIDTH    = 1024;
     private static final double                MAXIMUM_HEIGHT   = 1024;
     private static final double                ASPECT_RATIO     = PREFERRED_HEIGHT / PREFERRED_WIDTH;
-    private static final UpdateEvent           UPDATE_EVENT     = new UpdateEvent(UpdateEvent.UPDATE_BAR_CHART);
     private              double                width;
     private              double                height;
     private              double                size;
@@ -69,16 +66,14 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     private              Rectangle             barBackground;
     private              Rectangle             bar;
     private              Pane                  pane;
-    private              StringProperty        name;
-    private              DoubleProperty        value;
     private              ObjectProperty<Color> nameColor;
     private              ObjectProperty<Color> valueColor;
     private              ObjectProperty<Color> barBackgroundColor;
-    private              ObjectProperty<Color> barColor;
     private              String                formatString;
     private              Locale                locale;
     private              double                maxValue;
     private              double                stepSize;
+    private              ChartData             chartData;
 
 
     // ******************** Constructors **************************************
@@ -92,22 +87,6 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         this(NAME, VALUE, Tile.BLUE);
     }
     public BarChartItem(final String NAME, final double VALUE, final Color COLOR) {
-        name               = new StringPropertyBase(NAME) {
-            @Override protected void invalidated() {
-                nameText.setText(get());
-                fireEvent(UPDATE_EVENT);
-            }
-            @Override public Object getBean() { return BarChartItem.this; }
-            @Override public String getName() { return "name"; }
-        };
-        value              = new DoublePropertyBase(VALUE) {
-            @Override protected void invalidated() {
-                updateBar(get());
-                fireEvent(UPDATE_EVENT);
-            }
-            @Override public Object getBean() { return BarChartItem.this; }
-            @Override public String getName() { return "value"; }
-        };
         nameColor          = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
             @Override public Object getBean() { return BarChartItem.this; }
@@ -123,14 +102,10 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
             @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "barBackgroundColor"; }
         };
-        barColor           = new ObjectPropertyBase<Color>(COLOR) {
-            @Override protected void invalidated() { bar.setFill(get()); }
-            @Override public Object getBean() { return BarChartItem.this; }
-            @Override public String getName() { return "barColor"; }
-        };
         formatString       = "%.0f";
         locale             = Locale.US;
         maxValue           = 100;
+        chartData          = new ChartData(NAME, VALUE, COLOR);
         stepSize           = PREFERRED_WIDTH * 0.85 / maxValue;
         parentWidth        = 250;
         parentHeight       = 250;
@@ -182,13 +157,11 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
     @Override public ObservableList<Node> getChildren() { return super.getChildren(); }
 
-    public String getName() { return name.get(); }
-    public void setName(final String NAME) { name.set(NAME); }
-    public StringProperty nameProperty() { return name; }
+    public String getName() { return chartData.getName(); }
+    public void setName(final String NAME) { chartData.setName(NAME); }
 
-    public double getValue() { return value.get(); }
-    public void setValue(final double VALUE) { value.set(VALUE); }
-    public DoubleProperty valueProperty() { return value; }
+    public double getValue() { return chartData.getValue(); }
+    public void setValue(final double VALUE) { chartData.setValue(VALUE); }
 
     public Color getNameColor() { return nameColor.get(); }
     public void setNameColor(final Color COLOR) { nameColor.set(COLOR); }
@@ -198,13 +171,18 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     public void setValueColor(final Color COLOR) { valueColor.set(COLOR); }
     public ObjectProperty<Color> valueColorProperty() { return valueColor; }
 
+    public ChartData getChartData() { return chartData; }
+    public void setChartData(final ChartData DATA) {
+        chartData = DATA;
+        chartData.fireChartDataEvent(new ChartDataEvent(chartData));
+    }
+
     public Color getBarBackgroundColor() { return barBackgroundColor.get(); }
     public void setBarBackgroundColor(final Color COLOR) { barBackgroundColor.set(COLOR); }
     public ObjectProperty<Color> barBackgroundColorProperty() { return barBackgroundColor; }
 
-    public Color getBarColor() { return barColor.get(); }
-    public void setBarColor(final Color COLOR) { barColor.set(COLOR); }
-    public ObjectProperty<Color> barColorProperty() { return barColor; }
+    public Color getBarColor() { return chartData.getColor(); }
+    public void setBarColor(final Color COLOR) { chartData.setColor(COLOR); }
 
     @Override public int compareTo(final BarChartItem SEGMENT) { return Double.compare(getValue(), SEGMENT.getValue()); }
 
@@ -240,6 +218,12 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
         bar.setWidth(clamp(0, (width - size * 0.15), VALUE * stepSize));
     }
+
+
+    // ******************** Event Handling ************************************
+    public void setOnChartDataEvent(final ChartDataEventListener LISTENER) { chartData.addChartDataEventListener(LISTENER); }
+    public void addChartDataEventListener(final ChartDataEventListener LISTENER) { chartData.addChartDataEventListener(LISTENER); }
+    public void removeChartDataEventListener(final ChartDataEventListener LISTENER) { chartData.removeChartDataEventListener(LISTENER); }
 
 
     // ******************** Resizing ******************************************

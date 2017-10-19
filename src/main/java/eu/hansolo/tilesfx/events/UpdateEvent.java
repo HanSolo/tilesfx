@@ -25,7 +25,6 @@ import javafx.event.EventType;
  * Created by hansolo on 11.01.17.
  */
 public class UpdateEvent extends Event {
-    public static EventType<UpdateEvent> UPDATE_BAR_CHART    = new EventType<>(ANY, "UPDATE_BAR_CHART");
     public static EventType<UpdateEvent> UPDATE_LEADER_BOARD = new EventType<>(ANY, "UPDATE_LEADER_BOARD");
 
     public UpdateEvent(@NamedArg("eventType") final EventType<? extends Event> TYPE) {

@@ -17,6 +17,9 @@
 package eu.hansolo.tilesfx.events;
 
 
+import eu.hansolo.tilesfx.chart.ChartData;
+
+
 /**
  * Created by hansolo on 19.12.16.
  */
@@ -26,23 +29,24 @@ public class TileEvent {
                             MAX_VALUE_EXCEEDED, MIN_VALUE_UNDERRUN, VALUE_IN_RANGE,
                             FINISHED, SERIES, DATA, GRAPHIC, UPDATE, AVERAGING, LOCATION, TRACK, MAP_PROVIDER,
                             TOOLTIP_TEXT, VALUE_CHANGING, VALUE_CHANGED, FLIP_START, FLIP_FINISHED,
-                            SELECTED_CHART_VALUE };
+                            SELECTED_CHART_DATA}
+
     private final EventType EVENT_TYPE;
-    private final double    VALUE;
+    private final ChartData DATA;
 
 
     // ******************** Constructors **************************************
     public TileEvent(final EventType EVENT_TYPE) {
-        this(EVENT_TYPE, 0);
+        this(EVENT_TYPE, null);
     }
-    public TileEvent(final EventType EVENT_TYPE, final double VALUE) {
+    public TileEvent(final EventType EVENT_TYPE, final ChartData DATA) {
         this.EVENT_TYPE = EVENT_TYPE;
-        this.VALUE      = VALUE;
+        this.DATA       = DATA;
     }
 
 
     // ******************** Methods *******************************************
     public EventType getEventType() { return EVENT_TYPE; }
 
-    public double getValue() { return VALUE; }
+    public ChartData getData() { return DATA; }
 }

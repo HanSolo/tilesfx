@@ -445,8 +445,8 @@ public class Helper {
 
 
     public static boolean isInRectangle(final double X, final double Y,
-                                  final double MIN_X, final double MIN_Y,
-                                  final double MAX_X, final double MAX_Y) {
+                                        final double MIN_X, final double MIN_Y,
+                                        final double MAX_X, final double MAX_Y) {
         return (Double.compare(X, MIN_X) >= 0 &&
                 Double.compare(X, MAX_X) <= 0 &&
                 Double.compare(Y, MIN_Y) >= 0 &&
@@ -454,8 +454,8 @@ public class Helper {
     }
 
     public static boolean isInEllipse(final double X, final double Y,
-                                final double ELLIPSE_CENTER_X, final double ELLIPSE_CENTER_Y,
-                                final double ELLIPSE_RADIUS_X, final double ELLIPSE_RADIUS_Y) {
+                                      final double ELLIPSE_CENTER_X, final double ELLIPSE_CENTER_Y,
+                                      final double ELLIPSE_RADIUS_X, final double ELLIPSE_RADIUS_Y) {
         return Double.compare(((((X - ELLIPSE_CENTER_X) * (X - ELLIPSE_CENTER_X)) / (ELLIPSE_RADIUS_X * ELLIPSE_RADIUS_X)) +
                                (((Y - ELLIPSE_CENTER_Y) * (Y - ELLIPSE_CENTER_Y)) / (ELLIPSE_RADIUS_Y * ELLIPSE_RADIUS_Y))), 1) <= 0.0;
     }
@@ -491,12 +491,32 @@ public class Helper {
                                     final double CENTER_X, final double CENTER_Y,
                                     final double OUTER_RADIUS, final double INNER_RADIUS,
                                     final double START_ANGLE, final double SEGMENT_ANGLE) {
+        double angleOffset = 90.0;
         double pointRadius = Math.sqrt((X - CENTER_X) * (X - CENTER_X) + (Y - CENTER_Y) * (Y - CENTER_Y));
-        double pointAngle  = Math.atan2(Y, X);
-        // Angle of 0 is at 3 o'clock
+        double pointAngle  = getAngleFromXY(X, Y, CENTER_X, CENTER_Y, angleOffset);
+        double startAngle  = angleOffset - START_ANGLE;
+        double endAngle    = startAngle + SEGMENT_ANGLE;
+
         return (Double.compare(pointRadius, INNER_RADIUS) >= 0 &&
                 Double.compare(pointRadius, OUTER_RADIUS) <= 0 &&
-                Double.compare(pointAngle, START_ANGLE) >= 0 &&
-                Double.compare(pointAngle, (START_ANGLE + SEGMENT_ANGLE)) <= 0);
+                Double.compare(pointAngle, startAngle) >= 0 &&
+                Double.compare(pointAngle, endAngle) <= 0);
+    }
+
+    public static double getAngleFromXY(final double X, final double Y, final double CENTER_X, final double CENTER_Y) {
+        return getAngleFromXY(X, Y, CENTER_X, CENTER_Y, 90.0);
+    }
+    public static double getAngleFromXY(final double X, final double Y, final double CENTER_X, final double CENTER_Y, final double ANGLE_OFFSET) {
+        // For ANGLE_OFFSET =  0 -> Angle of 0 is at 3 o'clock
+        // For ANGLE_OFFSET = 90  ->Angle of 0 is at 12 o'clock
+        double deltaX      = X - CENTER_X;
+        double deltaY      = Y - CENTER_Y;
+        double radius      = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
+        double nx          = deltaX / radius;
+        double ny          = deltaY / radius;
+        double theta       = Math.atan2(ny, nx);
+        theta              = Double.compare(theta, 0.0) >= 0 ? Math.toDegrees(theta) : Math.toDegrees((theta)) + 360.0;
+        double angle       = (theta + ANGLE_OFFSET) % 360;
+        return angle;
     }
 }

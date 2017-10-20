@@ -18,6 +18,8 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -47,6 +49,10 @@ public class DonutChartTileSkin extends TileSkin {
     private GraphicsContext               legendCtx;
     private ListChangeListener<ChartData> chartDataListener;
     private ChartDataEventListener        chartEventListener;
+    private double                        centerX;
+    private double                        centerY;
+    private double                        innerRadius;
+    private double                        outerRadius;
 
 
     // ******************** Constructors **************************************
@@ -94,6 +100,28 @@ public class DonutChartTileSkin extends TileSkin {
     @Override protected void registerListeners() {
         super.registerListeners();
         tile.getChartData().addListener(chartDataListener);
+        chartCanvas.setOnMousePressed(e -> {
+            double          x          = e.getX();
+            double          y          = e.getY();
+            double          startAngle = 90;
+            double          angle      = 0;
+            List<ChartData> dataList   = tile.getChartData();
+            int             noOfItems  = dataList.size();
+            double          sum        = dataList.stream().mapToDouble(ChartData::getValue).sum();
+            double          stepSize   = 360.0 / sum;
+            double          barWidth   = chartCanvas.getWidth() * 0.1;
+            double          ri         = outerRadius - barWidth * 0.5;
+            double          ro         = outerRadius + barWidth * 0.5;
+
+            for (int i = 0 ; i < noOfItems ; i++) {
+                ChartData data  = dataList.get(i);
+                double    value = data.getValue();
+                startAngle -= angle;
+                angle = value * stepSize;
+                boolean hit = Helper.isInRingSegment(x, y, centerX, centerY, ro, ri, startAngle, angle);
+                if (hit) { tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data)); break; }
+            }
+        });
     }
 
 
@@ -127,8 +155,6 @@ public class DonutChartTileSkin extends TileSkin {
         double          canvasSize     = chartCanvas.getWidth();
         int             noOfItems      = dataList.size();
         double          center         = canvasSize * 0.5;
-        double          innerRadius    = canvasSize * 0.275;
-        double          outerRadius    = canvasSize * 0.4;
         double          barWidth       = canvasSize * 0.1;
         //List<ChartData> sortedDataList = dataList.stream().sorted(Comparator.comparingDouble(ChartData::getValue).reversed()).collect(Collectors.toList());
         double          sum            = dataList.stream().mapToDouble(ChartData::getValue).sum();
@@ -139,6 +165,11 @@ public class DonutChartTileSkin extends TileSkin {
         double          wh             = canvasSize * 0.8;
         Color           bkgColor       = tile.getBackgroundColor();
         Color           textColor      = tile.getTextColor();
+
+        centerX        = xy + wh * 0.5;
+        centerY        = xy + wh * 0.5;
+        innerRadius    = canvasSize * 0.275;
+        outerRadius    = canvasSize * 0.4;
 
         chartCtx.clearRect(0, 0, canvasSize, canvasSize);
         chartCtx.setLineCap(StrokeLineCap.BUTT);

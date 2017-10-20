@@ -18,10 +18,13 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.chart.ChartData;
 import javafx.collections.ListChangeListener;
+import javafx.event.WeakEventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -44,8 +47,8 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 public class RadialChartTileSkin extends TileSkin {
     private Text                          titleText;
     private Text                          text;
-    private Canvas                        canvas;
-    private GraphicsContext               ctx;
+    private Canvas                        chartCanvas;
+    private GraphicsContext               chartCtx;
     private ListChangeListener<ChartData> chartDataListener;
     private ChartDataEventListener        chartEventListener;
 
@@ -82,15 +85,37 @@ public class RadialChartTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
 
-        canvas = new Canvas(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
-        ctx    = canvas.getGraphicsContext2D();
+        chartCanvas = new Canvas(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
+        chartCtx = chartCanvas.getGraphicsContext2D();
 
-        getPane().getChildren().addAll(titleText, canvas, text);
+        getPane().getChildren().addAll(titleText, chartCanvas, text);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
         tile.getChartData().addListener(chartDataListener);
+        chartCanvas.setOnMousePressed(new WeakEventHandler<>(e -> {
+            double          x          = e.getX();
+            double          y          = e.getY();
+            double          startAngle = 90;
+            List<ChartData> dataList   = tile.getChartData();
+            int             noOfItems  = dataList.size();
+            double          canvasSize = chartCanvas.getWidth();
+            double          barWidth   = canvasSize * 0.1;
+            double          max        = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+            for (int i = 0 ; i < noOfItems ; i++) {
+                ChartData data    = dataList.get(i);
+                double    value   = clamp(0, Double.MAX_VALUE, data.getValue());
+                double    barXY   = barWidth * 0.5 + i * barWidth;
+                double    barWH   = canvasSize - barWidth - (2 * i * barWidth);
+                double    angle   = value / max * 270.0;
+                double    centerX = barXY + barWH * 0.5;
+                double    centerY = centerX;
+
+                boolean hit = Helper.isInRingSegment(x, y, centerX, centerY, (barWH + barWidth) * 0.5, (barWH - barWidth) * 0.5, startAngle, angle);
+                if (hit) { tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data)); break; }
+            }
+        }));
     }
 
 
@@ -101,8 +126,8 @@ public class RadialChartTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
-            canvas.setWidth(tile.isTextVisible() ? size * 0.68 : size * 0.795);
-            canvas.setHeight(tile.isTextVisible() ? size * 0.68 : size * 0.795);
+            chartCanvas.setWidth(tile.isTextVisible() ? size * 0.68 : size * 0.795);
+            chartCanvas.setHeight(tile.isTextVisible() ? size * 0.68 : size * 0.795);
         }
     }
 
@@ -113,34 +138,33 @@ public class RadialChartTileSkin extends TileSkin {
     }
 
     private void drawChart() {
-        double                canvasSize     = canvas.getWidth();
-        double                radius         = canvasSize * 0.5;
-        double                innerSpacer    = radius * 0.18;
-        double                barWidth       = (radius - innerSpacer) / tile.getChartData().size();
+        double          canvasSize     = chartCanvas.getWidth();
+        double          radius         = canvasSize * 0.5;
+        double          innerSpacer    = radius * 0.18;
+        double          barWidth       = (radius - innerSpacer) / tile.getChartData().size();
         //List<RadialChartData> sortedDataList = tile.getChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
-        List<ChartData> dataList  = tile.getChartData();
-        int             noOfItems = dataList.size();
-        double          max       = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+        List<ChartData> dataList       = tile.getChartData();
+        int             noOfItems      = dataList.size();
+        double          max            = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
 
-        double                nameX          = radius * 0.975;
-        double                nameWidth      = radius * 0.95;
-        double                valueY         = radius * 0.94;
-        double                valueWidth     = barWidth * 0.9;
+        double          nameX          = radius * 0.975;
+        double          nameWidth      = radius * 0.95;
+        double          valueY         = radius * 0.94;
+        double          valueWidth     = barWidth * 0.9;
+        Color           bkgColor       = Color.color(tile.getTextColor().getRed(), tile.getTextColor().getGreen(), tile.getTextColor().getBlue(), 0.15);
 
-        Color                 bkgColor       = Color.color(tile.getTextColor().getRed(), tile.getTextColor().getGreen(), tile.getTextColor().getBlue(), 0.15);
+        chartCtx.clearRect(0, 0, canvasSize, canvasSize);
+        chartCtx.setLineCap(StrokeLineCap.BUTT);
+        chartCtx.setFill(tile.getTextColor());
+        chartCtx.setTextAlign(TextAlignment.RIGHT);
+        chartCtx.setTextBaseline(VPos.CENTER);
+        chartCtx.setFont(Fonts.latoRegular(barWidth * 0.5));
 
-        ctx.clearRect(0, 0, canvasSize, canvasSize);
-        ctx.setLineCap(StrokeLineCap.BUTT);
-        ctx.setFill(tile.getTextColor());
-        ctx.setTextAlign(TextAlignment.RIGHT);
-        ctx.setTextBaseline(VPos.CENTER);
-        ctx.setFont(Fonts.latoRegular(barWidth * 0.5));
-
-        ctx.setStroke(bkgColor);
-        ctx.setLineWidth(1);
-        ctx.strokeLine(radius, 0, radius, radius - barWidth * 0.875);
-        ctx.strokeLine(0, radius, radius - barWidth * 0.875, radius);
-        ctx.strokeArc(noOfItems * barWidth, noOfItems * barWidth, canvasSize - (2 * noOfItems * barWidth), canvasSize - (2 * noOfItems * barWidth), 90, -270, ArcType.OPEN);
+        chartCtx.setStroke(bkgColor);
+        chartCtx.setLineWidth(1);
+        chartCtx.strokeLine(radius, 0, radius, radius - barWidth * 0.875);
+        chartCtx.strokeLine(0, radius, radius - barWidth * 0.875, radius);
+        chartCtx.strokeArc(noOfItems * barWidth, noOfItems * barWidth, canvasSize - (2 * noOfItems * barWidth), canvasSize - (2 * noOfItems * barWidth), 90, -270, ArcType.OPEN);
 
         for (int i = 0 ; i < noOfItems ; i++) {
             ChartData data  = dataList.get(i);
@@ -152,22 +176,22 @@ public class RadialChartTileSkin extends TileSkin {
             double    angle = value / max * 270.0;
 
             // Background
-            ctx.setLineWidth(1);
-            ctx.setStroke(bkgColor);
-            ctx.strokeArc(bkgXY, bkgXY, bkgWH, bkgWH, 90, -270, ArcType.OPEN);
+            chartCtx.setLineWidth(1);
+            chartCtx.setStroke(bkgColor);
+            chartCtx.strokeArc(bkgXY, bkgXY, bkgWH, bkgWH, 90, -270, ArcType.OPEN);
 
             // DataBar
-            ctx.setLineWidth(barWidth);
-            ctx.setStroke(data.getColor());
-            ctx.strokeArc(barXY, barXY, barWH, barWH, 90, -angle, ArcType.OPEN);
+            chartCtx.setLineWidth(barWidth);
+            chartCtx.setStroke(data.getColor());
+            chartCtx.strokeArc(barXY, barXY, barWH, barWH, 90, -angle, ArcType.OPEN);
 
             // Name
-            ctx.setTextAlign(TextAlignment.RIGHT);
-            ctx.fillText(data.getName(), nameX, barXY, nameWidth);
+            chartCtx.setTextAlign(TextAlignment.RIGHT);
+            chartCtx.fillText(data.getName(), nameX, barXY, nameWidth);
 
             // Value
-            ctx.setTextAlign(TextAlignment.CENTER);
-            ctx.fillText(String.format(Locale.US, "%.0f", value), barXY, valueY, valueWidth);
+            chartCtx.setTextAlign(TextAlignment.CENTER);
+            chartCtx.fillText(String.format(Locale.US, "%.0f", value), barXY, valueY, valueWidth);
         }
     }
 
@@ -210,10 +234,10 @@ public class RadialChartTileSkin extends TileSkin {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            canvas.setWidth(canvasSize);
-            canvas.setHeight(canvasSize);
+            chartCanvas.setWidth(canvasSize);
+            chartCanvas.setHeight(canvasSize);
 
-            canvas.relocate((width - canvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - canvasSize) * 0.5);
+            chartCanvas.relocate((width - canvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - canvasSize) * 0.5);
 
             resizeStaticText();
         }

@@ -18,6 +18,8 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.events.ChartDataEvent;
+import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import javafx.beans.DefaultProperty;
@@ -189,6 +191,12 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     public Color getValueColor() { return valueColor.get(); }
     public void setValueColor(final Color COLOR) { valueColor.set(COLOR); }
     public ObjectProperty<Color> valueColorProperty() { return valueColor; }
+
+    public ChartData getChartData() { return chartData; }
+    public void setChartData(final ChartData DATA) {
+        chartData = DATA;
+        chartData.fireChartDataEvent(new ChartDataEvent(EventType.UPDATE, chartData));
+    }
 
     public Color getSeparatorColor() { return separatorColor.get(); }
     public void setSeparatorColor(final Color COLOR) { separatorColor.set(COLOR); }

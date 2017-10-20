@@ -17,16 +17,15 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.events.UpdateEvent;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.WeakInvalidationListener;
 import javafx.collections.WeakListChangeListener;
-import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
@@ -65,6 +64,7 @@ public class BarChartTileSkin extends TileSkin {
 
         tile.getBarChartItems().forEach(item -> {
             item.addChartDataEventListener(updateHandler);
+            item.setOnMousePressed(new WeakEventHandler<>(event -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, item.getChartData()))));
             item.setMaxValue(tile.getMaxValue());
             if (null == item.getFormatString() || item.getFormatString().isEmpty()) {
                 item.setFormatString(formatString);
@@ -92,6 +92,7 @@ public class BarChartTileSkin extends TileSkin {
                     change.getAddedSubList().forEach(addedItem -> {
                         barChartPane.getChildren().add(addedItem);
                         addedItem.addChartDataEventListener(updateHandler);
+                        addedItem.setOnMousePressed(new WeakEventHandler<>(event -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, addedItem.getChartData()))));
                     });
                     updateChart();
                 } else if (change.wasRemoved()) {

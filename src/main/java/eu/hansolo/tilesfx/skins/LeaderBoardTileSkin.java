@@ -19,10 +19,12 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.event.WeakEventHandler;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
@@ -108,6 +110,7 @@ public class LeaderBoardTileSkin extends TileSkin {
         tile.getLeaderBoardItems().forEach(item -> {
             item.setFormatString(formatString);
             item.addChartDataEventListener(updateHandler);
+            item.setOnMousePressed(new WeakEventHandler<>(event -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, item.getChartData()))));
         });
     }
 

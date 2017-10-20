@@ -25,6 +25,7 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.WeakEventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.input.MouseEvent;
@@ -130,7 +131,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         super.registerListeners();
         tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
         tile.getChartData().addListener(chartDataListener);
-        fillPath.setOnMousePressed(e -> selectData(e));
+        fillPath.setOnMousePressed(new WeakEventHandler<>(e -> selectData(e)));
     }
 
     @Override public void dispose() {

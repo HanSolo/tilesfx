@@ -24,6 +24,7 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
+import javafx.event.WeakEventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -100,7 +101,7 @@ public class DonutChartTileSkin extends TileSkin {
     @Override protected void registerListeners() {
         super.registerListeners();
         tile.getChartData().addListener(chartDataListener);
-        chartCanvas.setOnMousePressed(e -> {
+        chartCanvas.setOnMousePressed(new WeakEventHandler<>(e -> {
             double          x          = e.getX();
             double          y          = e.getY();
             double          startAngle = 90;
@@ -121,7 +122,7 @@ public class DonutChartTileSkin extends TileSkin {
                 boolean hit = Helper.isInRingSegment(x, y, centerX, centerY, ro, ri, startAngle, angle);
                 if (hit) { tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data)); break; }
             }
-        });
+        }));
     }
 
 

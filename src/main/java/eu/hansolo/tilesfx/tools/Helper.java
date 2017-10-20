@@ -18,12 +18,22 @@ package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.CountryPath;
 import eu.hansolo.tilesfx.Section;
+import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -320,5 +330,173 @@ public class Helper {
         CTX.lineTo(x, y + RADII.getUpperRight());
         CTX.quadraticCurveTo(x, y, x + RADII.getUpperRight(), y);
         CTX.closePath();
+    }
+
+    // Smooth given path defined by it's list of path elements
+    public static Path smoothPath(final ObservableList<PathElement> ELEMENTS, final boolean FILLED) {
+        if (ELEMENTS.isEmpty()) { return new Path(); }
+        final Point2D[] dataPoints = new Point2D[ELEMENTS.size()];
+        for (int i = 0; i < ELEMENTS.size(); i++) {
+            final PathElement element = ELEMENTS.get(i);
+            if (element instanceof MoveTo) {
+                MoveTo move   = (MoveTo) element;
+                dataPoints[i] = new Point2D(move.getX(), move.getY());
+            } else if (element instanceof LineTo) {
+                LineTo line   = (LineTo) element;
+                dataPoints[i] = new Point2D(line.getX(), line.getY());
+            }
+        }
+        double                     zeroY               = ((MoveTo) ELEMENTS.get(0)).getY();
+        List<PathElement>          smoothedElements    = new ArrayList<>();
+        Pair<Point2D[], Point2D[]> result              = calcCurveControlPoints(dataPoints);
+        Point2D[]                  firstControlPoints  = result.getKey();
+        Point2D[]                  secondControlPoints = result.getValue();
+        // Start path dependent on filled or not
+        if (FILLED) {
+            smoothedElements.add(new MoveTo(dataPoints[0].getX(), zeroY));
+            smoothedElements.add(new LineTo(dataPoints[0].getX(), dataPoints[0].getY()));
+        } else {
+            smoothedElements.add(new MoveTo(dataPoints[0].getX(), dataPoints[0].getY()));
+        }
+        // Add curves
+        for (int i = 2; i < dataPoints.length; i++) {
+            final int ci = i - 1;
+            smoothedElements.add(new CubicCurveTo(
+                firstControlPoints[ci].getX(), firstControlPoints[ci].getY(),
+                secondControlPoints[ci].getX(), secondControlPoints[ci].getY(),
+                dataPoints[i].getX(), dataPoints[i].getY()));
+        }
+        // Close the path if filled
+        if (FILLED) {
+            smoothedElements.add(new LineTo(dataPoints[dataPoints.length - 1].getX(), zeroY));
+            smoothedElements.add(new ClosePath());
+        }
+        return new Path(smoothedElements);
+    }
+    private static Pair<Point2D[], Point2D[]> calcCurveControlPoints(Point2D[] dataPoints) {
+        Point2D[] firstControlPoints;
+        Point2D[] secondControlPoints;
+        int n = dataPoints.length - 1;
+        if (n == 1) { // Special case: Bezier curve should be a straight line.
+            firstControlPoints     = new Point2D[1];
+            // 3P1 = 2P0 + P3
+            firstControlPoints[0]  = new Point2D((2 * dataPoints[0].getX() + dataPoints[1].getX()) / 3, (2 * dataPoints[0].getY() + dataPoints[1].getY()) / 3);
+            secondControlPoints    = new Point2D[1];
+            // P2 = 2P1 – P0
+            secondControlPoints[0] = new Point2D(2 * firstControlPoints[0].getX() - dataPoints[0].getX(), 2 * firstControlPoints[0].getY() - dataPoints[0].getY());
+            return new Pair<>(firstControlPoints, secondControlPoints);
+        }
+
+        // Calculate first Bezier control points
+        // Right hand side vector
+        double[] rhs = new double[n];
+
+        // Set right hand side X values
+        for (int i = 1; i < n - 1; ++i) {
+            rhs[i] = 4 * dataPoints[i].getX() + 2 * dataPoints[i + 1].getX();
+        }
+        rhs[0]     = dataPoints[0].getX() + 2 * dataPoints[1].getX();
+        rhs[n - 1] = (8 * dataPoints[n - 1].getX() + dataPoints[n].getX()) / 2.0;
+        // Get first control points X-values
+        double[] x = getFirstControlPoints(rhs);
+
+        // Set right hand side Y values
+        for (int i = 1; i < n - 1; ++i) {
+            rhs[i] = 4 * dataPoints[i].getY() + 2 * dataPoints[i + 1].getY();
+        }
+        rhs[0]     = dataPoints[0].getY() + 2 * dataPoints[1].getY();
+        rhs[n - 1] = (8 * dataPoints[n - 1].getY() + dataPoints[n].getY()) / 2.0;
+        // Get first control points Y-values
+        double[] y = getFirstControlPoints(rhs);
+
+        // Fill output arrays.
+        firstControlPoints  = new Point2D[n];
+        secondControlPoints = new Point2D[n];
+        for (int i = 0; i < n; ++i) {
+            // First control point
+            firstControlPoints[i] = new Point2D(x[i], y[i]);
+            // Second control point
+            if (i < n - 1) {
+                secondControlPoints[i] = new Point2D(2 * dataPoints[i + 1].getX() - x[i + 1], 2 * dataPoints[i + 1].getY() - y[i + 1]);
+            } else {
+                secondControlPoints[i] = new Point2D((dataPoints[n].getX() + x[n - 1]) / 2, (dataPoints[n].getY() + y[n - 1]) / 2);
+            }
+        }
+        return new Pair<>(firstControlPoints, secondControlPoints);
+    }
+    private static double[] getFirstControlPoints(double[] rhs) {
+        int      n   = rhs.length;
+        double[] x   = new double[n]; // Solution vector.
+        double[] tmp = new double[n]; // Temp workspace.
+        double   b   = 2.0;
+
+        x[0] = rhs[0] / b;
+
+        for (int i = 1; i < n; i++) {// Decomposition and forward substitution.
+            tmp[i] = 1 / b;
+            b      = (i < n - 1 ? 4.0 : 3.5) - tmp[i];
+            x[i]   = (rhs[i] - x[i - 1]) / b;
+        }
+        for (int i = 1; i < n; i++) {
+            x[n - i - 1] -= tmp[n - i] * x[n - i]; // Backsubstitution.
+        }
+        return x;
+    }
+
+
+    public static boolean isInRectangle(final double X, final double Y,
+                                  final double MIN_X, final double MIN_Y,
+                                  final double MAX_X, final double MAX_Y) {
+        return (Double.compare(X, MIN_X) >= 0 &&
+                Double.compare(X, MAX_X) <= 0 &&
+                Double.compare(Y, MIN_Y) >= 0 &&
+                Double.compare(Y, MAX_Y) <= 0);
+    }
+
+    public static boolean isInEllipse(final double X, final double Y,
+                                final double ELLIPSE_CENTER_X, final double ELLIPSE_CENTER_Y,
+                                final double ELLIPSE_RADIUS_X, final double ELLIPSE_RADIUS_Y) {
+        return Double.compare(((((X - ELLIPSE_CENTER_X) * (X - ELLIPSE_CENTER_X)) / (ELLIPSE_RADIUS_X * ELLIPSE_RADIUS_X)) +
+                               (((Y - ELLIPSE_CENTER_Y) * (Y - ELLIPSE_CENTER_Y)) / (ELLIPSE_RADIUS_Y * ELLIPSE_RADIUS_Y))), 1) <= 0.0;
+    }
+
+    public static boolean isInPolygon(final double X, final double Y, final Polygon POLYGON) {
+        List<Double> points              = POLYGON.getPoints();
+        int          noOfPointsInPolygon = POLYGON.getPoints().size() / 2;
+        double[]     pointsX             = new double[noOfPointsInPolygon];
+        double[]     pointsY             = new double[noOfPointsInPolygon];
+        int          pointCounter        = 0;
+        for (int i = 0 ; i < points.size() ; i++) {
+            if (i % 2 == 0) {
+                pointsX[i] = points.get(pointCounter);
+            } else {
+                pointsY[i] = points.get(pointCounter);
+                pointCounter++;
+            }
+        }
+        return isInPolygon(X, Y, noOfPointsInPolygon, pointsX, pointsY);
+    }
+    public static boolean isInPolygon(final double X, final double Y, final int NO_OF_POINTS_IN_POLYGON, final double[] POINTS_X, final double[] POINTS_Y) {
+        if (NO_OF_POINTS_IN_POLYGON != POINTS_X.length || NO_OF_POINTS_IN_POLYGON != POINTS_Y.length) { return false; }
+        boolean inside = false;
+        for (int i = 0, j = NO_OF_POINTS_IN_POLYGON - 1; i < NO_OF_POINTS_IN_POLYGON ; j = i++) {
+            if (((POINTS_Y[i] > Y) != (POINTS_Y[j] > Y)) && (X < (POINTS_X[j] - POINTS_X[i]) * (Y - POINTS_Y[i]) / (POINTS_Y[j] - POINTS_Y[i]) + POINTS_X[i])) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+
+    public static boolean isInRingSegment(final double X, final double Y,
+                                    final double CENTER_X, final double CENTER_Y,
+                                    final double OUTER_RADIUS, final double INNER_RADIUS,
+                                    final double START_ANGLE, final double SEGMENT_ANGLE) {
+        double pointRadius = Math.sqrt((X - CENTER_X) * (X - CENTER_X) + (Y - CENTER_Y) * (Y - CENTER_Y));
+        double pointAngle  = Math.atan2(Y, X);
+        // Angle of 0 is at 3 o'clock
+        return (Double.compare(pointRadius, INNER_RADIUS) >= 0 &&
+                Double.compare(pointRadius, OUTER_RADIUS) <= 0 &&
+                Double.compare(pointAngle, START_ANGLE) >= 0 &&
+                Double.compare(pointAngle, (START_ANGLE + SEGMENT_ANGLE)) <= 0);
     }
 }

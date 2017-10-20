@@ -19,12 +19,15 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -103,6 +106,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         strokePath.setFill(null);
         strokePath.setStroke(tile.getBarColor());
         strokePath.setClip(strokeClip);
+        strokePath.setMouseTransparent(true);
 
         valueText = new Text(String.format(locale, formatString, ((tile.getValue() - minValue) / range * 100)));
         valueText.setFill(tile.getValueColor());
@@ -126,6 +130,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         super.registerListeners();
         tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
         tile.getChartData().addListener(chartDataListener);
+        fillPath.setOnMousePressed(e -> selectData(e));
     }
 
     @Override public void dispose() {
@@ -298,6 +303,120 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             x[n - i - 1] -= tmp[n - i] * x[n - i]; // Backsubstitution.
         }
         return x;
+    }
+
+    private void selectData(final MouseEvent EVT) {
+        final double EVENT_X     = EVT.getX();
+        final double CHART_X     = 0;
+        final double CHART_WIDTH = width;
+
+        if (Double.compare(EVENT_X, CHART_X) < 0 || Double.compare(EVENT_X, CHART_WIDTH) > 0) { return; }
+
+        double lowerBound = tile.getChartData().stream().min(Comparator.comparing(ChartData::getValue)).get().getValue();
+        double upperBound = tile.getChartData().stream().max(Comparator.comparing(ChartData::getValue)).get().getValue();
+        double range      = upperBound - lowerBound;
+        double factor     = range / (height * 0.5);
+
+        double x0 = 0;
+        double y0 = 0;
+        double x1 = 0;
+        double y1 = 0;
+        double x2 = 0;
+        double y2 = 0;
+        double x3 = 0;
+        double y3 = 0;
+        double x = EVT.getX(); // x coordinate of selected point
+        for (PathElement element : strokePath.getElements()) {
+            if (element instanceof MoveTo) {
+                final MoveTo moveTo = (MoveTo) element;
+                x0 = moveTo.getX();
+                y0 = moveTo.getY();
+            } else if (element instanceof CubicCurveTo) {
+                final CubicCurveTo cubicCurveTo = (CubicCurveTo) element;
+                x1 = cubicCurveTo.getControlX1();
+                y1 = cubicCurveTo.getControlY1();
+                x2 = cubicCurveTo.getControlX2();
+                y2 = cubicCurveTo.getControlY2();
+                x3 = cubicCurveTo.getX();
+                y3 = cubicCurveTo.getY();
+
+                if (x > x0 && x < x3) break;
+
+                x0 = cubicCurveTo.getX();
+                y0 = cubicCurveTo.getY();
+            }
+        }
+
+        //double cx = 3.0 * (x1 - x0);
+        //double bx = 3.0 * (x2 - x1) - cx;
+        //double ax = x3 - x0 - cx - bx;
+        double cy = 3.0 * (y1 - y0);
+        double by = 3.0 * (y2 - y1) - cy;
+        double ay = y3 - y0 - cy - by;
+
+        double a0 = x0;
+        double a1 = 3.0 * (x1 - x0);
+        double a2 = 3.0 * (x2 - 2.0 * x1 + x0);
+        double a3 = x3 - 3.0 * x2 + 3.0 * x1 - x0;
+        double t  = invB3P(a0, a1, a2, a3, x);
+        double yt = ay * t * t * t + by * t * t + cy * t + y0;
+
+        double selectedValue = upperBound - (yt - (height * 0.5)) * factor;
+
+        tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_VALUE, selectedValue));
+    }
+    private double invB3P(double a0, double a1, double a2, double a3, double x) {
+        double c;
+        double h, p, q, D, R, S, F, t;
+        double w1 = 2.0 * Math.PI / 3.0;
+        double w2 = 4.0 * Math.PI / 3.0;
+
+        c = 1.0 + a3;
+
+        if (Double.compare(c, 1.0) == 0) { a3 = 1e-6; }
+        h  = a2 / 3.0 / a3;
+        p  = (3.0 * a1 * a3 - a2 * a2) / 3.0 / a3 / a3;
+        q  = (2.0 * a2 * a2 * a2 - 9.0 * a1 * a2 * a3 - 27.0 * a3 * a3 * (x - a0)) / 27.0 / a3 / a3 / a3;
+
+        c  = (1.0 + p);        /* Check for p being too near to zero     */
+        if (Double.compare(c, 1.0) == 0) {
+            c = 1.0 + q;      /* Check for q being too near to zero     */
+            if (Double.compare(c, 1.0)  == 0) { return( (float)(-h) ); }
+
+            t = -Math.exp(Math.log(Math.abs(q)) / 3.0);
+            if (q < 0.0) {
+                t = -t;
+            }
+            t -= h;
+            return t;
+        }
+
+        R  = Math.sqrt(Math.abs(p) / 3.0);
+        S  = Math.abs(q) / 2.0 / R / R / R;
+
+        R  = -2.0 * R;
+        if (q < 0.0) { R = -R; }
+
+        if (p < 0.0) {
+            D = p * p * p / 27.0 + q * q / 4.0;
+            if (D <= 0.0) {
+                F = Math.acos(S)/3.0;
+                t = R * Math.cos(F + w2) - h;
+                if ((t < -0.00005) || (t > 1.00005)) {
+                    t = R * Math.cos(F + w1) - h;
+                    if ((t < -0.00005) || (t > 1.00005)) {
+                        t = R * Math.cos(F) - h;
+                        t = Helper.clamp(-0.00005, 1.00005, t);
+                    }
+                }
+            } else {
+                t = R * Math.cosh(Math.log(S + Math.sqrt((S + 1.0) * (S - 1.0))) / 3.0) - h;  /* arcosh */
+            }
+        } else {
+            t = R * Math.sinh(Math.log(S + Math.sqrt(S * S + 1.0)) / 3.0) - h;                /* arsinh */
+        }
+
+        return t;
     }
 
 

@@ -25,16 +25,24 @@ public class TileEvent {
                             THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN,
                             MAX_VALUE_EXCEEDED, MIN_VALUE_UNDERRUN, VALUE_IN_RANGE,
                             FINISHED, SERIES, DATA, GRAPHIC, UPDATE, AVERAGING, LOCATION, TRACK, MAP_PROVIDER,
-                            TOOLTIP_TEXT, VALUE_CHANGING, VALUE_CHANGED, FLIP_START, FLIP_FINISHED };
+                            TOOLTIP_TEXT, VALUE_CHANGING, VALUE_CHANGED, FLIP_START, FLIP_FINISHED,
+                            SELECTED_CHART_VALUE };
     private final EventType EVENT_TYPE;
+    private final double    VALUE;
 
 
     // ******************** Constructors **************************************
     public TileEvent(final EventType EVENT_TYPE) {
+        this(EVENT_TYPE, 0);
+    }
+    public TileEvent(final EventType EVENT_TYPE, final double VALUE) {
         this.EVENT_TYPE = EVENT_TYPE;
+        this.VALUE      = VALUE;
     }
 
 
     // ******************** Methods *******************************************
     public EventType getEventType() { return EVENT_TYPE; }
+
+    public double getValue() { return VALUE; }
 }

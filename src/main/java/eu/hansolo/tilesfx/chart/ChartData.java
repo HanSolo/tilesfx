@@ -41,7 +41,7 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 /**
  * Created by hansolo on 17.02.17.
  */
-public class ChartData {
+public class ChartData implements Comparable<ChartData> {
     private final ChartDataEvent         UPDATE_EVENT = new ChartDataEvent(EventType.UPDATE, ChartData.this);
     private final ChartDataEvent         FINISHED_EVENT = new ChartDataEvent(EventType.FINISHED, ChartData.this);
     private String                       name;
@@ -150,6 +150,8 @@ public class ChartData {
                                   .append("}")
                                   .toString();
     }
+
+    @Override public int compareTo(final ChartData DATA) { return Double.compare(getValue(), DATA.getValue()); }
 
 
     // ******************** Event Handling ************************************

@@ -362,8 +362,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         double yt = ay * t * t * t + by * t * t + cy * t + y0;
 
         double selectedValue = upperBound - (yt - (height * 0.5)) * factor;
-
-        tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_VALUE, selectedValue));
+        tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(selectedValue)));
     }
     private double invB3P(double a0, double a1, double a2, double a3, double x) {
         double c;

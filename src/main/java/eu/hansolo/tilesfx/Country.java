@@ -266,14 +266,16 @@ public enum Country {
     ZM("Zambia"),
     ZW("Zimbabwe");
 
-    private ValueObject value;
+    private ValueObject valueObject;
+    private double      value;
     private Color       color;
     private String      displayName;
 
 
     // ******************** Constructors **************************************
     Country(final String DISPLAY_NAME) {
-        value       = null;
+        valueObject = null;
+        value       = 0;
         color       = null;
         displayName = DISPLAY_NAME;
     }
@@ -282,8 +284,11 @@ public enum Country {
     // ******************** Methods *******************************************
     public String getName() { return name(); }
 
-    public ValueObject getValue() { return value; }
-    public void setValue(final ValueObject VALUE) { value = VALUE; }
+    public ValueObject getValueObject() { return valueObject; }
+    public void setValueObject(final ValueObject VALUE) { valueObject = VALUE; }
+
+    public double getValue() { return value; }
+    public void setValue(final double VALUE) { value = VALUE; }
 
     public Color getColor() { return color; }
     public void setColor(final Color COLOR) { color = COLOR; }

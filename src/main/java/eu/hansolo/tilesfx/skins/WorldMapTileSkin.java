@@ -20,10 +20,16 @@ import eu.hansolo.tilesfx.Country;
 import eu.hansolo.tilesfx.CountryPath;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
+import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -86,6 +92,10 @@ public class WorldMapTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
+        countryPaths.forEach((name , pathList) -> {
+            Country country = Country.valueOf(name);
+            pathList.forEach(path -> path.setOnMouseClicked(new WeakEventHandler<>(e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getColor()))))) );
+        });
     }
 
 

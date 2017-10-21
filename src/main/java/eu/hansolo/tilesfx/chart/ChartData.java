@@ -59,11 +59,17 @@ public class ChartData implements Comparable<ChartData> {
     public ChartData() {
         this("", 0, Tile.BLUE, Instant.now());
     }
+    public ChartData(final String NAME) {
+        this(NAME, 0, Tile.BLUE, Instant.now());
+    }
     public ChartData(double VALUE) {
         this("", VALUE, Tile.BLUE, Instant.now());
     }
     public ChartData(final double VALUE, final Instant TIMESTAMP) {
         this("", VALUE, Tile.BLUE, TIMESTAMP);
+    }
+    public ChartData(final String NAME, final Color COLOR) {
+        this(NAME, 0, COLOR);
     }
     public ChartData(final String NAME, final double VALUE) {
         this(NAME, VALUE, Tile.BLUE, Instant.now());

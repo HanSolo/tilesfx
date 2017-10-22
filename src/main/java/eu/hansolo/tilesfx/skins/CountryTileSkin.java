@@ -35,6 +35,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -63,7 +64,8 @@ public class CountryTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        country = null == tile.getCountry() ? Country.DE : tile.getCountry();
+        country = tile.getCountry();
+        if (null == country) { country = Country.DE; }
 
         clickHandler = event -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getColor())));
 
@@ -119,7 +121,8 @@ public class CountryTileSkin extends TileSkin {
             countryContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
             countryContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            country = null == tile.getCountry() ? Country.DE : tile.getCountry();
+            country = tile.getCountry();
+            if (null == country) { country = Country.DE; }
             countryPaths.clear();
             countryPaths.addAll(Helper.getHiresCountryPaths().get(country.name()));
             countryGroup.getChildren().setAll(countryPaths);

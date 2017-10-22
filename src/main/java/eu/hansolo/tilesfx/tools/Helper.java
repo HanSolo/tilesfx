@@ -55,8 +55,8 @@ import java.util.concurrent.ThreadFactory;
 public class Helper {
     private static final double                         EPSILON                  = 1E-6;
     private static final String                         HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
-    public static        Properties                     hiresCountryProperties;
-    public static        Map<String, List<CountryPath>> hiresCountryPaths;
+    private static       Properties                     hiresCountryProperties;
+    private static       Map<String, List<CountryPath>> hiresCountryPaths        = new HashMap<>();
 
 
     public static final String[] TIME_0_TO_5       = {"1", "2", "3", "4", "5", "0"};
@@ -291,15 +291,14 @@ public class Helper {
 
     public static Map<String, List<CountryPath>> getHiresCountryPaths() {
         if (null == hiresCountryProperties) { hiresCountryProperties = readProperties(HIRES_COUNTRY_PROPERTIES); }
-        if (null == hiresCountryPaths) {
-            hiresCountryPaths = new HashMap<>();
+        //if (hiresCountryPaths.isEmpty()) {
             hiresCountryProperties.forEach((key, value) -> {
                 String            name     = key.toString();
                 List<CountryPath> pathList = new ArrayList<>();
                 for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
                 hiresCountryPaths.put(name, pathList);
             });
-        }
+        //}
         return hiresCountryPaths;
     }
     private static Properties readProperties(final String FILE_NAME) {

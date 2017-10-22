@@ -25,7 +25,7 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.WeakEventHandler;
+import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.input.MouseEvent;
@@ -68,6 +68,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     private Rectangle                     strokeClip;
     private ChartDataEventListener        chartEventListener;
     private ListChangeListener<ChartData> chartDataListener;
+    private EventHandler<MouseEvent>      clickHandler;
 
 
     // ******************** Constructors **************************************
@@ -91,6 +92,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             }
             handleData();
         };
+        clickHandler       = e -> selectData(e);
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -131,13 +133,14 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         super.registerListeners();
         tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
         tile.getChartData().addListener(chartDataListener);
-        fillPath.setOnMousePressed(new WeakEventHandler<>(e -> selectData(e)));
+        fillPath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
     }
 
     @Override public void dispose() {
-        super.dispose();
         tile.getChartData().removeListener(chartDataListener);
         tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        fillPath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+        super.dispose();
     }
 
 

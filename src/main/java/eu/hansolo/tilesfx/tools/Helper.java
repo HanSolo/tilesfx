@@ -55,8 +55,8 @@ import java.util.concurrent.ThreadFactory;
 public class Helper {
     private static final double                         EPSILON                  = 1E-6;
     private static final String                         HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
-    private static       Properties                     hiresCountryProperties;
-    private static       Map<String, List<CountryPath>> hiresCountryPaths;
+    public static        Properties                     hiresCountryProperties;
+    public static        Map<String, List<CountryPath>> hiresCountryPaths;
 
 
     public static final String[] TIME_0_TO_5       = {"1", "2", "3", "4", "5", "0"};

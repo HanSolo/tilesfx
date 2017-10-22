@@ -24,10 +24,11 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
-import javafx.event.WeakEventHandler;
+import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
@@ -54,6 +55,7 @@ public class DonutChartTileSkin extends TileSkin {
     private double                        centerY;
     private double                        innerRadius;
     private double                        outerRadius;
+    private EventHandler<MouseEvent>      clickHandler;
 
 
     // ******************** Constructors **************************************
@@ -81,27 +83,7 @@ public class DonutChartTileSkin extends TileSkin {
             drawLegend();
         };
 
-        titleText = new Text();
-        titleText.setFill(tile.getTitleColor());
-        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
-
-        text = new Text(tile.getText());
-        text.setFill(tile.getTextColor());
-        Helper.enableNode(text, tile.isTextVisible());
-
-        chartCanvas = new Canvas(size * 0.9, tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205);
-        chartCtx    = chartCanvas.getGraphicsContext2D();
-
-        legendCanvas = new Canvas(size * 0.225, tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205);
-        legendCtx    = legendCanvas.getGraphicsContext2D();
-
-        getPane().getChildren().addAll(titleText, legendCanvas, chartCanvas, text);
-    }
-
-    @Override protected void registerListeners() {
-        super.registerListeners();
-        tile.getChartData().addListener(chartDataListener);
-        chartCanvas.setOnMousePressed(new WeakEventHandler<>(e -> {
+        clickHandler = e -> {
             double          x          = e.getX();
             double          y          = e.getY();
             double          startAngle = 90;
@@ -122,7 +104,29 @@ public class DonutChartTileSkin extends TileSkin {
                 boolean hit = Helper.isInRingSegment(x, y, centerX, centerY, ro, ri, startAngle, angle);
                 if (hit) { tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data)); break; }
             }
-        }));
+        };
+
+        titleText = new Text();
+        titleText.setFill(tile.getTitleColor());
+        Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+
+        text = new Text(tile.getText());
+        text.setFill(tile.getTextColor());
+        Helper.enableNode(text, tile.isTextVisible());
+
+        chartCanvas = new Canvas(size * 0.9, tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205);
+        chartCtx    = chartCanvas.getGraphicsContext2D();
+
+        legendCanvas = new Canvas(size * 0.225, tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205);
+        legendCtx    = legendCanvas.getGraphicsContext2D();
+
+        getPane().getChildren().addAll(titleText, legendCanvas, chartCanvas, text);
+    }
+
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        tile.getChartData().addListener(chartDataListener);
+        chartCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
     }
 
 
@@ -148,6 +152,7 @@ public class DonutChartTileSkin extends TileSkin {
     @Override public void dispose() {
         tile.getChartData().removeListener(chartDataListener);
         tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        chartCanvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         super.dispose();
     }
 

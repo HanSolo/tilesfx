@@ -24,12 +24,15 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.event.WeakEventHandler;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -37,11 +40,12 @@ import java.util.stream.Collectors;
  * Created by hansolo on 19.12.16.
  */
 public class LeaderBoardTileSkin extends TileSkin {
-    private Text                   titleText;
-    private Text                   text;
-    private Pane                   leaderBoardPane;
-    private ChartDataEventListener updateHandler;
-    private InvalidationListener   paneSizeListener;
+    private Text                                           titleText;
+    private Text                                           text;
+    private Pane                                           leaderBoardPane;
+    private ChartDataEventListener                         updateHandler;
+    private InvalidationListener                           paneSizeListener;
+    private Map<LeaderBoardItem, EventHandler<MouseEvent>> handlerMap;
 
 
     // ******************** Constructors **************************************
@@ -66,6 +70,7 @@ public class LeaderBoardTileSkin extends TileSkin {
             }
         };
         paneSizeListener = o -> resizeItems();
+        handlerMap       = new HashMap<>();
 
         List<LeaderBoardItem> leaderBoardItems = tile.getLeaderBoardItems().stream()
                                                                .sorted(Comparator.comparing(LeaderBoardItem::getValue).reversed())
@@ -110,7 +115,9 @@ public class LeaderBoardTileSkin extends TileSkin {
         tile.getLeaderBoardItems().forEach(item -> {
             item.setFormatString(formatString);
             item.addChartDataEventListener(updateHandler);
-            item.setOnMousePressed(new WeakEventHandler<>(event -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, item.getChartData()))));
+            EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, item.getChartData()));
+            handlerMap.put(item, clickHandler);
+            item.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         });
     }
 
@@ -124,6 +131,11 @@ public class LeaderBoardTileSkin extends TileSkin {
     @Override public void dispose() {
         pane.widthProperty().removeListener(paneSizeListener);
         pane.heightProperty().removeListener(paneSizeListener);
+        tile.getLeaderBoardItems().forEach(item -> {
+            item.removeChartDataEventListener(updateHandler);
+            item.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(item));
+        });
+        handlerMap.clear();
         super.dispose();
     }
 

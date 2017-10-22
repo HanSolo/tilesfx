@@ -26,7 +26,6 @@ import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
-import javafx.event.WeakEventHandler;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
@@ -34,6 +33,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,13 +44,14 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class WorldMapTileSkin extends TileSkin {
-    protected static final double                         PREFERRED_WIDTH  = 500; //380; //510;
-    protected static final double                         PREFERRED_HEIGHT = 250;
-    private                Text                           titleText;
-    private                Text                           text;
-    private                Pane                           worldPane;
-    private                Group                          group;
-    private                Map<String, List<CountryPath>> countryPaths;
+    protected static final double                                     PREFERRED_WIDTH  = 500; //380; //510;
+    protected static final double                                     PREFERRED_HEIGHT = 250;
+    private                Text                                       titleText;
+    private                Text                                       text;
+    private                Pane                                       worldPane;
+    private                Group                                      group;
+    private                Map<String, List<CountryPath>>             countryPaths;
+    private                Map<CountryPath, EventHandler<MouseEvent>> handlerMap;
 
 
     public WorldMapTileSkin(final Tile TILE) {
@@ -60,6 +61,9 @@ public class WorldMapTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        handlerMap = new HashMap<>();
+
         countryPaths = tile.getCountryPaths();
 
         titleText = new Text();
@@ -94,7 +98,11 @@ public class WorldMapTileSkin extends TileSkin {
         super.registerListeners();
         countryPaths.forEach((name , pathList) -> {
             Country country = Country.valueOf(name);
-            pathList.forEach(path -> path.setOnMouseClicked(new WeakEventHandler<>(e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getColor()))))) );
+            EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getColor())));
+            pathList.forEach(path -> {
+                handlerMap.put(path, clickHandler);
+                path.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+            });
         });
     }
 
@@ -107,6 +115,12 @@ public class WorldMapTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
         }
+    }
+
+    @Override public void dispose() {
+        countryPaths.forEach((name, pathList) -> pathList.forEach(path -> path.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(path))));
+        handlerMap.clear();
+        super.dispose();
     }
 
     private void setFillAndStroke() {
@@ -157,7 +171,7 @@ public class WorldMapTileSkin extends TileSkin {
         size   = width < height ? width : height;
 
         double containerWidth  = width - size * 0.1;
-        double containerHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.215;
+        double containerHeight = tile.isTextVisible() ? height - size * 0.24 : height - size * 0.2;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -176,7 +190,7 @@ public class WorldMapTileSkin extends TileSkin {
             worldPane.setScaleY(worldMapHeight / 665 * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
 
             group.resize(worldMapWidth, worldMapHeight);
-            group.relocate((width - worldMapWidth) * 0.5, (height - worldMapHeight) * 0.5);
+            group.relocate((width - worldMapWidth) * 0.5, (height - worldMapHeight) * 0.5 + (tile.isTextVisible() ? size * 0.01 : size * 0.05));
 
             worldPane.setCache(false);
         }

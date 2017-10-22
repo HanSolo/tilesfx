@@ -40,11 +40,11 @@ import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 
@@ -55,8 +55,11 @@ import java.util.concurrent.ThreadFactory;
 public class Helper {
     private static final double                         EPSILON                  = 1E-6;
     private static final String                         HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
+    private static final String                         LORES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/lowres.properties";
     private static       Properties                     hiresCountryProperties;
-    private static       Map<String, List<CountryPath>> hiresCountryPaths        = new HashMap<>();
+    private static       Map<String, List<CountryPath>> hiresCountryPaths;
+    private static       Properties                     loresCountryProperties;
+    private static       Map<String, List<CountryPath>> loresCountryPaths;
 
 
     public static final String[] TIME_0_TO_5       = {"1", "2", "3", "4", "5", "0"};
@@ -291,15 +294,29 @@ public class Helper {
 
     public static Map<String, List<CountryPath>> getHiresCountryPaths() {
         if (null == hiresCountryProperties) { hiresCountryProperties = readProperties(HIRES_COUNTRY_PROPERTIES); }
-        //if (hiresCountryPaths.isEmpty()) {
+        if (null == hiresCountryPaths) {
+            hiresCountryPaths = new ConcurrentHashMap<>();
             hiresCountryProperties.forEach((key, value) -> {
                 String            name     = key.toString();
                 List<CountryPath> pathList = new ArrayList<>();
                 for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
                 hiresCountryPaths.put(name, pathList);
             });
-        //}
+        }
         return hiresCountryPaths;
+    }
+    public static Map<String, List<CountryPath>> getLoresCountryPaths() {
+        if (null == loresCountryProperties) { loresCountryProperties = readProperties(LORES_COUNTRY_PROPERTIES); }
+        if (null == loresCountryPaths) {
+            loresCountryPaths = new ConcurrentHashMap<>();
+            loresCountryProperties.forEach((key, value) -> {
+                String            name     = key.toString();
+                List<CountryPath> pathList = new ArrayList<>();
+                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+                loresCountryPaths.put(name, pathList);
+            });
+        }
+        return loresCountryPaths;
     }
     private static Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();

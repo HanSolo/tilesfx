@@ -181,7 +181,6 @@ public class Tile extends Control {
     public  static final int         SHORT_INTERVAL        = 20;
     public  static final int         LONG_INTERVAL         = 1000;
     private static final int         MAX_NO_OF_DECIMALS    = 3;
-    private static final String      COUNTRY_PROPERTIES    = "eu/hansolo/tilesfx/lowres.properties";
 
     private        final TileEvent   EXCEEDED_EVENT        = new TileEvent(EventType.THRESHOLD_EXCEEDED);
     private        final TileEvent   UNDERRUN_EVENT        = new TileEvent(EventType.THRESHOLD_UNDERRUN);
@@ -4288,19 +4287,7 @@ public class Tile extends Control {
      * Returns a list of path elements that define the countries
      * @return a list of path elements that define the countries
      */
-    public Map<String, List<CountryPath>> getCountryPaths() {
-        if (null == countryProperties) { countryProperties = readProperties(COUNTRY_PROPERTIES); }
-        if (null == countryPaths) {
-            countryPaths = new HashMap<>();
-            countryProperties.forEach((key, value) -> {
-                String            name     = key.toString();
-                List<CountryPath> pathList = new ArrayList<>();
-                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
-                countryPaths.put(name, pathList);
-            });
-        }
-        return countryPaths;
-    }
+    public Map<String, List<CountryPath>> getCountryPaths() { return Helper.getLoresCountryPaths(); }
 
     /**
      * Returns true if a gradient defined by gradientStops will be

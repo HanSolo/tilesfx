@@ -24,7 +24,6 @@ import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
@@ -35,7 +34,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -123,8 +121,8 @@ public class CountryTileSkin extends TileSkin {
         } else if ("RECALC".equals(EVENT_TYPE)) {
             country = tile.getCountry();
             if (null == country) { country = Country.DE; }
-            countryPaths.clear();
-            countryPaths.addAll(Helper.getHiresCountryPaths().get(country.name()));
+            countryPaths = Helper.getHiresCountryPaths().get(country.name());
+            countryPaths.forEach(path -> path.setFill(tile.getBarColor()));
             countryGroup.getChildren().setAll(countryPaths);
             text.setText(country.getDisplayName());
 

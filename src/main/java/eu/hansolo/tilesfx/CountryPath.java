@@ -62,4 +62,13 @@ public class CountryPath extends SVGPath {
         tooltip = TOOLTIP;
         Tooltip.install(CountryPath.this, tooltip);
     }
+
+    @Override public String toString() {
+        return new StringBuilder("{\n").append("  name   :\"").append(name).append("\"\n")
+                                       .append("  locale :\"").append(locale).append("\"\n")
+                                       .append("  tooltip:\"").append(tooltip.getText()).append("\"\n")
+                                       .append("  content:\"").append(getContent()).append("\"\n")
+                                       .append("}\n")
+                                       .toString();
+    }
 }

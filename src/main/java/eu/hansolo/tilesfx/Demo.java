@@ -46,7 +46,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import sun.java2d.jules.TileWorker;
 
 import java.time.LocalTime;
 import java.util.Locale;

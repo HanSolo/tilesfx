@@ -154,13 +154,14 @@ public class BarChartTileSkin extends TileSkin {
             int                noOfItems = items.size();
             if (noOfItems == 0) return;
             double maxValue = tile.getMaxValue();
-
+            double maxY     = height - size * 0.25;
             for (int i = 0 ; i < noOfItems ; i++) {
                 BarChartItem item = items.get(i);
-                if (i < 4) {
+                double y = size * 0.18 + i * 0.175 * size;
+                if (y < maxY) {
                     item.setMaxValue(maxValue);
                     item.setVisible(true);
-                    item.relocate(0, size * 0.18 + i * 0.175 * size);
+                    item.relocate(0, y);
                 } else {
                     item.setVisible(false);
                 }

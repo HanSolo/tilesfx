@@ -42,7 +42,7 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 17.02.17.
  */
 public class ChartData implements Comparable<ChartData> {
-    private final ChartDataEvent         UPDATE_EVENT = new ChartDataEvent(EventType.UPDATE, ChartData.this);
+    private final ChartDataEvent         UPDATE_EVENT   = new ChartDataEvent(EventType.UPDATE, ChartData.this);
     private final ChartDataEvent         FINISHED_EVENT = new ChartDataEvent(EventType.FINISHED, ChartData.this);
     private String                       name;
     private double                       value;

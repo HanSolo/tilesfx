@@ -330,19 +330,21 @@ public class Helper {
     }
 
     public static void drawRoundedRect(final GraphicsContext CTX, final CtxBounds BOUNDS, final CtxCornerRadii RADII) {
-        double x      = BOUNDS.getX();
-        double y      = BOUNDS.getY();
-        double width  = BOUNDS.getWidth();
-        double height = BOUNDS.getHeight();
+        double x           = BOUNDS.getX();
+        double y           = BOUNDS.getY();
+        double width       = BOUNDS.getWidth();
+        double height      = BOUNDS.getHeight();
+        double xPlusWidth  = x + width;
+        double yPlusHeight = y + height;
 
         CTX.beginPath();
         CTX.moveTo(x + RADII.getUpperRight(), y);
-        CTX.lineTo(x + width - RADII.getUpperRight(), y);
-        CTX.quadraticCurveTo(x + width, y, x + width, y + RADII.getUpperRight());
-        CTX.lineTo(x + width, y + height - RADII.getLowerRight());
-        CTX.quadraticCurveTo(x + width, y + height, x + width - RADII.getLowerRight(), y + height);
-        CTX.lineTo(x + RADII.getLowerLeft(), y + height);
-        CTX.quadraticCurveTo(x, y + height, x, y + height - RADII.getLowerLeft());
+        CTX.lineTo(xPlusWidth - RADII.getUpperRight(), y);
+        CTX.quadraticCurveTo(xPlusWidth, y, xPlusWidth, y + RADII.getUpperRight());
+        CTX.lineTo(xPlusWidth, yPlusHeight - RADII.getLowerRight());
+        CTX.quadraticCurveTo(xPlusWidth, yPlusHeight, xPlusWidth - RADII.getLowerRight(), yPlusHeight);
+        CTX.lineTo(x + RADII.getLowerLeft(), yPlusHeight);
+        CTX.quadraticCurveTo(x, yPlusHeight, x, yPlusHeight - RADII.getLowerLeft());
         CTX.lineTo(x, y + RADII.getUpperRight());
         CTX.quadraticCurveTo(x, y, x + RADII.getUpperRight(), y);
         CTX.closePath();

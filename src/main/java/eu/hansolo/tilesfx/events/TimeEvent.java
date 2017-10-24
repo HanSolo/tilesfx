@@ -23,7 +23,7 @@ import java.util.EventObject;
 /**
  * Created by hansolo on 19.12.16.
  */
-public class TimeEvent extends EventObject {
+public class TimeEvent {
     public enum TimeEventType { HOUR, MINUTE, SECOND };
     public final ZonedDateTime TIME;
     public final TimeEventType TYPE;
@@ -31,7 +31,6 @@ public class TimeEvent extends EventObject {
 
     // ******************** Constructors **************************************
     public TimeEvent(final Object SRC, final ZonedDateTime TIME, final TimeEventType TYPE) {
-        super(SRC);
         this.TIME = TIME;
         this.TYPE = TYPE;
     }

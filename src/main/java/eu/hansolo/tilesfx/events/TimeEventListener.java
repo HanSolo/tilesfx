@@ -16,13 +16,11 @@
 
 package eu.hansolo.tilesfx.events;
 
-import java.util.EventListener;
-
 
 /**
  * Created by hansolo on 19.12.16.
  */
 @FunctionalInterface
-public interface TimeEventListener extends EventListener {
-    public void onTimeEvent(final TimeEvent EVENT);
+public interface TimeEventListener {
+    void onTimeEvent(final TimeEvent EVENT);
 }

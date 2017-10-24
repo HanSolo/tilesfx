@@ -16,8 +16,6 @@
 
 package eu.hansolo.tilesfx.tools;
 
-import eu.hansolo.tilesfx.colors.Wan;
-
 
 public class CtxBounds {
     private double x;
@@ -29,6 +27,9 @@ public class CtxBounds {
     // ******************** Constructors **************************************
     public CtxBounds() {
         this(0, 0, 0, 0);
+    }
+    public CtxBounds(final double WIDTH, final double HEIGHT) {
+        this(0, 0, WIDTH, HEIGHT);
     }
     public CtxBounds(final double X, final double Y, final double WIDTH, final double HEIGHT) {
         x      = X;

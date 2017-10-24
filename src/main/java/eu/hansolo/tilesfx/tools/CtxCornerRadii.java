@@ -27,6 +27,9 @@ public class CtxCornerRadii {
     public CtxCornerRadii() {
         this(0, 0, 0, 0);
     }
+    public CtxCornerRadii(final double RADIUS) {
+        this(RADIUS, RADIUS, RADIUS, RADIUS);
+    }
     public CtxCornerRadii(final double UPPER_LEFT, final double UPPER_RIGHT,
                           final double LOWER_RIGHT, final double LOWER_LEFT) {
         upperLeft  = UPPER_LEFT;

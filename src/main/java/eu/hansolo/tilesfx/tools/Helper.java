@@ -338,15 +338,15 @@ public class Helper {
         double yPlusHeight = y + height;
 
         CTX.beginPath();
-        CTX.moveTo(x + RADII.getUpperRight(), y);
-        CTX.lineTo(xPlusWidth - RADII.getUpperRight(), y);
-        CTX.quadraticCurveTo(xPlusWidth, y, xPlusWidth, y + RADII.getUpperRight());
-        CTX.lineTo(xPlusWidth, yPlusHeight - RADII.getLowerRight());
-        CTX.quadraticCurveTo(xPlusWidth, yPlusHeight, xPlusWidth - RADII.getLowerRight(), yPlusHeight);
-        CTX.lineTo(x + RADII.getLowerLeft(), yPlusHeight);
-        CTX.quadraticCurveTo(x, yPlusHeight, x, yPlusHeight - RADII.getLowerLeft());
-        CTX.lineTo(x, y + RADII.getUpperRight());
-        CTX.quadraticCurveTo(x, y, x + RADII.getUpperRight(), y);
+        CTX.moveTo(x + RADII.getTopLeft(), y);
+        CTX.lineTo(xPlusWidth - RADII.getTopRight(), y);
+        CTX.quadraticCurveTo(xPlusWidth, y, xPlusWidth, y + RADII.getTopRight());
+        CTX.lineTo(xPlusWidth, yPlusHeight - RADII.getBottomRight());
+        CTX.quadraticCurveTo(xPlusWidth, yPlusHeight, xPlusWidth - RADII.getBottomRight(), yPlusHeight);
+        CTX.lineTo(x + RADII.getBottomLeft(), yPlusHeight);
+        CTX.quadraticCurveTo(x, yPlusHeight, x, yPlusHeight - RADII.getBottomLeft());
+        CTX.lineTo(x, y + RADII.getTopLeft());
+        CTX.quadraticCurveTo(x, y, x + RADII.getTopLeft(), y);
         CTX.closePath();
     }
 

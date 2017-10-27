@@ -448,10 +448,6 @@ public class RadarChart extends Region {
         return RadarChart.class.getResource("radarchart.css").toExternalForm();
     }
 
-    //public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() { return FACTORY.getCssMetaData(); }
-
-    //@Override public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() { return FACTORY.getCssMetaData(); }
-
 
     // ******************** Private Methods ***********************************
     private void resize() {
@@ -606,7 +602,6 @@ public class RadarChart extends Region {
                     chartCtx.closePath();
 
                     chartCtx.fill();
-                    chartCtx.stroke();
                 } else {
                     chartCtx.beginPath();
                     chartCtx.moveTo(CENTER_X, 0.36239 * size);

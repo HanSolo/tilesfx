@@ -95,129 +95,71 @@ public class RadarChart extends Region {
     private              double                    legendStep;
     private              int                       decimals;
     private              String                    formatString;
+    private              int                       _noOfSectors;
     private              IntegerProperty           noOfSectors;
     private              double                    angleStep;
     private              ObservableList<ChartData> data;
+    private              double                    _minValue;
     private              DoubleProperty            minValue;
+    private              double                    _maxValue;
     private              DoubleProperty            maxValue;
+    private              double                    _threshold;
     private              DoubleProperty            threshold;
+    private              double                    _range;
     private              DoubleProperty            range;
+    private              String                    _unit;
     private              StringProperty            unit;
+    private              boolean                   _legendVisible;
     private              BooleanProperty           legendVisible;
+    private              boolean                   _thresholdVisible;
     private              BooleanProperty           thresholdVisible;
     private              ObservableList<Stop>      gradientStops;
     private              List<Stop>                stops;
     private              boolean                   _smoothing;
+    private              Color                     _chartBackgroundColor;
     private              ObjectProperty<Color>     chartBackgroundColor;
+    private              Color                     _chartForegroundColor;
     private              ObjectProperty<Color>     chartForegroundColor;
+    private              Color                     _chartTextColor;
     private              ObjectProperty<Color>     chartTextColor;
+    private              Color                     _gridColor;
     private              ObjectProperty<Color>     gridColor;
+    private              Paint                     _chartFill;
     private              ObjectProperty<Paint>     chartFill;
+    private              Color                     _thresholdColor;
     private              ObjectProperty<Color>     thresholdColor;
+    private              Mode                      _mode;
     private              ObjectProperty<Mode>      mode;
     private              double                    legendScaleFactor;
     private              InvalidationListener      resizeListener;
-    private              InvalidationListener      redrawListener;
-    private              InvalidationListener      redrawOverlayListener;
     private              ListChangeListener<Stop>  gradientListener;
 
 
     // ******************** Constructors **************************************
     public RadarChart() { this(null); }
     public RadarChart(final List<ChartData> DATA) {
-        minValue              = new DoublePropertyBase(0) {
-            @Override public void set(final double MIN_VALUE) {
-                super.set(clamp(-Double.MAX_VALUE, getMaxValue(), MIN_VALUE));
-                range.set(getMaxValue() - get());
-            }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "minValue"; }
-        };
-        maxValue              = new DoublePropertyBase(100) {
-            @Override protected void invalidated() {
-                set(clamp(getMinValue(), Double.MAX_VALUE, get()));
-                range.set(get() - getMinValue());
-                redraw();
-            }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "maxValue"; }
-        };
-        threshold             = new DoublePropertyBase(1) {
-            @Override protected void invalidated() {
-                set(clamp(minValue.get(), maxValue.get(), get()));
-                range.set(getMaxValue() - get());
-                redraw();
-            }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "threshold"; }
-        };
-        range                 = new DoublePropertyBase(100) {
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "range"; }
-        };
-        noOfSectors           = new IntegerPropertyBase(MIN_NO_OF_SECTORS) {
-            @Override public void set(final int NO_OF_SECTORS) {
-                super.set(clamp(1, MAX_NO_OF_SECTORS, NO_OF_SECTORS));
-                angleStep = 360.0 / get();
-            }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "noOfSectors"; }
-        };
-        unit                  = new StringPropertyBase("") {
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "unit"; }
-        };
-        legendVisible         = new BooleanPropertyBase(false) {
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "legendVisible"; }
-        };
-        thresholdVisible      = new BooleanPropertyBase() {
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "thresholdVisible"; }
-        };
-        mode                  = new ObjectPropertyBase<Mode>(Mode.POLYGON) {
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "mode"; }
-        };
+        _minValue             = 0;
+        _maxValue             = 100;
+        _range                = 100;
+        _threshold            = 100;
+        _noOfSectors          = MIN_NO_OF_SECTORS;
+        _unit                 = "";
+        _legendVisible        = false;
+        _thresholdVisible     = false;
+        _mode                 = Mode.POLYGON;
         gradientStops         = FXCollections.observableArrayList();
         decimals              = 0;
         formatString          = new StringBuilder("%.").append(decimals).append("f").toString();
         data                  = FXCollections.observableArrayList();
         legendScaleFactor     = 1.0;
         _smoothing            = false;
-        chartBackgroundColor  = new ObjectPropertyBase<Color>(Color.TRANSPARENT) {
-            @Override protected void invalidated() { redraw(); }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "chartBackgroundColor"; }
-        };
-        chartForegroundColor  = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
-            @Override protected void invalidated() { redraw(); }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "chartForegroundColor"; }
-        };
-        chartTextColor        = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
-            @Override protected void invalidated() { redraw(); }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "chartTextColor"; }
-        };
-        gridColor             = new ObjectPropertyBase<Color>(Tile.GRAY) {
-            @Override protected void invalidated() { redraw(); }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "gridColor"; }
-        };
-        chartFill             = new ObjectPropertyBase<Paint>(Tile.BLUE) {
-            @Override protected void invalidated() { redraw(); }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "chartFile"; }
-        };
-        thresholdColor        = new ObjectPropertyBase<Color>(Tile.LIGHT_RED) {
-            @Override protected void invalidated() { redraw(); }
-            @Override public Object getBean() { return RadarChart.this; }
-            @Override public String getName() { return "thresholdColor"; }
-        };
+        _chartBackgroundColor = Color.TRANSPARENT;
+        _chartForegroundColor = Tile.FOREGROUND;
+        _chartTextColor       = Tile.FOREGROUND;
+        _gridColor            = Tile.GRAY;
+        _chartFill            = Tile.BLUE;
+        _thresholdColor       = Tile.LIGHT_RED;
         resizeListener        = o -> resize();
-        redrawListener        = o -> redraw();
-        redrawOverlayListener = o -> drawOverlay();
         gradientListener      = change -> {
             stops.clear();
             for (Stop stop : getGradientStops()) {
@@ -226,10 +168,10 @@ public class RadarChart extends Region {
             }
             redraw();
         };
-        initData(DATA);
 
         init();
         initGraphics();
+        initData(DATA);
         registerListeners();
     }
 
@@ -329,59 +271,200 @@ public class RadarChart extends Region {
     private void registerListeners() {
         widthProperty().addListener(resizeListener);
         heightProperty().addListener(resizeListener);
-        unit.addListener(redrawListener);
-        legendVisible.addListener(redrawListener);
-        minValue.addListener(redrawListener);
-        maxValue.addListener(redrawListener);
         //data.addListener((MapChangeListener<Integer, ChartData>) change -> redraw());
-        thresholdVisible.addListener(redrawOverlayListener);
-        mode.addListener(redrawListener);
-        noOfSectors.addListener(redrawListener);
         gradientStops.addListener(gradientListener);
     }
 
     public void dispose() {
         widthProperty().removeListener(resizeListener);
         heightProperty().removeListener(resizeListener);
-        unit.removeListener(redrawListener);
-        legendVisible.removeListener(redrawListener);
-        minValue.removeListener(redrawListener);
-        maxValue.removeListener(redrawListener);
-        thresholdVisible.removeListener(redrawOverlayListener);
-        mode.removeListener(redrawListener);
-        noOfSectors.removeListener(redrawListener);
         gradientStops.removeListener(gradientListener);
     }
 
 
     // ******************** Methods *******************************************
-    public double getMinValue() { return minValue.get(); }
-    public void setMinValue(final double VALUE) { minValue.set(VALUE); }
-    public ReadOnlyDoubleProperty minValueProperty() { return minValue; }
+    public double getMinValue() { return null == minValue ? _minValue : minValue.get(); }
+    public void setMinValue(final double VALUE) {
+        if (null == minValue) {
+            _minValue = clamp(-Double.MAX_VALUE, getMaxValue(), VALUE);
+            setRange(getMaxValue() - _minValue);
+            redraw();
+        } else {
+            minValue.set(VALUE);
+        }
+    }
+    public ReadOnlyDoubleProperty minValueProperty() {
+        if (null == minValue) {
+            minValue = new DoublePropertyBase(_minValue) {
+                @Override public void set(final double MIN_VALUE) {
+                    super.set(clamp(-Double.MAX_VALUE, getMaxValue(), MIN_VALUE));
+                    setRange(getMaxValue() - get());
+                }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "minValue"; }
+            };
+        }
+        return minValue;
+    }
 
-    public double getMaxValue() { return maxValue.get(); }
-    public void setMaxValue(final double VALUE) { maxValue.set(VALUE); }
-    public ReadOnlyDoubleProperty maxValueProperty() { return maxValue; }
+    public double getMaxValue() { return null == maxValue ? _maxValue : maxValue.get(); }
+    public void setMaxValue(final double VALUE) {
+        if (null == maxValue) {
+            _maxValue = clamp(getMinValue(), Double.MAX_VALUE, VALUE);
+            setRange(_maxValue - getMinValue());
+            redraw();
+        } else {
+            maxValue.set(VALUE);
+        }
+    }
+    public ReadOnlyDoubleProperty maxValueProperty() {
+        if (null == maxValue) {
+            maxValue = new DoublePropertyBase(_maxValue) {
+                @Override protected void invalidated() {
+                    set(clamp(getMinValue(), Double.MAX_VALUE, get()));
+                    setRange(_maxValue - getMinValue());
+                    redraw();
+                }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "maxValue"; }
+            };
+        }
+        return maxValue;
+    }
 
-    public double getRange() { return range.get(); }
-    public ReadOnlyDoubleProperty rangeProperty() { return range; }
+    public double getRange() { return null == range ? _range : range.get(); }
+    private void setRange(final double VALUE) {
+        if (null == range) {
+            _range = VALUE;
+        } else {
+            range.set(VALUE);
+        }
+    }
+    public ReadOnlyDoubleProperty rangeProperty() {
+        if (null == range) {
+            range = new DoublePropertyBase(_range) {
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "range"; }
+            };
+        }
+        return range;
+    }
 
-    public boolean isThresholdVisible() { return thresholdVisible.get(); }
-    public void setThresholdVisible(final boolean VISIBLE) { thresholdVisible.set(VISIBLE); }
-    public BooleanProperty thresholdVisibleProperty() { return thresholdVisible; }
+    public double getThreshold() { return null == threshold ? _threshold : threshold.get(); }
+    public void setThreshold(final double VALUE) {
+        if (null == threshold) {
+            _threshold = clamp(getMinValue(), getMaxValue(), VALUE);
+            setRange(getMaxValue() - VALUE);
+            drawOverlay();
+        } else {
+            threshold.set(VALUE);
+        }
+    }
+    public DoubleProperty thresholdProperty() {
+        if (null == threshold) {
+            threshold = new DoublePropertyBase(_threshold) {
+                @Override protected void invalidated() {
+                    set(clamp(getMinValue(), getMaxValue(), get()));
+                    setRange(getMaxValue() - get());
+                    drawOverlay();
+                }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "threshold"; }
+            };
+        }
+        return threshold;
+    }
+
+    public int getNoOfSectors() { return null == noOfSectors ? _noOfSectors : noOfSectors.get(); }
+    public void setNoOfSectors(final int SECTORS) {
+        if (null == noOfSectors) {
+            _noOfSectors = clamp(1, MAX_NO_OF_SECTORS, SECTORS);
+            angleStep    = 360.0 / _noOfSectors;
+            redraw();
+        } else {
+            noOfSectors.set(SECTORS);
+        }
+    }
+    public IntegerProperty noOfSectorsProperty() {
+        if (null == noOfSectors) {
+            noOfSectors = new IntegerPropertyBase(_noOfSectors) {
+                @Override public void set(final int SECTORS) {
+                    super.set(clamp(1, MAX_NO_OF_SECTORS, SECTORS));
+                    angleStep = 360.0 / get();
+                    redraw();
+                }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "noOfSectors"; }
+            };
+        }
+        return noOfSectors;
+    }
+
+    public boolean isThresholdVisible() { return null == thresholdVisible ? _thresholdVisible : thresholdVisible.get(); }
+    public void setThresholdVisible(final boolean VISIBLE) {
+        if (null == thresholdVisible) {
+            _thresholdVisible = VISIBLE;
+            redraw();
+        } else {
+            thresholdVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty thresholdVisibleProperty() {
+        if (null == thresholdVisible) {
+            thresholdVisible = new BooleanPropertyBase(_thresholdVisible) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "thresholdVisible"; }
+            };
+        }
+        return thresholdVisible;
+    }
 
     public ObservableList<Stop> getGradientStops() { return gradientStops; }
     public void setGradientStops(final List<Stop> STOPS) { gradientStops.setAll(STOPS); }
     public void setGradientStops(final Stop... STOPS) { gradientStops.setAll(STOPS); }
     public void addGradientStop(final Stop STOP) { gradientStops.add(STOP); }
 
-    public String getUnit() { return unit.get(); }
-    public void setUnit(final String TEXT) { unit.set(TEXT); }
-    public StringProperty unitProperty() { return unit; }
+    public String getUnit() { return null == unit ? _unit : unit.get(); }
+    public void setUnit(final String TEXT) {
+        if (null == unit) {
+            _unit = TEXT;
+            redraw();
+        } else {
+            unit.set(TEXT);
+        }
+    }
+    public StringProperty unitProperty() {
+        if (null == unit) {
+            unit = new StringPropertyBase(_unit) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "unit"; }
+            };
+            _unit = null;
+        }
+        return unit;
+    }
 
-    public boolean isLegendVisible() { return legendVisible.get(); }
-    public void setLegendVisible(final boolean VISIBLE) { legendVisible.set(VISIBLE); }
-    public BooleanProperty legendVisibleProperty() { return legendVisible; }
+    public boolean isLegendVisible() { return null == legendVisible ? _legendVisible : legendVisible.get(); }
+    public void setLegendVisible(final boolean VISIBLE) {
+        if (null == legendVisible) {
+            _legendVisible = VISIBLE;
+            redraw();
+        } else {
+            legendVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty legendVisibleProperty() {
+        if (null == legendVisible) {
+            legendVisible = new BooleanPropertyBase(_legendVisible) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "legendVisible"; }
+            };
+        }
+        return legendVisible;
+    }
 
     public ObservableList<ChartData> getData() { return data; }
     public void setData(final List<ChartData> DATA) {
@@ -392,7 +475,7 @@ public class RadarChart extends Region {
     public void addData(final ChartData DATA) {
         if (data.size() > (getNoOfSectors() + 1)) throw new IllegalArgumentException("Too many sectors (max. " + getNoOfSectors() + " sectors allowed)");
         data.add(DATA);
-        noOfSectors.set(data.size());
+        setNoOfSectors(data.size());
     }
 
     public void reset() {
@@ -400,41 +483,157 @@ public class RadarChart extends Region {
         initData(data);
     }
 
-    public Color getChartBackgroundColor() { return chartBackgroundColor.getValue(); }
-    public void setChartBackgroundColor(Color COLOR) { chartBackgroundColor.setValue(COLOR); }
-    public ObjectProperty<Color> chartBackgroundColorProperty() { return chartBackgroundColor; }
+    public Color getChartBackgroundColor() { return null == chartBackgroundColor ? _chartBackgroundColor : chartBackgroundColor.getValue(); }
+    public void setChartBackgroundColor(Color COLOR) {
+        if (null == chartBackgroundColor) {
+            _chartBackgroundColor = COLOR;
+            redraw();
+        } else {
+            chartBackgroundColor.setValue(COLOR);
+        }
+    }
+    public ObjectProperty<Color> chartBackgroundColorProperty() {
+        if (null == chartBackgroundColor) {
+            chartBackgroundColor = new ObjectPropertyBase<Color>(_chartBackgroundColor) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "chartBackgroundColor"; }
+            };
+            _chartBackgroundColor = null;
+        }
+        return chartBackgroundColor;
+    }
 
-    public Color getChartForegroundColor() { return chartForegroundColor.getValue(); }
-    public void setChartForegroundColor(final Color COLOR) { chartForegroundColor.setValue(COLOR); }
-    public ObjectProperty<Color> chartForegroundColorProperty() { return chartForegroundColor; }
+    public Color getChartForegroundColor() { return null == chartForegroundColor ? _chartForegroundColor : chartForegroundColor.getValue(); }
+    public void setChartForegroundColor(final Color COLOR) {
+        if (null == chartForegroundColor) {
+            _chartForegroundColor = COLOR;
+            redraw();
+        } else {
+            chartForegroundColor.setValue(COLOR);
+        }
+    }
+    public ObjectProperty<Color> chartForegroundColorProperty() {
+        if (null == chartForegroundColor) {
+            chartForegroundColor = new ObjectPropertyBase<Color>(_chartForegroundColor) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "chartForegroundColor"; }
+            };
+            _chartForegroundColor = null;
+        }
+        return chartForegroundColor;
+    }
 
-    public Color getChartTextColor() { return chartTextColor.getValue(); }
-    public void setChartTextColor(Color COLOR) { chartTextColor.setValue(COLOR); }
-    public ObjectProperty<Color> chartTextColorProperty() { return chartTextColor; }
+    public Color getChartTextColor() { return null == chartTextColor ? _chartTextColor : chartTextColor.getValue(); }
+    public void setChartTextColor(Color COLOR) {
+        if (null == chartTextColor) {
+            _chartTextColor = COLOR;
+            redraw();
+        } else {
+            chartTextColor.setValue(COLOR);
+        }
+    }
+    public ObjectProperty<Color> chartTextColorProperty() {
+        if (null == chartTextColor) {
+            chartTextColor  = new ObjectPropertyBase<Color>(_chartTextColor) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "chartTextColor"; }
+            };
+            _chartTextColor = null;
+        }
+        return chartTextColor;
+    }
 
-    public Color getGridColor() { return gridColor.getValue(); }
-    public void setGridColor(Color COLOR) { gridColor.setValue(COLOR); }
-    public ObjectProperty<Color> gridColorProperty() { return gridColor; }
+    public Color getGridColor() { return null == gridColor ? _gridColor : gridColor.getValue(); }
+    public void setGridColor(Color COLOR) {
+        if (null == gridColor) {
+            _gridColor = COLOR;
+            redraw();
+        } else {
+            gridColor.setValue(COLOR);
+        }
+    }
+    public ObjectProperty<Color> gridColorProperty() {
+        if (null == gridColor) {
+            gridColor  = new ObjectPropertyBase<Color>(_gridColor) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "gridColor"; }
+            };
+            _gridColor = null;
+        }
+        return gridColor;
+    }
 
-    public Paint getChartFill() { return chartFill.getValue(); }
-    public void setChartFill(final Paint PAINT) { chartFill.setValue(PAINT); }
-    public ObjectProperty<Paint> chartFillProperty() { return chartFill; }
+    public Paint getChartFill() { return null == chartFill ? _chartFill : chartFill.getValue(); }
+    public void setChartFill(final Paint PAINT) {
+        if (null == chartFill) {
+            _chartFill = PAINT;
+            redraw();
+        } else {
+            chartFill.setValue(PAINT);
+        }
+    }
+    public ObjectProperty<Paint> chartFillProperty() {
+        if (null == chartFill) {
+            chartFill  = new ObjectPropertyBase<Paint>(_chartFill) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "chartFill"; }
+            };
+            _chartFill = null;
+        }
+        return chartFill;
+    }
 
-    public Color getThresholdColor() { return thresholdColor.getValue(); }
-    public void setThresholdColor(final Color COLOR) { thresholdColor.setValue(COLOR); }
-    public ObjectProperty<Color> thresholdColorProperty() { return thresholdColor; }
+    public Color getThresholdColor() { return null == thresholdColor ? _thresholdColor : thresholdColor.getValue(); }
+    public void setThresholdColor(final Color COLOR) {
+        if (null == thresholdColor) {
+            _thresholdColor = COLOR;
+            redraw();
+        } else {
+            thresholdColor.setValue(COLOR);
+        }
+    }
+    public ObjectProperty<Color> thresholdColorProperty() {
+        if (null == thresholdColor) {
+            thresholdColor  = new ObjectPropertyBase<Color>(_thresholdColor) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "thresholdColor"; }
+            };
+            _thresholdColor = null;
+        }
+        return thresholdColor;
+    }
 
     public void scaleLegendToValue(final double VALUE) {
         legendScaleFactor = VALUE;
         redrawText();
     }
 
-    public Mode getMode() { return mode.get(); }
-    public void setMode(final Mode MODE) { mode.set(MODE); }
-    public ObjectProperty<Mode> modeProperty() { return mode; }
-
-    public int getNoOfSectors() { return noOfSectors.get(); }
-    public IntegerProperty noOfSectorsProperty() { return noOfSectors; }
+    public Mode getMode() { return null == mode ? _mode : mode.get(); }
+    public void setMode(final Mode MODE) {
+        if (null == mode) {
+            _mode = MODE;
+            redraw();
+        } else {
+            mode.set(MODE);
+        }
+    }
+    public ObjectProperty<Mode> modeProperty() {
+        if (null == mode) {
+            mode = new ObjectPropertyBase<Mode>(_mode) {
+                @Override protected void invalidated() { redraw(); }
+                @Override public Object getBean() { return RadarChart.this; }
+                @Override public String getName() { return "mode"; }
+            };
+            _mode = null;
+        }
+        return mode;
+    }
 
     public boolean isSmoothing() { return _smoothing; }
     public void setSmoothing(final boolean SMOOTHING) {
@@ -567,7 +766,7 @@ public class RadarChart extends Region {
         }
 
         double radiusFactor;
-        switch(mode.get()) {
+        switch(getMode()) {
             case POLYGON:
                 if (isSmoothing()) {
                     double      radAngle     = Math.toRadians(180);
@@ -688,7 +887,7 @@ public class RadarChart extends Region {
 
         // draw threshold line
         if (isThresholdVisible()) {
-            radius = ((threshold.get() - MIN_VALUE) / DATA_RANGE);
+            radius = ((getThreshold() - MIN_VALUE) / DATA_RANGE);
             overlayCtx.setLineWidth(clamp(1d, 3d, size * 0.005));
             overlayCtx.setStroke(getThresholdColor());
             overlayCtx.strokeOval(0.5 * size - OFFSET - radius * RANGE, 0.5 * size - OFFSET - radius * RANGE,
@@ -698,7 +897,7 @@ public class RadarChart extends Region {
         // prerotate if sectormode
         overlayCtx.save();
 
-        if (Mode.SECTOR == mode.get()) {
+        if (Mode.SECTOR == getMode()) {
             overlayCtx.translate(CENTER_X, CENTER_Y);
             overlayCtx.rotate(angleStep * 0.5);
             overlayCtx.translate(-CENTER_X, -CENTER_Y);

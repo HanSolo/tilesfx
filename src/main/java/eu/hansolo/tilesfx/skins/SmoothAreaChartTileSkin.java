@@ -201,15 +201,15 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         if (lastDataEntry.isPresent()) { tile.setValue(lastDataEntry.get().getValue()); }
         dataSize  = data.size();
         maxValue  = data.stream().max(Comparator.comparing(c -> c.getValue())).get().getValue();
-        hStepSize = width / dataSize;
+        hStepSize = width / (dataSize - 1);
         vStepSize = (height * 0.5) / maxValue;
         fillPath.getElements().clear();
         fillPath.getElements().add(new MoveTo(0, height));
         strokePath.getElements().clear();
         strokePath.getElements().add(new MoveTo(0, height - data.get(0).getValue() * vStepSize));
         for (int i = 0 ; i < dataSize ; i++) {
-            fillPath.getElements().add(new LineTo((i + 1) * hStepSize, height - data.get(i).getValue() * vStepSize));
-            strokePath.getElements().add(new LineTo((i + 1) * hStepSize, height - data.get(i).getValue() * vStepSize));
+            fillPath.getElements().add(new LineTo(i * hStepSize, height - data.get(i).getValue() * vStepSize));
+            strokePath.getElements().add(new LineTo(i * hStepSize, height - data.get(i).getValue() * vStepSize));
         }
         fillPath.getElements().add(new LineTo(width, height));
         fillPath.getElements().add(new ClosePath());

@@ -182,8 +182,8 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     public void setBarBackgroundColor(final Color COLOR) { barBackgroundColor.set(COLOR); }
     public ObjectProperty<Color> barBackgroundColorProperty() { return barBackgroundColor; }
 
-    public Color getBarColor() { return chartData.getColor(); }
-    public void setBarColor(final Color COLOR) { chartData.setColor(COLOR); }
+    public Color getBarColor() { return chartData.getFillColor(); }
+    public void setBarColor(final Color COLOR) { chartData.setFillColor(COLOR); }
 
     @Override public int compareTo(final BarChartItem SEGMENT) { return Double.compare(getValue(), SEGMENT.getValue()); }
 

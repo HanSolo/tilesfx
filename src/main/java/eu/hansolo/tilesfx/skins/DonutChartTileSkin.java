@@ -198,7 +198,7 @@ public class DonutChartTileSkin extends TileSkin {
 
             // Segment
             chartCtx.setLineWidth(barWidth);
-            chartCtx.setStroke(data.getColor());
+            chartCtx.setStroke(data.getFillColor());
             chartCtx.strokeArc(xy, xy, wh, wh, startAngle, -angle, ArcType.OPEN);
 
             double radValue = Math.toRadians(startAngle - (angle * 0.5));
@@ -236,7 +236,7 @@ public class DonutChartTileSkin extends TileSkin {
         for (int i = 0 ; i < noOfItems ; i++) {
             ChartData data = dataList.get(i);
 
-            legendCtx.setFill(data.getColor());
+            legendCtx.setFill(data.getFillColor());
             legendCtx.fillOval(0, (i + 1) * stepSize, size * 0.0375, size * 0.0375);
             legendCtx.setFill(textColor);
             legendCtx.fillText(data.getName(), size * 0.05, (i + 1) * stepSize + canvasHeight * 0.025);

@@ -187,7 +187,7 @@ public class RadialChartTileSkin extends TileSkin {
 
             // DataBar
             chartCtx.setLineWidth(barWidth);
-            chartCtx.setStroke(data.getColor());
+            chartCtx.setStroke(data.getFillColor());
             chartCtx.strokeArc(barXY, barXY, barWH, barWH, 90, -angle, ArcType.OPEN);
 
             // Name

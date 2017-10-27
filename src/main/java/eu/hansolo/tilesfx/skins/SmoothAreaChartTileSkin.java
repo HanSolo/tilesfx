@@ -28,7 +28,6 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -41,7 +40,6 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
-import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -51,8 +49,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
-import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -68,8 +66,10 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     private TextFlow                      valueUnitFlow;
     private int                           dataSize;
     private double                        maxValue;
+    private List<Point>                   points;
     private Path                          fillPath;
     private Path                          strokePath;
+    private boolean                       smoothing;
     private double                        hStepSize;
     private double                        vStepSize;
     private Circle                        selectionIndicator;
@@ -104,8 +104,10 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             }
             handleData();
         };
-        clickHandler               = e -> selectData(e);
+        clickHandler               = e -> select(e);
         endOfTransformationHandler = e -> selectionTooltip.hide();
+
+        smoothing = tile.isSmoothing();
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -113,6 +115,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         fillClip   = new Rectangle(0, 0, PREFERRED_HEIGHT, PREFERRED_HEIGHT);
         strokeClip = new Rectangle(0, 0, PREFERRED_HEIGHT, PREFERRED_HEIGHT);
+
+        points = new ArrayList<>();
 
         fillPath = new Path();
         fillPath.setStroke(null);
@@ -187,285 +191,106 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         }
     }
 
-    @Override protected void handleCurrentValue(final double VALUE) {
-        valueText.setText(String.format(locale, formatString, VALUE));
-        resizeDynamicText();
-    }
-
     private void handleData() {
         selectionTooltip.hide();
         selectionIndicator.setVisible(false);
         List<ChartData> data = tile.getChartData();
         if (null == data || data.isEmpty()) { return; }
         Optional<ChartData> lastDataEntry = data.stream().reduce((first, second) -> second);
-        if (lastDataEntry.isPresent()) { tile.setValue(lastDataEntry.get().getValue()); }
+        if (lastDataEntry.isPresent()) {
+            valueText.setText(String.format(locale, formatString, lastDataEntry.get().getValue()));
+            tile.setValue(lastDataEntry.get().getValue());
+            resizeDynamicText();
+        }
         dataSize  = data.size();
         maxValue  = data.stream().max(Comparator.comparing(c -> c.getValue())).get().getValue();
         hStepSize = width / (dataSize - 1);
         vStepSize = (height * 0.5) / maxValue;
+
+        points.clear();
+        for (int i = 0 ; i < dataSize ; i++) {
+            points.add(new Point((i) * hStepSize, height - data.get(i).getValue() * vStepSize));
+        }
+        drawChart(points);
+    }
+
+    private void drawChart(final List<Point> POINTS) {
+        if (POINTS.isEmpty()) return;
+        Point[] points = smoothing ? Helper.subdividePoints(POINTS.toArray(new Point[0]), 8) : POINTS.toArray(new Point[0]);
+
         fillPath.getElements().clear();
         fillPath.getElements().add(new MoveTo(0, height));
+
         strokePath.getElements().clear();
-        strokePath.getElements().add(new MoveTo(0, height - data.get(0).getValue() * vStepSize));
-        for (int i = 0 ; i < dataSize ; i++) {
-            fillPath.getElements().add(new LineTo(i * hStepSize, height - data.get(i).getValue() * vStepSize));
-            strokePath.getElements().add(new LineTo(i * hStepSize, height - data.get(i).getValue() * vStepSize));
+        strokePath.getElements().add(new MoveTo(points[0].getX(), points[0].getY()));
+
+        for (Point p : points) {
+            fillPath.getElements().add(new LineTo(p.getX(), p.getY()));
+            strokePath.getElements().add(new LineTo(p.getX(), p.getY()));
         }
+
         fillPath.getElements().add(new LineTo(width, height));
+        fillPath.getElements().add(new LineTo(0, height));
         fillPath.getElements().add(new ClosePath());
-        smooth(strokePath.getElements(), fillPath.getElements());
     }
 
-    private static void smooth(ObservableList<PathElement> strokeElements, ObservableList<PathElement> fillElements) {
-        if (fillElements.isEmpty()) return;
-        // as we do not have direct access to the data, first recreate the list of all the data points we have
-        final Point[] dataPoints = new Point[strokeElements.size()];
-        for (int i = 0; i < strokeElements.size(); i++) {
-            final PathElement element = strokeElements.get(i);
-            if (element instanceof MoveTo) {
-                MoveTo move   = (MoveTo) element;
-                dataPoints[i] = new Point(move.getX(), move.getY());
-            } else if (element instanceof LineTo) {
-                LineTo line   = (LineTo) element;
-                dataPoints[i] = new Point(line.getX(), line.getY());
-            }
-        }
-        // next we need to know the zero Y value
-        final double zeroY = ((MoveTo) fillElements.get(0)).getY();
-        // now clear and rebuild elements
-        strokeElements.clear();
-        fillElements.clear();
-        Pair<Point[], Point[]> result              = calcCurveControlPoints(dataPoints);
-        Point[]                firstControlPoints  = result.getKey();
-        Point[]                secondControlPoints = result.getValue();
-        // start both paths
-        strokeElements.add(new MoveTo(dataPoints[0].getX(), dataPoints[0].getY()));
-        fillElements.add(new MoveTo(dataPoints[0].getX(), zeroY));
-        fillElements.add(new LineTo(dataPoints[0].getX(), dataPoints[0].getY()));
-        // add curves
-        for (int i = 2; i < dataPoints.length; i++) {
-            final int ci = i - 1;
-            strokeElements.add(new CubicCurveTo(
-                firstControlPoints[ci].getX(), firstControlPoints[ci].getY(),
-                secondControlPoints[ci].getX(), secondControlPoints[ci].getY(),
-                dataPoints[i].getX(), dataPoints[i].getY()));
-            fillElements.add(new CubicCurveTo(
-                firstControlPoints[ci].getX(), firstControlPoints[ci].getY(),
-                secondControlPoints[ci].getX(), secondControlPoints[ci].getY(),
-                dataPoints[i].getX(), dataPoints[i].getY()));
-        }
-        // end the paths
-        fillElements.add(new LineTo(dataPoints[dataPoints.length - 1].getX(), zeroY));
-        fillElements.add(new ClosePath());
-    }
-
-    /**
-     * Calculate open-ended Bezier Spline Control Points.
-     *
-     * @param dataPoints Input data Bezier spline points.
-     * @return The spline points
-     */
-    private static Pair<Point[], Point[]> calcCurveControlPoints(Point[] dataPoints) {
-        Point[] firstControlPoints;
-        Point[] secondControlPoints;
-        int n = dataPoints.length - 1;
-        if (n == 1) { // Special case: Bezier curve should be a straight line.
-            firstControlPoints     = new Point[1];
-            // 3P1 = 2P0 + P3
-            firstControlPoints[0]  = new Point((2 * dataPoints[0].getX() + dataPoints[1].getX()) / 3, (2 * dataPoints[0].getY() + dataPoints[1].getY()) / 3);
-            secondControlPoints    = new Point[1];
-            // P2 = 2P1 – P0
-            secondControlPoints[0] = new Point(2 * firstControlPoints[0].getX() - dataPoints[0].getX(), 2 * firstControlPoints[0].getY() - dataPoints[0].getY());
-            return new Pair<>(firstControlPoints, secondControlPoints);
-        }
-
-        // Calculate first Bezier control points
-        // Right hand side vector
-        double[] rhs = new double[n];
-
-        // Set right hand side X values
-        for (int i = 1; i < n - 1; ++i) {
-            rhs[i] = 4 * dataPoints[i].getX() + 2 * dataPoints[i + 1].getX();
-        }
-        rhs[0]     = dataPoints[0].getX() + 2 * dataPoints[1].getX();
-        rhs[n - 1] = (8 * dataPoints[n - 1].getX() + dataPoints[n].getX()) / 2.0;
-        // Get first control points X-values
-        double[] x = getFirstControlPoints(rhs);
-
-        // Set right hand side Y values
-        for (int i = 1; i < n - 1; ++i) {
-            rhs[i] = 4 * dataPoints[i].getY() + 2 * dataPoints[i + 1].getY();
-        }
-        rhs[0]     = dataPoints[0].getY() + 2 * dataPoints[1].getY();
-        rhs[n - 1] = (8 * dataPoints[n - 1].getY() + dataPoints[n].getY()) / 2.0;
-        // Get first control points Y-values
-        double[] y = getFirstControlPoints(rhs);
-
-        // Fill output arrays.
-        firstControlPoints  = new Point[n];
-        secondControlPoints = new Point[n];
-        for (int i = 0; i < n; ++i) {
-            // First control point
-            firstControlPoints[i] = new Point(x[i], y[i]);
-            // Second control point
-            if (i < n - 1) {
-                secondControlPoints[i] = new Point(2 * dataPoints[i + 1].getX() - x[i + 1], 2 * dataPoints[i + 1].getY() - y[i + 1]);
-            } else {
-                secondControlPoints[i] = new Point((dataPoints[n].getX() + x[n - 1]) / 2, (dataPoints[n].getY() + y[n - 1]) / 2);
-            }
-        }
-        return new Pair<>(firstControlPoints, secondControlPoints);
-    }
-
-    /**
-     * Solves a tridiagonal system for one of coordinates (x or y) of first
-     * Bezier control points.
-     *
-     * @param rhs Right hand side vector.
-     * @return Solution vector.
-     */
-    private static double[] getFirstControlPoints(double[] rhs) {
-        int      n   = rhs.length;
-        double[] x   = new double[n]; // Solution vector.
-        double[] tmp = new double[n]; // Temp workspace.
-        double   b   = 2.0;
-
-        x[0] = rhs[0] / b;
-
-        for (int i = 1; i < n; i++) {// Decomposition and forward substitution.
-            tmp[i] = 1 / b;
-            b      = (i < n - 1 ? 4.0 : 3.5) - tmp[i];
-            x[i]   = (rhs[i] - x[i - 1]) / b;
-        }
-        for (int i = 1; i < n; i++) {
-            x[n - i - 1] -= tmp[n - i] * x[n - i]; // Backsubstitution.
-        }
-        return x;
-    }
-
-    private void selectData(final MouseEvent EVT) {
+    private void select(final MouseEvent EVT) {
         final double EVENT_X     = EVT.getX();
         final double CHART_X     = 0;
         final double CHART_WIDTH = width;
 
         if (Double.compare(EVENT_X, CHART_X) < 0 || Double.compare(EVENT_X, CHART_WIDTH) > 0) { return; }
 
-        double lowerBound = tile.getChartData().stream().min(Comparator.comparing(ChartData::getValue)).get().getValue();
-        double upperBound = tile.getChartData().stream().max(Comparator.comparing(ChartData::getValue)).get().getValue();
-        double range      = upperBound - lowerBound;
-        double factor     = range / (height * 0.5);
+        double upperBound   = tile.getChartData().stream().max(Comparator.comparing(ChartData::getValue)).get().getValue();
+        double range        = upperBound - tile.getMinValue();
+        double factor       = range / (height * 0.5);
+        int    noOfElements = strokePath.getElements().size();
 
-        double x0 = 0;
-        double y0 = 0;
-        double x1 = 0;
-        double y1 = 0;
-        double x2 = 0;
-        double y2 = 0;
-        double x3 = 0;
-        double y3 = 0;
-        double x = EVT.getX(); // x coordinate of selected point
-        for (PathElement element : strokePath.getElements()) {
-            if (element instanceof MoveTo) {
-                final MoveTo moveTo = (MoveTo) element;
-                x0 = moveTo.getX();
-                y0 = moveTo.getY();
-            } else if (element instanceof CubicCurveTo) {
-                final CubicCurveTo cubicCurveTo = (CubicCurveTo) element;
-                x1 = cubicCurveTo.getControlX1();
-                y1 = cubicCurveTo.getControlY1();
-                x2 = cubicCurveTo.getControlX2();
-                y2 = cubicCurveTo.getControlY2();
-                x3 = cubicCurveTo.getX();
-                y3 = cubicCurveTo.getY();
+        for (int i = 1 ; i < noOfElements ; i++) {
+            PathElement last    = strokePath.getElements().get(i - 1);
+            PathElement current = strokePath.getElements().get(i);
 
-                if (x > x0 && x < x3) break;
-
-                x0 = cubicCurveTo.getX();
-                y0 = cubicCurveTo.getY();
-            }
-        }
-
-        //double cx = 3.0 * (x1 - x0);
-        //double bx = 3.0 * (x2 - x1) - cx;
-        //double ax = x3 - x0 - cx - bx;
-        double cy = 3.0 * (y1 - y0);
-        double by = 3.0 * (y2 - y1) - cy;
-        double ay = y3 - y0 - cy - by;
-
-        double a0 = x0;
-        double a1 = 3.0 * (x1 - x0);
-        double a2 = 3.0 * (x2 - 2.0 * x1 + x0);
-        double a3 = x3 - 3.0 * x2 + 3.0 * x1 - x0;
-        double t  = invB3P(a0, a1, a2, a3, x);
-        double yt = ay * t * t * t + by * t * t + cy * t + y0;
-
-        double selectedValue = upperBound - (yt - (height * 0.5)) * factor;
-
-        selectionIndicator.setCenterX(EVT.getX());
-        selectionIndicator.setCenterY(yt);
-        selectionIndicator.setVisible(true);
-        fadeInFadeOut.playFrom(Duration.millis(0));
-
-        Point2D popupLocation = tile.localToScreen(EVT.getX() - selectionTooltip.getWidth() * 0.5, selectionIndicator.getCenterY() - size * 0.025 - selectionTooltip.getHeight());
-        selectionTooltip.setText(String.format(locale, formatString, selectedValue));
-        selectionTooltip.setX(popupLocation.getX());
-        selectionTooltip.setY(popupLocation.getY());
-        selectionTooltip.show(tile.getScene().getWindow());
-
-        tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(selectedValue)));
-    }
-    private double invB3P(double a0, double a1, double a2, double a3, double x) {
-        double c;
-        double h, p, q, D, R, S, F, t;
-        double w1 = 2.0 * Math.PI / 3.0;
-        double w2 = 4.0 * Math.PI / 3.0;
-
-        c = 1.0 + a3;
-
-        if (Double.compare(c, 1.0) == 0) { a3 = 1e-6; }
-        h  = a2 / 3.0 / a3;
-        p  = (3.0 * a1 * a3 - a2 * a2) / 3.0 / a3 / a3;
-        q  = (2.0 * a2 * a2 * a2 - 9.0 * a1 * a2 * a3 - 27.0 * a3 * a3 * (x - a0)) / 27.0 / a3 / a3 / a3;
-
-        c  = (1.0 + p);        /* Check for p being too near to zero     */
-        if (Double.compare(c, 1.0) == 0) {
-            c = 1.0 + q;      /* Check for q being too near to zero     */
-            if (Double.compare(c, 1.0)  == 0) { return( (float)(-h) ); }
-
-            t = -Math.exp(Math.log(Math.abs(q)) / 3.0);
-            if (q < 0.0) {
-                t = -t;
-            }
-            t -= h;
-            return t;
-        }
-
-        R  = Math.sqrt(Math.abs(p) / 3.0);
-        S  = Math.abs(q) / 2.0 / R / R / R;
-
-        R  = -2.0 * R;
-        if (q < 0.0) { R = -R; }
-
-        if (p < 0.0) {
-            D = p * p * p / 27.0 + q * q / 4.0;
-            if (D <= 0.0) {
-                F = Math.acos(S)/3.0;
-                t = R * Math.cos(F + w2) - h;
-                if ((t < -0.00005) || (t > 1.00005)) {
-                    t = R * Math.cos(F + w1) - h;
-                    if ((t < -0.00005) || (t > 1.00005)) {
-                        t = R * Math.cos(F) - h;
-                        t = Helper.clamp(-0.00005, 1.00005, t);
-                    }
-                }
+            double x1, y1;
+            if (last instanceof MoveTo) {
+                x1 = ((MoveTo) last).getX();
+                y1 = ((MoveTo) last).getY();
             } else {
-                t = R * Math.cosh(Math.log(S + Math.sqrt((S + 1.0) * (S - 1.0))) / 3.0) - h;  /* arcosh */
+                x1 = ((LineTo) last).getX();
+                y1 = ((LineTo) last).getY();
             }
-        } else {
-            t = R * Math.sinh(Math.log(S + Math.sqrt(S * S + 1.0)) / 3.0) - h;                /* arsinh */
+
+            double x2, y2;
+            if (current instanceof MoveTo) {
+                x2 = ((MoveTo) current).getX();
+                y2 = ((MoveTo) current).getY();
+            } else {
+                x2 = ((LineTo) current).getX();
+                y2 = ((LineTo) current).getY();
+            }
+
+            if (EVENT_X > x1 && EVENT_X < x2) {
+                double deltaX        = x2 - x1;
+                double deltaY        = y2 - y1;
+                double m             = deltaY / deltaX;
+                double y             = m * (EVT.getX() - x1) + y1;
+                double selectedValue = upperBound - (y - (height * 0.5)) * factor;
+
+                selectionIndicator.setCenterX(EVT.getX());
+                selectionIndicator.setCenterY(y);
+                selectionIndicator.setVisible(true);
+                fadeInFadeOut.playFrom(Duration.millis(0));
+
+                Point2D popupLocation = tile.localToScreen(EVT.getX() - selectionTooltip.getWidth() * 0.5, selectionIndicator.getCenterY() - size * 0.025 - selectionTooltip.getHeight());
+                selectionTooltip.setText(String.format(locale, formatString, selectedValue));
+                selectionTooltip.setX(popupLocation.getX());
+                selectionTooltip.setY(popupLocation.getY());
+                selectionTooltip.show(tile.getScene().getWindow());
+
+                tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(selectedValue)));
+            }
+
         }
 
-        return t;
     }
 
 
@@ -526,6 +351,9 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
+
+        smoothing = tile.isSmoothing();
+
         titleText.setText(tile.getTitle());
 
         valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));

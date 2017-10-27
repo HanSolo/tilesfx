@@ -4644,6 +4644,7 @@ public class Tile extends Control {
                 setAngleRange(270);
                 break;
             case SMOOTH_AREA_CHART:
+                setSmoothing(true);
                 break;
             case RADAR_CHART:
                 break;

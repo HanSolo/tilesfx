@@ -895,6 +895,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     CONTROL.setAngleRange(270);
                     break;
                 case SMOOTH_AREA_CHART:
+                    CONTROL.setSmoothing(true);
                     break;
                 case RADAR_CHART:
                     break;

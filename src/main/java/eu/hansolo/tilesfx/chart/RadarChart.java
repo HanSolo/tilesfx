@@ -18,6 +18,8 @@ package eu.hansolo.tilesfx.chart;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.Point;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
@@ -105,6 +107,7 @@ public class RadarChart extends Region {
     private              BooleanProperty           thresholdVisible;
     private              ObservableList<Stop>      gradientStops;
     private              List<Stop>                stops;
+    private              boolean                   _smoothing;
     private              ObjectProperty<Color>     chartBackgroundColor;
     private              ObjectProperty<Color>     chartForegroundColor;
     private              ObjectProperty<Color>     chartTextColor;
@@ -181,6 +184,7 @@ public class RadarChart extends Region {
         formatString          = new StringBuilder("%.").append(decimals).append("f").toString();
         data                  = FXCollections.observableArrayList();
         legendScaleFactor     = 1.0;
+        _smoothing            = false;
         chartBackgroundColor  = new ObjectPropertyBase<Color>(Color.TRANSPARENT) {
             @Override protected void invalidated() { redraw(); }
             @Override public Object getBean() { return RadarChart.this; }
@@ -432,6 +436,12 @@ public class RadarChart extends Region {
     public int getNoOfSectors() { return noOfSectors.get(); }
     public IntegerProperty noOfSectorsProperty() { return noOfSectors; }
 
+    public boolean isSmoothing() { return _smoothing; }
+    public void setSmoothing(final boolean SMOOTHING) {
+        _smoothing = SMOOTHING;
+        redraw();
+    }
+
 
     // ******************** Style related *************************************
     @Override public String getUserAgentStylesheet() {
@@ -547,9 +557,6 @@ public class RadarChart extends Region {
         // clear the chartCanvas
         chartCtx.clearRect(0, 0, size, size);
 
-        // draw the chart background
-        //chartCtx.setFill(getChartFill());
-        //chartCtx.fillOval((size - CIRCLE_SIZE) * 0.5, (size - CIRCLE_SIZE) * 0.5, CIRCLE_SIZE, CIRCLE_SIZE);
 
         // draw the chart data
         chartCtx.save();
@@ -566,22 +573,57 @@ public class RadarChart extends Region {
         double radiusFactor;
         switch(mode.get()) {
             case POLYGON:
-                chartCtx.beginPath();
-                chartCtx.moveTo(CENTER_X, 0.36239 * size);
-                for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
-                    radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (data.get(i).getValue()) - MIN_VALUE) / DATA_RANGE);
-                    //chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
+                if (isSmoothing()) {
+                    double      radAngle     = Math.toRadians(180);
+                    double      radAngleStep = Math.toRadians(angleStep);
+                    List<Point> points       = new ArrayList<>();
+
+                    double x = CENTER_X + (-Math.sin(radAngle) * (CENTER_Y - (0.36239 * size)));
+                    double y = CENTER_Y + (+Math.cos(radAngle) * (CENTER_Y - (0.36239 * size)));
+                    points.add(new Point(x, y));
+
+                    for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
+                        double r1 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
+                        x = CENTER_X + (-Math.sin(radAngle) * r1);
+                        y = CENTER_Y + (+Math.cos(radAngle) * r1);
+                        points.add(new Point(x, y));
+                        radAngle += radAngleStep;
+                    }
+                    double r3 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(NO_OF_SECTORS - 1).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
+                    x = CENTER_X + (-Math.sin(radAngle) * r3);
+                    y = CENTER_Y + (+Math.cos(radAngle) * r3);
+                    points.add(new Point(x, y));
+
+                    Point[] interpolatedPoints = Helper.subdividePoints(points.toArray(new Point[0]), 8);
+
+                    chartCtx.beginPath();
+                    chartCtx.moveTo(interpolatedPoints[0].getX(), interpolatedPoints[0].getY());
+                    for (int i = 0 ; i < interpolatedPoints.length - 1 ; i++) {
+                        Point point = interpolatedPoints[i];
+                        chartCtx.lineTo(point.getX(), point.getY());
+                    }
+                    chartCtx.lineTo(interpolatedPoints[interpolatedPoints.length - 1].getX(), interpolatedPoints[interpolatedPoints.length - 1].getY());
+                    chartCtx.closePath();
+
+                    chartCtx.fill();
+                    chartCtx.stroke();
+                } else {
+                    chartCtx.beginPath();
+                    chartCtx.moveTo(CENTER_X, 0.36239 * size);
+                    for (int i = 0; i < NO_OF_SECTORS; i++) {
+                        radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (data.get(i).getValue()) - MIN_VALUE) / DATA_RANGE);
+                        //chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
+                        chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
+
+                        chartCtx.translate(CENTER_X, CENTER_Y);
+                        chartCtx.rotate(angleStep);
+                        chartCtx.translate(-CENTER_X, -CENTER_Y);
+                    }
+                    radiusFactor = ((clamp(MIN_VALUE, MAX_VALUE, data.get(NO_OF_SECTORS - 1).getValue()) - MIN_VALUE) / DATA_RANGE);
                     chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
-
-                    chartCtx.translate(CENTER_X, CENTER_Y);
-                    chartCtx.rotate(angleStep);
-                    chartCtx.translate(-CENTER_X, -CENTER_Y);
+                    chartCtx.closePath();
+                    chartCtx.fill();
                 }
-                radiusFactor = ((clamp(MIN_VALUE, MAX_VALUE, data.get(NO_OF_SECTORS - 1).getValue()) - MIN_VALUE) / DATA_RANGE);
-                chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
-                chartCtx.closePath();
-                chartCtx.fill();
-
                 break;
             case SECTOR:
                 chartCtx.translate(CENTER_X, CENTER_Y);

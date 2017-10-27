@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -283,6 +284,35 @@ public class Helper {
     public static final boolean equals(final double A, final double B) { return A == B || Math.abs(A - B) < EPSILON; }
     public static final boolean biggerThan(final double A, final double B) { return (A - B) > EPSILON; }
     public static final boolean lessThan(final double A, final double B) { return (B - A) > EPSILON; }
+
+    public static List<Point> subdividePoints(final List<Point> POINTS, final int SUB_DEVISIONS) {
+        Point[] points = POINTS.toArray(new Point[0]);
+        return Arrays.asList(subdividePoints(points, SUB_DEVISIONS));
+    }
+    public static Point[] subdividePoints(final Point[] POINTS, final int SUB_DEVISIONS) {
+        assert POINTS != null;
+        assert POINTS.length >= 3;
+        int    noOfPoints = POINTS.length;
+
+        Point[] subdividedPoints = new Point[((noOfPoints - 1) * SUB_DEVISIONS) + 1];
+
+        double increments = 1.0 / (double) SUB_DEVISIONS;
+
+        for (int i = 0 ; i < noOfPoints - 1 ; i++) {
+            Point p0 = i == 0 ? POINTS[i] : POINTS[i - 1];
+            Point p1 = POINTS[i];
+            Point p2 = POINTS[i + 1];
+            Point p3 = (i+2 == noOfPoints) ? POINTS[i + 1] : POINTS[i + 2];
+
+            CatmullRomSpline2D crs = new CatmullRomSpline2D(p0, p1, p2, p3);
+
+            for (int j = 0; j <= SUB_DEVISIONS; j++) {
+                subdividedPoints[(i * SUB_DEVISIONS) + j] = crs.q(j * increments);
+            }
+        }
+
+        return subdividedPoints;
+    }
 
     public static Color getContrastColor(final Color COLOR) {
         return COLOR.getBrightness() > 0.5 ? Color.BLACK : Color.WHITE;

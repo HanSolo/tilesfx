@@ -161,7 +161,7 @@ public class RadarChartTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-
+        radarChart.setSmoothing(tile.isSmoothing());
         radarChart.setUnit(tile.getUnit());
         radarChart.setMode(tile.getRadarChartMode());
 

@@ -3227,14 +3227,15 @@ public class Tile extends Control {
 
     /**
      * Returns true when smoothing is enabled. This property is only used
-     * in the TileSparklineSkin to smooth the path. In a custom skin it
-     * could be also used for other things.
+     * in the SparkLineTileSkin and RadarChartTileSkin (Polygon mode) to smooth the path.
+     * In a custom skin it could be also used for other things.
      * @return true when smoothing is enabled
      */
     public boolean isSmoothing() { return null == smoothing ? _smoothing : smoothing.get(); }
     /**
      * Defines if the smoothing property should be enabled/disabled.
-     * At the moment this is only used in the TileSparklineSkin.
+     * At the moment this is only used in the SparkLineTileSkin and
+     * RadarChartTileSkin.
      * @param SMOOTHING
      */
     public void setSmoothing(final boolean SMOOTHING) {

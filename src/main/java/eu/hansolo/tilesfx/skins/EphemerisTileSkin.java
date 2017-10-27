@@ -153,6 +153,7 @@ public class EphemerisTileSkin extends TileSkin {
         infoBoxMorning = new VBox(blueHourSunriseBox, sunriseBox, goldenHourSunriseBox);
         infoBoxEvening = new VBox(goldenHourSunsetBox, sunsetBox, blueHourSunsetBox);
         infoBox        = new HBox(infoBoxMorning, infoBoxEvening);
+        infoBox.setAlignment(Pos.CENTER);
 
         text = new Text(tile.getText());
         Helper.enableNode(text, tile.isTextVisible());
@@ -259,6 +260,7 @@ public class EphemerisTileSkin extends TileSkin {
         infoBoxEvening.setSpacing(height * 0.1);
         infoBox.setSpacing(width * 0.15);
 
+        infoBox.setPrefWidth(width - size * 0.1);
         double infoBoxHeight = infoBox.getLayoutBounds().getHeight();
         double posY = infoBoxHeight == 0.0 ? size * 0.25 : (height - infoBox.getLayoutBounds().getHeight()) * 0.5;
 

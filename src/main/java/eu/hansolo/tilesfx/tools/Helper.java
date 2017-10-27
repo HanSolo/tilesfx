@@ -19,7 +19,6 @@ package eu.hansolo.tilesfx.tools;
 import eu.hansolo.tilesfx.CountryPath;
 import eu.hansolo.tilesfx.Section;
 import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
@@ -383,22 +382,22 @@ public class Helper {
     // Smooth given path defined by it's list of path elements
     public static Path smoothPath(final ObservableList<PathElement> ELEMENTS, final boolean FILLED) {
         if (ELEMENTS.isEmpty()) { return new Path(); }
-        final Point2D[] dataPoints = new Point2D[ELEMENTS.size()];
+        final Point[] dataPoints = new Point[ELEMENTS.size()];
         for (int i = 0; i < ELEMENTS.size(); i++) {
             final PathElement element = ELEMENTS.get(i);
             if (element instanceof MoveTo) {
                 MoveTo move   = (MoveTo) element;
-                dataPoints[i] = new Point2D(move.getX(), move.getY());
+                dataPoints[i] = new Point(move.getX(), move.getY());
             } else if (element instanceof LineTo) {
                 LineTo line   = (LineTo) element;
-                dataPoints[i] = new Point2D(line.getX(), line.getY());
+                dataPoints[i] = new Point(line.getX(), line.getY());
             }
         }
-        double                     zeroY               = ((MoveTo) ELEMENTS.get(0)).getY();
-        List<PathElement>          smoothedElements    = new ArrayList<>();
-        Pair<Point2D[], Point2D[]> result              = calcCurveControlPoints(dataPoints);
-        Point2D[]                  firstControlPoints  = result.getKey();
-        Point2D[]                  secondControlPoints = result.getValue();
+        double                 zeroY               = ((MoveTo) ELEMENTS.get(0)).getY();
+        List<PathElement>      smoothedElements    = new ArrayList<>();
+        Pair<Point[], Point[]> result              = calcCurveControlPoints(dataPoints);
+        Point[]                firstControlPoints  = result.getKey();
+        Point[]                secondControlPoints = result.getValue();
         // Start path dependent on filled or not
         if (FILLED) {
             smoothedElements.add(new MoveTo(dataPoints[0].getX(), zeroY));
@@ -421,17 +420,17 @@ public class Helper {
         }
         return new Path(smoothedElements);
     }
-    private static Pair<Point2D[], Point2D[]> calcCurveControlPoints(Point2D[] dataPoints) {
-        Point2D[] firstControlPoints;
-        Point2D[] secondControlPoints;
+    private static Pair<Point[], Point[]> calcCurveControlPoints(Point[] dataPoints) {
+        Point[] firstControlPoints;
+        Point[] secondControlPoints;
         int n = dataPoints.length - 1;
         if (n == 1) { // Special case: Bezier curve should be a straight line.
-            firstControlPoints     = new Point2D[1];
+            firstControlPoints     = new Point[1];
             // 3P1 = 2P0 + P3
-            firstControlPoints[0]  = new Point2D((2 * dataPoints[0].getX() + dataPoints[1].getX()) / 3, (2 * dataPoints[0].getY() + dataPoints[1].getY()) / 3);
-            secondControlPoints    = new Point2D[1];
+            firstControlPoints[0]  = new Point((2 * dataPoints[0].getX() + dataPoints[1].getX()) / 3, (2 * dataPoints[0].getY() + dataPoints[1].getY()) / 3);
+            secondControlPoints    = new Point[1];
             // P2 = 2P1 – P0
-            secondControlPoints[0] = new Point2D(2 * firstControlPoints[0].getX() - dataPoints[0].getX(), 2 * firstControlPoints[0].getY() - dataPoints[0].getY());
+            secondControlPoints[0] = new Point(2 * firstControlPoints[0].getX() - dataPoints[0].getX(), 2 * firstControlPoints[0].getY() - dataPoints[0].getY());
             return new Pair<>(firstControlPoints, secondControlPoints);
         }
 
@@ -458,16 +457,16 @@ public class Helper {
         double[] y = getFirstControlPoints(rhs);
 
         // Fill output arrays.
-        firstControlPoints  = new Point2D[n];
-        secondControlPoints = new Point2D[n];
+        firstControlPoints  = new Point[n];
+        secondControlPoints = new Point[n];
         for (int i = 0; i < n; ++i) {
             // First control point
-            firstControlPoints[i] = new Point2D(x[i], y[i]);
+            firstControlPoints[i] = new Point(x[i], y[i]);
             // Second control point
             if (i < n - 1) {
-                secondControlPoints[i] = new Point2D(2 * dataPoints[i + 1].getX() - x[i + 1], 2 * dataPoints[i + 1].getY() - y[i + 1]);
+                secondControlPoints[i] = new Point(2 * dataPoints[i + 1].getX() - x[i + 1], 2 * dataPoints[i + 1].getY() - y[i + 1]);
             } else {
-                secondControlPoints[i] = new Point2D((dataPoints[n].getX() + x[n - 1]) / 2, (dataPoints[n].getY() + y[n - 1]) / 2);
+                secondControlPoints[i] = new Point((dataPoints[n].getX() + x[n - 1]) / 2, (dataPoints[n].getY() + y[n - 1]) / 2);
             }
         }
         return new Pair<>(firstControlPoints, secondControlPoints);

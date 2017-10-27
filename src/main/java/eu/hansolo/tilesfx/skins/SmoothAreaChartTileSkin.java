@@ -23,10 +23,10 @@ import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.Point;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
-import javafx.animation.Transition;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -219,15 +219,15 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     private static void smooth(ObservableList<PathElement> strokeElements, ObservableList<PathElement> fillElements) {
         if (fillElements.isEmpty()) return;
         // as we do not have direct access to the data, first recreate the list of all the data points we have
-        final Point2D[] dataPoints = new Point2D[strokeElements.size()];
+        final Point[] dataPoints = new Point[strokeElements.size()];
         for (int i = 0; i < strokeElements.size(); i++) {
             final PathElement element = strokeElements.get(i);
             if (element instanceof MoveTo) {
                 MoveTo move   = (MoveTo) element;
-                dataPoints[i] = new Point2D(move.getX(), move.getY());
+                dataPoints[i] = new Point(move.getX(), move.getY());
             } else if (element instanceof LineTo) {
                 LineTo line   = (LineTo) element;
-                dataPoints[i] = new Point2D(line.getX(), line.getY());
+                dataPoints[i] = new Point(line.getX(), line.getY());
             }
         }
         // next we need to know the zero Y value
@@ -235,9 +235,9 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         // now clear and rebuild elements
         strokeElements.clear();
         fillElements.clear();
-        Pair<Point2D[], Point2D[]> result              = calcCurveControlPoints(dataPoints);
-        Point2D[]                  firstControlPoints  = result.getKey();
-        Point2D[]                  secondControlPoints = result.getValue();
+        Pair<Point[], Point[]> result              = calcCurveControlPoints(dataPoints);
+        Point[]                firstControlPoints  = result.getKey();
+        Point[]                secondControlPoints = result.getValue();
         // start both paths
         strokeElements.add(new MoveTo(dataPoints[0].getX(), dataPoints[0].getY()));
         fillElements.add(new MoveTo(dataPoints[0].getX(), zeroY));
@@ -265,17 +265,17 @@ public class SmoothAreaChartTileSkin extends TileSkin {
      * @param dataPoints Input data Bezier spline points.
      * @return The spline points
      */
-    private static Pair<Point2D[], Point2D[]> calcCurveControlPoints(Point2D[] dataPoints) {
-        Point2D[] firstControlPoints;
-        Point2D[] secondControlPoints;
+    private static Pair<Point[], Point[]> calcCurveControlPoints(Point[] dataPoints) {
+        Point[] firstControlPoints;
+        Point[] secondControlPoints;
         int n = dataPoints.length - 1;
         if (n == 1) { // Special case: Bezier curve should be a straight line.
-            firstControlPoints     = new Point2D[1];
+            firstControlPoints     = new Point[1];
             // 3P1 = 2P0 + P3
-            firstControlPoints[0]  = new Point2D((2 * dataPoints[0].getX() + dataPoints[1].getX()) / 3, (2 * dataPoints[0].getY() + dataPoints[1].getY()) / 3);
-            secondControlPoints    = new Point2D[1];
+            firstControlPoints[0]  = new Point((2 * dataPoints[0].getX() + dataPoints[1].getX()) / 3, (2 * dataPoints[0].getY() + dataPoints[1].getY()) / 3);
+            secondControlPoints    = new Point[1];
             // P2 = 2P1 – P0
-            secondControlPoints[0] = new Point2D(2 * firstControlPoints[0].getX() - dataPoints[0].getX(), 2 * firstControlPoints[0].getY() - dataPoints[0].getY());
+            secondControlPoints[0] = new Point(2 * firstControlPoints[0].getX() - dataPoints[0].getX(), 2 * firstControlPoints[0].getY() - dataPoints[0].getY());
             return new Pair<>(firstControlPoints, secondControlPoints);
         }
 
@@ -302,16 +302,16 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         double[] y = getFirstControlPoints(rhs);
 
         // Fill output arrays.
-        firstControlPoints  = new Point2D[n];
-        secondControlPoints = new Point2D[n];
+        firstControlPoints  = new Point[n];
+        secondControlPoints = new Point[n];
         for (int i = 0; i < n; ++i) {
             // First control point
-            firstControlPoints[i] = new Point2D(x[i], y[i]);
+            firstControlPoints[i] = new Point(x[i], y[i]);
             // Second control point
             if (i < n - 1) {
-                secondControlPoints[i] = new Point2D(2 * dataPoints[i + 1].getX() - x[i + 1], 2 * dataPoints[i + 1].getY() - y[i + 1]);
+                secondControlPoints[i] = new Point(2 * dataPoints[i + 1].getX() - x[i + 1], 2 * dataPoints[i + 1].getY() - y[i + 1]);
             } else {
-                secondControlPoints[i] = new Point2D((dataPoints[n].getX() + x[n - 1]) / 2, (dataPoints[n].getY() + y[n - 1]) / 2);
+                secondControlPoints[i] = new Point((dataPoints[n].getX() + x[n - 1]) / 2, (dataPoints[n].getY() + y[n - 1]) / 2);
             }
         }
         return new Pair<>(firstControlPoints, secondControlPoints);

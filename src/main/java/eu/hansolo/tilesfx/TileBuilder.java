@@ -731,6 +731,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B dataPointsVisible(final boolean VISIBLE) {
+        properties.put("dataPointsVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -1257,6 +1262,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
             } else if ("flipText".equals(key)) {
                 CONTROL.setFlipText(((StringProperty) properties.get(key)).get());
+            } else if ("dataPointsVisible".equals(key)) {
+                CONTROL.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

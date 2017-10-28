@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart;
 import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.events.AlarmEvent;
@@ -29,12 +30,11 @@ import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.*;
-import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.tools.TimeData;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.SectionComparator;
+import eu.hansolo.tilesfx.tools.TimeData;
 import eu.hansolo.tilesfx.tools.TimeSectionComparator;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.animation.Animation.Status;
@@ -74,7 +74,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -448,6 +447,8 @@ public class Tile extends Control {
     private              ObjectProperty<Country>                country;
     private              boolean                                _sortedData;
     private              BooleanProperty                        sortedData;
+    private              boolean                                _dataPointsVisible;
+    private              BooleanProperty                        dataPointsVisible;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -668,6 +669,7 @@ public class Tile extends Control {
         _chartGridColor                     = Tile.GRAY;
         _country                            = Country.DE;
         _sortedData                         = true;
+        _dataPointsVisible                  = false;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -4216,6 +4218,26 @@ public class Tile extends Control {
             };
         }
         return sortedData;
+    }
+
+    public boolean getDataPointsVisible() { return null == dataPointsVisible ? _dataPointsVisible : dataPointsVisible.get(); }
+    public void setDataPointsVisible(final boolean VISIBLE) {
+        if (null == dataPointsVisible) {
+            _dataPointsVisible = VISIBLE;
+            fireTileEvent(VISIBILITY_EVENT);
+        } else {
+            dataPointsVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty dataPointsVisibleProperty() {
+        if (null == dataPointsVisible) {
+            dataPointsVisible = new BooleanPropertyBase(_dataPointsVisible) {
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "dataPointsVisible"; }
+            };
+        }
+        return dataPointsVisible;
     }
 
     public double getIncrement() { return increment; }

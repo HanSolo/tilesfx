@@ -32,6 +32,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -69,6 +71,9 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     private List<Point>                   points;
     private Path                          fillPath;
     private Path                          strokePath;
+    private Canvas                        canvas;
+    private GraphicsContext               ctx;
+    private boolean                       dataPointsVisible;
     private boolean                       smoothing;
     private double                        hStepSize;
     private double                        vStepSize;
@@ -113,8 +118,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        fillClip   = new Rectangle(0, 0, PREFERRED_HEIGHT, PREFERRED_HEIGHT);
-        strokeClip = new Rectangle(0, 0, PREFERRED_HEIGHT, PREFERRED_HEIGHT);
+        fillClip   = new Rectangle(0, 0, PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        strokeClip = new Rectangle(0, 0, PREFERRED_WIDTH, PREFERRED_HEIGHT);
 
         points = new ArrayList<>();
 
@@ -127,6 +132,12 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         strokePath.setStroke(tile.getBarColor());
         strokePath.setClip(strokeClip);
         strokePath.setMouseTransparent(true);
+
+        canvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        canvas.setMouseTransparent(true);
+        ctx    = canvas.getGraphicsContext2D();
+
+        dataPointsVisible = tile.getDataPointsVisible();
 
         valueText = new Text(String.format(locale, formatString, ((tile.getValue() - minValue) / range * 100)));
         valueText.setFill(tile.getValueColor());
@@ -159,7 +170,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         handleData();
 
-        getPane().getChildren().addAll(titleText, fillPath, strokePath, valueUnitFlow, selectionIndicator);
+        getPane().getChildren().addAll(titleText, fillPath, strokePath, canvas, valueUnitFlow, selectionIndicator);
     }
 
     @Override protected void registerListeners() {
@@ -188,6 +199,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            dataPointsVisible = tile.getDataPointsVisible();
+            if (dataPointsVisible) { drawChart(points); } else { ctx.clearRect(0, 0, width, height); }
         }
     }
 
@@ -232,6 +245,32 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         fillPath.getElements().add(new LineTo(width, height));
         fillPath.getElements().add(new LineTo(0, height));
         fillPath.getElements().add(new ClosePath());
+
+        if (dataPointsVisible) { drawDataPoints(POINTS, tile.getBarColor()); }
+    }
+
+    private void drawDataPoints(final List<Point> DATA, final Color COLOR) {
+        if (DATA.isEmpty()) { return; }
+        final double LOWER_BOUND_X = 0;
+        final double LOWER_BOUND_Y = tile.getMinValue();
+        ctx.clearRect(0, 0, width, height);
+        for (Point point : DATA) {
+            double x = (point.getX() - LOWER_BOUND_X);
+            double y = (point.getY() - LOWER_BOUND_Y);
+            drawDataPoint(x, y, COLOR);
+        }
+    }
+
+    private void drawDataPoint(final double X, final double Y, final Color COLOR) {
+        double symbolSize     = size * 0.03;
+        double halfSymbolSize = symbolSize * 0.5;
+        ctx.save();
+        ctx.setLineWidth(size * 0.0075);
+        ctx.setFill(tile.getBackgroundColor());
+        ctx.fillOval(X - halfSymbolSize, Y - halfSymbolSize, symbolSize, symbolSize);
+        ctx.setStroke(COLOR);
+        ctx.strokeOval(X - halfSymbolSize, Y - halfSymbolSize, symbolSize, symbolSize);
+        ctx.restore();
     }
 
     private void select(final MouseEvent EVT) {
@@ -241,38 +280,24 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         if (Double.compare(EVENT_X, CHART_X) < 0 || Double.compare(EVENT_X, CHART_WIDTH) > 0) { return; }
 
-        double upperBound   = tile.getChartData().stream().max(Comparator.comparing(ChartData::getValue)).get().getValue();
-        double range        = upperBound - tile.getMinValue();
-        double factor       = range / (height * 0.5);
-        int    noOfElements = strokePath.getElements().size();
+        double            upperBound   = tile.getChartData().stream().max(Comparator.comparing(ChartData::getValue)).get().getValue();
+        double            range        = upperBound - tile.getMinValue();
+        double            factor       = range / (height * 0.5);
+        List<PathElement> elements     = strokePath.getElements();
+        int               noOfElements = elements.size();
+        PathElement       lastElement  = elements.get(0);
 
         for (int i = 1 ; i < noOfElements ; i++) {
-            PathElement last    = strokePath.getElements().get(i - 1);
-            PathElement current = strokePath.getElements().get(i);
+            PathElement element = elements.get(i);
 
-            double x1, y1;
-            if (last instanceof MoveTo) {
-                x1 = ((MoveTo) last).getX();
-                y1 = ((MoveTo) last).getY();
-            } else {
-                x1 = ((LineTo) last).getX();
-                y1 = ((LineTo) last).getY();
-            }
+            double[] xy  = getXYFromPathElement(lastElement);
+            double[] xy1 = getXYFromPathElement(element);
 
-            double x2, y2;
-            if (current instanceof MoveTo) {
-                x2 = ((MoveTo) current).getX();
-                y2 = ((MoveTo) current).getY();
-            } else {
-                x2 = ((LineTo) current).getX();
-                y2 = ((LineTo) current).getY();
-            }
-
-            if (EVENT_X > x1 && EVENT_X < x2) {
-                double deltaX        = x2 - x1;
-                double deltaY        = y2 - y1;
+            if (EVENT_X > xy[0] && EVENT_X < xy1[0]) {
+                double deltaX        = xy1[0] - xy[0];
+                double deltaY        = xy1[1] - xy[1];
                 double m             = deltaY / deltaX;
-                double y             = m * (EVT.getX() - x1) + y1;
+                double y             = m * (EVT.getX() - xy[0]) + xy[1];
                 double selectedValue = upperBound - (y - (height * 0.5)) * factor;
 
                 selectionIndicator.setCenterX(EVT.getX());
@@ -287,10 +312,18 @@ public class SmoothAreaChartTileSkin extends TileSkin {
                 selectionTooltip.show(tile.getScene().getWindow());
 
                 tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(selectedValue)));
+                break;
             }
-
+            lastElement = element;
         }
+    }
 
+    private double[] getXYFromPathElement(final PathElement ELEMENT) {
+        if (ELEMENT instanceof MoveTo) {
+            return new double[]{ ((MoveTo) ELEMENT).getX(), ((MoveTo) ELEMENT).getY() };
+        } else {
+            return new double[] { ((LineTo) ELEMENT).getX(), ((LineTo) ELEMENT).getY() };
+        }
     }
 
 
@@ -331,6 +364,9 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         handleData();
         strokePath.setStrokeWidth(size * 0.02);
+
+        canvas.setWidth(width);
+        canvas.setHeight(height);
 
         double cornerRadius = tile.getRoundedCorners() ? size * 0.05 : 0;
 
@@ -373,5 +409,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
                                             new Stop(0, fillPathColor1),
                                             new Stop(1, fillPathColor2)));
         strokePath.setStroke(tile.getBarColor());
+        drawChart(points);
+        if (dataPointsVisible) { drawDataPoints(points, tile.getBarColor()); }
     }
 }

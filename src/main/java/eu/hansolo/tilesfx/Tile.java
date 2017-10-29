@@ -4528,12 +4528,6 @@ public class Tile extends Control {
     public void setOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
     public void removeOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
 
-    public void setOnSwitchActive(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.ACTIVE, HANDLER); }
-    public void removeOnSwitchActive(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.ACTIVE, HANDLER); }
-
-    public void setOnSwitchInactive(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.INACTIVE, HANDLER); }
-    public void removeOnSwitchInactive(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.INACTIVE, HANDLER); }
-
 
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {

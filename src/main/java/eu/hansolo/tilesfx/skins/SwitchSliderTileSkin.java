@@ -41,8 +41,8 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
 
 public class SwitchSliderTileSkin extends TileSkin {
-    private static final SwitchEvent SWITCH_ACTIVE   = new SwitchEvent(SwitchEvent.ACTIVE);
-    private static final SwitchEvent SWITCH_INACTIVE = new SwitchEvent(SwitchEvent.INACTIVE);
+    private static final SwitchEvent SWITCH_PRESSED  = new SwitchEvent(SwitchEvent.SWITCH_PRESSED);
+    private static final SwitchEvent SWITCH_RELEASED = new SwitchEvent(SwitchEvent.SWITCH_RELEASED);
     private final        TileEvent   VALUE_CHANGING  = new TileEvent(TileEvent.EventType.VALUE_CHANGING);
     private final        TileEvent   VALUE_CHANGED   = new TileEvent(TileEvent.EventType.VALUE_CHANGED);
     private Text                     titleText;
@@ -89,7 +89,7 @@ public class SwitchSliderTileSkin extends TileSkin {
                     tile.fireTileEvent(VALUE_CHANGING);
                 } else if (SRC.equals(switchBorder)) {
                     tile.setActive(!tile.isActive());
-                    tile.fireEvent(SWITCH_ACTIVE);
+                    tile.fireEvent(SWITCH_PRESSED);
                 }
             } else if (MouseEvent.MOUSE_DRAGGED == TYPE) {
                 Point2D currentPos = thumb.localToParent(e.getX(), e.getY());
@@ -98,8 +98,8 @@ public class SwitchSliderTileSkin extends TileSkin {
             } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
                 if (SRC.equals(thumb)) {
                     tile.fireTileEvent(VALUE_CHANGED);
-                } else if (SRC.equals(switchThumb)) {
-                    tile.fireEvent(SWITCH_INACTIVE);
+                } else if (SRC.equals(switchBorder)) {
+                    tile.fireEvent(SWITCH_RELEASED);
                 }
             }
         };

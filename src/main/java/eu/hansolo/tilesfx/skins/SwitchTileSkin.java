@@ -38,8 +38,8 @@ import javafx.util.Duration;
  * Created by hansolo on 19.12.16.
  */
 public class SwitchTileSkin extends TileSkin {
-    private static final SwitchEvent SWITCH_ACTIVE   = new SwitchEvent(SwitchEvent.ACTIVE);
-    private static final SwitchEvent SWITCH_INACTIVE = new SwitchEvent(SwitchEvent.INACTIVE);
+    private static final SwitchEvent SWITCH_PRESSED  = new SwitchEvent(SwitchEvent.SWITCH_PRESSED);
+    private static final SwitchEvent SWITCH_RELEASED = new SwitchEvent(SwitchEvent.SWITCH_RELEASED);
     private Text                     titleText;
     private Text                     text;
     private Label                    description;
@@ -65,9 +65,9 @@ public class SwitchTileSkin extends TileSkin {
             final EventType TYPE = e.getEventType();
             if (MouseEvent.MOUSE_PRESSED == TYPE) {
                 tile.setActive(!tile.isActive());
-                tile.fireEvent(SWITCH_ACTIVE);
+                tile.fireEvent(SWITCH_PRESSED);
             } else if(MouseEvent.MOUSE_RELEASED == TYPE) {
-                tile.fireEvent(SWITCH_INACTIVE);
+                tile.fireEvent(SWITCH_RELEASED);
             }
         };
         selectedListener = o -> moveThumb();

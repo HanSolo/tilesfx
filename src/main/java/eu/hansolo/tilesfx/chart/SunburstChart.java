@@ -160,7 +160,7 @@ public class SunburstChart extends Region {
     private void registerListeners() {
         widthProperty().addListener(sizeListener);
         heightProperty().addListener(sizeListener);
-        tree.setOnTreeNodeEvent(e -> redraw());
+        tree.flattened().forEach(node -> node.setOnTreeNodeEvent(e -> redraw()));
     }
 
 
@@ -314,9 +314,9 @@ public class SunburstChart extends Region {
     }
 
     public void setTree(final TreeNode TREE) {
-        if (null != tree) { tree.removeAllTreeNodeEventListeners(); }
+        if (null != tree) { tree.flattened().forEach(node -> node.removeAllTreeNodeEventListeners()); }
         tree = TREE;
-        tree.setOnTreeNodeEvent(e -> redraw());
+        tree.flattened().forEach(node -> node.setOnTreeNodeEvent(e -> redraw()));
         prepareData();
         drawChart();
     }

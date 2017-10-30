@@ -64,7 +64,12 @@ public class TreeNode {
         // Add this node to parents children
         if (null != parent) { parent.getChildren().add(this); }
 
-        children.addListener((ListChangeListener<TreeNode>) c -> fireTreeNodeEvent(CHILDREN_CHANGED));
+        children.addListener((ListChangeListener<TreeNode>) c -> {
+            while (c.next()) {
+                if (c.wasRemoved()) { c.getRemoved().forEach(removedItem -> removedItem.removeAllTreeNodeEventListeners()); }
+            }
+            fireTreeNodeEvent(CHILDREN_CHANGED);
+        });
     }
 
     public boolean isRoot() { return null == parent; }

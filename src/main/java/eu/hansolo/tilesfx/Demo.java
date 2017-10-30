@@ -282,7 +282,7 @@ public class Demo extends Application {
                                  .skinType(SkinType.HIGH_LOW)
                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                  .title("HighLow Tile")
-                                 .unit("€")
+                                 .unit("\u20AC")
                                  .description("Test")
                                  .text("Whatever text")
                                  .referenceValue(6.7)

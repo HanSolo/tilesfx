@@ -17,6 +17,10 @@
 package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.tools.TreeNodeEvent.EventType;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,15 +28,21 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 public class TreeNode {
-    private ChartData      data;
-    private TreeNode       parent;
-    private TreeNode       myRoot;
-    private List<TreeNode> children;
+    private final TreeNodeEvent         PARENT_CHANGED   = new TreeNodeEvent(TreeNode.this, EventType.PARENT_CHANGED);
+    private final TreeNodeEvent         CHILDREN_CHANGED = new TreeNodeEvent(TreeNode.this, EventType.CHILDREN_CHANGED);
+    private ChartData                   data;
+    private TreeNode                    parent;
+    private TreeNode                    myRoot;
+    private TreeNode                    treeRoot;
+    private int                         depth;
+    private ObservableList<TreeNode>    children;
+    private List<TreeNodeEventListener> listeners;
 
 
     // ******************** Constructors **************************************
@@ -40,9 +50,11 @@ public class TreeNode {
         this(DATA, null);
     }
     public TreeNode(final ChartData DATA, final TreeNode PARENT) {
-        data     = DATA;
-        parent   = PARENT;
-        children = new ArrayList<>();
+        data      = DATA;
+        parent    = PARENT;
+        depth     = -1;
+        children  = FXCollections.observableArrayList();
+        listeners = new CopyOnWriteArrayList<>();
         init();
     }
 
@@ -51,18 +63,29 @@ public class TreeNode {
     private void init() {
         // Add this node to parents children
         if (null != parent) { parent.getChildren().add(this); }
+
+        children.addListener((ListChangeListener<TreeNode>) c -> fireTreeNodeEvent(CHILDREN_CHANGED));
     }
 
     public boolean isRoot() { return null == parent; }
     public boolean isLeaf() { return (null == children || children.isEmpty()); }
     public boolean hasParent() { return null != parent; }
-    public void removeParent() { parent = null; }
+    public void removeParent() {
+        parent   = null;
+        myRoot   = null;
+        treeRoot = null;
+        depth    = -1;
+        fireTreeNodeEvent(PARENT_CHANGED);
+    }
 
     public TreeNode getParent() { return parent; }
     public void setParent(final TreeNode PARENT) {
         if (null != PARENT) { PARENT.addNode(TreeNode.this); }
-        parent = PARENT;
-        myRoot = null;
+        parent   = PARENT;
+        myRoot   = null;
+        treeRoot = null;
+        depth    = -1;
+        fireTreeNodeEvent(PARENT_CHANGED);
     }
 
     public ChartData getData() { return data; }
@@ -70,7 +93,7 @@ public class TreeNode {
 
     public List<TreeNode> getChildrenUnmodifiable() { return Collections.unmodifiableList(children); }
     public List<TreeNode> getChildren() { return children; }
-    public void setChildren(final List<TreeNode> CHILDREN) { children = new ArrayList<>(new LinkedHashSet<>(CHILDREN)); }
+    public void setChildren(final List<TreeNode> CHILDREN) { children.setAll(new LinkedHashSet<>(CHILDREN)); }
 
     public void addNode(final ChartData DATA) {
         TreeNode child = new TreeNode(DATA);
@@ -90,10 +113,7 @@ public class TreeNode {
     public void removeNodes(final TreeNode... NODES) { removeNodes(Arrays.asList(NODES)); }
     public void removeNodes(final List<TreeNode> NODES) { NODES.forEach(node -> removeNode(node)); }
 
-    public void removeAllNodes() {
-        myRoot = null;
-        children.clear();
-    }
+    public void removeAllNodes() { children.clear(); }
 
     public Stream<TreeNode> stream() {
         if (isLeaf()) {
@@ -113,7 +133,8 @@ public class TreeNode {
     }
 
     public Stream<TreeNode> flattened() { return Stream.concat(Stream.of(this), children.stream().flatMap(TreeNode::flattened)); }
-    public List getAll() { return flattened().map(TreeNode::getData).collect(Collectors.toList()); }
+    public List<TreeNode> getAll() { return flattened().collect(Collectors.toList()); }
+    public List<ChartData> getAllData() { return flattened().map(TreeNode::getData).collect(Collectors.toList()); }
 
     public int getNoOfNodes() { return flattened().map(TreeNode::getData).collect(Collectors.toList()).size(); }
     public int getNoOfLeafNodes() { return flattened().filter(node -> node.isLeaf()).map(TreeNode::getData).collect(Collectors.toList()).size(); }
@@ -123,11 +144,13 @@ public class TreeNode {
 
     public TreeNode getMyRoot() {
         if (null == myRoot) {
-            if (getParent().isRoot()) { return this; }
-            return getMyRoot(getParent());
-        } else {
-            return myRoot;
+            if (null != getParent() && getParent().isRoot()) {
+                myRoot = this;
+            } else {
+                myRoot = getMyRoot(getParent());
+            }
         }
+        return myRoot;
     }
     private TreeNode getMyRoot(final TreeNode NODE) {
         if (NODE.getParent().isRoot()) { return NODE; }
@@ -135,25 +158,37 @@ public class TreeNode {
     }
 
     public TreeNode getTreeRoot() {
-        if (isRoot()) { return this; }
-        return getTreeRoot(getParent());
+        if (null == treeRoot) {
+            if (isRoot()) {
+                treeRoot = this;
+            } else {
+                treeRoot = getTreeRoot(getParent());
+            }
+        }
+        return treeRoot;
     }
     private TreeNode getTreeRoot(final TreeNode NODE) {
         if (NODE.isRoot()) { return NODE; }
         return getTreeRoot(NODE.getParent());
     }
 
-    public int getLevel() {
-        if (isRoot()) { return 0; }
-        return getLevel(getParent(), 0);
+    public int getDepth() {
+        if (depth == -1) {
+            if (isRoot()) {
+                depth = 0;
+            } else {
+                depth = getDepth(getParent(), 0);
+            }
+        }
+        return depth;
     }
-    private int getLevel(final TreeNode NODE, int level) {
-        level++;
-        if (NODE.isRoot()) { return level; }
-        return getLevel(NODE.getParent(), level);
+    private int getDepth(final TreeNode NODE, int depth) {
+        depth++;
+        if (NODE.isRoot()) { return depth; }
+        return getDepth(NODE.getParent(), depth);
     }
 
-    public int getMaxLevel() { return getTreeRoot().stream().map(TreeNode::getLevel).max(Comparator.naturalOrder()).orElse(0); }
+    public int getMaxLevel() { return getTreeRoot().stream().map(TreeNode::getDepth).max(Comparator.naturalOrder()).orElse(0); }
 
     public double getPercentage() {
         List<TreeNode> siblings   = getSiblings();
@@ -164,8 +199,8 @@ public class TreeNode {
     public List<TreeNode> getSiblings() { return null == getParent() ? new ArrayList<>() : getParent().getChildren(); }
 
     public List<TreeNode> nodesAtSameLevel() {
-        final int LEVEL = getLevel();
-        return getTreeRoot().stream().filter(node -> node.getLevel() == LEVEL).collect(Collectors.toList());
+        final int LEVEL = getDepth();
+        return getTreeRoot().stream().filter(node -> node.getDepth() == LEVEL).collect(Collectors.toList());
     }
 
     public double getParentAngle() {
@@ -180,4 +215,16 @@ public class TreeNode {
         for (TreeNode n : parentList) { parentAngle = parentAngle * n.getPercentage(); }
         return parentAngle;
     }
+
+
+    // ******************** Event handling ************************************
+    public void setOnTreeNodeEvent(final TreeNodeEventListener LISTENER) { addTreeNodeEventListener(LISTENER); }
+    public void addTreeNodeEventListener(final TreeNodeEventListener LISTENER) { if (!listeners.contains(LISTENER)) listeners.add(LISTENER); }
+    public void removeTreeNodeEventListener(final TreeNodeEventListener LISTENER) { if (listeners.contains(LISTENER)) listeners.remove(LISTENER); }
+    public void removeAllTreeNodeEventListeners() { listeners.clear(); }
+
+    public void fireTreeNodeEvent(final TreeNodeEvent EVENT) {
+        for (TreeNodeEventListener listener : listeners) { listener.onTreeNodeEvent(EVENT); }
+    }
+
 }

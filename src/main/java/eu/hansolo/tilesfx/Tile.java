@@ -206,9 +206,9 @@ public class Tile extends Control {
     private        final TileEvent   FLIP_START_EVENT      = new TileEvent(EventType.FLIP_START);
     
     // Tile events
-    private List<TileEventListener>  listenerList          = new CopyOnWriteArrayList<>();
-    private List<AlarmEventListener> alarmListenerList     = new CopyOnWriteArrayList<>();
-    private List<TimeEventListener>  timeEventListenerList = new CopyOnWriteArrayList<>();
+    private List<TileEventListener>  tileEventListeners    = new CopyOnWriteArrayList<>();
+    private List<AlarmEventListener> alarmEventListeners   = new CopyOnWriteArrayList<>();
+    private List<TimeEventListener>  timeEventListeners    = new CopyOnWriteArrayList<>();
 
 
     // Data related
@@ -4448,7 +4448,7 @@ public class Tile extends Control {
             for (TimeSection timeSection : timeSections) { timeSection.checkForTimeAndDate(now); }
         }
 
-        if (timeEventListenerList.isEmpty()) return;
+        if (timeEventListeners.isEmpty()) return;
         // Fire TimeEvents
         if (oldTime.getSecond() != now.getSecond()) fireTimeEvent(new TimeEvent(Tile.this, now, TimeEventType.SECOND));
         if (oldTime.getMinute() != now.getMinute()) fireTimeEvent(new TimeEvent(Tile.this, now, TimeEventType.MINUTE));
@@ -4498,29 +4498,32 @@ public class Tile extends Control {
     
     // ******************** Event handling ************************************
     public void setOnTileEvent(final TileEventListener LISTENER) { addTileEventListener(LISTENER); }
-    public void addTileEventListener(final TileEventListener LISTENER) { if (!listenerList.contains(LISTENER)) listenerList.add(LISTENER); }
-    public void removeTileEventListener(final TileEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
+    public void addTileEventListener(final TileEventListener LISTENER) { if (!tileEventListeners.contains(LISTENER)) tileEventListeners.add(LISTENER); }
+    public void removeTileEventListener(final TileEventListener LISTENER) { if (tileEventListeners.contains(LISTENER)) tileEventListeners.remove(LISTENER); }
+    public void removeAllTileEventListeners() { tileEventListeners.clear(); }
 
     public void fireTileEvent(final TileEvent EVENT) {
-        for (TileEventListener listener : listenerList) { listener.onTileEvent(EVENT); }
+        for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(EVENT); }
     }
 
     
     public void setOnAlarm(final AlarmEventListener LISTENER) { addAlarmEventListener(LISTENER); }
-    public void addAlarmEventListener(final AlarmEventListener LISTENER) { if (!alarmListenerList.contains(LISTENER)) alarmListenerList.add(LISTENER); }
-    public void removeAlarmEventListener(final AlarmEventListener LISTENER) { if (alarmListenerList.contains(LISTENER)) alarmListenerList.remove(LISTENER); }
+    public void addAlarmEventListener(final AlarmEventListener LISTENER) { if (!alarmEventListeners.contains(LISTENER)) alarmEventListeners.add(LISTENER); }
+    public void removeAlarmEventListener(final AlarmEventListener LISTENER) { if (alarmEventListeners.contains(LISTENER)) alarmEventListeners.remove(LISTENER); }
+    public void removeAllAlarmEventListeners() { alarmEventListeners.clear(); }
 
     public void fireAlarmEvent(final AlarmEvent EVENT) {
-        for (AlarmEventListener listener : alarmListenerList) { listener.onAlarmEvent(EVENT); }
+        for (AlarmEventListener listener : alarmEventListeners) { listener.onAlarmEvent(EVENT); }
     }
 
 
     public void setOnTimeEvent(final TimeEventListener LISTENER) { addTimeEventListener(LISTENER); }
-    public void addTimeEventListener(final TimeEventListener LISTENER) { if (!timeEventListenerList.contains(LISTENER)) timeEventListenerList.add(LISTENER); }
-    public void removeTimeEventListener(final TimeEventListener LISTENER) { if (timeEventListenerList.contains(LISTENER)) timeEventListenerList.remove(LISTENER); }
+    public void addTimeEventListener(final TimeEventListener LISTENER) { if (!timeEventListeners.contains(LISTENER)) timeEventListeners.add(LISTENER); }
+    public void removeTimeEventListener(final TimeEventListener LISTENER) { if (timeEventListeners.contains(LISTENER)) timeEventListeners.remove(LISTENER); }
+    public void removeAllTimeEventListeners() { timeEventListeners.clear(); }
 
     public void fireTimeEvent(final TimeEvent EVENT) {
-        for (TimeEventListener listener : timeEventListenerList) { listener.onTimeEvent(EVENT); }
+        for (TimeEventListener listener : timeEventListeners) { listener.onTimeEvent(EVENT); }
     }
 
 

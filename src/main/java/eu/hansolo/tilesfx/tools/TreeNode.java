@@ -16,6 +16,8 @@
 
 package eu.hansolo.tilesfx.tools;
 
+import eu.hansolo.tilesfx.chart.ChartData;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,17 +28,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-public class TreeNode<T> {
-    private T                 data;
-    private TreeNode<T>       parent;
-    private List<TreeNode<T>> children;
+public class TreeNode {
+    private ChartData      data;
+    private TreeNode       parent;
+    private TreeNode       myRoot;
+    private List<TreeNode> children;
 
 
     // ******************** Constructors **************************************
-    public TreeNode(final T DATA) {
+    public TreeNode(final ChartData DATA) {
         this(DATA, null);
     }
-    public TreeNode(final T DATA, final TreeNode<T> PARENT) {
+    public TreeNode(final ChartData DATA, final TreeNode PARENT) {
         data     = DATA;
         parent   = PARENT;
         children = new ArrayList<>();
@@ -55,40 +58,44 @@ public class TreeNode<T> {
     public boolean hasParent() { return null != parent; }
     public void removeParent() { parent = null; }
 
-    public TreeNode<T> getParent() { return parent; }
-    public void setParent(final TreeNode<T> PARENT) {
+    public TreeNode getParent() { return parent; }
+    public void setParent(final TreeNode PARENT) {
         if (null != PARENT) { PARENT.addNode(TreeNode.this); }
         parent = PARENT;
+        myRoot = null;
     }
 
-    public T getData() { return data; }
-    public void setData(final T DATA) { data = DATA; }
+    public ChartData getData() { return data; }
+    public void setData(final ChartData DATA) { data = DATA; }
 
-    public List<TreeNode<T>> getChildrenUnmodifiable() { return Collections.unmodifiableList(children); }
-    public List<TreeNode<T>> getChildren() { return children; }
-    public void setChildren(final List<TreeNode<T>> CHILDREN) { children = new ArrayList<>(new LinkedHashSet<>(CHILDREN)); }
+    public List<TreeNode> getChildrenUnmodifiable() { return Collections.unmodifiableList(children); }
+    public List<TreeNode> getChildren() { return children; }
+    public void setChildren(final List<TreeNode> CHILDREN) { children = new ArrayList<>(new LinkedHashSet<>(CHILDREN)); }
 
-    public void addNode(final T DATA) {
-        TreeNode<T> child = new TreeNode<T>(DATA);
+    public void addNode(final ChartData DATA) {
+        TreeNode child = new TreeNode(DATA);
         child.setParent(this);
         children.add(child);
     }
-    public void addNode(final TreeNode<T> NODE) {
+    public void addNode(final TreeNode NODE) {
         if (children.contains(NODE)) { return; }
         NODE.setParent(this);
         children.add(NODE);
     }
-    public void removeNode(final TreeNode<T> NODE) { if (children.contains(NODE)) { children.remove(NODE); } }
+    public void removeNode(final TreeNode NODE) { if (children.contains(NODE)) { children.remove(NODE); } }
 
-    public void addNodes(final TreeNode<T>... NODES) { addNodes(Arrays.asList(NODES)); }
-    public void addNodes(final List<TreeNode<T>> NODES) { NODES.forEach(node -> addNode(node)); }
+    public void addNodes(final TreeNode... NODES) { addNodes(Arrays.asList(NODES)); }
+    public void addNodes(final List<TreeNode> NODES) { NODES.forEach(node -> addNode(node)); }
 
-    public void removeNodes(final TreeNode<T>... NODES) { removeNodes(Arrays.asList(NODES)); }
-    public void removeNodes(final List<TreeNode<T>> NODES) { NODES.forEach(node -> removeNode(node)); }
+    public void removeNodes(final TreeNode... NODES) { removeNodes(Arrays.asList(NODES)); }
+    public void removeNodes(final List<TreeNode> NODES) { NODES.forEach(node -> removeNode(node)); }
 
-    public void removeAllNodes() { children.clear(); }
+    public void removeAllNodes() {
+        myRoot = null;
+        children.clear();
+    }
 
-    public Stream<TreeNode<T>> stream() {
+    public Stream<TreeNode> stream() {
         if (isLeaf()) {
             return Stream.of(this);
         } else {
@@ -97,7 +104,7 @@ public class TreeNode<T> {
                                 .reduce(Stream.of(this), (s1, s2) -> Stream.concat(s1, s2));
         }
     }
-    public Stream<TreeNode<T>> lazyStream() {
+    public Stream<TreeNode> lazyStream() {
         if (isLeaf()) {
             return Stream.of(this);
         } else {
@@ -105,33 +112,72 @@ public class TreeNode<T> {
         }
     }
 
-    public Stream<TreeNode<T>> flattened() { return Stream.concat(Stream.of(this), children.stream().flatMap(TreeNode::flattened)); }
-    public List<T> getAll() { return flattened().map(TreeNode::getData).collect(Collectors.toList()); }
+    public Stream<TreeNode> flattened() { return Stream.concat(Stream.of(this), children.stream().flatMap(TreeNode::flattened)); }
+    public List getAll() { return flattened().map(TreeNode::getData).collect(Collectors.toList()); }
 
     public int getNoOfNodes() { return flattened().map(TreeNode::getData).collect(Collectors.toList()).size(); }
     public int getNoOfLeafNodes() { return flattened().filter(node -> node.isLeaf()).map(TreeNode::getData).collect(Collectors.toList()).size(); }
 
-    public boolean contains(final TreeNode<T> NODE) { return flattened().anyMatch(n -> n.equals(NODE)); }
-    public boolean containsContext(final T DATA) { return flattened().anyMatch(n -> n.data.equals(DATA)); }
+    public boolean contains(final TreeNode NODE) { return flattened().anyMatch(n -> n.equals(NODE)); }
+    public boolean containsData(final ChartData DATA) { return flattened().anyMatch(n -> n.data.equals(DATA)); }
 
-    public TreeNode<T> getRoot() {
-        if (isRoot()) { return this; }
-        return findRoot(getParent());
+    public TreeNode getMyRoot() {
+        if (null == myRoot) {
+            if (getParent().isRoot()) { return this; }
+            return getMyRoot(getParent());
+        } else {
+            return myRoot;
+        }
     }
-    private TreeNode<T> findRoot(final TreeNode<T> NODE) {
+    private TreeNode getMyRoot(final TreeNode NODE) {
+        if (NODE.getParent().isRoot()) { return NODE; }
+        return getMyRoot(NODE.getParent());
+    }
+
+    public TreeNode getTreeRoot() {
+        if (isRoot()) { return this; }
+        return getTreeRoot(getParent());
+    }
+    private TreeNode getTreeRoot(final TreeNode NODE) {
         if (NODE.isRoot()) { return NODE; }
-        return findRoot(NODE.getParent());
+        return getTreeRoot(NODE.getParent());
     }
 
     public int getLevel() {
         if (isRoot()) { return 0; }
         return getLevel(getParent(), 0);
     }
-    private int getLevel(final TreeNode<T> NODE, int level) {
+    private int getLevel(final TreeNode NODE, int level) {
         level++;
         if (NODE.isRoot()) { return level; }
         return getLevel(NODE.getParent(), level);
     }
 
-    public int getMaxLevel() { return getRoot().stream().map(TreeNode::getLevel).max(Comparator.naturalOrder()).orElse(0); }
+    public int getMaxLevel() { return getTreeRoot().stream().map(TreeNode::getLevel).max(Comparator.naturalOrder()).orElse(0); }
+
+    public double getPercentage() {
+        List<TreeNode> siblings   = getSiblings();
+        double         sum        = siblings.stream().map(node -> node.getData()).mapToDouble(ChartData::getValue).sum();
+        return Double.compare(sum, 0) == 0 ? 1.0 : getData().getValue() / sum;
+    }
+
+    public List<TreeNode> getSiblings() { return null == getParent() ? new ArrayList<>() : getParent().getChildren(); }
+
+    public List<TreeNode> nodesAtSameLevel() {
+        final int LEVEL = getLevel();
+        return getTreeRoot().stream().filter(node -> node.getLevel() == LEVEL).collect(Collectors.toList());
+    }
+
+    public double getParentAngle() {
+        List<TreeNode> parentList = new ArrayList<>();
+        TreeNode node = TreeNode.this;
+        while (!node.getParent().isRoot()) {
+            node = node.getParent();
+            parentList.add(node);
+        }
+        Collections.reverse(parentList);
+        double parentAngle = 360.0;
+        for (TreeNode n : parentList) { parentAngle = parentAngle * n.getPercentage(); }
+        return parentAngle;
+    }
 }

@@ -17,7 +17,9 @@
 package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.tools.TreeNodeEvent.EventType;
+import eu.hansolo.tilesfx.events.TreeNodeEvent;
+import eu.hansolo.tilesfx.events.TreeNodeEvent.EventType;
+import eu.hansolo.tilesfx.events.TreeNodeEventListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -34,8 +36,8 @@ import java.util.stream.Stream;
 
 
 public class TreeNode {
-    private final TreeNodeEvent         PARENT_CHANGED   = new TreeNodeEvent(TreeNode.this, EventType.PARENT_CHANGED);
-    private final TreeNodeEvent         CHILDREN_CHANGED = new TreeNodeEvent(TreeNode.this, EventType.CHILDREN_CHANGED);
+    private final TreeNodeEvent PARENT_CHANGED   = new TreeNodeEvent(TreeNode.this, EventType.PARENT_CHANGED);
+    private final TreeNodeEvent CHILDREN_CHANGED = new TreeNodeEvent(TreeNode.this, EventType.CHILDREN_CHANGED);
     private ChartData                   data;
     private TreeNode                    parent;
     private TreeNode                    myRoot;

@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package eu.hansolo.tilesfx.tools;
+package eu.hansolo.tilesfx.events;
+
+import eu.hansolo.tilesfx.tools.TreeNode;
+
 
 public class TreeNodeEvent {
     public enum EventType { PARENT_CHANGED, CHILDREN_CHANGED }

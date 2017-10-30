@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.hansolo.tilesfx.tools;
+package eu.hansolo.tilesfx.events;
 
 
 /**

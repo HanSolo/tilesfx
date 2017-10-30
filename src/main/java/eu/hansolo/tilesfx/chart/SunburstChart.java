@@ -160,6 +160,7 @@ public class SunburstChart extends Region {
     private void registerListeners() {
         widthProperty().addListener(sizeListener);
         heightProperty().addListener(sizeListener);
+        tree.setOnTreeNodeEvent(e -> redraw());
     }
 
 
@@ -180,6 +181,7 @@ public class SunburstChart extends Region {
     public void dispose() {
         widthProperty().removeListener(sizeListener);
         heightProperty().removeListener(sizeListener);
+        tree.removeAllTreeNodeEventListeners();
     }
 
     public VisibleData getVisibleData() { return null == visibleData ? _visibleData : visibleData.get(); }
@@ -312,7 +314,9 @@ public class SunburstChart extends Region {
     }
 
     public void setTree(final TreeNode TREE) {
+        if (null != tree) { tree.removeAllTreeNodeEventListeners(); }
         tree = TREE;
+        tree.setOnTreeNodeEvent(e -> redraw());
         prepareData();
         drawChart();
     }
@@ -324,7 +328,7 @@ public class SunburstChart extends Region {
         // Create map of all nodes per level
         levelMap.clear();
         for (int i = 0 ; i <= maxLevel ; i++) { levelMap.put(i, new ArrayList<>()); }
-        root.stream().forEach(node -> levelMap.get(node.getLevel()).add(node));
+        root.stream().forEach(node -> levelMap.get(node.getDepth()).add(node));
 
         for (int level = 1 ; level < maxLevel ; level++) {
             List<TreeNode> treeNodeList = levelMap.get(level);
@@ -337,7 +341,7 @@ public class SunburstChart extends Region {
     private void drawChart() {
         levelMap.clear();
         for (int i = 0 ; i <= maxLevel ; i++) { levelMap.put(i, new ArrayList<>()); }
-        root.stream().forEach(node -> levelMap.get(node.getLevel()).add(node));
+        root.stream().forEach(node -> levelMap.get(node.getDepth()).add(node));
 
         double          canvasSize         = chartCanvas.getWidth();
         double          widthStep          = canvasSize * 0.8 / maxLevel;

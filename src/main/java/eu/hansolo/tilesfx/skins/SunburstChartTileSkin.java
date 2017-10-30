@@ -17,28 +17,20 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.chart.RadarChart;
-import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.chart.SunburstChart;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import javafx.collections.ListChangeListener;
 import javafx.scene.text.Text;
 
 
-/**
- * Created by hansolo on 10.06.17.
- */
-public class RadarChartTileSkin extends TileSkin {
-    private Text                          titleText;
-    private Text                          text;
-    private RadarChart                    radarChart;
-    private ListChangeListener<ChartData> chartDataListener;
-    private ChartDataEventListener        chartEventListener;
+public class SunburstChartTileSkin extends TileSkin {
+    private Text          titleText;
+    private Text          text;
+    private SunburstChart sunburstChart;
 
 
     // ******************** Constructors **************************************
-    public RadarChartTileSkin(final Tile TILE) {
+    public SunburstChartTileSkin(final Tile TILE) {
         super(TILE);
     }
 
@@ -47,30 +39,7 @@ public class RadarChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        radarChart = new RadarChart(tile.getChartData());
-        radarChart.setMaxValue(tile.getMaxValue());
-        radarChart.setUnit(tile.getUnit());
-        radarChart.setLegendVisible(true);
-        radarChart.setThresholdVisible(tile.isThresholdVisible());
-        radarChart.setMode(tile.getRadarChartMode());
-        radarChart.setGridColor(tile.getChartGridColor());
-        radarChart.setChartTextColor(tile.getTextColor());
-        radarChart.setThresholdColor(tile.getThresholdColor());
-        radarChart.setGradientStops(tile.getGradientStops());
-
-        chartEventListener = e -> radarChart.redraw();
-        tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
-
-        chartDataListener  = c -> {
-            while (c.next()) {
-                if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(addedItem -> addedItem.addChartDataEventListener(chartEventListener));
-                } else if (c.wasRemoved()) {
-                    c.getRemoved().forEach(removedItem -> removedItem.removeChartDataEventListener(chartEventListener));
-                }
-            }
-            radarChart.redraw();
-        };
+        sunburstChart = tile.getSunburstChart();
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -80,12 +49,11 @@ public class RadarChartTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
 
-        getPane().getChildren().addAll(titleText, radarChart, text);
+        getPane().getChildren().addAll(titleText, sunburstChart, text);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.getChartData().addListener(chartDataListener);
     }
 
 
@@ -96,20 +64,13 @@ public class RadarChartTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
-            radarChart.setThresholdVisible(tile.isThresholdVisible());
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            radarChart.setMaxValue(tile.getMaxValue());
-            radarChart.setUnit(tile.getUnit());
-            radarChart.setMode(tile.getRadarChartMode());
-            radarChart.setThresholdColor(tile.getThresholdColor());
-            radarChart.setGradientStops(tile.getGradientStops());
+            sunburstChart.redraw();
         }
     }
 
     @Override public void dispose() {
-        radarChart.dispose();
-        tile.getChartData().removeListener(chartDataListener);
-        tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        sunburstChart.dispose();
         super.dispose();
     }
 
@@ -152,8 +113,8 @@ public class RadarChartTileSkin extends TileSkin {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            radarChart.setPrefSize(chartSize, chartSize);
-            radarChart.relocate((width - chartSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartSize) * 0.5);
+            sunburstChart.setPrefSize(chartSize, chartSize);
+            sunburstChart.relocate((width - chartSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartSize) * 0.5);
 
             resizeStaticText();
         }
@@ -161,22 +122,14 @@ public class RadarChartTileSkin extends TileSkin {
 
     @Override protected void redraw() {
         super.redraw();
-        radarChart.setSmoothing(tile.isSmoothing());
-        radarChart.setUnit(tile.getUnit());
-        radarChart.setMode(tile.getRadarChartMode());
 
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
 
         resizeStaticText();
-        radarChart.redraw();
+        sunburstChart.redraw();
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
-        radarChart.setGridColor(tile.getForegroundColor());
-        radarChart.setChartTextColor(tile.getTextColor());
-        radarChart.setThresholdColor(tile.getThresholdColor());
-        radarChart.setGradientStops(tile.getGradientStops());
-        radarChart.setGridColor(tile.getChartGridColor());
     }
 }

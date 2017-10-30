@@ -21,6 +21,7 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.chart.RadarChart;
+import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
@@ -28,6 +29,7 @@ import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.tilesfx.tools.TreeNode;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -736,6 +738,31 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B sunburstTree(final TreeNode TREE) {
+        properties.put("sunburstTree", new SimpleObjectProperty(TREE));
+        return (B)this;
+    }
+
+    public final B sunburstBackgroundColor(final Color COLOR) {
+        properties.put("sunburstBackgroundColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B sunburstTextColor(final Color COLOR) {
+        properties.put("sunburstTextColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B sunburstUseColorFromParent(final boolean USE) {
+        properties.put("sunburstUseColorFromParent", new SimpleBooleanProperty(USE));
+        return (B)this;
+    }
+
+    public final B sunburstTextOrientation(final TextOrientation ORIENTATION) {
+        properties.put("sunburstTextOrientation", new SimpleObjectProperty(ORIENTATION));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -922,6 +949,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case CALENDAR:
                     CONTROL.setTitleAlignment(TextAlignment.CENTER);
                     CONTROL.setTextAlignment(TextAlignment.CENTER);
+                    break;
+                case SUNBURST:
                     break;
                 default:
                     break;
@@ -1264,6 +1293,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setFlipText(((StringProperty) properties.get(key)).get());
             } else if ("dataPointsVisible".equals(key)) {
                 CONTROL.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("sunburstTree".equals(key)) {
+                CONTROL.getSunburstChart().setTree(((ObjectProperty<TreeNode>) properties.get(key)).get());
+            } else if ("sunburstBackgroundColor".equals(key)) {
+                CONTROL.getSunburstChart().setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("sunburstTextColor".equals(key)) {
+                CONTROL.getSunburstChart().setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("sunburstUseColorFromParent".equals(key)) {
+                CONTROL.getSunburstChart().setUseColorFromParent(((BooleanProperty) properties.get(key)).get());
+            } else if ("sunburstTextOrientation".equals(key)) {
+                CONTROL.getSunburstChart().setTextOrientation(((ObjectProperty<TextOrientation>) properties.get(key)).get());
             }
         }
         return CONTROL;

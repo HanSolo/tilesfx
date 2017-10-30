@@ -483,7 +483,7 @@ public class SunburstChart extends Region {
         }
     }
 
-    private void redraw() {
+    public void redraw() {
         pane.setBackground(new Background(new BackgroundFill(backgroundPaint, CornerRadii.EMPTY, Insets.EMPTY)));
         pane.setBorder(new Border(new BorderStroke(borderPaint, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(borderWidth / PREFERRED_WIDTH * size))));
         drawChart();

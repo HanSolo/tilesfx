@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart;
 import eu.hansolo.tilesfx.chart.RadarChart.Mode;
+import eu.hansolo.tilesfx.chart.SunburstChart;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
@@ -109,7 +110,7 @@ public class Tile extends Control {
                            GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
                            RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris"),
                            CHARACTER("Character"), FLIP("Flip"), SWITCH_SLIDER("SwitchSlider"),
-                           DATE("Date"), CALENDAR("Calendar");
+                           DATE("Date"), CALENDAR("Calendar"), SUNBURST("Sunburst");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -254,8 +255,6 @@ public class Tile extends Control {
     private              MovingAverage                          movingAverage;
     private              ObservableList<Section>                sections;
     private              ObservableList<Series<String, Number>> series;
-    private              Properties                             countryProperties;
-    private              Map<String, List<CountryPath>>         countryPaths;
     private              List<Stop>                             gradientStops;
     private              ObjectProperty<ZonedDateTime>          time;
     private              LongProperty                           currentTime;
@@ -278,6 +277,7 @@ public class Tile extends Control {
     private              ObjectProperty<MapProvider>            mapProvider;
     private              List<String>                           characterList;
     private              long                                   flipTimeInMS;
+    private              SunburstChart                          sunburstChart;
 
     // UI related
     private              SkinType                               skinType;
@@ -591,6 +591,7 @@ public class Tile extends Control {
         flipTimeInMS                        = 500;
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
+        sunburstChart                       = new SunburstChart();
 
         _textSize                           = TextSize.NORMAL;
         _roundedCorners                     = true;
@@ -706,7 +707,7 @@ public class Tile extends Control {
     }
 
 
-    // ******************** Data related methods ******************************
+    // ******************** Methods *******************************************
 
     /**
      * Returns the value of the Tile. If animated == true this value represents
@@ -977,6 +978,8 @@ public class Tile extends Control {
         }
         return autoReferenceValue;
     }
+
+    public SunburstChart getSunburstChart() { return sunburstChart; }
 
     /**
      * Returns the title of the gauge. This title will usually
@@ -4571,6 +4574,7 @@ public class Tile extends Control {
             case SWITCH_SLIDER    : return new SwitchSliderTileSkin(Tile.this);
             case DATE             : return new DateTileSkin(Tile.this);
             case CALENDAR         : return new CalendarTileSkin(Tile.this);
+            case SUNBURST         : return new SunburstChartTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4688,6 +4692,8 @@ public class Tile extends Control {
                 setTitleAlignment(TextAlignment.CENTER);
                 setTextAlignment(TextAlignment.CENTER);
                 break;
+            case SUNBURST:
+                break;
             default:
                 break;
         }
@@ -4730,6 +4736,7 @@ public class Tile extends Control {
             case SWITCH_SLIDER    : setSkin(new SwitchSliderTileSkin(Tile.this)); break;
             case DATE             : setSkin(new DateTileSkin(Tile.this)); break;
             case CALENDAR         : setSkin(new CalendarTileSkin(Tile.this)); break;
+            case SUNBURST         : setSkin(new SunburstChartTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

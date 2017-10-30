@@ -139,7 +139,8 @@ public class Tile extends Control {
         ORANGE(Color.rgb(237, 162, 57), "ORANGE"),
         YELLOW_ORANGE(Color.rgb(229, 198, 76), "YELLOW_ORANGE"),
         YELLOW(Color.rgb(229, 229, 76), "YELLOW"),
-        MAGENTA(Color.rgb(198, 75, 232), "MAGENTA");
+        MAGENTA(Color.rgb(198, 75, 232), "MAGENTA"),
+        PINK(Color.rgb(233, 14, 139), "PINK");
 
         public final Color  color;
         public final String styleName;
@@ -177,6 +178,7 @@ public class Tile extends Control {
     public  static final Color       YELLOW_ORANGE         = TileColor.YELLOW_ORANGE.color;
     public  static final Color       YELLOW                = TileColor.YELLOW.color;
     public  static final Color       MAGENTA               = TileColor.MAGENTA.color;
+    public  static final Color       PINK                  = TileColor.PINK.color;
     public  static final int         SHORT_INTERVAL        = 20;
     public  static final int         LONG_INTERVAL         = 1000;
     private static final int         MAX_NO_OF_DECIMALS    = 3;

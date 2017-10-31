@@ -287,34 +287,58 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         int               noOfElements = elements.size();
         PathElement       lastElement  = elements.get(0);
 
-        for (int i = 1 ; i < noOfElements ; i++) {
-            PathElement element = elements.get(i);
+        if (tile.isSnapToTicks()) {
+            double    reverseFactor    = (height * 0.5) / range;
+            int       noOfDataElements = tile.getChartData().size();
+            double    interval         = width / (double) (noOfDataElements - 1);
+            int       selectedIndex    = roundDoubleToInt(EVENT_X / interval);
+            ChartData selectedData     = tile.getChartData().get(selectedIndex);
+            double    selectedValue    = selectedData.getValue();
 
-            double[] xy  = getXYFromPathElement(lastElement);
-            double[] xy1 = getXYFromPathElement(element);
+            selectionIndicator.setCenterX(interval * selectedIndex);
+            selectionIndicator.setCenterY(height - selectedValue * reverseFactor);
+            selectionIndicator.setVisible(true);
+            fadeInFadeOut.playFrom(Duration.millis(0));
 
-            if (EVENT_X > xy[0] && EVENT_X < xy1[0]) {
-                double deltaX        = xy1[0] - xy[0];
-                double deltaY        = xy1[1] - xy[1];
-                double m             = deltaY / deltaX;
-                double y             = m * (EVT.getX() - xy[0]) + xy[1];
-                double selectedValue = upperBound - (y - (height * 0.5)) * factor;
+            String tooltipText = new StringBuilder(selectedData.getName()).append("\n").append(String.format(locale, formatString, selectedValue)).toString();
 
-                selectionIndicator.setCenterX(EVT.getX());
-                selectionIndicator.setCenterY(y);
-                selectionIndicator.setVisible(true);
-                fadeInFadeOut.playFrom(Duration.millis(0));
+            Point2D popupLocation = tile.localToScreen(selectionIndicator.getCenterX() - selectionTooltip.getWidth() * 0.5, selectionIndicator.getCenterY() - size * 0.025 - selectionTooltip.getHeight());
+            selectionTooltip.setText(tooltipText);
+            selectionTooltip.setX(popupLocation.getX());
+            selectionTooltip.setY(popupLocation.getY());
+            selectionTooltip.show(tile.getScene().getWindow());
 
-                Point2D popupLocation = tile.localToScreen(EVT.getX() - selectionTooltip.getWidth() * 0.5, selectionIndicator.getCenterY() - size * 0.025 - selectionTooltip.getHeight());
-                selectionTooltip.setText(String.format(locale, formatString, selectedValue));
-                selectionTooltip.setX(popupLocation.getX());
-                selectionTooltip.setY(popupLocation.getY());
-                selectionTooltip.show(tile.getScene().getWindow());
+            tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, selectedData));
+        } else {
+            for (int i = 1; i < noOfElements; i++) {
+                PathElement element = elements.get(i);
 
-                tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(selectedValue)));
-                break;
+                double[] xy  = getXYFromPathElement(lastElement);
+                double[] xy1 = getXYFromPathElement(element);
+
+                if (EVENT_X > xy[0] && EVENT_X < xy1[0]) {
+                    double deltaX        = xy1[0] - xy[0];
+                    double deltaY        = xy1[1] - xy[1];
+                    double m             = deltaY / deltaX;
+                    double y             = m * (EVT.getX() - xy[0]) + xy[1];
+                    double selectedValue = upperBound - (y - (height * 0.5)) * factor;
+
+                    selectionIndicator.setCenterX(EVT.getX());
+                    selectionIndicator.setCenterY(y);
+                    selectionIndicator.setVisible(true);
+                    fadeInFadeOut.playFrom(Duration.millis(0));
+
+                    Point2D popupLocation = tile.localToScreen(EVT.getX() - selectionTooltip.getWidth() * 0.5, selectionIndicator.getCenterY() - size * 0.025 - selectionTooltip.getHeight());
+                    selectionTooltip.setText(String.format(locale, formatString, selectedValue));
+                    selectionTooltip.setX(popupLocation.getX());
+                    selectionTooltip.setY(popupLocation.getY());
+                    selectionTooltip.show(tile.getScene().getWindow());
+
+                    tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(selectedValue)));
+                    break;
+                }
+                lastElement = element;
             }
-            lastElement = element;
         }
     }
 
@@ -323,6 +347,17 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             return new double[]{ ((MoveTo) ELEMENT).getX(), ((MoveTo) ELEMENT).getY() };
         } else {
             return new double[] { ((LineTo) ELEMENT).getX(), ((LineTo) ELEMENT).getY() };
+        }
+    }
+
+    private int roundDoubleToInt(final double VALUE){
+        double dAbs = Math.abs(VALUE);
+        int    i      = (int) dAbs;
+        double result = dAbs - (double) i;
+        if (result < 0.5) {
+            return VALUE < 0 ? -i : i;
+        } else {
+            return VALUE < 0 ? -(i + 1) : i + 1;
         }
     }
 

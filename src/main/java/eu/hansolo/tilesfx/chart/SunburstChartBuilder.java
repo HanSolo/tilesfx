@@ -83,6 +83,11 @@ public class SunburstChartBuilder<B extends SunburstChartBuilder<B>> {
         return (B)this;
     }
 
+    public final B interactive(final boolean INTERACTIVE) {
+        properties.put("interactive", new SimpleBooleanProperty(INTERACTIVE));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -210,6 +215,8 @@ public class SunburstChartBuilder<B extends SunburstChartBuilder<B>> {
                 CONTROL.setUseColorFromParent(((BooleanProperty) properties.get(key)).get());
             } else if ("decimals".equals(key)) {
                 CONTROL.setDecimals(((IntegerProperty) properties.get(key)).get());
+            } else if ("interactive".equals(key)) {
+                CONTROL.setInteractive(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

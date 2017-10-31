@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.chart.RadarChart;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
+import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
@@ -763,6 +764,31 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B sunburstVisibleData(final VisibleData VISIBLE_DATA) {
+        properties.put("sunburstVisibleData", new SimpleObjectProperty(VISIBLE_DATA));
+        return (B)this;
+    }
+
+    public final B sunburstInteractive(final boolean INTERACTIVE) {
+        properties.put("sunburstInteractive", new SimpleBooleanProperty(INTERACTIVE));
+        return (B)this;
+    }
+
+    public final B snapToTicks(final boolean SNAP) {
+        properties.put("snapToTicks", new SimpleBooleanProperty(SNAP));
+        return (B)this;
+    }
+
+    public final B minorTickCount(final int COUNT) {
+        properties.put("minorTickCount", new SimpleIntegerProperty(COUNT));
+        return (B)this;
+    }
+
+    public final B majorTickUnit(final double UNIT) {
+        properties.put("majorTickUnit", new SimpleDoubleProperty(UNIT));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -1303,6 +1329,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.getSunburstChart().setUseColorFromParent(((BooleanProperty) properties.get(key)).get());
             } else if ("sunburstTextOrientation".equals(key)) {
                 CONTROL.getSunburstChart().setTextOrientation(((ObjectProperty<TextOrientation>) properties.get(key)).get());
+            } else if("sunburstVisibleData".equals(key)) {
+                CONTROL.getSunburstChart().setVisibleData(((ObjectProperty<VisibleData>) properties.get(key)).get());
+            } else if ("sunburstInteractive".equals(key)) {
+                CONTROL.getSunburstChart().setInteractive(((BooleanProperty) properties.get(key)).get());
+            } else if ("snapToTicks".equals(key)) {
+                CONTROL.setSnapToTicks(((BooleanProperty) properties.get(key)).get());
+            } else if ("minorTickCount".equals(key)) {
+                CONTROL.setMinorTickCount(((IntegerProperty) properties.get(key)).get());
+            } else if ("majorTickUnit".equals(key)) {
+                CONTROL.setMajorTickUnit(((DoubleProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

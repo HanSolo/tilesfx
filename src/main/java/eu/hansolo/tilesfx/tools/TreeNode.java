@@ -70,7 +70,7 @@ public class TreeNode {
             while (c.next()) {
                 if (c.wasRemoved()) { c.getRemoved().forEach(removedItem -> removedItem.removeAllTreeNodeEventListeners()); }
             }
-            fireTreeNodeEvent(CHILDREN_CHANGED);
+            getTreeRoot().fireTreeNodeEvent(CHILDREN_CHANGED);
         });
     }
 
@@ -82,7 +82,7 @@ public class TreeNode {
         myRoot   = null;
         treeRoot = null;
         depth    = -1;
-        fireTreeNodeEvent(PARENT_CHANGED);
+        getTreeRoot().fireTreeNodeEvent(PARENT_CHANGED);
     }
 
     public TreeNode getParent() { return parent; }
@@ -92,7 +92,7 @@ public class TreeNode {
         myRoot   = null;
         treeRoot = null;
         depth    = -1;
-        fireTreeNodeEvent(PARENT_CHANGED);
+        getTreeRoot().fireTreeNodeEvent(PARENT_CHANGED);
     }
 
     public ChartData getData() { return data; }

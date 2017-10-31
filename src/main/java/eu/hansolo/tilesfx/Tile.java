@@ -451,6 +451,10 @@ public class Tile extends Control {
     private              BooleanProperty                        sortedData;
     private              boolean                                _dataPointsVisible;
     private              BooleanProperty                        dataPointsVisible;
+    private              boolean                                _snapToTicks;
+    private              BooleanProperty                        snapToTicks;
+    private              int                                    _minorTickCount;
+    private              double                                 _majorTickUnit;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -673,6 +677,9 @@ public class Tile extends Control {
         _country                            = Country.DE;
         _sortedData                         = true;
         _dataPointsVisible                  = false;
+        _snapToTicks                        = false;
+        _minorTickCount                     = 0;
+        _majorTickUnit                      = 1;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -998,6 +1005,7 @@ public class Tile extends Control {
         if (null == title) {
             _title = TITLE;
             fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvent(REDRAW_EVENT);
         } else {
             title.set(TITLE);
         }
@@ -1005,7 +1013,10 @@ public class Tile extends Control {
     public StringProperty titleProperty() {
         if (null == title) {
             title  = new StringPropertyBase(_title) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() {
+                    fireTileEvent(VISIBILITY_EVENT);
+                    fireTileEvent(REDRAW_EVENT);
+                }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "title"; }
             };
@@ -3279,7 +3290,6 @@ public class Tile extends Control {
         setMaxValue(niceMaxValue);
     }
 
-
     /**
      * Returns the current time of the clock.
      * @return the current time of the clock
@@ -4244,6 +4254,40 @@ public class Tile extends Control {
         }
         return dataPointsVisible;
     }
+
+    public boolean isSnapToTicks() { return null == snapToTicks ? _snapToTicks : snapToTicks.get(); }
+    public void setSnapToTicks(final boolean SNAP) {
+        if (null == snapToTicks) {
+            _snapToTicks = SNAP;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            snapToTicks.set(SNAP);
+        }
+    }
+    public BooleanProperty snapToTicksProperty() {
+        if (null == snapToTicks) {
+            snapToTicks = new BooleanPropertyBase(_snapToTicks) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "snapToTicks"; }
+            };
+        }
+        return snapToTicks;
+    }
+
+    /**
+     * The number of ticks between 2 major tick marks (used in SliderTileSkin)
+     * @return the number of ticks between 2 major tick marks
+     */
+    public int getMinorTickCount() { return _minorTickCount; }
+    public void setMinorTickCount(final int MINOR_TICK_COUNT) { _minorTickCount = Helper.clamp(0, 10, MINOR_TICK_COUNT); }
+
+    /**
+     * The distance between 2 major tick marks (used in SliderTileSkin)
+     * @return the distance between 2 major tick marks
+     */
+    public double getMajorTickUnit() { return _majorTickUnit; }
+    public void setMajorTickUnit(final double MAJOR_TICK_UNIT) { _majorTickUnit = Double.compare(MAJOR_TICK_UNIT, 0.0) <= 0 ? 0.25 : MAJOR_TICK_UNIT; }
 
     public double getIncrement() { return increment; }
     public void setIncrement(final double INCREMENT) { increment = clamp(0, 10, INCREMENT); }

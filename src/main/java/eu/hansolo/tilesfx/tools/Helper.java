@@ -124,6 +124,10 @@ public class Helper {
         return VALUE;
     }
 
+    public static final double nearest(final double SMALLER, final double VALUE, final double LARGER) {
+        return (VALUE - SMALLER) < (LARGER - VALUE) ? SMALLER : LARGER;
+    }
+
     public static final double[] calcAutoScale(final double MIN_VALUE, final double MAX_VALUE) {
         double maxNoOfMajorTicks = 10;
         double maxNoOfMinorTicks = 10;
@@ -138,6 +142,36 @@ public class Helper {
         niceMaxValue   = (Math.ceil(MAX_VALUE / majorTickSpace) * majorTickSpace);
         minorTickSpace = calcNiceNumber(majorTickSpace / (maxNoOfMinorTicks - 1), true);
         return new double[]{ niceMinValue, niceMaxValue, majorTickSpace, minorTickSpace };
+    }
+
+    /**
+     * Can be used to implement discrete steps e.g. on a slider.
+     * @param MIN_VALUE          The min value of the range
+     * @param MAX_VALUE          The max value of the range
+     * @param VALUE              The value to snap
+     * @param MINOR_TICK_COUNT   The number of ticks between 2 major tick marks
+     * @param MAJOR_TICK_UNIT    The distance between 2 major tick marks
+     * @return The value snapped to the next tick mark defined by the given parameters
+     */
+    public static double snapToTicks(final double MIN_VALUE, final double MAX_VALUE, final double VALUE, final int MINOR_TICK_COUNT, final double MAJOR_TICK_UNIT) {
+        double v = VALUE;
+        int    minorTickCount = clamp(0, 10, MINOR_TICK_COUNT);
+        double majorTickUnit  = Double.compare(MAJOR_TICK_UNIT, 0.0) <= 0 ? 0.25 : MAJOR_TICK_UNIT;
+        double tickSpacing;
+
+        if (minorTickCount != 0) {
+            tickSpacing = majorTickUnit / (Math.max(minorTickCount, 0) + 1);
+        } else {
+            tickSpacing = majorTickUnit;
+        }
+
+        int    prevTick      = (int) ((v - MIN_VALUE) / tickSpacing);
+        double prevTickValue = prevTick * tickSpacing + MIN_VALUE;
+        double nextTickValue = (prevTick + 1) * tickSpacing + MIN_VALUE;
+
+        v = nearest(prevTickValue, v, nextTickValue);
+
+        return clamp(MIN_VALUE, MAX_VALUE, v);
     }
 
     /**

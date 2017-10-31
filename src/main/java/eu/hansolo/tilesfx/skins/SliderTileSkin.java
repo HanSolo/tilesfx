@@ -79,6 +79,7 @@ public class SliderTileSkin extends TileSkin {
                 double  dragPos    = currentPos.getX() - dragStart.getX();
                 thumbDragged((formerThumbPos + dragPos / trackLength));
             } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
+
                 tile.fireTileEvent(VALUE_CHANGED);
             }
         };
@@ -91,7 +92,7 @@ public class SliderTileSkin extends TileSkin {
         text.setFill(tile.getUnitColor());
         Helper.enableNode(text, tile.isTextVisible());
 
-        valueText = new Text(String.format(locale, formatString, ((tile.getValue() - minValue) / range * 100)));
+        valueText = new Text(String.format(locale, formatString, (tile.getValue())));
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
@@ -140,7 +141,12 @@ public class SliderTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.isSnapToTicks()) {
+            double value = Helper.snapToTicks(minValue, maxValue, VALUE, tile.getMinorTickCount(), tile.getMajorTickUnit());
+            valueText.setText(String.format(locale, formatString, value));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
         resizeDynamicText();
         centerX = trackStart + (trackLength * ((VALUE - minValue) / range));
         thumb.setCenterX(clamp(trackStart, (trackStart + trackLength), centerX));

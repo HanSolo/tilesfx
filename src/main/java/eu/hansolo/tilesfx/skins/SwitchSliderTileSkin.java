@@ -292,6 +292,10 @@ public class SwitchSliderTileSkin extends TileSkin {
         centerX     = trackStart + (trackLength * ((tile.getCurrentValue() - minValue) / range));
         centerY     = height * 0.71;
 
+        thumb.setRadius(size * 0.09);
+        thumb.setCenterX(centerX);
+        thumb.setCenterY(centerY);
+
         barBackground.setWidth(trackLength);
         barBackground.setHeight(size * 0.0275);
         barBackground.setX(trackStart);
@@ -305,10 +309,6 @@ public class SwitchSliderTileSkin extends TileSkin {
         bar.setY(centerY - size * 0.01375);
         bar.setArcWidth(size * 0.0275);
         bar.setArcHeight(size * 0.0275);
-
-        thumb.setRadius(size * 0.09);
-        thumb.setCenterX(centerX);
-        thumb.setCenterY(centerY);
 
         switchBorder.setWidth(size * 0.2225);
         switchBorder.setHeight(size * 0.11);

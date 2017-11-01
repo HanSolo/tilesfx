@@ -30,6 +30,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -70,6 +71,9 @@ public class ChartData implements Comparable<ChartData> {
     }
     public ChartData(final double VALUE, final Instant TIMESTAMP) {
         this("", VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
+    }
+    public ChartData(final String NAME, final Instant TIMESTAMP) {
+        this(NAME, 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
     }
     public ChartData(final String NAME, final Color FILL_COLOR) {
         this(NAME, 0, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
@@ -167,7 +171,11 @@ public class ChartData implements Comparable<ChartData> {
         fireChartDataEvent(UPDATE_EVENT);
     }
 
+    public ZonedDateTime getTimestampAdDateTime() { return getTimestampAsDateTime(ZoneId.systemDefault()); }
     public ZonedDateTime getTimestampAsDateTime(final ZoneId ZONE_ID) { return ZonedDateTime.ofInstant(timestamp, ZONE_ID); }
+
+    public LocalDate getTimestampAsLocalDate() { return getTimestampAsLocalDate(ZoneId.systemDefault()); }
+    public LocalDate getTimestampAsLocalDate(final ZoneId ZONE_ID) { return getTimestampAsDateTime(ZONE_ID).toLocalDate(); }
 
     public boolean isAnimated() { return animated; }
     public void setAnimated(final boolean ANIMATED) { animated = ANIMATED; }

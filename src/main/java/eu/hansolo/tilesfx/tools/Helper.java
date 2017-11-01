@@ -23,6 +23,7 @@ import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.LineTo;
@@ -40,10 +41,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
@@ -286,9 +290,9 @@ public class Helper {
     }
 
     public static final double colorDistance(final Color COLOR_1, final Color COLOR_2) {
-        final double DELTA_R = (COLOR_2.getRed() - COLOR_1.getRed());
+        final double DELTA_R = (COLOR_2.getRed()   - COLOR_1.getRed());
         final double DELTA_G = (COLOR_2.getGreen() - COLOR_1.getGreen());
-        final double DELTA_B = (COLOR_2.getBlue() - COLOR_1.getBlue());
+        final double DELTA_B = (COLOR_2.getBlue()  - COLOR_1.getBlue());
 
         return Math.sqrt(DELTA_R * DELTA_R + DELTA_G * DELTA_G + DELTA_B * DELTA_B);
     }
@@ -306,6 +310,77 @@ public class Helper {
 
     public static final Color getColorWithOpacity(final Color COLOR, final double OPACITY) {
         return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), clamp(0.0, 1.0, OPACITY));
+    }
+
+    public static final List<Color> createColorPalette(final Color FROM_COLOR, final Color TO_COLOR, final int NO_OF_COLORS) {
+        int    steps        = clamp(1, 12, NO_OF_COLORS) - 1;
+        double step         = 1.0 / steps;
+        double deltaRed     = (TO_COLOR.getRed()     - FROM_COLOR.getRed())     * step;
+        double deltaGreen   = (TO_COLOR.getGreen()   - FROM_COLOR.getGreen())   * step;
+        double deltaBlue    = (TO_COLOR.getBlue()    - FROM_COLOR.getBlue())    * step;
+        double deltaOpacity = (TO_COLOR.getOpacity() - FROM_COLOR.getOpacity()) * step;
+
+        List<Color> palette      = new ArrayList<>(NO_OF_COLORS);
+        Color       currentColor = FROM_COLOR;
+        palette.add(currentColor);
+        for (int i = 0 ; i < steps ; i++) {
+            double red     = clamp(0d, 1d, (currentColor.getRed()     + deltaRed));
+            double green   = clamp(0d, 1d, (currentColor.getGreen()   + deltaGreen));
+            double blue    = clamp(0d, 1d, (currentColor.getBlue()    + deltaBlue));
+            double opacity = clamp(0d, 1d, (currentColor.getOpacity() + deltaOpacity));
+            currentColor   = Color.color(red, green, blue, opacity);
+            palette.add(currentColor);
+        }
+        return palette;
+    }
+
+    public static final Color getColorAt(final List<Stop> STOP_LIST, final double POSITION_OF_COLOR) {
+        Map<Double, Stop> STOPS = new TreeMap<>();
+        for (Stop stop : STOP_LIST) { STOPS.put(stop.getOffset(), stop); }
+
+        if (STOPS.isEmpty()) return Color.BLACK;
+
+        double minFraction = Collections.min(STOPS.keySet());
+        double maxFraction = Collections.max(STOPS.keySet());
+
+        if (Double.compare(minFraction, 0d) > 0) { STOPS.put(0.0, new Stop(0.0, STOPS.get(minFraction).getColor())); }
+        if (Double.compare(maxFraction, 1d) < 0) { STOPS.put(1.0, new Stop(1.0, STOPS.get(maxFraction).getColor())); }
+
+        final double POSITION = clamp(0d, 1d, POSITION_OF_COLOR);
+        final Color COLOR;
+        if (STOPS.size() == 1) {
+            final Map<Double, Color> ONE_ENTRY = (Map<Double, Color>) STOPS.entrySet().iterator().next();
+            COLOR = STOPS.get(ONE_ENTRY.keySet().iterator().next()).getColor();
+        } else {
+            Stop lowerBound = STOPS.get(0.0);
+            Stop upperBound = STOPS.get(1.0);
+            for (Double fraction : STOPS.keySet()) {
+                if (Double.compare(fraction,POSITION) < 0) {
+                    lowerBound = STOPS.get(fraction);
+                }
+                if (Double.compare(fraction, POSITION) > 0) {
+                    upperBound = STOPS.get(fraction);
+                    break;
+                }
+            }
+            COLOR = interpolateColor(lowerBound, upperBound, POSITION);
+        }
+        return COLOR;
+    }
+    public static final Color interpolateColor(final Stop LOWER_BOUND, final Stop UPPER_BOUND, final double POSITION) {
+        final double POS  = (POSITION - LOWER_BOUND.getOffset()) / (UPPER_BOUND.getOffset() - LOWER_BOUND.getOffset());
+
+        final double DELTA_RED     = (UPPER_BOUND.getColor().getRed()     - LOWER_BOUND.getColor().getRed())     * POS;
+        final double DELTA_GREEN   = (UPPER_BOUND.getColor().getGreen()   - LOWER_BOUND.getColor().getGreen())   * POS;
+        final double DELTA_BLUE    = (UPPER_BOUND.getColor().getBlue()    - LOWER_BOUND.getColor().getBlue())    * POS;
+        final double DELTA_OPACITY = (UPPER_BOUND.getColor().getOpacity() - LOWER_BOUND.getColor().getOpacity()) * POS;
+
+        double red     = clamp(0d, 1d, (LOWER_BOUND.getColor().getRed()     + DELTA_RED));
+        double green   = clamp(0d, 1d, (LOWER_BOUND.getColor().getGreen()   + DELTA_GREEN));
+        double blue    = clamp(0d, 1d, (LOWER_BOUND.getColor().getBlue()    + DELTA_BLUE));
+        double opacity = clamp(0d, 1d, (LOWER_BOUND.getColor().getOpacity() + DELTA_OPACITY));
+
+        return Color.color(red, green, blue, opacity);
     }
 
     public static final void scaleNodeTo(final Node NODE, final double TARGET_WIDTH, final double TARGET_HEIGHT) {

@@ -983,6 +983,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case SUNBURST:
                     break;
+                case MATRIX:
+                    break;
                 default:
                     break;
             }

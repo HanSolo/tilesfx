@@ -17,6 +17,6 @@
 package eu.hansolo.tilesfx.events;
 
 @FunctionalInterface
-public interface DotMatrixEventListener {
-    void onDotMatrixEvent(DotMatrixEvent event);
+public interface PixelMatrixEventListener {
+    void onPixelMatrixEvent(PixelMatrixEvent event);
 }

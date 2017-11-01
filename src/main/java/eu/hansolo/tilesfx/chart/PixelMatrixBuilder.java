@@ -16,7 +16,7 @@
 
 package eu.hansolo.tilesfx.chart;
 
-import eu.hansolo.tilesfx.chart.DotMatrix.DotShape;
+import eu.hansolo.tilesfx.chart.PixelMatrix.PixelShape;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -36,36 +36,37 @@ import java.util.HashMap;
 /**
  * Created by hansolo on 20.03.17.
  */
-public class DotMatrixBuilder<B extends DotMatrixBuilder<B>> {
+public class PixelMatrixBuilder<B extends PixelMatrixBuilder<B>> {
     private HashMap<String, Property> properties = new HashMap<>();
 
 
     // ******************** Constructors **************************************
-    protected DotMatrixBuilder() {}
+    protected PixelMatrixBuilder() {}
 
 
     // ******************** Methods *******************************************
-    public static final DotMatrixBuilder create() {
-        return new DotMatrixBuilder();
+    public static final PixelMatrixBuilder create() {
+        return new PixelMatrixBuilder();
     }
 
+    public final B colsAndRows(final int[] COLS_AND_ROWS) { return colsAndRows(COLS_AND_ROWS[0], COLS_AND_ROWS[1]); }
     public final B colsAndRows(final int COLS, final int ROWS) {
         properties.put("cols", new SimpleIntegerProperty(COLS));
         properties.put("rows", new SimpleIntegerProperty(ROWS));
         return (B)this;
     }
 
-    public final B dotOnColor(final Color COLOR) {
-        properties.put("dotOnColor", new SimpleObjectProperty(COLOR));
+    public final B pixelOnColor(final Color COLOR) {
+        properties.put("pixelOnColor", new SimpleObjectProperty(COLOR));
         return (B)this;
     }
-    public final B dotOffColor(final Color COLOR) {
-        properties.put("dotOffColor", new SimpleObjectProperty(COLOR));
+    public final B pixelOffColor(final Color COLOR) {
+        properties.put("pixelOffColor", new SimpleObjectProperty(COLOR));
         return (B)this;
     }
 
-    public final B dotShape(final DotShape SHAPE) {
-        properties.put("dotShape", new SimpleObjectProperty(SHAPE));
+    public final B pixelShape(final PixelShape SHAPE) {
+        properties.put("pixelShape", new SimpleObjectProperty(SHAPE));
         return (B)this;
     }
 
@@ -76,6 +77,11 @@ public class DotMatrixBuilder<B extends DotMatrixBuilder<B>> {
 
     public final B useSpacer(final boolean USE) {
         properties.put("useSpacer", new SimpleBooleanProperty(USE));
+        return (B)this;
+    }
+
+    public final B squarePixels(final boolean SQUARE) {
+        properties.put("squarePixels", new SimpleBooleanProperty(SQUARE));
         return (B)this;
     }
 
@@ -156,14 +162,14 @@ public class DotMatrixBuilder<B extends DotMatrixBuilder<B>> {
         return (B)this;
     }
 
-    public final DotMatrix build() {
-        final DotMatrix CONTROL;
+    public final PixelMatrix build() {
+        final PixelMatrix CONTROL;
         if (properties.keySet().contains("cols") && properties.keySet().contains("rows")) {
             int cols = ((IntegerProperty) properties.get("cols")).get();
             int rows = ((IntegerProperty) properties.get("rows")).get();
-            CONTROL = new DotMatrix(cols, rows);
+            CONTROL = new PixelMatrix(cols, rows);
         } else {
-            CONTROL = new DotMatrix();
+            CONTROL = new PixelMatrix();
         }
 
         for (String key : properties.keySet()) {
@@ -202,18 +208,20 @@ public class DotMatrixBuilder<B extends DotMatrixBuilder<B>> {
                 CONTROL.setTranslateY(((DoubleProperty) properties.get(key)).get());
             } else if ("padding".equals(key)) {
                 CONTROL.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
-            } else if("dotOnColor".equals(key)) {
-                CONTROL.setDotOnColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("dotOffColor".equals(key)) {
-                CONTROL.setDotOffColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("dotShape".equals(key)) {
-                CONTROL.setDotShape(((ObjectProperty<DotShape>) properties.get(key)).get());
+            } else if("pixelOnColor".equals(key)) {
+                CONTROL.setPixelOnColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if("pixelOffColor".equals(key)) {
+                CONTROL.setPixelOffColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("pixelShape".equals(key)) {
+                CONTROL.setPixelShape(((ObjectProperty<PixelShape>) properties.get(key)).get());
             } else if ("matrixFont".equals(key)) {
                 CONTROL.setMatrixFont(((ObjectProperty<MatrixFont>) properties.get(key)).get());
             } else if ("useSpacer".equals(key)) {
                 CONTROL.setUseSpacer(((BooleanProperty) properties.get(key)).get());
             } else if ("spacerSizeFactor".equals(key)) {
                 CONTROL.setSpacerSizeFactor(((DoubleProperty) properties.get(key)).get());
+            } else if ("squarePixels".equals(key)) {
+                CONTROL.setSquarePixels(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

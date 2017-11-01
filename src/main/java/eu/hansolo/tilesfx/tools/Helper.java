@@ -128,6 +128,17 @@ public class Helper {
         return (VALUE - SMALLER) < (LARGER - VALUE) ? SMALLER : LARGER;
     }
 
+    public static int roundDoubleToInt(final double VALUE){
+        double dAbs = Math.abs(VALUE);
+        int    i      = (int) dAbs;
+        double result = dAbs - (double) i;
+        if (result < 0.5) {
+            return VALUE < 0 ? -i : i;
+        } else {
+            return VALUE < 0 ? -(i + 1) : i + 1;
+        }
+    }
+
     public static final double[] calcAutoScale(final double MIN_VALUE, final double MAX_VALUE) {
         double maxNoOfMajorTicks = 10;
         double maxNoOfMinorTicks = 10;

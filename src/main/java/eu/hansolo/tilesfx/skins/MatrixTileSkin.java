@@ -18,14 +18,24 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.chart.DotMatrix;
-import eu.hansolo.tilesfx.chart.DotMatrix.DotShape;
-import eu.hansolo.tilesfx.chart.DotMatrixBuilder;
+import eu.hansolo.tilesfx.chart.PixelMatrix;
+import eu.hansolo.tilesfx.chart.PixelMatrix.PixelShape;
+import eu.hansolo.tilesfx.chart.PixelMatrixBuilder;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.events.PixelMatrixEventListener;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+
+import java.util.List;
 
 
 /**
@@ -34,9 +44,12 @@ import javafx.scene.text.Text;
 public class MatrixTileSkin extends TileSkin {
     private Text                          titleText;
     private Text                          text;
-    private DotMatrix                     matrix;
+    private PixelMatrix                   matrix;
     private ListChangeListener<ChartData> chartDataListener;
     private ChartDataEventListener        chartEventListener;
+    private Tooltip                       selectionTooltip;
+    private PixelMatrixEventListener      matrixListener;
+    private EventHandler<MouseEvent>      moveHandler;
 
 
     // ******************** Constructors **************************************
@@ -49,27 +62,52 @@ public class MatrixTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        matrix = DotMatrixBuilder.create()
-                                 .dotShape(DotShape.SQUARE)
-                                 .useSpacer(true)
-                                 .colsAndRows(12, 30)
-                                 .dotOnColor(tile.getBarColor())
-                                 .dotOffColor(Helper.isDark(tile.getBackgroundColor()) ? tile.getBackgroundColor().brighter() : tile.getBackgroundColor().darker())
-                                 .build();
+        matrix = PixelMatrixBuilder.create()
+                                   .pixelShape(PixelShape.SQUARE)
+                                   .useSpacer(true)
+                                   .squarePixels(false)
+                                   .colsAndRows(tile.getMatrixSize())
+                                   .pixelOnColor(tile.getBarColor())
+                                   .pixelOffColor(Helper.isDark(tile.getBackgroundColor()) ? tile.getBackgroundColor().brighter() : tile.getBackgroundColor().darker())
+                                   .build();
 
-        chartEventListener = e -> matrix.drawMatrix();
+        if (!tile.getChartData().isEmpty() && tile.getChartData().size() > 2) {
+            matrix.setColsAndRows(tile.getChartData().size(), matrix.getRows());
+        }
+
+        chartEventListener = e -> updateMatrixWithChartData();
         tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
 
-        chartDataListener  = c -> {
+        chartDataListener = c -> {
             while (c.next()) {
                 if (c.wasAdded()) {
                     c.getAddedSubList().forEach(addedItem -> addedItem.addChartDataEventListener(chartEventListener));
+                    if (!tile.getChartData().isEmpty() && tile.getChartData().size() > 2) {
+                        matrix.setColsAndRows(tile.getChartData().size(), matrix.getRows());
+                    }
                 } else if (c.wasRemoved()) {
                     c.getRemoved().forEach(removedItem -> removedItem.removeChartDataEventListener(chartEventListener));
+                    if (!tile.getChartData().isEmpty() && tile.getChartData().size() > 2) {
+                        matrix.setColsAndRows(tile.getChartData().size(), matrix.getRows());
+                    }
                 }
             }
-            matrix.drawMatrix();
+            updateMatrixWithChartData();
         };
+        matrixListener    = e -> {
+            int       column      = e.getX();
+            ChartData data        = tile.getChartData().get(column);
+            String    tooltipText = new StringBuilder(data.getName()).append("\n").append(String.format(locale, formatString, data.getValue())).toString();
+            Point2D popupLocation = new Point2D(e.getMouseScreenX() - selectionTooltip.getWidth() * 0.5, e.getMouseScreenY() - size * 0.025 - selectionTooltip.getHeight());
+
+            selectionTooltip.setText(tooltipText);
+            selectionTooltip.setX(popupLocation.getX());
+            selectionTooltip.setY(popupLocation.getY());
+            selectionTooltip.show(tile.getScene().getWindow());
+
+            tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data));
+        };
+        moveHandler       = e -> matrix.checkForClick(e);
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -79,12 +117,19 @@ public class MatrixTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
 
+        selectionTooltip = new Tooltip("");
+        selectionTooltip.setWidth(60);
+        selectionTooltip.setHeight(48);
+        Tooltip.install(matrix, selectionTooltip);
+
         getPane().getChildren().addAll(titleText, matrix, text);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
         tile.getChartData().addListener(chartDataListener);
+        matrix.addPixelMatrixEventListener(matrixListener);
+        matrix.addEventHandler(MouseEvent.MOUSE_MOVED, moveHandler);
     }
 
 
@@ -95,14 +140,36 @@ public class MatrixTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
+        } else if ("RECALC".equals(EVENT_TYPE)) {
+            matrix.setColsAndRows(tile.getMatrixSize());
+            resize();
         }
     }
 
     @Override public void dispose() {
+        matrix.removeAllPixelMatrixEventListeners();
+        matrix.removeEventHandler(MouseEvent.MOUSE_MOVED, moveHandler);
         matrix.dispose();
         tile.getChartData().removeListener(chartDataListener);
         tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
         super.dispose();
+    }
+
+    private void updateMatrixWithChartData() {
+        List<ChartData> dataList = tile.getChartData();
+        int             cols     = dataList.size();
+        int             rows     = matrix.getRows();
+        double          factor   = rows / tile.getRange();
+        Color           offColor = matrix.getPixelOffColor();
+
+        matrix.setAllPixelsOff();
+        for (int y = rows ; y >= 0 ; y--) {
+            for (int x = 0 ; x < cols; x++) {
+                int noOfActivePixels = Helper.roundDoubleToInt((maxValue - dataList.get(x).getValue()) * factor);
+                matrix.setPixel(x, y, noOfActivePixels <= y ? dataList.get(x).getFillColor() : offColor);
+            }
+        }
+        matrix.drawMatrix();
     }
 
 
@@ -136,9 +203,8 @@ public class MatrixTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double chartWidth   = width - size * 0.1;
-        double chartHeight  = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
-        double chartSize    = chartWidth < chartHeight ? chartWidth : chartHeight;
+        double chartWidth  = width - size * 0.1;
+        double chartHeight = tile.isTextVisible() ? height - size * 0.15 - height * 0.15 : height - size * 0.1 - height * 0.15;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -162,7 +228,7 @@ public class MatrixTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
 
-        matrix.setDotOnColor(tile.getBarColor());
-        matrix.setDotOffColor(Helper.isDark(tile.getBackgroundColor()) ? tile.getBackgroundColor().brighter() : tile.getBackgroundColor().darker());
+        matrix.setPixelOnColor(tile.getBarColor());
+        matrix.setPixelOffColor(Helper.isDark(tile.getBackgroundColor()) ? tile.getBackgroundColor().brighter() : tile.getBackgroundColor().darker());
     }
 }

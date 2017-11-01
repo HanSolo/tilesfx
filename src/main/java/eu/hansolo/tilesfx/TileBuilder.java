@@ -794,6 +794,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B matrixSize(final int COLS, final int ROWS) {
+        properties.put("matrixSize", null);
+        properties.put("matrixColumns", new SimpleIntegerProperty(COLS));
+        properties.put("matrixRows", new SimpleIntegerProperty(ROWS));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -1348,8 +1355,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setMinorTickCount(((IntegerProperty) properties.get(key)).get());
             } else if ("majorTickUnit".equals(key)) {
                 CONTROL.setMajorTickUnit(((DoubleProperty) properties.get(key)).get());
+            } else if ("matrixSize".equals(key)) {
+                final int COLS = ((IntegerProperty) properties.get("matrixColumns")).get();
+                final int ROWS = ((IntegerProperty) properties.get("matrixRows")).get();
+                CONTROL.setMatrixSize(COLS, ROWS);
             }
         }
+        properties.clear();
         return CONTROL;
     }
 }

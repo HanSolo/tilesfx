@@ -457,6 +457,7 @@ public class Tile extends Control {
     private              BooleanProperty                        snapToTicks;
     private              int                                    _minorTickCount;
     private              double                                 _majorTickUnit;
+    private              int[]                                  _matrixSize;
 
     private volatile     ScheduledFuture<?>                     periodicTickTask;
     private static       ScheduledExecutorService               periodicTickExecutorService;
@@ -683,6 +684,7 @@ public class Tile extends Control {
         _snapToTicks                        = false;
         _minorTickCount                     = 0;
         _majorTickUnit                      = 1;
+        _matrixSize                         = new int[]{ 30, 25 };
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -4291,6 +4293,15 @@ public class Tile extends Control {
      */
     public double getMajorTickUnit() { return _majorTickUnit; }
     public void setMajorTickUnit(final double MAJOR_TICK_UNIT) { _majorTickUnit = Double.compare(MAJOR_TICK_UNIT, 0.0) <= 0 ? 0.25 : MAJOR_TICK_UNIT; }
+
+    public int[] getMatrixSize() { return _matrixSize; }
+    public void setMatrixSize(final int[] COLUMNS_AND_ROWS) {
+        setMatrixSize(COLUMNS_AND_ROWS[0], COLUMNS_AND_ROWS[1]);
+    }
+    public void setMatrixSize(final int COLUMNS, final int ROWS) {
+        _matrixSize = new int[] { Helper.clamp(2, 1000, COLUMNS), Helper.clamp(2, 1000, ROWS) };
+        fireTileEvent(RECALC_EVENT);
+    }
 
     public double getIncrement() { return increment; }
     public void setIncrement(final double INCREMENT) { increment = clamp(0, 10, INCREMENT); }

@@ -46,6 +46,7 @@ public class ChartData implements Comparable<ChartData> {
     private final ChartDataEvent               FINISHED_EVENT = new ChartDataEvent(EventType.FINISHED, ChartData.this);
     private       String                       name;
     private       double                       value;
+    private       double                       oldValue;
     private       Color                        fillColor;
     private       Color                        strokeColor;
     private       Color                        textColor;
@@ -94,13 +95,15 @@ public class ChartData implements Comparable<ChartData> {
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Color TEXT_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
         name              = NAME;
         value             = VALUE;
+        oldValue          = 0;
         fillColor         = FILL_COLOR;
         strokeColor       = STROKE_COLOR;
         textColor         = TEXT_COLOR;
         timestamp         = TIMESTAMP;
         currentValue      = new DoublePropertyBase(value) {
             @Override protected void invalidated() {
-                value = get();
+                oldValue = value;
+                value    = get();
                 fireChartDataEvent(UPDATE_EVENT);
             }
             @Override public Object getBean() { return ChartData.this; }
@@ -132,10 +135,13 @@ public class ChartData implements Comparable<ChartData> {
             timeline.getKeyFrames().setAll(kf1, kf2);
             timeline.play();
         } else {
-            value = VALUE;
+            oldValue = value;
+            value    = VALUE;
             fireChartDataEvent(FINISHED_EVENT);
         }
     }
+
+    public double getOldValue() { return oldValue; }
 
     public Color getFillColor() { return fillColor; }
     public void setFillColor(final Color COLOR) {

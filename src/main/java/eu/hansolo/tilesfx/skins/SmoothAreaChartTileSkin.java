@@ -291,7 +291,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             double    reverseFactor    = (height * 0.5) / range;
             int       noOfDataElements = tile.getChartData().size();
             double    interval         = width / (double) (noOfDataElements - 1);
-            int       selectedIndex    = roundDoubleToInt(EVENT_X / interval);
+            int       selectedIndex    = Helper.roundDoubleToInt(EVENT_X / interval);
             ChartData selectedData     = tile.getChartData().get(selectedIndex);
             double    selectedValue    = selectedData.getValue();
 
@@ -347,17 +347,6 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             return new double[]{ ((MoveTo) ELEMENT).getX(), ((MoveTo) ELEMENT).getY() };
         } else {
             return new double[] { ((LineTo) ELEMENT).getX(), ((LineTo) ELEMENT).getY() };
-        }
-    }
-
-    private int roundDoubleToInt(final double VALUE){
-        double dAbs = Math.abs(VALUE);
-        int    i      = (int) dAbs;
-        double result = dAbs - (double) i;
-        if (result < 0.5) {
-            return VALUE < 0 ? -i : i;
-        } else {
-            return VALUE < 0 ? -(i + 1) : i + 1;
         }
     }
 

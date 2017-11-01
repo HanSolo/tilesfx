@@ -19,7 +19,7 @@ package eu.hansolo.tilesfx.events;
 import javafx.geometry.Point2D;
 
 
-public class DotMatrixEvent {
+public class PixelMatrixEvent {
     private final int    X;
     private final int    Y;
     private final double MOUSE_SCREEN_X;
@@ -27,7 +27,7 @@ public class DotMatrixEvent {
 
 
     // ******************** Constructors **************************************
-    public DotMatrixEvent(final int X, final int Y, final double MOUSE_X, final double MOUSE_Y) {
+    public PixelMatrixEvent(final int X, final int Y, final double MOUSE_X, final double MOUSE_Y) {
         this.X         = X;
         this.Y         = Y;
         MOUSE_SCREEN_X = MOUSE_X;

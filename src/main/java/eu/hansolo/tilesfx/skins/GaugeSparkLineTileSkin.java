@@ -787,7 +787,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         } else {
             sparkLine.setStroke(tile.getBarColor());
         }
-        stdDeviationArea.setFill(Helper.getTranslucentColorFrom(Tile.FOREGROUND, 0.1));
+        stdDeviationArea.setFill(Helper.getColorWithOpacity(Tile.FOREGROUND, 0.1));
         dot.setFill(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
     }
 }

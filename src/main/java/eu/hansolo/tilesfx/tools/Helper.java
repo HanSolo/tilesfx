@@ -289,8 +289,12 @@ public class Helper {
         return DISTANCE_TO_BLACK < DISTANCE_TO_WHITE;
     }
 
-    public static final Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
-        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0.0, 1.0, FACTOR));
+    public static final Color getContrastColor(final Color COLOR) {
+        return COLOR.getBrightness() > 0.5 ? Color.BLACK : Color.WHITE;
+    }
+
+    public static final Color getColorWithOpacity(final Color COLOR, final double OPACITY) {
+        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), clamp(0.0, 1.0, OPACITY));
     }
 
     public static final void scaleNodeTo(final Node NODE, final double TARGET_WIDTH, final double TARGET_HEIGHT) {
@@ -318,11 +322,11 @@ public class Helper {
     public static final boolean biggerThan(final double A, final double B) { return (A - B) > EPSILON; }
     public static final boolean lessThan(final double A, final double B) { return (B - A) > EPSILON; }
 
-    public static List<Point> subdividePoints(final List<Point> POINTS, final int SUB_DEVISIONS) {
+    public static final List<Point> subdividePoints(final List<Point> POINTS, final int SUB_DEVISIONS) {
         Point[] points = POINTS.toArray(new Point[0]);
         return Arrays.asList(subdividePoints(points, SUB_DEVISIONS));
     }
-    public static Point[] subdividePoints(final Point[] POINTS, final int SUB_DEVISIONS) {
+    public static final Point[] subdividePoints(final Point[] POINTS, final int SUB_DEVISIONS) {
         assert POINTS != null;
         assert POINTS.length >= 3;
         int    noOfPoints = POINTS.length;
@@ -347,15 +351,7 @@ public class Helper {
         return subdividedPoints;
     }
 
-    public static Color getContrastColor(final Color COLOR) {
-        return COLOR.getBrightness() > 0.5 ? Color.BLACK : Color.WHITE;
-    }
-
-    public static Color getColorWithOpacity(final Color COLOR, final double OPACITY) {
-        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), OPACITY);
-    }
-
-    public static Map<String, List<CountryPath>> getHiresCountryPaths() {
+    public static final Map<String, List<CountryPath>> getHiresCountryPaths() {
         if (null == hiresCountryProperties) { hiresCountryProperties = readProperties(HIRES_COUNTRY_PROPERTIES); }
         if (null == hiresCountryPaths) {
             hiresCountryPaths = new ConcurrentHashMap<>();
@@ -368,7 +364,7 @@ public class Helper {
         }
         return hiresCountryPaths;
     }
-    public static Map<String, List<CountryPath>> getLoresCountryPaths() {
+    public static final Map<String, List<CountryPath>> getLoresCountryPaths() {
         if (null == loresCountryProperties) { loresCountryProperties = readProperties(LORES_COUNTRY_PROPERTIES); }
         if (null == loresCountryPaths) {
             loresCountryPaths = new ConcurrentHashMap<>();
@@ -381,7 +377,7 @@ public class Helper {
         }
         return loresCountryPaths;
     }
-    private static Properties readProperties(final String FILE_NAME) {
+    private static final Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();
         final Properties  PROPERTIES = new Properties();
         try(InputStream resourceStream = LOADER.getResourceAsStream(FILE_NAME)) {
@@ -392,7 +388,7 @@ public class Helper {
         return PROPERTIES;
     }
 
-    public static void drawRoundedRect(final GraphicsContext CTX, final CtxBounds BOUNDS, final CtxCornerRadii RADII) {
+    public static final void drawRoundedRect(final GraphicsContext CTX, final CtxBounds BOUNDS, final CtxCornerRadii RADII) {
         double x           = BOUNDS.getX();
         double y           = BOUNDS.getY();
         double width       = BOUNDS.getWidth();
@@ -414,7 +410,7 @@ public class Helper {
     }
 
     // Smooth given path defined by it's list of path elements
-    public static Path smoothPath(final ObservableList<PathElement> ELEMENTS, final boolean FILLED) {
+    public static final Path smoothPath(final ObservableList<PathElement> ELEMENTS, final boolean FILLED) {
         if (ELEMENTS.isEmpty()) { return new Path(); }
         final Point[] dataPoints = new Point[ELEMENTS.size()];
         for (int i = 0; i < ELEMENTS.size(); i++) {
@@ -454,7 +450,7 @@ public class Helper {
         }
         return new Path(smoothedElements);
     }
-    private static Pair<Point[], Point[]> calcCurveControlPoints(Point[] dataPoints) {
+    private static final Pair<Point[], Point[]> calcCurveControlPoints(Point[] dataPoints) {
         Point[] firstControlPoints;
         Point[] secondControlPoints;
         int n = dataPoints.length - 1;
@@ -505,7 +501,7 @@ public class Helper {
         }
         return new Pair<>(firstControlPoints, secondControlPoints);
     }
-    private static double[] getFirstControlPoints(double[] rhs) {
+    private static final double[] getFirstControlPoints(double[] rhs) {
         int      n   = rhs.length;
         double[] x   = new double[n]; // Solution vector.
         double[] tmp = new double[n]; // Temp workspace.
@@ -525,23 +521,23 @@ public class Helper {
     }
 
 
-    public static boolean isInRectangle(final double X, final double Y,
-                                        final double MIN_X, final double MIN_Y,
-                                        final double MAX_X, final double MAX_Y) {
+    public static final boolean isInRectangle(final double X, final double Y,
+                                              final double MIN_X, final double MIN_Y,
+                                              final double MAX_X, final double MAX_Y) {
         return (Double.compare(X, MIN_X) >= 0 &&
                 Double.compare(X, MAX_X) <= 0 &&
                 Double.compare(Y, MIN_Y) >= 0 &&
                 Double.compare(Y, MAX_Y) <= 0);
     }
 
-    public static boolean isInEllipse(final double X, final double Y,
-                                      final double ELLIPSE_CENTER_X, final double ELLIPSE_CENTER_Y,
-                                      final double ELLIPSE_RADIUS_X, final double ELLIPSE_RADIUS_Y) {
+    public static final boolean isInEllipse(final double X, final double Y,
+                                            final double ELLIPSE_CENTER_X, final double ELLIPSE_CENTER_Y,
+                                            final double ELLIPSE_RADIUS_X, final double ELLIPSE_RADIUS_Y) {
         return Double.compare(((((X - ELLIPSE_CENTER_X) * (X - ELLIPSE_CENTER_X)) / (ELLIPSE_RADIUS_X * ELLIPSE_RADIUS_X)) +
                                (((Y - ELLIPSE_CENTER_Y) * (Y - ELLIPSE_CENTER_Y)) / (ELLIPSE_RADIUS_Y * ELLIPSE_RADIUS_Y))), 1) <= 0.0;
     }
 
-    public static boolean isInPolygon(final double X, final double Y, final Polygon POLYGON) {
+    public static final boolean isInPolygon(final double X, final double Y, final Polygon POLYGON) {
         List<Double> points              = POLYGON.getPoints();
         int          noOfPointsInPolygon = POLYGON.getPoints().size() / 2;
         double[]     pointsX             = new double[noOfPointsInPolygon];
@@ -557,7 +553,7 @@ public class Helper {
         }
         return isInPolygon(X, Y, noOfPointsInPolygon, pointsX, pointsY);
     }
-    public static boolean isInPolygon(final double X, final double Y, final int NO_OF_POINTS_IN_POLYGON, final double[] POINTS_X, final double[] POINTS_Y) {
+    public static final boolean isInPolygon(final double X, final double Y, final int NO_OF_POINTS_IN_POLYGON, final double[] POINTS_X, final double[] POINTS_Y) {
         if (NO_OF_POINTS_IN_POLYGON != POINTS_X.length || NO_OF_POINTS_IN_POLYGON != POINTS_Y.length) { return false; }
         boolean inside = false;
         for (int i = 0, j = NO_OF_POINTS_IN_POLYGON - 1; i < NO_OF_POINTS_IN_POLYGON ; j = i++) {
@@ -568,10 +564,10 @@ public class Helper {
         return inside;
     }
 
-    public static boolean isInRingSegment(final double X, final double Y,
-                                    final double CENTER_X, final double CENTER_Y,
-                                    final double OUTER_RADIUS, final double INNER_RADIUS,
-                                    final double START_ANGLE, final double SEGMENT_ANGLE) {
+    public static final boolean isInRingSegment(final double X, final double Y,
+                                                final double CENTER_X, final double CENTER_Y,
+                                                final double OUTER_RADIUS, final double INNER_RADIUS,
+                                                final double START_ANGLE, final double SEGMENT_ANGLE) {
         double angleOffset = 90.0;
         double pointRadius = Math.sqrt((X - CENTER_X) * (X - CENTER_X) + (Y - CENTER_Y) * (Y - CENTER_Y));
         double pointAngle  = getAngleFromXY(X, Y, CENTER_X, CENTER_Y, angleOffset);
@@ -584,10 +580,10 @@ public class Helper {
                 Double.compare(pointAngle, endAngle) <= 0);
     }
 
-    public static double getAngleFromXY(final double X, final double Y, final double CENTER_X, final double CENTER_Y) {
+    public static final double getAngleFromXY(final double X, final double Y, final double CENTER_X, final double CENTER_Y) {
         return getAngleFromXY(X, Y, CENTER_X, CENTER_Y, 90.0);
     }
-    public static double getAngleFromXY(final double X, final double Y, final double CENTER_X, final double CENTER_Y, final double ANGLE_OFFSET) {
+    public static final double getAngleFromXY(final double X, final double Y, final double CENTER_X, final double CENTER_Y, final double ANGLE_OFFSET) {
         // For ANGLE_OFFSET =  0 -> Angle of 0 is at 3 o'clock
         // For ANGLE_OFFSET = 90  ->Angle of 0 is at 12 o'clock
         double deltaX      = X - CENTER_X;

@@ -433,6 +433,8 @@ public class Tile extends Control {
     private              List<Alarm>                            alarmsToRemove;
     private              boolean                                _strokeWithGradient;
     private              BooleanProperty                        strokeWithGradient;
+    private              boolean                                _fillWithGradient;
+    private              BooleanProperty                        fillWithGradient;
     private              DarkSky                                darkSky;
     private              String                                 _tooltipText;
     private              StringProperty                         tooltipText;
@@ -669,6 +671,7 @@ public class Tile extends Control {
         _alarmsEnabled                      = false;
         _alarmsVisible                      = false;
         _strokeWithGradient                 = false;
+        _fillWithGradient                   = false;
         tooltip                             = new Tooltip(null);
         _xAxis                              = new CategoryAxis();
         _yAxis                              = new NumberAxis();
@@ -4391,6 +4394,36 @@ public class Tile extends Control {
         return  strokeWithGradient;
     }
 
+    /**
+     * Returns true if a gradient defined by gradientStops will be
+     * used to fill the area in the SmoothAreaTileSkin.
+     * @return true if a gradient defined by gradientStops will be used to fill the area in the SmoothAreaTileSkin
+     */
+    public boolean isFillWithGradient() { return null == fillWithGradient ? _fillWithGradient : fillWithGradient.get(); }
+    /**
+     * Defines the usage of a gradient defined by gradientStops to fill the area
+     * in the SmoothAreaTileSkin
+     * @param FILL_WITH_GRADIENT
+     */
+    public void setFillWithGradient(final boolean FILL_WITH_GRADIENT) {
+        if (null == fillWithGradient) {
+            _fillWithGradient = FILL_WITH_GRADIENT;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            fillWithGradient.set(FILL_WITH_GRADIENT);
+        }
+    }
+    public BooleanProperty fillWithGradientProperty() {
+        if (null == fillWithGradient) {
+            fillWithGradient = new BooleanPropertyBase(_fillWithGradient) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "fillWithGradient"; }
+            };
+        }
+        return fillWithGradient;
+    }
+
     public DarkSky getDarkSky() { return darkSky; }
     public void setDarkSky(final DarkSky DARK_SKY) {
         darkSky = DARK_SKY;
@@ -4541,7 +4574,7 @@ public class Tile extends Control {
     }
 
     private void createShutdownHook() { Runtime.getRuntime().addShutdownHook(new Thread(() -> stop())); }
-    
+
     
     // ******************** Event handling ************************************
     public void setOnTileEvent(final TileEventListener LISTENER) { addTileEventListener(LISTENER); }

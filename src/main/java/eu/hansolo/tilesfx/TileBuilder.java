@@ -694,6 +694,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B fillWithGradient(final boolean FILL_WITH_GRADIENT) {
+        properties.put("fillWithGradient", new SimpleBooleanProperty(FILL_WITH_GRADIENT));
+        return (B)this;
+    }
+
     public final B roundedCorners(final boolean ROUNDED) {
         properties.put("roundedCorners", new SimpleBooleanProperty(ROUNDED));
         return (B)this;
@@ -1287,6 +1292,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
             } else if ("strokeWithGradient".equals(key)) {
                 CONTROL.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
+            } else if ("fillWithGradient".equals(key)) {
+                CONTROL.setFillWithGradient(((BooleanProperty) properties.get(key)).get());
             } else if ("graphic".equals(key)) {
                 CONTROL.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
             } else if ("roundedCorners".equals(key)) {

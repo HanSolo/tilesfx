@@ -160,10 +160,12 @@ public class BarChartTileSkin extends TileSkin {
                 double y = size * 0.18 + i * 0.175 * size;
                 if (y < maxY) {
                     item.setMaxValue(maxValue);
+                    item.setManaged(true);
                     item.setVisible(true);
                     item.relocate(0, y);
                 } else {
                     item.setVisible(false);
+                    item.setManaged(false);
                 }
             }
         });

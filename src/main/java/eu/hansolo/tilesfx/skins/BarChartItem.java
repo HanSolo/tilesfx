@@ -218,6 +218,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         valueText.setText(String.format(locale, formatString, VALUE));
         valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
         bar.setWidth(clamp(0, (width - size * 0.15), VALUE * stepSize));
+        bar.setFill(getBarColor());
     }
 
 

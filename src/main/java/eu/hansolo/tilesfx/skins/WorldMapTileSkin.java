@@ -114,6 +114,8 @@ public class WorldMapTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
+        } else if ("REFRESH".equals(EVENT_TYPE)) {
+            refresh();
         }
     }
 
@@ -205,5 +207,18 @@ public class WorldMapTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
+    }
+
+    private void refresh() {
+        Color fill   = tile.getForegroundColor();
+        Color stroke = tile.getBackgroundColor();
+        countryPaths.forEach((name, pathList) -> {
+            Country country = Country.valueOf(name);
+            pathList.forEach(path -> {
+                path.setFill(null == country.getColor() ? fill : country.getColor());
+                path.setStroke(stroke);
+                path.setStrokeWidth(0.2);
+            });
+        });
     }
 }

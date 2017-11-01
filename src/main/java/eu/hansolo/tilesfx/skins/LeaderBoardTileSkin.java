@@ -151,10 +151,12 @@ public class LeaderBoardTileSkin extends TileSkin {
                 LeaderBoardItem item = items.get(i);
                 double y = size * 0.18 + i * 0.175 * size;
                 if (y < maxY) {
+                    item.setManaged(true);
                     item.setVisible(true);
                     item.relocate(0, y);
                 } else {
                     item.setVisible(false);
+                    item.setManaged(false);
                 }
             }
         });

@@ -246,7 +246,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         fillPath.getElements().add(new LineTo(0, height));
         fillPath.getElements().add(new ClosePath());
 
-        if (dataPointsVisible) { drawDataPoints(POINTS, tile.getBarColor()); }
+        if (dataPointsVisible) { drawDataPoints(POINTS, tile.isFillWithGradient() ? tile.getGradientStops().get(0).getColor() : tile.getBarColor()); }
     }
 
     private void drawDataPoints(final List<Point> DATA, final Color COLOR) {
@@ -440,11 +440,15 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         selectionIndicator.setFill(tile.getBackgroundColor());
         Color fillPathColor1 = Helper.getColorWithOpacity(tile.getBarColor(), 0.7);
         Color fillPathColor2 = Helper.getColorWithOpacity(tile.getBarColor(), 0.1);
-        fillPath.setFill(new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                                            new Stop(0, fillPathColor1),
-                                            new Stop(1, fillPathColor2)));
-        strokePath.setStroke(tile.getBarColor());
+        if (tile.isFillWithGradient() && !tile.getGradientStops().isEmpty()) {
+            fillPath.setFill(new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE, tile.getGradientStops()));
+            strokePath.setStroke(tile.getGradientStops().get(0).getColor());
+            if (dataPointsVisible) { drawDataPoints(points, tile.getGradientStops().get(0).getColor()); }
+        } else {
+            fillPath.setFill(new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE, new Stop(0, fillPathColor1), new Stop(1, fillPathColor2)));
+            strokePath.setStroke(tile.getBarColor());
+            if (dataPointsVisible) { drawDataPoints(points, tile.getBarColor()); }
+        }
         drawChart(points);
-        if (dataPointsVisible) { drawDataPoints(points, tile.getBarColor()); }
     }
 }

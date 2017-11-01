@@ -25,9 +25,11 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
@@ -35,8 +37,10 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 
 /**
@@ -55,7 +59,9 @@ public class DonutChartTileSkin extends TileSkin {
     private double                        centerY;
     private double                        innerRadius;
     private double                        outerRadius;
+    private Tooltip                       selectionTooltip;
     private EventHandler<MouseEvent>      clickHandler;
+    private EventHandler<MouseEvent>      moveHandler;
 
 
     // ******************** Constructors **************************************
@@ -68,7 +74,7 @@ public class DonutChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        chartEventListener = e -> drawChart();
+        chartEventListener = e -> redraw();
         tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
 
         chartDataListener  = c -> {
@@ -88,7 +94,7 @@ public class DonutChartTileSkin extends TileSkin {
             double          y          = e.getY();
             double          startAngle = 90;
             double          angle      = 0;
-            List<ChartData> dataList   = tile.getChartData();
+            List<ChartData> dataList   = tile.isSortedData() ? tile.getChartData().stream().sorted(Comparator.comparingDouble(ChartData::getValue)).collect(Collectors.toList()) : tile.getChartData();
             int             noOfItems  = dataList.size();
             double          sum        = dataList.stream().mapToDouble(ChartData::getValue).sum();
             double          stepSize   = 360.0 / sum;
@@ -102,9 +108,20 @@ public class DonutChartTileSkin extends TileSkin {
                 startAngle -= angle;
                 angle = value * stepSize;
                 boolean hit = Helper.isInRingSegment(x, y, centerX, centerY, ro, ri, startAngle, angle);
-                if (hit) { tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data)); break; }
+                if (hit) {
+                    String tooltipText = new StringBuilder(data.getName()).append("\n").append(String.format(locale, formatString, value)).toString();
+
+                    Point2D popupLocation = new Point2D(e.getScreenX() - selectionTooltip.getWidth() * 0.5, e.getScreenY() - size * 0.025 - selectionTooltip.getHeight());
+                    selectionTooltip.setText(tooltipText);
+                    selectionTooltip.setX(popupLocation.getX());
+                    selectionTooltip.setY(popupLocation.getY());
+                    selectionTooltip.show(tile.getScene().getWindow());
+
+                    tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data)); break;
+                }
             }
         };
+        moveHandler  = e -> selectionTooltip.hide();
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -120,6 +137,11 @@ public class DonutChartTileSkin extends TileSkin {
         legendCanvas = new Canvas(size * 0.225, tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205);
         legendCtx    = legendCanvas.getGraphicsContext2D();
 
+        selectionTooltip = new Tooltip("");
+        selectionTooltip.setWidth(60);
+        selectionTooltip.setHeight(48);
+        Tooltip.install(chartCanvas, selectionTooltip);
+
         getPane().getChildren().addAll(titleText, legendCanvas, chartCanvas, text);
     }
 
@@ -127,6 +149,7 @@ public class DonutChartTileSkin extends TileSkin {
         super.registerListeners();
         tile.getChartData().addListener(chartDataListener);
         chartCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+        chartCanvas.addEventHandler(MouseEvent.MOUSE_MOVED, moveHandler);
     }
 
 
@@ -153,23 +176,23 @@ public class DonutChartTileSkin extends TileSkin {
         tile.getChartData().removeListener(chartDataListener);
         tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
         chartCanvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+        chartCanvas.removeEventHandler(MouseEvent.MOUSE_MOVED, moveHandler);
         super.dispose();
     }
 
     private void drawChart() {
-        List<ChartData> dataList       = tile.getChartData();
+        List<ChartData> dataList       = tile.isSortedData() ? tile.getChartData().stream().sorted(Comparator.comparingDouble(ChartData::getValue)).collect(Collectors.toList()) : tile.getChartData();
         double          canvasSize     = chartCanvas.getWidth();
         int             noOfItems      = dataList.size();
         double          center         = canvasSize * 0.5;
         double          barWidth       = canvasSize * 0.1;
-        //List<ChartData> sortedDataList = dataList.stream().sorted(Comparator.comparingDouble(ChartData::getValue).reversed()).collect(Collectors.toList());
         double          sum            = dataList.stream().mapToDouble(ChartData::getValue).sum();
         double          stepSize       = 360.0 / sum;
         double          angle          = 0;
         double          startAngle     = 90;
         double          xy             = canvasSize * 0.1;
         double          wh             = canvasSize * 0.8;
-        Color           bkgColor       = tile.getBackgroundColor();
+        //Color           bkgColor       = tile.getBackgroundColor();
         Color           textColor      = tile.getTextColor();
 
         centerX        = xy + wh * 0.5;
@@ -212,10 +235,12 @@ public class DonutChartTileSkin extends TileSkin {
             chartCtx.fillText(String.format(Locale.US, "%.0f%%", (value / sum * 100.0)), center + x, center + y, barWidth);
 
             // Value
-            x = outerRadius * cosValue;
-            y = -outerRadius * sinValue;
-            chartCtx.setFill(bkgColor);
-            chartCtx.fillText(String.format(Locale.US, "%.0f", value), center + x, center + y, barWidth);
+            if (angle > 10) {
+                x = outerRadius * cosValue;
+                y = -outerRadius * sinValue;
+                chartCtx.setFill(data.getTextColor());
+                chartCtx.fillText(String.format(Locale.US, "%.0f", value), center + x, center + y, barWidth);
+            }
         }
     }
 

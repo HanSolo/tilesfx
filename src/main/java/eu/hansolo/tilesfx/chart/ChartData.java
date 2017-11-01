@@ -48,6 +48,7 @@ public class ChartData implements Comparable<ChartData> {
     private       double                       value;
     private       Color                        fillColor;
     private       Color                        strokeColor;
+    private       Color                        textColor;
     private       Instant                      timestamp;
     private       boolean                      animated;
     private       long                         animationDuration;
@@ -58,40 +59,44 @@ public class ChartData implements Comparable<ChartData> {
 
     // ******************** Constructors **************************************
     public ChartData() {
-        this("", 0, Tile.BLUE, Color.TRANSPARENT, Instant.now(), true, 800);
+        this("", 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final String NAME) {
-        this(NAME, 0, Tile.BLUE, Color.TRANSPARENT, Instant.now(), true, 800);
+        this(NAME, 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(double VALUE) {
-        this("", VALUE, Tile.BLUE, Color.TRANSPARENT, Instant.now(), true, 800);
+        this("", VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final double VALUE, final Instant TIMESTAMP) {
-        this("", VALUE, Tile.BLUE, Color.TRANSPARENT, TIMESTAMP, true, 800);
+        this("", VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
     }
     public ChartData(final String NAME, final Color FILL_COLOR) {
-        this(NAME, 0, FILL_COLOR, Color.TRANSPARENT, Instant.now(), true, 800);
+        this(NAME, 0, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final String NAME, final double VALUE) {
-        this(NAME, VALUE, Tile.BLUE, Color.TRANSPARENT, Instant.now(), true, 800);
+        this(NAME, VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final String NAME, final double VALUE, final Instant TIMESTAMP) {
-        this(NAME, VALUE, Tile.BLUE, Color.TRANSPARENT, TIMESTAMP, true, 800);
+        this(NAME, VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR) {
-        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Instant.now(), true, 800);
+        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Instant TIMESTAMP) {
-        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, TIMESTAMP, true, 800);
+        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
-        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
+        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
+        this(NAME, VALUE, FILL_COLOR, STROKE_COLOR, Tile.FOREGROUND, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
+    }
+    public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Color TEXT_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
         name              = NAME;
         value             = VALUE;
         fillColor         = FILL_COLOR;
         strokeColor       = STROKE_COLOR;
+        textColor         = TEXT_COLOR;
         timestamp         = TIMESTAMP;
         currentValue      = new DoublePropertyBase(value) {
             @Override protected void invalidated() {
@@ -141,6 +146,12 @@ public class ChartData implements Comparable<ChartData> {
     public Color getStrokeColor() { return strokeColor; }
     public void setStrokeColor(final Color COLOR) {
         strokeColor = COLOR;
+        fireChartDataEvent(UPDATE_EVENT);
+    }
+
+    public Color getTextColor() { return textColor; }
+    public void setTextColor(final Color COLOR) {
+        textColor = COLOR;
         fireChartDataEvent(UPDATE_EVENT);
     }
 

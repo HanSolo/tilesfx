@@ -20,7 +20,6 @@ import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.TileEventListener;
-import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;

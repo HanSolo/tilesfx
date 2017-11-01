@@ -24,7 +24,7 @@ import eu.hansolo.tilesfx.chart.ChartData;
  * Created by hansolo on 19.12.16.
  */
 public class TileEvent {
-    public enum EventType { RECALC, REDRAW, RESIZE, VISIBILITY, SECTION, ALERT, VALUE,
+    public enum EventType { RECALC, REDRAW, REFRESH, RESIZE, VISIBILITY, SECTION, ALERT, VALUE,
                             THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN,
                             MAX_VALUE_EXCEEDED, MIN_VALUE_UNDERRUN, VALUE_IN_RANGE,
                             FINISHED, SERIES, DATA, GRAPHIC, UPDATE, AVERAGING, LOCATION, TRACK, MAP_PROVIDER,

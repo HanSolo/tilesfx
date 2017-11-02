@@ -779,6 +779,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B sunburstAutoTextColor(final boolean AUTOMATIC) {
+        properties.put("sunburstAutoTextColor", new SimpleBooleanProperty(AUTOMATIC));
+        return (B)this;
+    }
+
+    public final B sunburstUseChartDataTextColor(final boolean USE) {
+        properties.put("sunburstUseChartDataTextColor", new SimpleBooleanProperty(USE));
+        return (B)this;
+    }
+
     public final B snapToTicks(final boolean SNAP) {
         properties.put("snapToTicks", new SimpleBooleanProperty(SNAP));
         return (B)this;
@@ -1349,6 +1359,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.getSunburstChart().setVisibleData(((ObjectProperty<VisibleData>) properties.get(key)).get());
             } else if ("sunburstInteractive".equals(key)) {
                 CONTROL.getSunburstChart().setInteractive(((BooleanProperty) properties.get(key)).get());
+            } else if ("sunburstAutoTextColor".equals(key)) {
+                CONTROL.getSunburstChart().setAutoTextColor(((BooleanProperty) properties.get(key)).get());
+            } else if ("sunburstUseChartDataTextColor".equals(key)) {
+                CONTROL.getSunburstChart().setUseChartDataTextColor(((BooleanProperty) properties.get(key)).get());
             } else if ("snapToTicks".equals(key)) {
                 CONTROL.setSnapToTicks(((BooleanProperty) properties.get(key)).get());
             } else if ("minorTickCount".equals(key)) {

@@ -626,6 +626,9 @@ public class Demo extends Application {
                                   .sunburstTextColor(Tile.BACKGROUND)
                                   .sunburstUseColorFromParent(true)
                                   .sunburstTextOrientation(TextOrientation.TANGENT)
+                                  .sunburstAutoTextColor(true)
+                                  .sunburstUseChartDataTextColor(true)
+                                  .sunburstInteractive(true)
                                   .build();
 
         lastTimerCall = System.nanoTime();

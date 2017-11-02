@@ -88,6 +88,26 @@ public class SunburstChartBuilder<B extends SunburstChartBuilder<B>> {
         return (B)this;
     }
 
+    public final B autoTextColor(final boolean AUTOMATIC) {
+        properties.put("autoTextColor", new SimpleBooleanProperty(AUTOMATIC));
+        return (B)this;
+    }
+
+    public final B brightTextColor(final Color COLOR) {
+        properties.put("brightTextColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B darkTextColor(final Color COLOR) {
+        properties.put("darkTextColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B useChartDataTextColor(final boolean USE) {
+        properties.put("useChartDataTextColor", new SimpleBooleanProperty(USE));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -217,6 +237,14 @@ public class SunburstChartBuilder<B extends SunburstChartBuilder<B>> {
                 CONTROL.setDecimals(((IntegerProperty) properties.get(key)).get());
             } else if ("interactive".equals(key)) {
                 CONTROL.setInteractive(((BooleanProperty) properties.get(key)).get());
+            } else if ("autoTextColor".equals(key)) {
+                CONTROL.setAutoTextColor(((BooleanProperty) properties.get(key)).get());
+            } else if ("brightTextColor".equals(key)) {
+                CONTROL.setBrightTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("darkTextColor".equals(key)) {
+                CONTROL.setDarkTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("useChartDataTextColor".equals(key)) {
+                CONTROL.setUseChartDataTextColor(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

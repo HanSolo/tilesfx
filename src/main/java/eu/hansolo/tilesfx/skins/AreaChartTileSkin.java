@@ -17,9 +17,14 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.chart.SmoothedChart;
+import eu.hansolo.tilesfx.events.SmoothedChartEvent;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.chart.SmoothAreaChart;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
@@ -30,10 +35,11 @@ import javafx.scene.text.Text;
  * Created by hansolo on 19.12.16.
  */
 public class AreaChartTileSkin extends TileSkin {
-    private Text                            titleText;
-    private SmoothAreaChart<String, Number> chart;
-    private Axis                            xAxis;
-    private Axis                            yAxis;
+    private Text                             titleText;
+    private SmoothedChart<String, Number>    chart;
+    private Axis                             xAxis;
+    private Axis                             yAxis;
+    private EventHandler<SmoothedChartEvent> chartEventEventHandler;
 
 
     // ******************** Constructors **************************************
@@ -45,6 +51,8 @@ public class AreaChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
+        chartEventEventHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(e.getValue())));
+
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
@@ -52,23 +60,31 @@ public class AreaChartTileSkin extends TileSkin {
         xAxis = tile.getXAxis();
         yAxis = tile.getYAxis();
 
-        chart = new SmoothAreaChart<>(xAxis, yAxis);
+        chart = new SmoothedChart<>(xAxis, yAxis);
         chart.getData().addAll(tile.getSeries());
+        chart.setFilled(true);
         chart.setLegendSide(Side.TOP);
         chart.setVerticalZeroLineVisible(false);
         chart.setCreateSymbols(false);
+        chart.setSnapToTicks(tile.isSnapToTicks());
 
         getPane().getChildren().addAll(titleText, chart);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
+        chart.addEventHandler(SmoothedChartEvent.DATA_SELECTED, chartEventEventHandler);
     }
 
 
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
+    }
+
+    @Override public void dispose() {
+        chart.removeEventHandler(SmoothedChartEvent.DATA_SELECTED, chartEventEventHandler);
+        super.dispose();
     }
 
 
@@ -103,6 +119,8 @@ public class AreaChartTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
 
         resizeStaticText();
+        chart.setSelectorStrokeColor(tile.getForegroundColor());
+        chart.setSelectorFillColor(tile.getBackgroundColor());
 
         titleText.setFill(tile.getTitleColor());
     }

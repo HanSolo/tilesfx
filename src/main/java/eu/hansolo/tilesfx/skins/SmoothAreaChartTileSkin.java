@@ -77,8 +77,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     private boolean                       smoothing;
     private double                        hStepSize;
     private double                        vStepSize;
-    private Circle                        selectionIndicator;
-    private Tooltip                       selectionTooltip;
+    private Circle                        selector;
+    private Tooltip                       selectorTooltip;
     private SequentialTransition          fadeInFadeOut;
     private Rectangle                     fillClip;
     private Rectangle                     strokeClip;
@@ -110,7 +110,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             handleData();
         };
         clickHandler               = e -> select(e);
-        endOfTransformationHandler = e -> selectionTooltip.hide();
+        endOfTransformationHandler = e -> selectorTooltip.hide();
 
         smoothing = tile.isSmoothing();
 
@@ -152,17 +152,17 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         valueUnitFlow = new TextFlow(valueText, unitText);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
-        selectionIndicator = new Circle();
-        selectionTooltip = new Tooltip("");
-        selectionTooltip.setWidth(60);
-        selectionTooltip.setHeight(48);
-        Tooltip.install(selectionIndicator, selectionTooltip);
+        selector        = new Circle();
+        selectorTooltip = new Tooltip("");
+        selectorTooltip.setWidth(60);
+        selectorTooltip.setHeight(48);
+        Tooltip.install(selector, selectorTooltip);
 
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(100), selectionIndicator);
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(100), selector);
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
 
-        FadeTransition fadeOut = new FadeTransition(Duration.millis(100), selectionIndicator);
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(100), selector);
         fadeOut.setFromValue(1);
         fadeOut.setToValue(0);
 
@@ -170,7 +170,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         handleData();
 
-        getPane().getChildren().addAll(titleText, fillPath, strokePath, canvas, valueUnitFlow, selectionIndicator);
+        getPane().getChildren().addAll(titleText, fillPath, strokePath, canvas, valueUnitFlow, selector);
     }
 
     @Override protected void registerListeners() {
@@ -205,8 +205,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     }
 
     private void handleData() {
-        selectionTooltip.hide();
-        selectionIndicator.setVisible(false);
+        selectorTooltip.hide();
+        selector.setVisible(false);
         List<ChartData> data = tile.getChartData();
         if (null == data || data.isEmpty()) { return; }
         Optional<ChartData> lastDataEntry = data.stream().reduce((first, second) -> second);
@@ -295,18 +295,18 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             ChartData selectedData     = tile.getChartData().get(selectedIndex);
             double    selectedValue    = selectedData.getValue();
 
-            selectionIndicator.setCenterX(interval * selectedIndex);
-            selectionIndicator.setCenterY(height - selectedValue * reverseFactor);
-            selectionIndicator.setVisible(true);
+            selector.setCenterX(interval * selectedIndex);
+            selector.setCenterY(height - selectedValue * reverseFactor);
+            selector.setVisible(true);
             fadeInFadeOut.playFrom(Duration.millis(0));
 
             String tooltipText = new StringBuilder(selectedData.getName()).append("\n").append(String.format(locale, formatString, selectedValue)).toString();
 
-            Point2D popupLocation = tile.localToScreen(selectionIndicator.getCenterX() - selectionTooltip.getWidth() * 0.5, selectionIndicator.getCenterY() - size * 0.025 - selectionTooltip.getHeight());
-            selectionTooltip.setText(tooltipText);
-            selectionTooltip.setX(popupLocation.getX());
-            selectionTooltip.setY(popupLocation.getY());
-            selectionTooltip.show(tile.getScene().getWindow());
+            Point2D popupLocation = tile.localToScreen(selector.getCenterX() - selectorTooltip.getWidth() * 0.5, selector.getCenterY() - size * 0.025 - selectorTooltip.getHeight());
+            selectorTooltip.setText(tooltipText);
+            selectorTooltip.setX(popupLocation.getX());
+            selectorTooltip.setY(popupLocation.getY());
+            selectorTooltip.show(tile.getScene().getWindow());
 
             tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, selectedData));
         } else {
@@ -323,16 +323,16 @@ public class SmoothAreaChartTileSkin extends TileSkin {
                     double y             = m * (EVT.getX() - xy[0]) + xy[1];
                     double selectedValue = upperBound - (y - (height * 0.5)) * factor;
 
-                    selectionIndicator.setCenterX(EVT.getX());
-                    selectionIndicator.setCenterY(y);
-                    selectionIndicator.setVisible(true);
+                    selector.setCenterX(EVT.getX());
+                    selector.setCenterY(y);
+                    selector.setVisible(true);
                     fadeInFadeOut.playFrom(Duration.millis(0));
 
-                    Point2D popupLocation = tile.localToScreen(EVT.getX() - selectionTooltip.getWidth() * 0.5, selectionIndicator.getCenterY() - size * 0.025 - selectionTooltip.getHeight());
-                    selectionTooltip.setText(String.format(locale, formatString, selectedValue));
-                    selectionTooltip.setX(popupLocation.getX());
-                    selectionTooltip.setY(popupLocation.getY());
-                    selectionTooltip.show(tile.getScene().getWindow());
+                    Point2D popupLocation = tile.localToScreen(EVT.getX() - selectorTooltip.getWidth() * 0.5, selector.getCenterY() - size * 0.025 - selectorTooltip.getHeight());
+                    selectorTooltip.setText(String.format(locale, formatString, selectedValue));
+                    selectorTooltip.setX(popupLocation.getX());
+                    selectorTooltip.setY(popupLocation.getY());
+                    selectorTooltip.show(tile.getScene().getWindow());
 
                     tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(selectedValue)));
                     break;
@@ -382,8 +382,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         hStepSize = width / dataSize;
         vStepSize = (height * 0.5) / maxValue;
 
-        selectionIndicator.setRadius(size * 0.02);
-        selectionIndicator.setStrokeWidth(size * 0.01);
+        selector.setRadius(size * 0.02);
+        selector.setStrokeWidth(size * 0.01);
 
 
         handleData();
@@ -425,8 +425,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
         unitText.setFill(tile.getUnitColor());
-        selectionIndicator.setStroke(tile.getForegroundColor());
-        selectionIndicator.setFill(tile.getBackgroundColor());
+        selector.setStroke(tile.getForegroundColor());
+        selector.setFill(tile.getBackgroundColor());
         Color fillPathColor1 = Helper.getColorWithOpacity(tile.getBarColor(), 0.7);
         Color fillPathColor2 = Helper.getColorWithOpacity(tile.getBarColor(), 0.1);
         if (tile.isFillWithGradient() && !tile.getGradientStops().isEmpty()) {

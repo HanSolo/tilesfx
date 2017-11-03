@@ -47,7 +47,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
@@ -435,7 +434,7 @@ public class Helper {
             Point p2 = POINTS[i + 1];
             Point p3 = (i+2 == noOfPoints) ? POINTS[i + 1] : POINTS[i + 2];
 
-            CatmullRomSpline2D crs = new CatmullRomSpline2D(p0, p1, p2, p3);
+            CatmullRom crs = new CatmullRom(p0, p1, p2, p3);
 
             for (int j = 0; j <= SUB_DEVISIONS; j++) {
                 subdividedPoints[(i * SUB_DEVISIONS) + j] = crs.q(j * increments);

@@ -16,13 +16,13 @@
 
 package eu.hansolo.tilesfx.tools;
 
-public class CatmullRomSpline2D {
+public class CatmullRom {
     private CatmullRomSpline splineXValues;
     private CatmullRomSpline splineYValues;
 
 
     // ******************** Constructors **************************************
-    public CatmullRomSpline2D(final Point P0, final Point P1, final Point P2, final Point P3) {
+    public CatmullRom(final Point P0, final Point P1, final Point P2, final Point P3) {
         assert P0 != null : "p0 cannot be null";
         assert P1 != null : "p1 cannot be null";
         assert P2 != null : "p2 cannot be null";
@@ -35,4 +35,28 @@ public class CatmullRomSpline2D {
 
     // ******************** Methods *******************************************
     public Point q(final double T) { return new Point(splineXValues.q(T), splineYValues.q(T)); }
+
+
+    // ******************** Inner Classes *************************************
+    class CatmullRomSpline {
+        private double p0;
+        private double p1;
+        private double p2;
+        private double p3;
+
+
+        // ******************** Constructors **********************************
+        protected CatmullRomSpline(final double P0, final double P1, final double P2, final double P3) {
+            p0 = P0;
+            p1 = P1;
+            p2 = P2;
+            p3 = P3;
+        }
+
+
+        // ******************** Methods ***************************************
+        protected double q(final double T) {
+            return 0.5 * ((2 * p1) + (p2 - p0) * T + (2 * p0 - 5 * p1 + 4 * p2 - p3) * T * T + (3 * p1 -p0 - 3 * p2 + p3) * T * T * T);
+        }
+    }
 }

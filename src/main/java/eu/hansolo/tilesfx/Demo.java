@@ -53,6 +53,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -595,9 +598,23 @@ public class Demo extends Application {
                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
                               .build();
 
+        ZonedDateTime   now          = ZonedDateTime.now();
+        List<ChartData> calendarData = new ArrayList<>(10);
+        calendarData.add(new ChartData("Item 1", now.minusDays(1).toInstant()));
+        calendarData.add(new ChartData("Item 2", now.plusDays(2).toInstant()));
+        calendarData.add(new ChartData("Item 3", now.plusDays(10).toInstant()));
+        calendarData.add(new ChartData("Item 4", now.plusDays(15).toInstant()));
+        calendarData.add(new ChartData("Item 5", now.plusDays(15).toInstant()));
+        calendarData.add(new ChartData("Item 6", now.plusDays(20).toInstant()));
+        calendarData.add(new ChartData("Item 7", now.plusDays(7).toInstant()));
+        calendarData.add(new ChartData("Item 8", now.minusDays(1).toInstant()));
+        calendarData.add(new ChartData("Item 9", now.toInstant()));
+        calendarData.add(new ChartData("Item 10", now.toInstant()));
+
         calendarTile = TileBuilder.create()
                                   .skinType(SkinType.CALENDAR)
                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                  .chartData(calendarData)
                                   .build();
 
         TreeNode tree   = new TreeNode(new ChartData("ROOT"));

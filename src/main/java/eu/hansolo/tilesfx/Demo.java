@@ -67,14 +67,17 @@ public class Demo extends Application {
     private static final    double TILE_WIDTH  = 150;
     private static final    double TILE_HEIGHT = 150;
     private static          int    noOfNodes = 0;
+
     private BarChartItem    barChartItem1;
     private BarChartItem    barChartItem2;
     private BarChartItem    barChartItem3;
     private BarChartItem    barChartItem4;
+
     private LeaderBoardItem leaderBoardItem1;
     private LeaderBoardItem leaderBoardItem2;
     private LeaderBoardItem leaderBoardItem3;
     private LeaderBoardItem leaderBoardItem4;
+
     private ChartData       chartData1;
     private ChartData       chartData2;
     private ChartData       chartData3;

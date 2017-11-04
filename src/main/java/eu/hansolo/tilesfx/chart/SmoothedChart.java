@@ -43,6 +43,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
@@ -58,32 +59,34 @@ import java.util.Locale;
 
 
 public class SmoothedChart<T, S> extends AreaChart<T, S> {
-    private static final int          MAX_SUBDIVISIONS = 16;
-    private static final int          MAX_DECIMALS     = 10;
-    private boolean                   _smoothed;
-    private BooleanProperty           smoothed;
-    private boolean                   _filled;
-    private BooleanProperty           filled;
-    private int                       _subDivisions;
-    private IntegerProperty           subDivisions;
-    private boolean                   _snapToTicks;
-    private BooleanProperty           snapToTicks;
-    private Color                     _selectorFillColor;
-    private ObjectProperty<Color>     selectorFillColor;
-    private Color                     _selectorStrokeColor;
-    private ObjectProperty<Color>     selectorStrokeColor;
-    private int                       _decimals;
-    private IntegerProperty           decimals;
-    private String                    formatString;
-    private Circle                    selector;
-    private Tooltip                   selectorTooltip;
-    private Region                    chartPlotBackground;
-    private SequentialTransition      fadeInFadeOut;
-    private List<Path>                strokePaths;
-    private boolean                   _interactive;
-    private BooleanProperty           interactive;
-    private EventHandler<MouseEvent>  clickHandler;
-    private EventHandler<ActionEvent> endOfTransformationHandler;
+    private static final int                       MAX_SUBDIVISIONS = 16;
+    private static final int                       MAX_DECIMALS     = 10;
+    private              boolean                   _smoothed;
+    private              BooleanProperty           smoothed;
+    private              boolean                   _filled;
+    private              BooleanProperty           filled;
+    private              int                       _subDivisions;
+    private              IntegerProperty           subDivisions;
+    private              boolean                   _snapToTicks;
+    private              BooleanProperty           snapToTicks;
+    private              boolean                   _dataPointsVisible;
+    private              BooleanProperty           dataPointsVisible;
+    private              Color                     _selectorFillColor;
+    private              ObjectProperty<Color>     selectorFillColor;
+    private              Color                     _selectorStrokeColor;
+    private              ObjectProperty<Color>     selectorStrokeColor;
+    private              int                       _decimals;
+    private              IntegerProperty           decimals;
+    private              String                    formatString;
+    private              Circle                    selector;
+    private              Tooltip                   selectorTooltip;
+    private              Region                    chartPlotBackground;
+    private              SequentialTransition      fadeInFadeOut;
+    private              List<Path>                strokePaths;
+    private              boolean                   _interactive;
+    private              BooleanProperty           interactive;
+    private              EventHandler<MouseEvent>  clickHandler;
+    private              EventHandler<ActionEvent> endOfTransformationHandler;
 
 
     // ******************** Constructors **************************************
@@ -259,6 +262,26 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         return snapToTicks;
     }
 
+    public boolean getDataPointsVisible() { return null == dataPointsVisible ? _dataPointsVisible : dataPointsVisible.get(); }
+    public void setDataPointsVisible(final boolean VISIBLE) {
+        if (null == dataPointsVisible) {
+            _dataPointsVisible = VISIBLE;
+            getData().forEach(series -> setSeriesDataPointsVisible(series, _dataPointsVisible));
+        } else {
+            dataPointsVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty dataPointsVisibleProperty() {
+        if (null == dataPointsVisible) {
+            dataPointsVisible = new BooleanPropertyBase(_dataPointsVisible) {
+                @Override protected void invalidated() { getData().forEach(series -> setSeriesDataPointsVisible(series, _dataPointsVisible)); }
+                @Override public Object getBean() { return SmoothedChart.this; }
+                @Override public String getName() { return "dataPointsVisible"; }
+            };
+        }
+        return dataPointsVisible;
+    }
+
     public Color getSelectorFillColor() { return null == selectorFillColor ? _selectorFillColor : selectorFillColor.get(); }
     public void setSelectorFillColor(final Color COLOR) {
         if (null == selectorFillColor) {
@@ -348,6 +371,15 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             };
         }
         return interactive;
+    }
+
+    public void setSeriesDataPointsVisible(final XYChart.Series<T, S> SERIES, final boolean VISIBLE) {
+        if (!getData().contains(SERIES)) { return; }
+        for (XYChart.Data<T, S> data : SERIES.getData()) {
+            StackPane stackPane = (StackPane) data.getNode();
+            stackPane.setVisible(VISIBLE);
+        }
+
     }
 
 

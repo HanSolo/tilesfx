@@ -67,6 +67,7 @@ public class AreaChartTileSkin extends TileSkin {
         chart.setVerticalZeroLineVisible(false);
         chart.setCreateSymbols(false);
         chart.setSnapToTicks(tile.isSnapToTicks());
+        chart.setDataPointsVisible(tile.getDataPointsVisible());
 
         getPane().getChildren().addAll(titleText, chart);
     }
@@ -80,6 +81,9 @@ public class AreaChartTileSkin extends TileSkin {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
+        if ("VISIBILITY".equals(EVENT_TYPE)) {
+            chart.setDataPointsVisible(tile.getDataPointsVisible());
+        }
     }
 
     @Override public void dispose() {

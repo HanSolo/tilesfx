@@ -37,6 +37,15 @@ public class TilesFXSeries<X, Y> {
     public TilesFXSeries(final Series<X, Y> SERIES) {
         this(SERIES, null, null);
     }
+    public TilesFXSeries(final Series<X, Y> SERIES, final Paint COLOR) {
+        series = SERIES;
+        stroke = COLOR;
+        fill   = COLOR;
+        if (null != COLOR) {
+            symbolBackground = new Background(new BackgroundFill(COLOR, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
+            legendSymbolFill = COLOR;
+        }
+    }
     public TilesFXSeries(final Series<X, Y> SERIES, final Paint STROKE, final Paint FILL) {
         series = SERIES;
         stroke = STROKE;

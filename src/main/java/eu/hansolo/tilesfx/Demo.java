@@ -16,12 +16,14 @@
 
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
+import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
@@ -48,6 +50,8 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -278,16 +282,26 @@ public class Demo extends Application {
         //sparkLineTile.valueProperty().bind(value);
 
         areaChartTile = TileBuilder.create()
-                                   .skinType(SkinType.AREA_CHART)
+                                   .skinType(SkinType.SMOOTHED_CHART)
                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                   .title("AreaChart Tile")
-                                   .series(series1)
+                                   .title("SmoothedChart Tile")
+                                   .chartType(ChartType.AREA)
+                                   .animated(true)
+                                   .smoothing(true)
+                                   .tilesFxSeries(new TilesFXSeries<>(series1,
+                                                               Tile.BLUE,
+                                                               new LinearGradient(0, 0, 0, 1,
+                                                                                  true, CycleMethod.NO_CYCLE,
+                                                                                  new Stop(0, Tile.BLUE),
+                                                                                  new Stop(1, Color.TRANSPARENT))))
                                    .build();
 
         lineChartTile = TileBuilder.create()
-                                   .skinType(SkinType.LINE_CHART)
+                                   .skinType(SkinType.SMOOTHED_CHART)
                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                   .title("LineChart Tile")
+                                   .title("SmoothedChart Tile")
+                                   .animated(true)
+                                   .smoothing(false)
                                    .series(series2, series3)
                                    .build();
 

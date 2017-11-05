@@ -30,11 +30,10 @@ import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
 import javafx.scene.text.Text;
 
+import java.util.stream.Collectors;
 
-/**
- * Created by hansolo on 19.12.16.
- */
-public class AreaChartTileSkin extends TileSkin {
+
+public class SmoothedChartTileSkin extends TileSkin {
     private Text                             titleText;
     private SmoothedChart<String, Number>    chart;
     private Axis                             xAxis;
@@ -43,7 +42,7 @@ public class AreaChartTileSkin extends TileSkin {
 
 
     // ******************** Constructors **************************************
-    public AreaChartTileSkin(final Tile TILE) {
+    public SmoothedChartTileSkin(final Tile TILE) {
         super(TILE);
     }
 
@@ -61,15 +60,34 @@ public class AreaChartTileSkin extends TileSkin {
         yAxis = tile.getYAxis();
 
         chart = new SmoothedChart<>(xAxis, yAxis);
-        chart.getData().addAll(tile.getSeries());
-        chart.setFilled(true);
+        chart.setSmoothed(tile.isSmoothing());
+        chart.setAnimated(tile.isAnimated());
         chart.setLegendSide(Side.TOP);
         chart.setVerticalZeroLineVisible(false);
         chart.setCreateSymbols(false);
         chart.setSnapToTicks(tile.isSnapToTicks());
         chart.setDataPointsVisible(tile.getDataPointsVisible());
 
+        switch(tile.getChartType()) {
+            case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
+            default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
+        }
+
         getPane().getChildren().addAll(titleText, chart);
+
+        // Add series not before chart is part of scene
+        chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
+        /*
+        Scene scene = chart.getScene();
+        if (scene != null) {
+            Window stage = scene.getWindow();
+            if (stage != null) {
+                if (stage.isShowing()) {
+                    chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
+                }
+            }
+        }
+        */
     }
 
     @Override protected void registerListeners() {
@@ -83,6 +101,15 @@ public class AreaChartTileSkin extends TileSkin {
         super.handleEvents(EVENT_TYPE);
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             chart.setDataPointsVisible(tile.getDataPointsVisible());
+        } else if ("SERIES".equals(EVENT_TYPE)) {
+            switch(tile.getChartType()) {
+                case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
+                default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
+            }
+            chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
+            tile.getTilesFXSeries()
+                .stream()
+                .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
         }
     }
 
@@ -125,7 +152,10 @@ public class AreaChartTileSkin extends TileSkin {
         resizeStaticText();
         chart.setSelectorStrokeColor(tile.getForegroundColor());
         chart.setSelectorFillColor(tile.getBackgroundColor());
+        chart.setSmoothed(tile.isSmoothing());
+        chart.setAnimated(tile.isAnimated());
 
         titleText.setFill(tile.getTitleColor());
+
     }
 }

@@ -20,6 +20,7 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart;
 import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.chart.SunburstChart;
+import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
@@ -74,7 +75,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -96,8 +96,8 @@ import static eu.hansolo.tilesfx.tools.MovingAverage.MAX_PERIOD;
  * Created by hansolo on 19.12.16.
  */
 public class Tile extends Control {
-    public enum SkinType { AREA_CHART("AreaChartTileSkin"), BAR_CHART("BarChartTileSkin"),
-                           LINE_CHART("LineChartTileSkin"), CLOCK("ClockTileSkin"), GAUGE("GaugeTileSkin"),
+    public enum SkinType { SMOOTHED_CHART("ChartTileSkin"), BAR_CHART("BarChartTileSkin"),
+                           CLOCK("ClockTileSkin"), GAUGE("GaugeTileSkin"),
                            HIGH_LOW("HighLowTileSkin)"), PERCENTAGE("PercentageTileSkin"),
                            PLUS_MINUS("PlusMinusTileSkin"), SLIDER("SliderTileSkin"),
                            SPARK_LINE("SparkLineTileSkin"), SWITCH("SwitchTileSkin"),
@@ -110,7 +110,8 @@ public class Tile extends Control {
                            GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
                            RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris"),
                            CHARACTER("Character"), FLIP("Flip"), SWITCH_SLIDER("SwitchSlider"),
-                           DATE("Date"), CALENDAR("Calendar"), SUNBURST("Sunburst"), MATRIX("Matrix");
+                           DATE("Date"), CALENDAR("Calendar"), SUNBURST("Sunburst"), MATRIX("Matrix"),
+                           RADIAL_PERCENTAGE("RadialPercentage");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -165,6 +166,7 @@ public class Tile extends Control {
             name = NAME;
         }
     }
+    public enum ChartType { LINE, AREA }
 
     public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
@@ -213,254 +215,255 @@ public class Tile extends Control {
 
 
     // Data related
-    private              DoubleProperty                         value;
-    private              DoubleProperty                         oldValue;      // last value
-    private              DoubleProperty                         currentValue;
-    private              DoubleProperty                         formerValue;   // last current value
-    private              double                                 _minValue;
-    private              DoubleProperty                         minValue;
-    private              double                                 _maxValue;
-    private              DoubleProperty                         maxValue;
-    private              double                                 _range;
-    private              DoubleProperty                         range;
-    private              double                                 _threshold;
-    private              DoubleProperty                         threshold;
-    private              double                                 _referenceValue;
-    private              DoubleProperty                         referenceValue;
-    private              boolean                                _autoReferenceValue;
-    private              BooleanProperty                        autoReferenceValue;
-    private              String                                 _title;
-    private              StringProperty                         title;
-    private              TextAlignment                          _titleAlignment;
-    private              ObjectProperty<TextAlignment>          titleAlignment;
-    private              String                                 _description;
-    private              StringProperty                         description;
-    private              Pos                                    _descriptionAlignment;
-    private              ObjectProperty<Pos>                    descriptionAlignment;
-    private              String                                 _unit;
-    private              StringProperty                         unit;
-    private              String                                 oldFlipText;
-    private              String                                 _flipText;
-    private              StringProperty                         flipText;
-    private              String                                 _text;
-    private              StringProperty                         text;
-    private              TextAlignment                          _textAlignment;
-    private              ObjectProperty<TextAlignment>          textAlignment;
-    private              boolean                                _active;
-    private              BooleanProperty                        active;
-    private              boolean                                _averagingEnabled;
-    private              BooleanProperty                        averagingEnabled;
-    private              int                                    _averagingPeriod;
-    private              IntegerProperty                        averagingPeriod;
-    private              MovingAverage                          movingAverage;
-    private              ObservableList<Section>                sections;
-    private              ObservableList<Series<String, Number>> series;
-    private              List<Stop>                             gradientStops;
-    private              ObjectProperty<ZonedDateTime>          time;
-    private              LongProperty                           currentTime;
-    private              ZoneId                                 zoneId;
-    private              int                                    updateInterval;
-    private              ObservableList<TimeSection>            timeSections;
-    private              LocalTime                              _duration;
-    private              ObjectProperty<LocalTime>              duration;
-    private              ObservableList<BarChartItem>           barChartItems;
-    private              List<LeaderBoardItem>                  leaderBoardItems;
-    private              ObjectProperty<Node>                   graphic;
-    private              Location                               _currentLocation;
-    private              ObjectProperty<Location>               currentLocation;
-    private              ObservableList<Location>               poiList;
-    private              ObservableList<ChartData>              chartDataList;
-    private              List<Location>                         track;
-    private              TileColor                              _trackColor;
-    private              ObjectProperty<TileColor>              trackColor;
-    private              MapProvider                            _mapProvider;
-    private              ObjectProperty<MapProvider>            mapProvider;
-    private              List<String>                           characterList;
-    private              long                                   flipTimeInMS;
-    private              SunburstChart                          sunburstChart;
+    private              DoubleProperty                                value;
+    private              DoubleProperty                                oldValue;      // last value
+    private              DoubleProperty                                currentValue;
+    private              DoubleProperty                                formerValue;   // last current value
+    private              double                                        _minValue;
+    private              DoubleProperty                                minValue;
+    private              double                                        _maxValue;
+    private              DoubleProperty                                maxValue;
+    private              double                                        _range;
+    private              DoubleProperty                                range;
+    private              double                                        _threshold;
+    private              DoubleProperty                                threshold;
+    private              double                                        _referenceValue;
+    private              DoubleProperty                                referenceValue;
+    private              boolean                                       _autoReferenceValue;
+    private              BooleanProperty                               autoReferenceValue;
+    private              String                                        _title;
+    private              StringProperty                                title;
+    private              TextAlignment                                 _titleAlignment;
+    private              ObjectProperty<TextAlignment>                 titleAlignment;
+    private              String                                        _description;
+    private              StringProperty                                description;
+    private              Pos                                           _descriptionAlignment;
+    private              ObjectProperty<Pos>                           descriptionAlignment;
+    private              String                                        _unit;
+    private              StringProperty                                unit;
+    private              String                                        oldFlipText;
+    private              String                                        _flipText;
+    private              StringProperty                                flipText;
+    private              String                                        _text;
+    private              StringProperty                                text;
+    private              TextAlignment                                 _textAlignment;
+    private              ObjectProperty<TextAlignment>                 textAlignment;
+    private              boolean                                       _active;
+    private              BooleanProperty                               active;
+    private              boolean                                       _averagingEnabled;
+    private              BooleanProperty                               averagingEnabled;
+    private              int                                           _averagingPeriod;
+    private              IntegerProperty                               averagingPeriod;
+    private              MovingAverage                                 movingAverage;
+    private              ObservableList<Section>                       sections;
+    private              ObservableList<TilesFXSeries<String, Number>> series;
+    private              List<Stop>                                    gradientStops;
+    private              ObjectProperty<ZonedDateTime>                 time;
+    private              LongProperty                                  currentTime;
+    private              ZoneId                                        zoneId;
+    private              int                                           updateInterval;
+    private              ObservableList<TimeSection>                   timeSections;
+    private              LocalTime                                     _duration;
+    private              ObjectProperty<LocalTime>                     duration;
+    private              ObservableList<BarChartItem>                  barChartItems;
+    private              List<LeaderBoardItem>                         leaderBoardItems;
+    private              ObjectProperty<Node>                          graphic;
+    private              Location                                      _currentLocation;
+    private              ObjectProperty<Location>                      currentLocation;
+    private              ObservableList<Location>                      poiList;
+    private              ObservableList<ChartData>                     chartDataList;
+    private              List<Location>                                track;
+    private              TileColor                                     _trackColor;
+    private              ObjectProperty<TileColor>                     trackColor;
+    private              MapProvider                                   _mapProvider;
+    private              ObjectProperty<MapProvider>                   mapProvider;
+    private              List<String>                                  characterList;
+    private              long                                          flipTimeInMS;
+    private              SunburstChart                                 sunburstChart;
 
     // UI related
-    private              SkinType                               skinType;
-    private              TextSize                               _textSize;
-    private              ObjectProperty<TextSize>               textSize;
-    private              boolean                                _roundedCorners;
-    private              BooleanProperty                        roundedCorners;
-    private              boolean                                _startFromZero;
-    private              BooleanProperty                        startFromZero;
-    private              boolean                                _returnToZero;
-    private              BooleanProperty                        returnToZero;
-    private              double                                 _minMeasuredValue;
-    private              DoubleProperty                         minMeasuredValue;
-    private              double                                 _maxMeasuredValue;
-    private              DoubleProperty                         maxMeasuredValue;
-    private              boolean                                _minMeasuredValueVisible;
-    private              BooleanProperty                        minMeasuredValueVisible;
-    private              boolean                                _maxMeasuredValueVisible;
-    private              BooleanProperty                        maxMeasuredValueVisible;
-    private              boolean                                _oldValueVisible;
-    private              BooleanProperty                        oldValueVisible;
-    private              boolean                                _valueVisible;
-    private              BooleanProperty                        valueVisible;
-    private              Color                                  _foregroundColor;
-    private              ObjectProperty<Color>                  foregroundColor;
-    private              Color                                  _backgroundColor;
-    private              ObjectProperty<Color>                  backgroundColor;
-    private              Color                                  _borderColor;
-    private              ObjectProperty<Color>                  borderColor;
-    private              double                                 _borderWidth;
-    private              DoubleProperty                         borderWidth;
-    private              Color                                  _activeColor;
-    private              ObjectProperty<Color>                  activeColor;
-    private              Color                                  _knobColor;
-    private              ObjectProperty<Color>                  knobColor;
-    private              boolean                                _animated;
-    private              BooleanProperty                        animated;
-    private              long                                   animationDuration;
-    private              double                                 _startAngle;
-    private              DoubleProperty                         startAngle;
-    private              double                                 _angleRange;
-    private              DoubleProperty                         angleRange;
-    private              double                                 _angleStep;
-    private              DoubleProperty                         angleStep;
-    private              boolean                                _autoScale;
-    private              BooleanProperty                        autoScale;
-    private              boolean                                _shadowsEnabled;
-    private              BooleanProperty                        shadowsEnabled;
-    private              Locale                                 _locale;
-    private              ObjectProperty<Locale>                 locale;
-    private              NumberFormat                           _numberFormat;
-    private              ObjectProperty<NumberFormat>           numberFormat;
-    private              int                                    _decimals;
-    private              IntegerProperty                        decimals;
-    private              int                                    _tickLabelDecimals;
-    private              IntegerProperty                        tickLabelDecimals;
-    private              Color                                  _needleColor;
-    private              ObjectProperty<Color>                  needleColor;
-    private              Color                                  _barColor;
-    private              ObjectProperty<Color>                  barColor;
-    private              Color                                  _barBackgroundColor;
-    private              ObjectProperty<Color>                  barBackgroundColor;
-    private              Color                                  _titleColor;
-    private              ObjectProperty<Color>                  titleColor;
-    private              Color                                  _descriptionColor;
-    private              ObjectProperty<Color>                  descriptionColor;
-    private              Color                                  _unitColor;
-    private              ObjectProperty<Color>                  unitColor;
-    private              Color                                  _valueColor;
-    private              ObjectProperty<Color>                  valueColor;
-    private              Color                                  _thresholdColor;
-    private              ObjectProperty<Color>                  thresholdColor;
-    private              boolean                                _checkSectionsForValue;
-    private              BooleanProperty                        checkSectionsForValue;
-    private              boolean                                _checkThreshold;
-    private              BooleanProperty                        checkThreshold;
-    private              boolean                                _innerShadowEnabled;
-    private              BooleanProperty                        innerShadowEnabled;
-    private              boolean                                _thresholdVisible;
-    private              BooleanProperty                        thresholdVisible;
-    private              boolean                                _averageVisible;
-    private              BooleanProperty                        averageVisible;
-    private              boolean                                _sectionsVisible;
-    private              BooleanProperty                        sectionsVisible;
-    private              boolean                                _sectionsAlwaysVisible;
-    private              BooleanProperty                        sectionsAlwaysVisible;
-    private              boolean                                _sectionTextVisible;
-    private              BooleanProperty                        sectionTextVisible;
-    private              boolean                                _sectionIconsVisible;
-    private              BooleanProperty                        sectionIconsVisible;
-    private              boolean                                _highlightSections;
-    private              BooleanProperty                        highlightSections;
-    private              Orientation                            _orientation;
-    private              ObjectProperty<Orientation>            orientation;
-    private              boolean                                _keepAspect;
-    private              BooleanProperty                        keepAspect;
-    private              boolean                                _customFontEnabled;
-    private              BooleanProperty                        customFontEnabled;
-    private              Font                                   _customFont;
-    private              ObjectProperty<Font>                   customFont;
-    private              boolean                                _alert;
-    private              BooleanProperty                        alert;
-    private              String                                 _alertMessage;
-    private              StringProperty                         alertMessage;
-    private              boolean                                _smoothing;
-    private              BooleanProperty                        smoothing;
-    private              double                                 increment;
-    private              double                                 originalMinValue;
-    private              double                                 originalMaxValue;
-    private              double                                 originalThreshold;
-    private              Timeline                               timeline;
-    private              Instant                                lastCall;
-    private              boolean                                withinSpeedLimit;
-    private              boolean                                _discreteSeconds;
-    private              BooleanProperty                        discreteSeconds;
-    private              boolean                                _discreteMinutes;
-    private              BooleanProperty                        discreteMinutes;
-    private              boolean                                _discreteHours;
-    private              BooleanProperty                        discreteHours;
-    private              boolean                                _secondsVisible;
-    private              BooleanProperty                        secondsVisible;
-    private              boolean                                _textVisible;
-    private              BooleanProperty                        textVisible;
-    private              boolean                                _dateVisible;
-    private              BooleanProperty                        dateVisible;
-    private              boolean                                _running;
-    private              BooleanProperty                        running;
-    private              Color                                  _textColor;
-    private              ObjectProperty<Color>                  textColor;
-    private              Color                                  _dateColor;
-    private              ObjectProperty<Color>                  dateColor;
-    private              Color                                  _hourTickMarkColor;
-    private              ObjectProperty<Color>                  hourTickMarkColor;
-    private              Color                                  _minuteTickMarkColor;
-    private              ObjectProperty<Color>                  minuteTickMarkColor;
-    private              Color                                  _alarmColor;
-    private              ObjectProperty<Color>                  alarmColor;
-    private              boolean                                _hourTickMarksVisible;
-    private              BooleanProperty                        hourTickMarksVisible;
-    private              boolean                                _minuteTickMarksVisible;
-    private              BooleanProperty                        minuteTickMarksVisible;
-    private              Color                                  _hourColor;
-    private              ObjectProperty<Color>                  hourColor;
-    private              Color                                  _minuteColor;
-    private              ObjectProperty<Color>                  minuteColor;
-    private              Color                                  _secondColor;
-    private              ObjectProperty<Color>                  secondColor;
-    private              boolean                                _alarmsEnabled;
-    private              BooleanProperty                        alarmsEnabled;
-    private              boolean                                _alarmsVisible;
-    private              BooleanProperty                        alarmsVisible;
-    private              ObservableList<Alarm>                  alarms;
-    private              List<Alarm>                            alarmsToRemove;
-    private              boolean                                _strokeWithGradient;
-    private              BooleanProperty                        strokeWithGradient;
-    private              boolean                                _fillWithGradient;
-    private              BooleanProperty                        fillWithGradient;
-    private              DarkSky                                darkSky;
-    private              String                                 _tooltipText;
-    private              StringProperty                         tooltipText;
-    private              Tooltip                                tooltip;
-    private              Axis                                   _xAxis;
-    private              ObjectProperty<Axis>                   xAxis;
-    private              Axis                                   _yAxis;
-    private              ObjectProperty<Axis>                   yAxis;
-    private              RadarChart.Mode                        _radarChartMode;
-    private              ObjectProperty<RadarChart.Mode>        radarChartMode;
-    private              Color                                  _chartGridColor;
-    private              ObjectProperty<Color>                  chartGridColor;
-    private              Country                                _country;
-    private              ObjectProperty<Country>                country;
-    private              boolean                                _sortedData;
-    private              BooleanProperty                        sortedData;
-    private              boolean                                _dataPointsVisible;
-    private              BooleanProperty                        dataPointsVisible;
-    private              boolean                                _snapToTicks;
-    private              BooleanProperty                        snapToTicks;
-    private              int                                    _minorTickCount;
-    private              double                                 _majorTickUnit;
-    private              int[]                                  _matrixSize;
+    private              SkinType                                      skinType;
+    private              TextSize                                      _textSize;
+    private              ObjectProperty<TextSize>                      textSize;
+    private              boolean                                       _roundedCorners;
+    private              BooleanProperty                               roundedCorners;
+    private              boolean                                       _startFromZero;
+    private              BooleanProperty                               startFromZero;
+    private              boolean                                       _returnToZero;
+    private              BooleanProperty                               returnToZero;
+    private              double                                        _minMeasuredValue;
+    private              DoubleProperty                                minMeasuredValue;
+    private              double                                        _maxMeasuredValue;
+    private              DoubleProperty                                maxMeasuredValue;
+    private              boolean                                       _minMeasuredValueVisible;
+    private              BooleanProperty                               minMeasuredValueVisible;
+    private              boolean                                       _maxMeasuredValueVisible;
+    private              BooleanProperty                               maxMeasuredValueVisible;
+    private              boolean                                       _oldValueVisible;
+    private              BooleanProperty                               oldValueVisible;
+    private              boolean                                       _valueVisible;
+    private              BooleanProperty                               valueVisible;
+    private              Color                                         _foregroundColor;
+    private              ObjectProperty<Color>                         foregroundColor;
+    private              Color                                         _backgroundColor;
+    private              ObjectProperty<Color>                         backgroundColor;
+    private              Color                                         _borderColor;
+    private              ObjectProperty<Color>                         borderColor;
+    private              double                                        _borderWidth;
+    private              DoubleProperty                                borderWidth;
+    private              Color                                         _activeColor;
+    private              ObjectProperty<Color>                         activeColor;
+    private              Color                                         _knobColor;
+    private              ObjectProperty<Color>                         knobColor;
+    private              boolean                                       _animated;
+    private              BooleanProperty                               animated;
+    private              long                                          animationDuration;
+    private              double                                        _startAngle;
+    private              DoubleProperty                                startAngle;
+    private              double                                        _angleRange;
+    private              DoubleProperty                                angleRange;
+    private              double                                        _angleStep;
+    private              DoubleProperty                                angleStep;
+    private              boolean                                       _autoScale;
+    private              BooleanProperty                               autoScale;
+    private              boolean                                       _shadowsEnabled;
+    private              BooleanProperty                               shadowsEnabled;
+    private              Locale                                        _locale;
+    private              ObjectProperty<Locale>                        locale;
+    private              NumberFormat                                  _numberFormat;
+    private              ObjectProperty<NumberFormat>                  numberFormat;
+    private              int                                           _decimals;
+    private              IntegerProperty                               decimals;
+    private              int                                           _tickLabelDecimals;
+    private              IntegerProperty                               tickLabelDecimals;
+    private              Color                                         _needleColor;
+    private              ObjectProperty<Color>                         needleColor;
+    private              Color                                         _barColor;
+    private              ObjectProperty<Color>                         barColor;
+    private              Color                                         _barBackgroundColor;
+    private              ObjectProperty<Color>                         barBackgroundColor;
+    private              Color                                         _titleColor;
+    private              ObjectProperty<Color>                         titleColor;
+    private              Color                                         _descriptionColor;
+    private              ObjectProperty<Color>                         descriptionColor;
+    private              Color                                         _unitColor;
+    private              ObjectProperty<Color>                         unitColor;
+    private              Color                                         _valueColor;
+    private              ObjectProperty<Color>                         valueColor;
+    private              Color                                         _thresholdColor;
+    private              ObjectProperty<Color>                         thresholdColor;
+    private              boolean                                       _checkSectionsForValue;
+    private              BooleanProperty                               checkSectionsForValue;
+    private              boolean                                       _checkThreshold;
+    private              BooleanProperty                               checkThreshold;
+    private              boolean                                       _innerShadowEnabled;
+    private              BooleanProperty                               innerShadowEnabled;
+    private              boolean                                       _thresholdVisible;
+    private              BooleanProperty                               thresholdVisible;
+    private              boolean                                       _averageVisible;
+    private              BooleanProperty                               averageVisible;
+    private              boolean                                       _sectionsVisible;
+    private              BooleanProperty                               sectionsVisible;
+    private              boolean                                       _sectionsAlwaysVisible;
+    private              BooleanProperty                               sectionsAlwaysVisible;
+    private              boolean                                       _sectionTextVisible;
+    private              BooleanProperty                               sectionTextVisible;
+    private              boolean                                       _sectionIconsVisible;
+    private              BooleanProperty                               sectionIconsVisible;
+    private              boolean                                       _highlightSections;
+    private              BooleanProperty                               highlightSections;
+    private              Orientation                                   _orientation;
+    private              ObjectProperty<Orientation>                   orientation;
+    private              boolean                                       _keepAspect;
+    private              BooleanProperty                               keepAspect;
+    private              boolean                                       _customFontEnabled;
+    private              BooleanProperty                               customFontEnabled;
+    private              Font                                          _customFont;
+    private              ObjectProperty<Font>                          customFont;
+    private              boolean                                       _alert;
+    private              BooleanProperty                               alert;
+    private              String                                        _alertMessage;
+    private              StringProperty                                alertMessage;
+    private              boolean                                       _smoothing;
+    private              BooleanProperty                               smoothing;
+    private              double                                        increment;
+    private              double                                        originalMinValue;
+    private              double                                        originalMaxValue;
+    private              double                                        originalThreshold;
+    private              Timeline                                      timeline;
+    private              Instant                                       lastCall;
+    private              boolean                                       withinSpeedLimit;
+    private              boolean                                       _discreteSeconds;
+    private              BooleanProperty                               discreteSeconds;
+    private              boolean                                       _discreteMinutes;
+    private              BooleanProperty                               discreteMinutes;
+    private              boolean                                       _discreteHours;
+    private              BooleanProperty                               discreteHours;
+    private              boolean                                       _secondsVisible;
+    private              BooleanProperty                               secondsVisible;
+    private              boolean                                       _textVisible;
+    private              BooleanProperty                               textVisible;
+    private              boolean                                       _dateVisible;
+    private              BooleanProperty                               dateVisible;
+    private              boolean                                       _running;
+    private              BooleanProperty                               running;
+    private              Color                                         _textColor;
+    private              ObjectProperty<Color>                         textColor;
+    private              Color                                         _dateColor;
+    private              ObjectProperty<Color>                         dateColor;
+    private              Color                                         _hourTickMarkColor;
+    private              ObjectProperty<Color>                         hourTickMarkColor;
+    private              Color                                         _minuteTickMarkColor;
+    private              ObjectProperty<Color>                         minuteTickMarkColor;
+    private              Color                                         _alarmColor;
+    private              ObjectProperty<Color>                         alarmColor;
+    private              boolean                                       _hourTickMarksVisible;
+    private              BooleanProperty                               hourTickMarksVisible;
+    private              boolean                                       _minuteTickMarksVisible;
+    private              BooleanProperty                               minuteTickMarksVisible;
+    private              Color                                         _hourColor;
+    private              ObjectProperty<Color>                         hourColor;
+    private              Color                                         _minuteColor;
+    private              ObjectProperty<Color>                         minuteColor;
+    private              Color                                         _secondColor;
+    private              ObjectProperty<Color>                         secondColor;
+    private              boolean                                       _alarmsEnabled;
+    private              BooleanProperty                               alarmsEnabled;
+    private              boolean                                       _alarmsVisible;
+    private              BooleanProperty                               alarmsVisible;
+    private              ObservableList<Alarm>                         alarms;
+    private              List<Alarm>                                   alarmsToRemove;
+    private              boolean                                       _strokeWithGradient;
+    private              BooleanProperty                               strokeWithGradient;
+    private              boolean                                       _fillWithGradient;
+    private              BooleanProperty                               fillWithGradient;
+    private              DarkSky                                       darkSky;
+    private              String                                        _tooltipText;
+    private              StringProperty                                tooltipText;
+    private              Tooltip                                       tooltip;
+    private              Axis                                          _xAxis;
+    private              ObjectProperty<Axis>                          xAxis;
+    private              Axis                                          _yAxis;
+    private              ObjectProperty<Axis>                          yAxis;
+    private              RadarChart.Mode                               _radarChartMode;
+    private              ObjectProperty<RadarChart.Mode>               radarChartMode;
+    private              Color                                         _chartGridColor;
+    private              ObjectProperty<Color>                         chartGridColor;
+    private              Country                                       _country;
+    private              ObjectProperty<Country>                       country;
+    private              boolean                                       _sortedData;
+    private              BooleanProperty                               sortedData;
+    private              boolean                                       _dataPointsVisible;
+    private              BooleanProperty                               dataPointsVisible;
+    private              boolean                                       _snapToTicks;
+    private              BooleanProperty                               snapToTicks;
+    private              int                                           _minorTickCount;
+    private              double                                        _majorTickUnit;
+    private              int[]                                         _matrixSize;
+    private              ChartType                                     _chartType;
 
-    private volatile     ScheduledFuture<?>                     periodicTickTask;
-    private static       ScheduledExecutorService               periodicTickExecutorService;
+    private volatile     ScheduledFuture<?>                            periodicTickTask;
+    private static       ScheduledExecutorService                      periodicTickExecutorService;
 
 
     // ******************** Constructors **************************************
@@ -598,7 +601,6 @@ public class Tile extends Control {
         flipTimeInMS                        = 500;
         leaderBoardItems                    = new ArrayList<>();
         gradientStops                       = new ArrayList<>(4);
-        sunburstChart                       = new SunburstChart();
 
         _textSize                           = TextSize.NORMAL;
         _roundedCorners                     = true;
@@ -685,6 +687,7 @@ public class Tile extends Control {
         _minorTickCount                     = 0;
         _majorTickUnit                      = 1;
         _matrixSize                         = new int[]{ 30, 25 };
+        _chartType                          = ChartType.LINE;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -991,7 +994,10 @@ public class Tile extends Control {
         return autoReferenceValue;
     }
 
-    public SunburstChart getSunburstChart() { return sunburstChart; }
+    public SunburstChart getSunburstChart() {
+        if (null == sunburstChart) { sunburstChart = new SunburstChart(); }
+        return sunburstChart;
+    }
 
     /**
      * Returns the title of the gauge. This title will usually
@@ -1407,23 +1413,44 @@ public class Tile extends Control {
         fireTileEvent(SECTION_EVENT);
     }
 
-    public Collection<Series<String, Number>> getSeries() { return series; }
+    public List<Series<String, Number>> getSeries() {
+        List<Series<String, Number>> seriesList = new ArrayList<>();
+        getTilesFXSeries().forEach(tilesFxSeries -> seriesList.add(tilesFxSeries.getSeries()));
+        return seriesList;
+    }
     public void setSeries(final List<Series<String, Number>> SERIES) {
+        SERIES.forEach(series -> addTilesFXSeries(new TilesFXSeries<String, Number>(series)));
+    }
+    public void setSeries(final Series<String, Number>... SERIES) {
+        setSeries(Arrays.asList(SERIES));
+    }
+    public void addSeries(final Series<String, Number> SERIES) {
+        addTilesFXSeries(new TilesFXSeries<String, Number>(SERIES));
+    }
+    public void removeSeries(final Series<String, Number> SERIES) {
+        TilesFXSeries<String, Number> seriesToRemove = series.stream().filter(tilesFxSeries -> tilesFxSeries.getSeries().equals(SERIES)).findFirst().orElse(null);
+        if (null == seriesToRemove) return;
+        series.removeAll(seriesToRemove);
+    }
+    public void clearSeries() { clearTilesFXSeries(); }
+
+    public List<TilesFXSeries<String, Number>> getTilesFXSeries() { return series; }
+    public void setTilesFXSeries(final List<TilesFXSeries<String, Number>> SERIES) {
         series.setAll(SERIES);
         fireTileEvent(SERIES_EVENT);
     }
-    public void setSeries(final Series<String, Number>... SERIES) { setSeries(Arrays.asList(SERIES)); }
-    public void addSeries(final Series<String, Number> SERIES) {
+    public void setTilesFXSeries(final TilesFXSeries<String, Number>... SERIES) { setTilesFXSeries(Arrays.asList(SERIES)); }
+    public void addTilesFXSeries(final TilesFXSeries<String, Number> SERIES) {
         if (null == SERIES) return;
         series.add(SERIES);
         fireTileEvent(SERIES_EVENT);
     }
-    public void removeSeries(final Series<String, Number> SERIES) {
+    public void removeTilesFXSeries(final TilesFXSeries<String, Number> SERIES) {
         if (null == SERIES) return;
         series.remove(SERIES);
         fireTileEvent(SERIES_EVENT);
     }
-    public void clearSeries() {
+    public void clearTilesFXSeries() {
         series.clear();
         fireTileEvent(SERIES_EVENT);
     }
@@ -4303,6 +4330,12 @@ public class Tile extends Control {
         fireTileEvent(RECALC_EVENT);
     }
 
+    public ChartType getChartType() { return _chartType; }
+    public void setChartType(final ChartType TYPE) {
+        _chartType = TYPE;
+        fireTileEvent(SERIES_EVENT);
+    }
+
     public double getIncrement() { return increment; }
     public void setIncrement(final double INCREMENT) { increment = clamp(0, 10, INCREMENT); }
 
@@ -4628,9 +4661,8 @@ public class Tile extends Control {
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch (skinType) {
-            case AREA_CHART       : return new AreaChartTileSkin(Tile.this);
+            case SMOOTHED_CHART   : return new SmoothedChartTileSkin(Tile.this);
             case BAR_CHART        : return new BarChartTileSkin(Tile.this);
-            case LINE_CHART       : return new LineChartTileSkin(Tile.this);
             case CLOCK            : return new ClockTileSkin(Tile.this);
             case GAUGE            : return new GaugeTileSkin(Tile.this);
             case HIGH_LOW         : return new HighLowTileSkin(Tile.this);
@@ -4664,6 +4696,7 @@ public class Tile extends Control {
             case CALENDAR         : return new CalendarTileSkin(Tile.this);
             case SUNBURST         : return new SunburstChartTileSkin(Tile.this);
             case MATRIX           : return new MatrixTileSkin(Tile.this);
+            case RADIAL_PERCENTAGE: return new RadialPercentageTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4672,11 +4705,9 @@ public class Tile extends Control {
 
     private void presetTileParameters(final SkinType SKIN_TYPE) {
         switch (SKIN_TYPE) {
-            case AREA_CHART:
+            case SMOOTHED_CHART:
                 break;
             case BAR_CHART:
-                break;
-            case LINE_CHART:
                 break;
             case CLOCK:
                 break;
@@ -4785,6 +4816,10 @@ public class Tile extends Control {
                 break;
             case MATRIX:
                 break;
+            case RADIAL_PERCENTAGE:
+                setBarBackgroundColor(getBackgroundColor().brighter());
+                setAnimated(true);
+                break;
             default:
                 break;
         }
@@ -4794,9 +4829,8 @@ public class Tile extends Control {
     public void setSkinType(final SkinType SKIN_TYPE) {
         skinType = SKIN_TYPE;
         switch (SKIN_TYPE) {
-            case AREA_CHART       : setSkin(new AreaChartTileSkin(Tile.this)); break;
+            case SMOOTHED_CHART   : setSkin(new SmoothedChartTileSkin(Tile.this)); break;
             case BAR_CHART        : setSkin(new BarChartTileSkin(Tile.this)); break;
-            case LINE_CHART       : setSkin(new LineChartTileSkin(Tile.this)); break;
             case CLOCK            : setSkin(new ClockTileSkin(Tile.this)); break;
             case GAUGE            : setSkin(new GaugeTileSkin(Tile.this)); break;
             case HIGH_LOW         : setSkin(new HighLowTileSkin(Tile.this)); break;
@@ -4829,6 +4863,7 @@ public class Tile extends Control {
             case CALENDAR         : setSkin(new CalendarTileSkin(Tile.this)); break;
             case SUNBURST         : setSkin(new SunburstChartTileSkin(Tile.this)); break;
             case MATRIX           : setSkin(new MatrixTileSkin(Tile.this)); break;
+            case RADIAL_PERCENTAGE: setSkin(new RadialPercentageTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

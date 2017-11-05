@@ -66,12 +66,13 @@ import java.util.Locale;
 
 
 public class SmoothedChart<T, S> extends AreaChart<T, S> {
+    public enum ChartType { LINE, AREA }
     private static final int                       MAX_SUBDIVISIONS = 16;
     private static final int                       MAX_DECIMALS     = 10;
     private              boolean                   _smoothed;
     private              BooleanProperty           smoothed;
-    private              boolean                   _filled;
-    private              BooleanProperty           filled;
+    private              ChartType                 _chartType;
+    private              ObjectProperty<ChartType> chartType;
     private              int                       _subDivisions;
     private              IntegerProperty           subDivisions;
     private              boolean                   _snapToTicks;
@@ -112,7 +113,7 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
     // ******************** Initialization ************************************
     private void init() {
         _smoothed                  = true;
-        _filled                    = false;
+        _chartType                 = ChartType.LINE;
         _subDivisions              = 8;
         _snapToTicks               = true;
         _selectorFillColor         = Color.WHITE;
@@ -207,24 +208,25 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         return smoothed;
     }
 
-    public boolean isFilled() { return null == filled ? _filled : filled.get(); }
-    public void setFilled(final boolean FILLED) {
-        if (null == filled) {
-            _filled = FILLED;
+    public ChartType getChartType() { return null == chartType ? _chartType : chartType.get(); }
+    public void setChartType(final ChartType TYPE) {
+        if (null == chartType) {
+            _chartType = TYPE;
             layoutPlotChildren();
         } else {
-            filled.set(FILLED);
+            chartType.set(TYPE);
         }
     }
-    public BooleanProperty filledProperty() {
-        if (null == filled) {
-            filled = new BooleanPropertyBase(_filled) {
+    public ObjectProperty<ChartType> chartTypeProperty() {
+        if (null == chartType) {
+            chartType = new ObjectPropertyBase<ChartType>(_chartType) {
                 @Override protected void invalidated() { layoutPlotChildren(); }
                 @Override public Object getBean() { return SmoothedChart.this; }
-                @Override public String getName() { return "filled"; }
+                @Override public String getName() { return "chartType"; }
             };
+            _chartType = null;
         }
-        return filled;
+        return chartType;
     }
 
     public int getSubDivisions() { return null == subDivisions ? _subDivisions : subDivisions.get(); }
@@ -451,8 +453,8 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             final Path                 strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
             final Path                 fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
             if (isSmoothed()) { smooth(strokePath.getElements(), fillPath.getElements(), height); }
-            fillPath.setVisible(isFilled());
-            fillPath.setManaged(isFilled());
+            fillPath.setVisible(ChartType.AREA == getChartType());
+            fillPath.setManaged(ChartType.AREA == getChartType());
         }
     }
 

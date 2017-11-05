@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
@@ -23,6 +24,7 @@ import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.chart.RadarChart;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
+import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
@@ -324,6 +326,21 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B series(final List<Series<String, Number>> SERIES) {
         properties.put("seriesList", new SimpleObjectProperty(SERIES));
+        return (B)this;
+    }
+
+    public final B tilesFxSeries(final TilesFXSeries<String, Number>... SERIES) {
+        properties.put("tilesFxSeriesArray", new SimpleObjectProperty(SERIES));
+        return (B)this;
+    }
+
+    public final B tilesFxSeries(final List<TilesFXSeries<String, Number>> SERIES) {
+        properties.put("tilesFxSeriesList", new SimpleObjectProperty(SERIES));
+        return (B)this;
+    }
+
+    public final B chartType(final ChartType TYPE) {
+        properties.put("chartType", new SimpleObjectProperty(TYPE));
         return (B)this;
     }
 
@@ -889,11 +906,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
             SkinType skinType = ((ObjectProperty<SkinType>) properties.get("skinType")).get();
             CONTROL = new Tile(skinType);
             switch (skinType) {
-                case AREA_CHART:
+                case SMOOTHED_CHART:
                     break;
                 case BAR_CHART:
-                    break;
-                case LINE_CHART:
                     break;
                 case CLOCK:
                     break;
@@ -1002,6 +1017,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case MATRIX:
                     break;
+                case RADIAL_PERCENTAGE:
+                    CONTROL.setBarBackgroundColor(CONTROL.getBackgroundColor().brighter());
+                    CONTROL.setAnimated(true);
+                    break;
                 default:
                     break;
             }
@@ -1052,6 +1071,14 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
         if (properties.keySet().contains("seriesList")) {
             CONTROL.setSeries(((ObjectProperty<List<Series<String, Number>>>) properties.get("seriesList")).get());
+        }
+
+        if (properties.keySet().contains("tilesFxSeriesArray")) {
+            CONTROL.setTilesFXSeries(((ObjectProperty<TilesFXSeries<String, Number>[]>) properties.get("tilesFxSeriesArray")).get());
+        }
+
+        if (properties.keySet().contains("tilesFxSeriesList")) {
+            CONTROL.setTilesFXSeries(((ObjectProperty<List<TilesFXSeries<String, Number>>>) properties.get("tilesFxSeriesList")).get());
         }
 
         if (properties.keySet().contains("barChartItemsArray")) {
@@ -1373,6 +1400,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 final int COLS = ((IntegerProperty) properties.get("matrixColumns")).get();
                 final int ROWS = ((IntegerProperty) properties.get("matrixRows")).get();
                 CONTROL.setMatrixSize(COLS, ROWS);
+            } else if ("chartType".equals(key)) {
+                CONTROL.setChartType(((ObjectProperty<ChartType>) properties.get(key)).get());
             }
         }
         properties.clear();

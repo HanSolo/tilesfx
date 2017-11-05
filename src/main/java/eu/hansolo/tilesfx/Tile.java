@@ -87,6 +87,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 import static eu.hansolo.tilesfx.tools.MovingAverage.MAX_PERIOD;
@@ -266,7 +267,7 @@ public class Tile extends Control {
     private              LocalTime                                     _duration;
     private              ObjectProperty<LocalTime>                     duration;
     private              ObservableList<BarChartItem>                  barChartItems;
-    private              List<LeaderBoardItem>                         leaderBoardItems;
+    private              ObservableList<LeaderBoardItem>               leaderBoardItems;
     private              ObjectProperty<Node>                          graphic;
     private              Location                                      _currentLocation;
     private              ObjectProperty<Location>                      currentLocation;
@@ -461,6 +462,8 @@ public class Tile extends Control {
     private              double                                        _majorTickUnit;
     private              int[]                                         _matrixSize;
     private              ChartType                                     _chartType;
+    private              double                                        _tooltipTimeout;
+    private              DoubleProperty                                tooltipTimeout;
 
     private volatile     ScheduledFuture<?>                            periodicTickTask;
     private static       ScheduledExecutorService                      periodicTickExecutorService;
@@ -468,23 +471,20 @@ public class Tile extends Control {
 
     // ******************** Constructors **************************************
     public Tile() {
-        this(SkinType.GAUGE, ZonedDateTime.now());
+        this(SkinType.GAUGE);
     }
-    public Tile(final SkinType SKIN) {
-        this(SKIN, ZonedDateTime.now());
-    }
-    public Tile(final SkinType SKIN_TYPE, final ZonedDateTime TIME) {
+    public Tile(final SkinType SKIN_TYPE) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         skinType = SKIN_TYPE;
         getStyleClass().add("tile");
 
-        init(TIME);
+        init();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init(final ZonedDateTime TIME) {
+    private void init() {
         _minValue                           = 0;
         _maxValue                           = 100;
         value                               = new DoublePropertyBase(_minValue) {
@@ -545,32 +545,11 @@ public class Tile extends Control {
         _threshold                          = _maxValue;
         _referenceValue                     = _minValue;
         _autoReferenceValue                 = true;
-        time                                = new ObjectPropertyBase<ZonedDateTime>(TIME) {
-            @Override protected void invalidated() {
-                zoneId = get().getZone();
-                fireTileEvent(RECALC_EVENT);
-                if (!isRunning() && isAnimated()) {
-                    long animationDuration = getAnimationDuration();
-                    timeline.stop();
-                    final KeyValue KEY_VALUE = new KeyValue(currentTime, TIME.toEpochSecond());
-                    final KeyFrame KEY_FRAME = new KeyFrame(javafx.util.Duration.millis(animationDuration), KEY_VALUE);
-                    timeline.getKeyFrames().setAll(KEY_FRAME);
-                    timeline.setOnFinished(e -> fireTileEvent(FINISHED_EVENT));
-                    timeline.play();
-                } else {
-                    currentTime.set(TIME.toEpochSecond());
-                    fireTileEvent(FINISHED_EVENT);
-                }
-            }
-            @Override public Object getBean() { return Tile.this; }
-            @Override public String getName() { return "time"; }
-        };
-        currentTime                         = new LongPropertyBase(time.get().toEpochSecond()) {
-            @Override protected void invalidated() {}
+
+        currentTime                         = new LongPropertyBase(getTime().toEpochSecond()) {
             @Override public Object getBean() { return Tile.this; }
             @Override public String getName() { return "currentTime"; }
         };
-        zoneId                              = time.get().getZone();
         _title                              = "";
         _titleAlignment                     = TextAlignment.LEFT;
         _description                        = "";
@@ -585,22 +564,9 @@ public class Tile extends Control {
         _averagingPeriod                    = 10;
         _duration                           = LocalTime.of(1, 0);
         _currentLocation                    = new Location(0, 0);
-        poiList                             = FXCollections.observableArrayList();
-        chartDataList                       = FXCollections.observableArrayList();
-        movingAverage                       = new MovingAverage(_averagingPeriod);
-        sections                            = FXCollections.observableArrayList();
-        series                              = FXCollections.observableArrayList();
-        timeSections                        = FXCollections.observableArrayList();
-        alarms                              = FXCollections.observableArrayList();
-        alarmsToRemove                      = new ArrayList<>();
-        barChartItems                       = FXCollections.observableArrayList();
-        track                               = new ArrayList<>();
         _trackColor                         = TileColor.BLUE;
         _mapProvider                        = MapProvider.BW;
-        characterList                       = new ArrayList<>();
         flipTimeInMS                        = 500;
-        leaderBoardItems                    = new ArrayList<>();
-        gradientStops                       = new ArrayList<>(4);
 
         _textSize                           = TextSize.NORMAL;
         _roundedCorners                     = true;
@@ -688,6 +654,7 @@ public class Tile extends Control {
         _majorTickUnit                      = 1;
         _matrixSize                         = new int[]{ 30, 25 };
         _chartType                          = ChartType.LINE;
+        _tooltipTimeout                     = 2000;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -1235,7 +1202,10 @@ public class Tile extends Control {
      * Returns the moving average object
      * @return the moving average object
      */
-    public MovingAverage getMovingAverage() { return movingAverage; }
+    public MovingAverage getMovingAverage() {
+        if (null == movingAverage) { movingAverage = new MovingAverage(getAveragingPeriod()); }
+        return movingAverage;
+    }
 
     /**
      * Returns true if the averaging functionality is enabled.
@@ -1280,7 +1250,7 @@ public class Tile extends Control {
     public void setAveragingPeriod(final int PERIOD) {
         if (null == averagingPeriod) {
             _averagingPeriod = Helper.clamp(0, MAX_PERIOD, PERIOD);
-            movingAverage.setPeriod(_averagingPeriod); // MAX 1000 values
+            getMovingAverage().setPeriod(_averagingPeriod); // MAX 1000 values
             fireTileEvent(AVERAGING_EVENT);
         } else {
             averagingPeriod.set(Helper.clamp(0, MAX_PERIOD, PERIOD));
@@ -1290,7 +1260,7 @@ public class Tile extends Control {
         if (null == averagingPeriod) {
             averagingPeriod = new IntegerPropertyBase(_averagingPeriod) {
                 @Override protected void invalidated() {
-                    movingAverage.setPeriod(get());
+                    getMovingAverage().setPeriod(get());
                     fireTileEvent(AVERAGING_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
@@ -1356,7 +1326,10 @@ public class Tile extends Control {
      *
      * @return an observable list of Section objects
      */
-    public ObservableList<Section> getSections() { return sections; }
+    public ObservableList<Section> getSections() {
+        if (null == sections) { sections = FXCollections.observableArrayList(); }
+        return sections;
+    }
     /**
      * Sets the sections to the given list of Section objects. The
      * sections will be used to colorize areas with a special
@@ -1367,8 +1340,8 @@ public class Tile extends Control {
      * @param SECTIONS
      */
     public void setSections(final List<Section> SECTIONS) {
-        sections.setAll(SECTIONS);
-        sections.sort(new SectionComparator());
+        getSections().setAll(SECTIONS);
+        getSections().sort(new SectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -1388,8 +1361,8 @@ public class Tile extends Control {
      */
     public void addSection(final Section SECTION) {
         if (null == SECTION) return;
-        sections.add(SECTION);
-        sections.sort(new SectionComparator());
+        getSections().add(SECTION);
+        getSections().sort(new SectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -1401,22 +1374,20 @@ public class Tile extends Control {
      */
     public void removeSection(final Section SECTION) {
         if (null == SECTION) return;
-        sections.remove(SECTION);
-        sections.sort(new SectionComparator());
+        getSections().remove(SECTION);
+        getSections().sort(new SectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
      * Clears the list of sections.
      */
     public void clearSections() {
-        sections.clear();
+        getSections().clear();
         fireTileEvent(SECTION_EVENT);
     }
 
-    public List<Series<String, Number>> getSeries() {
-        List<Series<String, Number>> seriesList = new ArrayList<>();
-        getTilesFXSeries().forEach(tilesFxSeries -> seriesList.add(tilesFxSeries.getSeries()));
-        return seriesList;
+    public ObservableList<Series<String, Number>> getSeries() {
+        return getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toCollection(FXCollections::observableArrayList));
     }
     public void setSeries(final List<Series<String, Number>> SERIES) {
         SERIES.forEach(series -> addTilesFXSeries(new TilesFXSeries<String, Number>(series)));
@@ -1434,77 +1405,90 @@ public class Tile extends Control {
     }
     public void clearSeries() { clearTilesFXSeries(); }
 
-    public List<TilesFXSeries<String, Number>> getTilesFXSeries() { return series; }
+    public ObservableList<TilesFXSeries<String, Number>> getTilesFXSeries() {
+        if (null == series) { series = FXCollections.observableArrayList(); }
+        return series;
+    }
     public void setTilesFXSeries(final List<TilesFXSeries<String, Number>> SERIES) {
-        series.setAll(SERIES);
+        getTilesFXSeries().setAll(SERIES);
         fireTileEvent(SERIES_EVENT);
     }
     public void setTilesFXSeries(final TilesFXSeries<String, Number>... SERIES) { setTilesFXSeries(Arrays.asList(SERIES)); }
     public void addTilesFXSeries(final TilesFXSeries<String, Number> SERIES) {
         if (null == SERIES) return;
-        series.add(SERIES);
+        getTilesFXSeries().add(SERIES);
         fireTileEvent(SERIES_EVENT);
     }
     public void removeTilesFXSeries(final TilesFXSeries<String, Number> SERIES) {
         if (null == SERIES) return;
-        series.remove(SERIES);
-        fireTileEvent(SERIES_EVENT);
+        if (getTilesFXSeries().contains(SERIES)) {
+            getTilesFXSeries().remove(SERIES);
+            fireTileEvent(SERIES_EVENT);
+        }
     }
     public void clearTilesFXSeries() {
-        series.clear();
+        getTilesFXSeries().clear();
         fireTileEvent(SERIES_EVENT);
     }
 
-    public ObservableList<BarChartItem> getBarChartItems() { return barChartItems; }
+    public ObservableList<BarChartItem> getBarChartItems() {
+        if (null == barChartItems) { barChartItems = FXCollections.observableArrayList(); }
+        return barChartItems;
+    }
     public void setBarChartItems(final List<BarChartItem> ITEMS) {
-        barChartItems.setAll(ITEMS);
+        getBarChartItems().setAll(ITEMS);
         fireTileEvent(DATA_EVENT);
     }
     public void setBarChartItems(final BarChartItem... ITEMS) { setBarChartItems(Arrays.asList(ITEMS)); }
     public void addBarChartItem(final BarChartItem ITEM) {
         if (null == ITEM) return;
-        barChartItems.add(ITEM);
+        getBarChartItems().add(ITEM);
         fireTileEvent(DATA_EVENT);
     }
     public void removeBarChartItem(final BarChartItem ITEM) {
         if (null == ITEM) return;
-        barChartItems.remove(ITEM);
+        getBarChartItems().remove(ITEM);
         fireTileEvent(DATA_EVENT);
     }
     public void clearBarChartItems() {
-        barChartItems.clear();
+        getBarChartItems().clear();
         fireTileEvent(DATA_EVENT);
     }
 
-    public List<LeaderBoardItem> getLeaderBoardItems() { return leaderBoardItems; }
+    public ObservableList<LeaderBoardItem> getLeaderBoardItems() {
+        if (null == leaderBoardItems) { leaderBoardItems = FXCollections.observableArrayList(); }
+        return leaderBoardItems;
+    }
     public void setLeaderBoardItems(final List<LeaderBoardItem> ITEMS) {
-        leaderBoardItems.clear();
-        leaderBoardItems.addAll(ITEMS);
+        getLeaderBoardItems().setAll(ITEMS);
         fireTileEvent(DATA_EVENT);
     }
     public void setLeaderBoardItems(final LeaderBoardItem... ITEMS) { setLeaderBoardItems(Arrays.asList(ITEMS)); }
     public void addLeaderBoardItem(final LeaderBoardItem ITEM) {
         if (null == ITEM) return;
-        leaderBoardItems.add(ITEM);
+        getLeaderBoardItems().add(ITEM);
         fireTileEvent(DATA_EVENT);
     }
     public void removeLeaderBoardItem(final LeaderBoardItem ITEM) {
         if (null == ITEM) return;
-        leaderBoardItems.remove(ITEM);
+        getLeaderBoardItems().remove(ITEM);
         fireTileEvent(DATA_EVENT);
     }
     public void clearLeaderBoardItems() {
-        leaderBoardItems.clear();
+        getLeaderBoardItems().clear();
         fireTileEvent(DATA_EVENT);
     }
 
-    public List<Stop> getGradientStops() { return gradientStops; }
+    public List<Stop> getGradientStops() {
+        if (null == gradientStops) { gradientStops = new ArrayList<>(4); }
+        return gradientStops;
+    }
     public void setGradientStops(final Stop... STOPS) {
         setGradientStops(Arrays.asList(STOPS));
     }
     public void setGradientStops(final List<Stop> STOPS) {
-        gradientStops.clear();
-        gradientStops.addAll(STOPS);
+        getGradientStops().clear();
+        getGradientStops().addAll(STOPS);
         fireTileEvent(REDRAW_EVENT);
     }
 
@@ -1559,39 +1543,45 @@ public class Tile extends Control {
         fireTileEvent(LOCATION_EVENT);
     }
 
-    public ObservableList<Location> getPoiList() { return poiList; }
+    public ObservableList<Location> getPoiList() {
+        if (null == poiList) { poiList = FXCollections.observableArrayList(); }
+        return poiList;
+    }
     public void setPoiList(final List<Location> POI_LIST) {
-        poiList.clear();
-        poiList.addAll(POI_LIST);
+        getPoiList().clear();
+        getPoiList().addAll(POI_LIST);
         fireTileEvent(LOCATION_EVENT);
     }
     public void setPoiLocations(final Location... LOCATIONS) { setPoiList(Arrays.asList(LOCATIONS)); }
     public void addPoiLocation(final Location LOCATION) {
         if (null == LOCATION) return;
-        poiList.add(LOCATION);
+        getPoiList().add(LOCATION);
         fireTileEvent(LOCATION_EVENT);
     }
     public void removePoiLocation(final Location LOCATION) {
         if (null == LOCATION) return;
-        poiList.remove(LOCATION);
+        getPoiList().remove(LOCATION);
         fireTileEvent(LOCATION_EVENT);
     }
     public void clearPoiLocations() {
-        poiList.clear();
+        getPoiList().clear();
         fireTileEvent(DATA_EVENT);
     }
 
-    public List<Location> getTrack() { return track; }
+    public List<Location> getTrack() {
+        if (null == track) { track = new ArrayList<>(); }
+        return track;
+    }
     public void setTrack(final Location... LOCATIONS) {
         setTrack(Arrays.asList(LOCATIONS));
     }
     public void setTrack(final List<Location> LOCATIONS) {
-        track.clear();
-        track.addAll(LOCATIONS);
+        getTrack().clear();
+        getTrack().addAll(LOCATIONS);
         fireTileEvent(TRACK_EVENT);
     }
     public void clearTrack() {
-        track.clear();
+        getTrack().clear();
         fireTileEvent(TRACK_EVENT);
     }
 
@@ -1637,33 +1627,39 @@ public class Tile extends Control {
         return mapProvider;
     }
 
-    public List<String> getCharacterList() { return characterList; }
+    public List<String> getCharacterList() {
+        if (null == characterList) { characterList = new ArrayList<>(); }
+        return characterList;
+    }
     public void setCharacters(final String... CHARACTERS) {
-        characterList.clear();
+        getCharacterList().clear();
         Arrays.stream(CHARACTERS)
               .filter(Objects::nonNull)
               .filter(character -> !character.isEmpty())
-              .forEach(character -> characterList.add(character) /*characterList.add(character.substring(0, 1)) */);
+              .forEach(character -> getCharacterList().add(character) /*characterList.add(character.substring(0, 1)) */);
     }
 
     public long getFlipTimeInMS() { return flipTimeInMS; }
     public void setFlipTimeInMS(final long FLIP_TIME) { flipTimeInMS = Helper.clamp(0, 2000, FLIP_TIME); }
 
-    public ObservableList<ChartData> getChartData() { return chartDataList; }
+    public ObservableList<ChartData> getChartData() {
+        if (null == chartDataList) { chartDataList = FXCollections.observableArrayList(); }
+        return chartDataList;
+    }
     public void addChartData(final ChartData... DATA) { addChartData(Arrays.asList(DATA)); }
     public void addChartData(final List<ChartData> DATA) {
-        chartDataList.addAll(DATA);
+        getChartData().addAll(DATA);
         updateChartData();
     }
     public void setChartData(final ChartData... DATA) { setChartData(Arrays.asList(DATA)); }
     public void setChartData(final List<ChartData> DATA) {
-        chartDataList.setAll(DATA);
+        getChartData().setAll(DATA);
         updateChartData();
     }
-    public void removeChartData(final ChartData DATA) { chartDataList.remove(DATA); }
-    public void clearChartData() { chartDataList.clear(); }
+    public void removeChartData(final ChartData DATA) { getChartData().remove(DATA); }
+    public void clearChartData() { getChartData().clear(); }
     private void updateChartData() {
-        chartDataList.forEach(chartData -> {
+        getChartData().forEach(chartData -> {
             chartData.setAnimated(isAnimated());
             chartData.setAnimationDuration(getAnimationDuration());
         });
@@ -3326,7 +3322,32 @@ public class Tile extends Control {
      * Returns the current time of the clock.
      * @return the current time of the clock
      */
-    public ZonedDateTime getTime() { return time.get(); }
+    public ZonedDateTime getTime() {
+        if (null == time) {
+            ZonedDateTime now = ZonedDateTime.now();
+            time = new ObjectPropertyBase<ZonedDateTime>(now) {
+                @Override protected void invalidated() {
+                    zoneId = get().getZone();
+                    fireTileEvent(RECALC_EVENT);
+                    if (!isRunning() && isAnimated()) {
+                        long animationDuration = getAnimationDuration();
+                        timeline.stop();
+                        final KeyValue KEY_VALUE = new KeyValue(currentTime, now.toEpochSecond());
+                        final KeyFrame KEY_FRAME = new KeyFrame(javafx.util.Duration.millis(animationDuration), KEY_VALUE);
+                        timeline.getKeyFrames().setAll(KEY_FRAME);
+                        timeline.setOnFinished(e -> fireTileEvent(FINISHED_EVENT));
+                        timeline.play();
+                    } else {
+                        currentTime.set(now.toEpochSecond());
+                        fireTileEvent(FINISHED_EVENT);
+                    }
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "time"; }
+            };
+        }
+        return time.get();
+    }
     /**
      * Defines the current time of the clock.
      * @param TIME
@@ -3346,7 +3367,10 @@ public class Tile extends Control {
     public long getCurrentTime() { return currentTime.get(); }
     public ReadOnlyLongProperty currentTimeProperty() { return currentTime; }
 
-    public ZoneId getZoneId() { return zoneId; }
+    public ZoneId getZoneId() {
+        if (null == zoneId) { zoneId = getTime().getZone(); }
+        return zoneId;
+    }
 
     
     /**
@@ -3420,7 +3444,10 @@ public class Tile extends Control {
      * Areas.
      * @return an observable list of TimeSection objects
      */
-    public ObservableList<TimeSection> getTimeSections() { return timeSections; }
+    public ObservableList<TimeSection> getTimeSections() {
+        if (null == timeSections) { timeSections = FXCollections.observableArrayList(); }
+        return timeSections;
+    }
     /**
      * Sets the sections to the given list of TimeSection objects. The
      * sections will be used to colorize areas with a special
@@ -3429,8 +3456,8 @@ public class Tile extends Control {
      * @param SECTIONS
      */
     public void setTimeSections(final List<TimeSection> SECTIONS) {
-        timeSections.setAll(SECTIONS);
-        timeSections.sort(new TimeSectionComparator());
+        getTimeSections().setAll(SECTIONS);
+        getTimeSections().sort(new TimeSectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -3449,8 +3476,8 @@ public class Tile extends Control {
      */
     public void addTimeSection(final TimeSection SECTION) {
         if (null == SECTION) return;
-        timeSections.add(SECTION);
-        timeSections.sort(new TimeSectionComparator());
+        getTimeSections().add(SECTION);
+        getTimeSections().sort(new TimeSectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
@@ -3461,15 +3488,15 @@ public class Tile extends Control {
      */
     public void removeTimeSection(final TimeSection SECTION) {
         if (null == SECTION) return;
-        timeSections.remove(SECTION);
-        timeSections.sort(new TimeSectionComparator());
+        getTimeSections().remove(SECTION);
+        getTimeSections().sort(new TimeSectionComparator());
         fireTileEvent(SECTION_EVENT);
     }
     /**
      * Clears the list of sections.
      */
     public void clearTimeSections() {
-        sections.clear();
+        getTimeSections().clear();
         fireTileEvent(SECTION_EVENT);
     }
     
@@ -4042,12 +4069,15 @@ public class Tile extends Control {
      * Returns an observable list of Alarm objects.
      * @return an observable list of Alarm objects
      */
-    public ObservableList<Alarm> getAlarms() { return alarms; }
+    public ObservableList<Alarm> getAlarms() {
+        if (null == alarms) { alarms = FXCollections.observableArrayList(); }
+        return alarms;
+    }
     /**
      * Sets the alarms to the given list of Alarm objects.
      * @param ALARMS
      */
-    public void setAlarms(final List<Alarm> ALARMS) { alarms.setAll(ALARMS); }
+    public void setAlarms(final List<Alarm> ALARMS) { getAlarms().setAll(ALARMS); }
     /**
      * Sets the alarms to the given array of Alarm objects.
      * @param ALARMS
@@ -4057,16 +4087,16 @@ public class Tile extends Control {
      * Adds the given Alarm object from the list of alarms.
      * @param ALARM
      */
-    public void addAlarm(final Alarm ALARM) { if (!alarms.contains(ALARM)) alarms.add(ALARM); }
+    public void addAlarm(final Alarm ALARM) { if (!getAlarms().contains(ALARM)) { getAlarms().add(ALARM); }}
     /**
      * Removes the given Alarm object from the list of alarms.
      * @param ALARM
      */
-    public void removeAlarm(final Alarm ALARM) { if (alarms.contains(ALARM)) alarms.remove(ALARM); }
+    public void removeAlarm(final Alarm ALARM) { if (getAlarms().contains(ALARM)) { getAlarms().remove(ALARM); }}
     /**
      * Clears the list of alarms.
      */
-    public void clearAlarms() { alarms.clear(); }
+    public void clearAlarms() { getAlarms().clear(); }
 
     /**
      * Returns the text that will be shown in the Tile tooltip
@@ -4336,6 +4366,31 @@ public class Tile extends Control {
         fireTileEvent(SERIES_EVENT);
     }
 
+    public double getTooltipTimeout() { return null == tooltipTimeout ? _tooltipTimeout : tooltipTimeout.get(); }
+    public void setTooltipTimeout(final double TIMEOUT) {
+        if (null == tooltipTimeout) {
+            _tooltipTimeout = Helper.clamp(0, 10000, TIMEOUT);
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            tooltipTimeout.set(TIMEOUT);
+        }
+    }
+    public DoubleProperty tooltipTimeoutProperty() {
+        if (null == tooltipTimeout) {
+            tooltipTimeout = new DoublePropertyBase(_tooltipTimeout) {
+                @Override protected void invalidated() {
+                    set(Helper.clamp(0, 10000, get()));
+                    fireTileEvent(REDRAW_EVENT);
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() {
+                    return "tootipTimeout";
+                }
+            };
+        }
+        return tooltipTimeout;
+    }
+
     public double getIncrement() { return increment; }
     public void setIncrement(final double INCREMENT) { increment = clamp(0, 10, INCREMENT); }
 
@@ -4502,6 +4557,7 @@ public class Tile extends Control {
      * @param TIME
      */
     private void checkAlarms(final ZonedDateTime TIME) {
+        if (null == alarmsToRemove) { alarmsToRemove = new ArrayList<>(); }
         alarmsToRemove.clear();
         for (Alarm alarm : alarms) {
             final ZonedDateTime ALARM_TIME = alarm.getTime();
@@ -4557,9 +4613,7 @@ public class Tile extends Control {
                     break;
             }
         }
-        for (Alarm alarm : alarmsToRemove) {
-            removeAlarm(alarm);
-        }
+        for (Alarm alarm : alarmsToRemove) { removeAlarm(alarm); }
     }
 
     private void tick() { Platform.runLater(() -> {

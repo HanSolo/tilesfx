@@ -197,7 +197,7 @@ public class CircularProgressTileSkin extends TileSkin {
         }
         setBarColor(VALUE);
 
-        percentageValueText.setText(String.format(locale, formatString, VALUE / tile.getRange() * 100.0));
+        percentageValueText.setText(String.format(locale, formatString, VALUE / range * 100.0));
         valueText.setText(String.format(locale, formatString, VALUE));
     }
     

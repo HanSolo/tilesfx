@@ -77,6 +77,12 @@ public class SmoothedChartTileSkin extends TileSkin {
 
         // Add series not before chart is part of scene
         chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
+
+        // Adjust colors according to series settings
+        tile.getTilesFXSeries()
+            .stream()
+            .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
+
         /*
         Scene scene = chart.getScene();
         if (scene != null) {

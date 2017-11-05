@@ -26,6 +26,8 @@ import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.ObjectProperty;
@@ -67,34 +69,38 @@ import java.util.Locale;
 
 public class SmoothedChart<T, S> extends AreaChart<T, S> {
     public enum ChartType { LINE, AREA }
-    private static final int                       MAX_SUBDIVISIONS = 16;
-    private static final int                       MAX_DECIMALS     = 10;
-    private              boolean                   _smoothed;
-    private              BooleanProperty           smoothed;
-    private              ChartType                 _chartType;
-    private              ObjectProperty<ChartType> chartType;
-    private              int                       _subDivisions;
-    private              IntegerProperty           subDivisions;
-    private              boolean                   _snapToTicks;
-    private              BooleanProperty           snapToTicks;
-    private              boolean                   _dataPointsVisible;
-    private              BooleanProperty           dataPointsVisible;
-    private              Color                     _selectorFillColor;
-    private              ObjectProperty<Color>     selectorFillColor;
-    private              Color                     _selectorStrokeColor;
-    private              ObjectProperty<Color>     selectorStrokeColor;
-    private              int                       _decimals;
-    private              IntegerProperty           decimals;
-    private              String                    formatString;
-    private              Circle                    selector;
-    private              Tooltip                   selectorTooltip;
-    private              Region                    chartPlotBackground;
-    private              SequentialTransition      fadeInFadeOut;
-    private              List<Path>                strokePaths;
-    private              boolean                   _interactive;
-    private              BooleanProperty           interactive;
-    private              EventHandler<MouseEvent>  clickHandler;
-    private              EventHandler<ActionEvent> endOfTransformationHandler;
+    private static final int                              MAX_SUBDIVISIONS = 16;
+    private static final int                              MAX_DECIMALS     = 10;
+    private              boolean                          _smoothed;
+    private              BooleanProperty                  smoothed;
+    private              ChartType                        _chartType;
+    private              ObjectProperty<ChartType>        chartType;
+    private              int                              _subDivisions;
+    private              IntegerProperty                  subDivisions;
+    private              boolean                          _snapToTicks;
+    private              BooleanProperty                  snapToTicks;
+    private              boolean                          _dataPointsVisible;
+    private              BooleanProperty                  dataPointsVisible;
+    private              Color                            _selectorFillColor;
+    private              ObjectProperty<Color>            selectorFillColor;
+    private              Color                            _selectorStrokeColor;
+    private              ObjectProperty<Color>            selectorStrokeColor;
+    private              int                              _decimals;
+    private              IntegerProperty                  decimals;
+    private              String                           formatString;
+    private              Circle                           selector;
+    private              Tooltip                          selectorTooltip;
+    private              Region                           chartPlotBackground;
+    private              PauseTransition                  timeBeforeFadeOut;
+    private              SequentialTransition             fadeInFadeOut;
+    private              List<Path>                       strokePaths;
+    private              boolean                          _interactive;
+    private              BooleanProperty                  interactive;
+    private              double                           _tooltipTimeout;
+    private              DoubleProperty                   tooltipTimeout;
+    private              EventHandler<MouseEvent>         clickHandler;
+    private              EventHandler<ActionEvent>        endOfTransformationHandler;
+    private              ListChangeListener<Series<T, S>> seriesListener;
 
 
     // ******************** Constructors **************************************
@@ -120,47 +126,12 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         _selectorStrokeColor       = Color.RED;
         _decimals                  = 2;
         _interactive               = true;
+        _tooltipTimeout            = 2000;
         formatString               = "%.2f";
         strokePaths                = new ArrayList<>();
         clickHandler               = e -> select(e);
-        endOfTransformationHandler = e -> { selectorTooltip.hide(); };
-
-        // Add selector to chart
-        selector = new Circle();
-        selector.setFill(_selectorFillColor);
-        selector.setStroke(_selectorStrokeColor);
-        selector.setOpacity(0);
-
-        selectorTooltip = new Tooltip("");
-        Tooltip.install(selector, selectorTooltip);
-
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(100), selector);
-        fadeIn.setFromValue(0);
-        fadeIn.setToValue(1);
-
-        FadeTransition fadeOut = new FadeTransition(Duration.millis(100), selector);
-        fadeOut.setFromValue(1);
-        fadeOut.setToValue(0);
-
-        fadeInFadeOut = new SequentialTransition(fadeIn, new PauseTransition(Duration.millis(3000)), fadeOut);
-        fadeInFadeOut.setOnFinished(endOfTransformationHandler);
-
-        chartPlotBackground = getChartBackground();
-        chartPlotBackground.widthProperty().addListener(o -> resizeSelector(chartPlotBackground));
-        chartPlotBackground.heightProperty().addListener(o -> resizeSelector(chartPlotBackground));
-        chartPlotBackground.layoutYProperty().addListener(o -> resizeSelector(chartPlotBackground));
-
-        Path horizontalGridLines = getHorizontalGridLines();
-        if (null != horizontalGridLines) { horizontalGridLines.setMouseTransparent(true); }
-
-        Path verticalGridLines = getVerticalGridLines();
-        if (null != verticalGridLines) { verticalGridLines.setMouseTransparent(true); }
-
-        getChartChildren().addAll(selector);
-    }
-
-    private void registerListeners() {
-        getData().addListener((ListChangeListener<Series<T, S>>) change -> {
+        endOfTransformationHandler = e -> selectorTooltip.hide();
+        seriesListener             = change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(addedItem -> {
@@ -180,10 +151,48 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
                         strokePath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
                         strokePaths.remove(strokePath);
                     });
-
                 }
             }
-        });
+        };
+
+        // Add selector to chart
+        selector = new Circle();
+        selector.setFill(_selectorFillColor);
+        selector.setStroke(_selectorStrokeColor);
+        selector.setOpacity(0);
+
+        selectorTooltip = new Tooltip("");
+        Tooltip.install(selector, selectorTooltip);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(100), selector);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+
+        timeBeforeFadeOut = new PauseTransition(Duration.millis(_tooltipTimeout));
+
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(100), selector);
+        fadeOut.setFromValue(1);
+        fadeOut.setToValue(0);
+
+        fadeInFadeOut = new SequentialTransition(fadeIn, timeBeforeFadeOut, fadeOut);
+        fadeInFadeOut.setOnFinished(endOfTransformationHandler);
+
+        chartPlotBackground = getChartBackground();
+        chartPlotBackground.widthProperty().addListener(o -> resizeSelector(chartPlotBackground));
+        chartPlotBackground.heightProperty().addListener(o -> resizeSelector(chartPlotBackground));
+        chartPlotBackground.layoutYProperty().addListener(o -> resizeSelector(chartPlotBackground));
+
+        Path horizontalGridLines = getHorizontalGridLines();
+        if (null != horizontalGridLines) { horizontalGridLines.setMouseTransparent(true); }
+
+        Path verticalGridLines = getVerticalGridLines();
+        if (null != verticalGridLines) { verticalGridLines.setMouseTransparent(true); }
+
+        getChartChildren().addAll(selector);
+    }
+
+    private void registerListeners() {
+        getData().addListener(seriesListener);
     }
 
 
@@ -382,6 +391,31 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         return interactive;
     }
 
+    public double getTooltipTimeout() { return null == tooltipTimeout ? _tooltipTimeout : tooltipTimeout.get(); }
+    public void setTooltipTimeout(final double TIMEOUT) {
+        if (null == tooltipTimeout) {
+            _tooltipTimeout = Helper.clamp(0, 10000, TIMEOUT);
+            timeBeforeFadeOut.setDuration(Duration.millis(_tooltipTimeout));
+        } else {
+            tooltipTimeout.set(TIMEOUT);
+        }
+    }
+    public DoubleProperty tooltipTimeoutProperty() {
+        if (null == tooltipTimeout) {
+            tooltipTimeout = new DoublePropertyBase(_tooltipTimeout) {
+                @Override protected void invalidated() {
+                    set(Helper.clamp(0, 10000, get()));
+                    timeBeforeFadeOut.setDuration(Duration.millis(get()));
+                }
+                @Override public Object getBean() { return SmoothedChart.this; }
+                @Override public String getName() {
+                    return "tootipTimeout";
+                }
+            };
+        }
+        return tooltipTimeout;
+    }
+
     public void setSymbolsVisible(final XYChart.Series<T, S> SERIES, final boolean VISIBLE) {
         if (!getData().contains(SERIES)) { return; }
         for (XYChart.Data<T, S> data : SERIES.getData()) {
@@ -441,6 +475,10 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         if (null == symbol) { return; }
 
         symbol.setBackground(new Background(new BackgroundFill(LEGEND_SYMBOL_FILL, new CornerRadii(6), Insets.EMPTY)));
+    }
+
+    public void dispose() {
+        getData().removeListener(seriesListener);
     }
 
 

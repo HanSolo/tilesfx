@@ -288,6 +288,7 @@ public class Demo extends Application {
                                    .chartType(ChartType.AREA)
                                    .animated(true)
                                    .smoothing(true)
+                                   .tooltipTimeout(1000)
                                    .tilesFxSeries(new TilesFXSeries<>(series1,
                                                                Tile.BLUE,
                                                                new LinearGradient(0, 0, 0, 1,

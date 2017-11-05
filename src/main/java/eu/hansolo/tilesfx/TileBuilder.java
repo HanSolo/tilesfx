@@ -344,6 +344,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B tooltipTimeout(final double TIMEOUT) {
+        properties.put("tooltipTimeout", new SimpleDoubleProperty(TIMEOUT));
+        return (B)this;
+    }
+
     public final B barChartItems(final BarChartItem... ITEMS) {
         properties.put("barChartItemsArray", new SimpleObjectProperty<>(ITEMS));
         return (B)this;
@@ -1402,6 +1407,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setMatrixSize(COLS, ROWS);
             } else if ("chartType".equals(key)) {
                 CONTROL.setChartType(((ObjectProperty<ChartType>) properties.get(key)).get());
+            } else if ("tooltipTimeout".equals(key)) {
+                CONTROL.setTooltipTimeout(((DoubleProperty) properties.get(key)).get());
             }
         }
         properties.clear();

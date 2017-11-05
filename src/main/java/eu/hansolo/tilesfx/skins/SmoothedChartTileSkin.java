@@ -120,6 +120,7 @@ public class SmoothedChartTileSkin extends TileSkin {
     }
 
     @Override public void dispose() {
+        chart.dispose();
         chart.removeEventHandler(SmoothedChartEvent.DATA_SELECTED, chartEventEventHandler);
         super.dispose();
     }
@@ -160,6 +161,7 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setSelectorFillColor(tile.getBackgroundColor());
         chart.setSmoothed(tile.isSmoothing());
         chart.setAnimated(tile.isAnimated());
+        chart.setTooltipTimeout(tile.getTooltipTimeout());
 
         titleText.setFill(tile.getTitleColor());
 

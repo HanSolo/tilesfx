@@ -118,8 +118,7 @@ public class DateTileSkin extends TileSkin {
         super.resize();
 
         description.setPrefSize(width - size * 0.1, height * 0.7);
-        description.relocate(size * 0.05, height * 0.1125);
-        description.setAlignment(Pos.CENTER);
+        description.relocate(contentBounds.getX(), height * 0.1125);
 
         redraw();
     }

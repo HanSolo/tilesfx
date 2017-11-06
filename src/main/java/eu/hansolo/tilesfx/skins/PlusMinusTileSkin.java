@@ -215,7 +215,7 @@ public class PlusMinusTileSkin extends TileSkin {
         super.resize();
 
         description.setPrefSize(width - size * 0.1, size * 0.43);
-        description.relocate(size * 0.05, height * 0.42);
+        description.relocate(size * 0.05, titleText.isVisible() ? height * 0.42 : height * 0.32);
 
         double buttonSize = size * 0.18;
 
@@ -236,8 +236,8 @@ public class PlusMinusTileSkin extends TileSkin {
         plusLabel.setBorder(new Border(new BorderStroke(tile.getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
         plusLabel.relocate(width - size * 0.05 - buttonSize, height - size * 0.20 - buttonSize);
 
-        valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
+        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
     }
 
     @Override protected void redraw() {

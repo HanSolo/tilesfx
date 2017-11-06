@@ -56,26 +56,25 @@ import java.util.Map;
  * Created by hansolo on 20.12.16.
  */
 public class TimerControlTileSkin extends TileSkin {
-    private static final double            CLOCK_SCALE_FACTOR = 0.75;
-    private              DateTimeFormatter dateFormatter;
-    private              double            clockSize;
-    private              Pane              sectionsPane;
-    private              Path              minuteTickMarks;
-    private              Path              hourTickMarks;
-    private              Rectangle         hour;
-    private              Rectangle         minute;
-    private              Rectangle         second;
-    private              Circle            knob;
-    private              Text              titleText;
-    private              Text              amPmText;
-    private              Text              dateText;
-    private              Text              text;
-    private              Rotate            hourRotate;
-    private              Rotate            minuteRotate;
-    private              Rotate            secondRotate;
-    private              Group             shadowGroupHour;
-    private              Group             shadowGroupMinute;
-    private              Group             shadowGroupSecond;
+    private              DateTimeFormatter     dateFormatter;
+    private              double                clockSize;
+    private              Pane                  sectionsPane;
+    private              Path                  minuteTickMarks;
+    private              Path                  hourTickMarks;
+    private              Rectangle             hour;
+    private              Rectangle             minute;
+    private              Rectangle             second;
+    private              Circle                knob;
+    private              Text                  titleText;
+    private              Text                  amPmText;
+    private              Text                  dateText;
+    private              Text                  text;
+    private              Rotate                hourRotate;
+    private              Rotate                minuteRotate;
+    private              Rotate                secondRotate;
+    private              Group                 shadowGroupHour;
+    private              Group                 shadowGroupMinute;
+    private              Group                 shadowGroupSecond;
     private              DropShadow            dropShadow;
     private              Map<TimeSection, Arc> sectionMap;
 
@@ -383,7 +382,7 @@ public class TimerControlTileSkin extends TileSkin {
 
     @Override protected void resize() {
         super.resize();
-        clockSize      = size * CLOCK_SCALE_FACTOR * (TextSize.NORMAL == textSize ? 1.0 : 0.95);
+        clockSize      = contentBounds.getWidth() < contentBounds.getHeight() ? contentBounds.getWidth() : contentBounds.getHeight();
         double centerX = width * 0.5;
         double centerY = height * 0.5;
 
@@ -409,7 +408,7 @@ public class TimerControlTileSkin extends TileSkin {
         hour.setArcHeight(clockSize * 0.015);
         hour.setCache(true);
         hour.setCacheHint(CacheHint.ROTATE);
-        hour.relocate((width - hour.getWidth()) * 0.5, centerY - size * 0.165 / CLOCK_SCALE_FACTOR);
+        hour.relocate(contentCenterX, contentCenterY - hour.getHeight());
 
         minute.setFill(tile.getMinuteColor());
         minute.setCache(false);
@@ -419,7 +418,7 @@ public class TimerControlTileSkin extends TileSkin {
         minute.setArcHeight(clockSize * 0.015);
         minute.setCache(true);
         minute.setCacheHint(CacheHint.ROTATE);
-        minute.relocate((width - minute.getWidth()) * 0.5, centerY - size * 0.265 / CLOCK_SCALE_FACTOR);
+        minute.relocate(contentCenterX, contentCenterY - minute.getHeight());
 
         second.setFill(tile.getSecondColor());
         second.setCache(false);
@@ -429,7 +428,7 @@ public class TimerControlTileSkin extends TileSkin {
         second.setArcHeight(clockSize * 0.015);
         second.setCache(true);
         second.setCacheHint(CacheHint.ROTATE);
-        second.relocate((width - second.getWidth()) * 0.5, centerY - size * 0.265 / CLOCK_SCALE_FACTOR);
+        second.relocate(contentCenterX, contentCenterY - second.getHeight());
 
         knob.setFill(tile.getKnobColor());
         knob.setRadius(clockSize * 0.0225);

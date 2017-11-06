@@ -501,7 +501,7 @@ public class GaugeTileSkin extends TileSkin {
         resizeDynamicText();
 
         valueUnitFlow.setPrefWidth(width * 0.9);
-        valueUnitFlow.relocate(width * 0.05, centerY - size * 0.35);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
 
         thresholdRect.setWidth(thresholdText.getLayoutBounds().getWidth() + size * 0.05);
         thresholdRect.setHeight(thresholdText.getLayoutBounds().getHeight());

@@ -110,30 +110,6 @@
     -fx-stroke: transparent;
 }
 
-.tile .chart-series-line {
-    -fx-stroke-width: 2px;
-    -fx-effect      : null;
-}
-
-.tile .chart-line-symbol {
-    -visibility: hidden;
-}
-
-.tile .default-color0.chart-series-line { -fx-stroke: -BLUE; }
-.tile .default-color1.chart-series-line { -fx-stroke: -ORANGE; }
-.tile .default-color2.chart-series-line { -fx-stroke: -MAGENTA; }
-.tile .default-color3.chart-series-line { -fx-stroke: -GREEN; }
-.tile .default-color4.chart-series-line { -fx-stroke: -RED; }
-.tile .default-color5.chart-series-line { -fx-stroke: -YELLOW; }
-
-.tile .default-color0.chart-line-symbol { -fx-background-color: -BLUE; }
-.tile .default-color1.chart-line-symbol { -fx-background-color: -ORANGE; }
-.tile .default-color2.chart-line-symbol { -fx-background-color: -MAGENTA; }
-.tile .default-color3.chart-line-symbol { -fx-background-color: -GREEN; }
-.tile .default-color4.chart-line-symbol { -fx-background-color: -RED; }
-.tile .default-color5.chart-line-symbol { -fx-background-color: -YELLOW; }
-
-
 .tile .area-legend-symbol {
     -fx-background-radius: 1em;
     -fx-padding: 5px;
@@ -142,6 +118,7 @@
 .tile .chart-area-symbol {
     -visibility: hidden;
 }
+
 .tile .default-color0.chart-area-symbol { -fx-background-color: -BLUE }
 .tile .default-color1.chart-area-symbol { -fx-background-color: -ORANGE }
 .tile .default-color2.chart-area-symbol { -fx-background-color: -MAGENTA }

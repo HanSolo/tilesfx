@@ -145,7 +145,7 @@ public class Demo extends Application {
     @Override public void init() {
         value = new SimpleDoubleProperty(0);
 
-        // LineChart Data
+        // AreaChart Data
         XYChart.Series<String, Number> series1 = new XYChart.Series();
         series1.setName("Whatever");
         series1.getData().add(new XYChart.Data("MO", 23));
@@ -156,6 +156,7 @@ public class Demo extends Application {
         series1.getData().add(new XYChart.Data("SA", 22));
         series1.getData().add(new XYChart.Data("SU", 20));
 
+        // LineChart Data
         XYChart.Series<String, Number> series2 = new XYChart.Series();
         series2.setName("Inside");
         series2.getData().add(new XYChart.Data("MO", 8));

@@ -140,12 +140,13 @@ public class RadarChartTileSkin extends TileSkin {
     }
 
     @Override protected void resize() {
+        super.resize();
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double chartWidth   = width - size * 0.1;
-        double chartHeight  = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double chartWidth   = contentBounds.getWidth();
+        double chartHeight  = contentBounds.getHeight();
         double chartSize    = chartWidth < chartHeight ? chartWidth : chartHeight;
 
         if (width > 0 && height > 0) {
@@ -153,7 +154,7 @@ public class RadarChartTileSkin extends TileSkin {
             pane.setPrefSize(width, height);
 
             radarChart.setPrefSize(chartSize, chartSize);
-            radarChart.relocate((width - chartSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartSize) * 0.5);
+            radarChart.relocate((width - chartSize) * 0.5, contentBounds.getY() + (contentBounds.getHeight() - chartSize) * 0.5);
 
             resizeStaticText();
         }

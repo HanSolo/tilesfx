@@ -981,7 +981,7 @@ public class Tile extends Control {
      */
     public void setTitle(final String TITLE) {
         if (null == title) {
-            _title = TITLE;
+            _title = null == TITLE ? "" : TITLE;
             fireTileEvent(VISIBILITY_EVENT);
             fireTileEvent(REDRAW_EVENT);
         } else {
@@ -992,6 +992,7 @@ public class Tile extends Control {
         if (null == title) {
             title  = new StringPropertyBase(_title) {
                 @Override protected void invalidated() {
+                    if (null == get()) { set(""); }
                     fireTileEvent(VISIBILITY_EVENT);
                     fireTileEvent(REDRAW_EVENT);
                 }

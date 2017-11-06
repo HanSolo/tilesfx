@@ -198,7 +198,7 @@ public class DonutChartTileSkin extends TileSkin {
         centerX        = xy + wh * 0.5;
         centerY        = xy + wh * 0.5;
         innerRadius    = canvasSize * 0.275;
-        outerRadius    = canvasSize * 0.4;
+        outerRadius    = canvasSize * 0.5;
 
         chartCtx.clearRect(0, 0, canvasSize, canvasSize);
         chartCtx.setLineCap(StrokeLineCap.BUTT);
@@ -295,12 +295,13 @@ public class DonutChartTileSkin extends TileSkin {
     }
 
     @Override protected void resize() {
+        super.resize();
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double chartCanvasWidth   = width - size * 0.1;
-        double chartCanvasHeight  = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double chartCanvasWidth   = contentBounds.getWidth();
+        double chartCanvasHeight  = contentBounds.getHeight();
         double chartCanvasSize    = chartCanvasWidth < chartCanvasHeight ? chartCanvasWidth : chartCanvasHeight;
         double legendCanvasWidth  = width * 0.225;
         double legendCanvasHeight = chartCanvasSize;
@@ -313,18 +314,18 @@ public class DonutChartTileSkin extends TileSkin {
             legendCanvas.setWidth(legendCanvasWidth);
             legendCanvas.setHeight(legendCanvasHeight);
 
-            legendCanvas.relocate(size * 0.05, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+            legendCanvas.relocate(contentBounds.getX(), contentBounds.getY());
             legendCanvas.setVisible(width > (height * 1.2));
             
             chartCanvas.setWidth(chartCanvasSize);
             chartCanvas.setHeight(chartCanvasSize);
 
             if (width > (height * 1.5)) {
-                chartCanvas.relocate((width - chartCanvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+                chartCanvas.relocate((width - chartCanvasSize) * 0.5, contentBounds.getY() + (contentBounds.getHeight() - chartCanvasSize) * 0.5);
             } else if (width > (height * 1.2)) {
-                chartCanvas.relocate((width - size * 0.05 - chartCanvasSize), height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+                chartCanvas.relocate((width - size * 0.05 - chartCanvasSize), contentBounds.getY() + (contentBounds.getHeight() - chartCanvasSize) * 0.5);
             } else {
-                chartCanvas.relocate((width - chartCanvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartCanvasSize) * 0.5);
+                chartCanvas.relocate((width - chartCanvasSize) * 0.5, contentBounds.getY() + (contentBounds.getHeight() - chartCanvasSize) * 0.5);
             }
 
             resizeStaticText();

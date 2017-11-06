@@ -180,8 +180,8 @@ public class SwitchTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        description.setPrefSize(width - size * 0.1, size * 0.43);
-        description.relocate(size * 0.05, height * 0.42);
+        description.setPrefSize(contentBounds.getWidth(), size * 0.43);
+        description.relocate(contentBounds.getX(), height * 0.42);
 
         switchBorder.setWidth(size * 0.445);
         switchBorder.setHeight(size * 0.22);

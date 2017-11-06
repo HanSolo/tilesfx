@@ -255,7 +255,7 @@ public class HighLowTileSkin extends TileSkin {
         super.resize();
 
         description.setPrefSize(width - size * 0.1, size * 0.43);
-        description.relocate(size * 0.05, height * 0.42);
+        description.relocate(size * 0.05, titleText.isVisible() ? height * 0.42 : height * 0.32);
 
         drawTriangle();
         indicatorPane.setPadding(new Insets(0, size * 0.035, 0, 0));
@@ -265,8 +265,8 @@ public class HighLowTileSkin extends TileSkin {
         referenceUnitFlow.setPrefWidth(width - size * 0.1);
         referenceUnitFlow.relocate(size * 0.05, height * 0.595);
 
-        valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
+        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
     }
 
     @Override protected void redraw() {

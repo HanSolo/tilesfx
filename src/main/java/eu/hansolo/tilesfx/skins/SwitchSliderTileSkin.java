@@ -284,8 +284,8 @@ public class SwitchSliderTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        description.setPrefSize(width - size * 0.1, size * 0.43);
-        description.relocate(size * 0.05, height * 0.42);
+        description.setPrefSize(contentBounds.getWidth(), size * 0.43);
+        description.relocate(contentBounds.getX(), titleText.isVisible() ? height * 0.42 : height * 0.32);
 
         trackStart  = size * 0.14;
         trackLength = width - size * 0.28;
@@ -328,7 +328,7 @@ public class SwitchSliderTileSkin extends TileSkin {
         switchThumb.setCenterY(switchBackground.getLayoutY() + switchBackground.getLayoutBounds().getHeight() * 0.5);
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
     }
 
     @Override protected void redraw() {

@@ -276,33 +276,32 @@ public class CircularProgressTileSkin extends TileSkin {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            double chartWidth  = width - size * 0.1;
-            double chartHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
-            chartSize = chartWidth < chartHeight ? chartWidth : chartHeight;
+            double chartWidth  = contentBounds.getWidth();
+            double chartHeight = contentBounds.getHeight();
+            chartSize          = chartWidth < chartHeight ? chartWidth : chartHeight;
 
             double maxContainerSize = chartSize * 0.5;
             double containerWidth   = maxContainerSize - size * 0.1;
             double containerHeight  = tile.isTextVisible() ? height - maxContainerSize * 0.28 : height - maxContainerSize * 0.205;
 
-            double x = (width - chartSize) * 0.5;
-            double y = height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartSize) * 0.5;
+            double radius = chartSize * 0.495 - contentBounds.getX();
 
-            barBackground.setCenterX(x + chartSize * 0.5);
-            barBackground.setCenterY(y + chartSize * 0.5);
-            barBackground.setRadiusX(chartSize * 0.4135);
-            barBackground.setRadiusY(chartSize * 0.4135);
+            barBackground.setCenterX(contentCenterX);
+            barBackground.setCenterY(contentCenterY);
+            barBackground.setRadiusX(radius);
+            barBackground.setRadiusY(radius);
             barBackground.setStrokeWidth(chartSize * 0.1);
 
-            bar.setCenterX(x + chartSize * 0.5);
-            bar.setCenterY(y + chartSize * 0.5);
-            bar.setRadiusX(chartSize * 0.4135);
-            bar.setRadiusY(chartSize * 0.4135);
+            bar.setCenterX(contentCenterX);
+            bar.setCenterY(contentCenterY);
+            bar.setRadiusX(radius);
+            bar.setRadiusY(radius);
             bar.setStrokeWidth(chartSize * 0.1);
 
-            separator.setStartX(x + chartSize * 0.5);
-            separator.setStartY(y + chartSize * 0.0365);
-            separator.setEndX(x + chartSize * 0.5);
-            separator.setEndY(y + chartSize * 0.1365);
+            separator.setStartX(contentCenterX);
+            separator.setStartY(contentCenterX - radius - chartSize * 0.05);
+            separator.setEndX(contentCenterX);
+            separator.setEndY(contentCenterX - radius + chartSize * 0.05);
 
             if (graphicContainer.isVisible() && containerWidth > 0 && containerHeight > 0) {
                 graphicContainer.setMinSize(containerWidth, containerHeight);

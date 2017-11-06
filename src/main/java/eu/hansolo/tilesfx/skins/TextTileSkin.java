@@ -115,8 +115,8 @@ public class TextTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        description.setPrefSize(width - size * 0.1, height - size * 0.255);
-        description.relocate(size * 0.05, size * 0.15);
+        description.setPrefSize(contentBounds.getWidth(), contentBounds.getHeight());
+        description.relocate(contentBounds.getX(), contentBounds.getY());
     }
 
     @Override protected void redraw() {

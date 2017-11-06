@@ -95,6 +95,7 @@ public class MatrixTileSkin extends TileSkin {
             updateMatrixWithChartData();
         };
         matrixListener    = e -> {
+            if (tile.getChartData().isEmpty()) { return; }
             int       column      = e.getX();
             ChartData data        = tile.getChartData().get(column);
             String    tooltipText = new StringBuilder(data.getName()).append("\n").append(String.format(locale, formatString, data.getValue())).toString();
@@ -199,19 +200,20 @@ public class MatrixTileSkin extends TileSkin {
     }
 
     @Override protected void resize() {
+        super.resize();
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double chartWidth  = width - size * 0.1;
-        double chartHeight = tile.isTextVisible() ? height - size * 0.15 - height * 0.15 : height - size * 0.1 - height * 0.15;
+        double chartWidth  = contentBounds.getWidth();
+        double chartHeight = contentBounds.getHeight();
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
             matrix.setPrefSize(chartWidth, chartHeight);
-            matrix.relocate((width - chartWidth) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartHeight) * 0.5);
+            matrix.relocate((width - chartWidth) * 0.5, contentBounds.getY() + (contentBounds.getHeight() - chartHeight) * 0.5);
 
             resizeStaticText();
         }

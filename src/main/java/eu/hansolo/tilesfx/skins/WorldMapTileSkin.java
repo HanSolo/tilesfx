@@ -168,12 +168,13 @@ public class WorldMapTileSkin extends TileSkin {
     }
 
     @Override protected void resize() {
+        super.resize();
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double containerWidth  = width - size * 0.1;
-        double containerHeight = tile.isTextVisible() ? height - size * 0.24 : height - size * 0.2;
+        double containerWidth  = contentBounds.getWidth();
+        double containerHeight = contentBounds.getHeight();
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -192,7 +193,7 @@ public class WorldMapTileSkin extends TileSkin {
             worldPane.setScaleY(worldMapHeight / 665 * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
 
             group.resize(worldMapWidth, worldMapHeight);
-            group.relocate((width - worldMapWidth) * 0.5, (height - worldMapHeight) * 0.5 + (tile.isTextVisible() ? size * 0.01 : size * 0.05));
+            group.relocate((width - worldMapWidth) * 0.5, contentBounds.getY());
 
             worldPane.setCache(false);
         }

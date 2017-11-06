@@ -118,12 +118,13 @@ public class CustomTileSkin extends TileSkin {
     }
 
     @Override protected void resize() {
+        super.resize();
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double containerWidth  = width - size * 0.1;
-        double containerHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double containerWidth  = contentBounds.getWidth();
+        double containerHeight = contentBounds.getHeight();
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -133,7 +134,7 @@ public class CustomTileSkin extends TileSkin {
                 graphicContainer.setMinSize(containerWidth, containerHeight);
                 graphicContainer.setMaxSize(containerWidth, containerHeight);
                 graphicContainer.setPrefSize(containerWidth, containerHeight);
-                graphicContainer.relocate(size * 0.05, size * 0.15);
+                graphicContainer.relocate(contentBounds.getX(), contentBounds.getY());
 
                 if (null != tile) {
                     Node graphic = tile.getGraphic();

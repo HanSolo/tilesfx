@@ -175,15 +175,15 @@ public class WeatherTileSkin extends TileSkin {
         super.resize();
 
         weatherSymbol.setPrefSize(width * 0.5, height - size * 0.4);
-        weatherSymbol.relocate( size * 0.05, (height - weatherSymbol.getPrefHeight()) * 0.5);
+        weatherSymbol.relocate( contentBounds.getX(), (height - weatherSymbol.getPrefHeight()) * 0.5);
 
         sunriseBox.setPrefSize(width - size * 0.1, size * 0.09);
         sunriseBox.setSpacing(size * 0.025);
-        sunriseBox.relocate(size * 0.05, height * 0.6075 + size * 0.0);
+        sunriseBox.relocate(contentBounds.getX(), height * 0.6075 + size * 0.0);
 
         sunsetBox.setPrefSize(width - size * 0.1, size * 0.09);
         sunsetBox.setSpacing(size * 0.025);
-        sunsetBox.relocate(size * 0.05, height * 0.725 + size * 0.0);
+        sunsetBox.relocate(contentBounds.getX(), height * 0.725 + size * 0.0);
 
         sunriseSymbol.setPrefSize(size * 0.1, size * 0.1);
         sunsetSymbol.setPrefSize(size * 0.1, size * 0.1);

@@ -355,12 +355,13 @@ public class MapTileSkin extends TileSkin {
     }
 
     @Override protected void resize() {
+        super.resize();
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double containerWidth  = width - size * 0.1;
-        double containerHeight = tile.isTextVisible() ? height - size * 0.27 : height - size * 0.205;
+        double containerWidth  = contentBounds.getWidth();
+        double containerHeight = contentBounds.getHeight();
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
@@ -370,7 +371,7 @@ public class MapTileSkin extends TileSkin {
                 webView.setMinSize(containerWidth, containerHeight);
                 webView.setMaxSize(containerWidth, containerHeight);
                 webView.setPrefSize(containerWidth, containerHeight);
-                webView.relocate(size * 0.05, size * 0.15);
+                webView.relocate(contentBounds.getX(), contentBounds.getY());
             }
             resizeStaticText();
         }

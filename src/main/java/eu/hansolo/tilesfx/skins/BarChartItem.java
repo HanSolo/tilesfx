@@ -185,7 +185,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     public Color getBarColor() { return chartData.getFillColor(); }
     public void setBarColor(final Color COLOR) { chartData.setFillColor(COLOR); }
 
-    @Override public int compareTo(final BarChartItem SEGMENT) { return Double.compare(getValue(), SEGMENT.getValue()); }
+    @Override public int compareTo(final BarChartItem ITEM) { return Double.compare(getValue(), ITEM.getValue()); }
 
     public void setStepSize(final double STEP_SIZE) {
         stepSize = STEP_SIZE;
@@ -212,12 +212,13 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     protected void setParentSize(final double WIDTH, final double HEIGHT) {
         parentWidth  = WIDTH;
         parentHeight = HEIGHT;
+        resize();
     }
 
     private void updateBar(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
-        valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
-        bar.setWidth(clamp(0, (width - size * 0.15), VALUE * stepSize));
+        valueText.setX((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth());
+        bar.setWidth(clamp(0, (parentWidth - size * 0.15), VALUE * stepSize));
         bar.setFill(getBarColor());
     }
 
@@ -243,25 +244,25 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         if (width > 0 && height > 0) {
             stepSize = (width - size * 0.15) / maxValue;
 
-            pane.setMaxSize(width, height);
-            pane.setPrefSize(width, height);
+            pane.setMaxSize(parentWidth, height * 0.12);
+            pane.setPrefSize(parentWidth, height * 0.12);
 
             nameText.setFont(Fonts.latoRegular(size * 0.06));
             nameText.setX(size * 0.05);
             nameText.setY(0);
 
             valueText.setFont(Fonts.latoRegular(size * 0.06));
-            valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
+            valueText.setX((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth());
             valueText.setY(0);
 
             barBackground.setX(size * 0.075);
             barBackground.setY(size * 0.10333333);
-            barBackground.setWidth(width - size * 0.15);
+            barBackground.setWidth(parentWidth - size * 0.15);
             barBackground.setHeight(size * 0.01);
 
             bar.setX(size * 0.075);
             bar.setY(size * 0.09666667);
-            bar.setWidth(clamp(0, (width - size * 0.15), getValue() * stepSize));
+            bar.setWidth(clamp(0, (parentWidth - size * 0.15), getValue() * stepSize));
             bar.setHeight(size * 0.02333333);
 
             redraw();

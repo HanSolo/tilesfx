@@ -147,11 +147,11 @@ public class NumberTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
+        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
 
         description.setPrefSize(width - size * 0.1, size * 0.43);
-        description.relocate(size * 0.05, height * 0.42);
+        description.relocate(size * 0.05, titleText.isVisible() ? height * 0.42 : height * 0.32);
     }
 
     @Override protected void redraw() {

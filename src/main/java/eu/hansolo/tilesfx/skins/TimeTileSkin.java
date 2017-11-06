@@ -145,11 +145,11 @@ public class TimeTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        timeText.setPrefWidth(width - size * 0.1);
-        timeText.relocate(size * 0.05, size * 0.15);
+        timeText.setPrefWidth(contentBounds.getWidth());
+        timeText.relocate(contentBounds.getX(), contentBounds.getY());
 
-        description.setPrefSize(width - size * 0.1, size * 0.43);
-        description.relocate(size * 0.05, height * 0.42);
+        description.setPrefSize(contentBounds.getWidth(), titleText.isVisible() ? size * 0.43 : size * 0.53);
+        description.relocate(contentBounds.getX(), titleText.isVisible() ? height * 0.42 : height * 0.32);
     }
 
     @Override protected void redraw() {

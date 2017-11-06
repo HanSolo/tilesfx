@@ -103,7 +103,7 @@ public class ClockTileSkin extends TileSkin {
     public void updateTime(final ZonedDateTime TIME) {
         timeText.setText(timeFormatter.format(tile.getTime()));
         timeText.setX((width - timeText.getLayoutBounds().getWidth()) * 0.5);
-        timeText.setY(height * 0.4);
+        timeText.setY(height * 0.35);
 
         dayOfWeekText.setText(dayOfWeekFormatter.format(TIME));
         dayOfWeekText.setX(size * 0.05);
@@ -131,7 +131,7 @@ public class ClockTileSkin extends TileSkin {
         timeText.setText(timeFormatter.format(tile.getTime()));
         Helper.adjustTextSize(timeText, maxWidth, fontSize);
         timeText.setX((width - timeText.getLayoutBounds().getWidth()) * 0.5);
-        timeText.setY(height * 0.4);
+        timeText.setY(size * 0.35);
 
         //maxWidth = width - size * 0.1;
         fontSize = size * 0.1;
@@ -181,7 +181,7 @@ public class ClockTileSkin extends TileSkin {
         timeRect.setWidth(width);
         timeRect.setHeight(height * 0.4);
         timeRect.setX(0);
-        timeRect.setY(height * 0.2);
+        timeRect.setY(contentBounds.getY());
     }
 
     @Override protected void redraw() {

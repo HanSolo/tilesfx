@@ -376,15 +376,14 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
+        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
 
         hStepSize = width / dataSize;
         vStepSize = (height * 0.5) / maxValue;
 
         selector.setRadius(size * 0.02);
         selector.setStrokeWidth(size * 0.01);
-
 
         handleData();
         strokePath.setStrokeWidth(size * 0.02);

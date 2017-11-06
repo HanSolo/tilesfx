@@ -239,6 +239,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     protected void setParentSize(final double WIDTH, final double HEIGHT) {
         parentWidth  = WIDTH;
         parentHeight = HEIGHT;
+        resize();
     }
 
     private void drawTriangle() {
@@ -270,8 +271,11 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         }
 
         if (width > 0 && height > 0) {
-            pane.setMaxSize(width, height);
-            pane.setPrefSize(width, height);
+            //pane.setMaxSize(width, height);
+            //pane.setPrefSize(width, height);
+            
+            pane.setMaxSize(parentWidth, height * 0.12);
+            pane.setPrefSize(parentWidth, height * 0.12);
 
             drawTriangle();
             
@@ -283,12 +287,12 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
             nameText.setY(0);
 
             valueText.setFont(Fonts.latoRegular(size * 0.06));
-            valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
+            valueText.setX((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth());
             valueText.setY(0);
 
             separator.setStartX(size * 0.05);
             separator.setStartY(size * 0.1);
-            separator.setEndX(width - size * 0.05);
+            separator.setEndX(parentWidth - size * 0.05);
             separator.setEndY(size * 0.1);
 
             redraw();

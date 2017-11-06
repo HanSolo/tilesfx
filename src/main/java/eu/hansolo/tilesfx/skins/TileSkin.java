@@ -20,6 +20,7 @@ import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.TileEventListener;
+import eu.hansolo.tilesfx.tools.CtxBounds;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
@@ -55,6 +56,11 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              double               width;
     protected              double               height;
     protected              double               size;
+    protected              double               inset;
+    protected              double               doubleInset;
+    protected              CtxBounds            contentBounds;
+    protected              double               contentCenterX;
+    protected              double               contentCenterY;
     protected              Pane                 pane;
     protected              double               minValue;
     protected              double               maxValue;
@@ -98,6 +104,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         sizeListener         = o -> handleEvents("RESIZE");
         tileEventListener    = e -> handleEvents(e.getEventType().name());
         currentValueListener = o -> handleCurrentValue(tile.getCurrentValue());
+        contentBounds        = new CtxBounds();
 
         initGraphics();
         registerListeners();
@@ -188,9 +195,22 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         stepSize = width / range;
         shadow.setRadius(size * 0.012);
 
+        inset       = size * 0.05;
+        doubleInset = inset * 2;
+
         if (width > 0 && height > 0) {
             //pane.setMaxSize(size, size);
             //pane.relocate((width - size) * 0.5, (height - size) * 0.5);
+
+            double offsetTop    = tile.getTitle().isEmpty() ? inset : size * 0.15;
+            double offsetBottom = tile.isTextVisible() ? height - size * 0.15 : height - inset;
+            contentBounds.setX(inset);
+            contentBounds.setY(offsetTop);
+            contentBounds.setWidth(width - doubleInset);
+            contentBounds.setHeight(offsetBottom - offsetTop);
+
+            contentCenterX = contentBounds.getX() + contentBounds.getWidth() * 0.5;
+            contentCenterY = contentBounds.getY() + contentBounds.getHeight() * 0.5;
 
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);

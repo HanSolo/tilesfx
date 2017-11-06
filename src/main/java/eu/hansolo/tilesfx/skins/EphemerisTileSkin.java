@@ -256,15 +256,14 @@ public class EphemerisTileSkin extends TileSkin {
         goldenHourSunsetBox.setSpacing(size * 0.025);
         sunsetBox.setSpacing(size * 0.025);
         blueHourSunsetBox.setSpacing(size * 0.025);
-        infoBoxMorning.setSpacing(height * 0.1);
-        infoBoxEvening.setSpacing(height * 0.1);
+
+        infoBoxMorning.setSpacing(contentBounds.getHeight() * 0.25);
+        infoBoxEvening.setSpacing(contentBounds.getHeight() * 0.25);
+
         infoBox.setSpacing(width * 0.15);
 
-        infoBox.setPrefWidth(width - size * 0.1);
-        double infoBoxHeight = infoBox.getLayoutBounds().getHeight();
-        double posY = infoBoxHeight == 0.0 ? size * 0.25 : (height - infoBox.getLayoutBounds().getHeight()) * 0.5;
-
-        infoBox.relocate(size * 0.05, posY);
+        infoBox.setPrefSize(contentBounds.getWidth(), contentBounds.getHeight());
+        infoBox.relocate(contentBounds.getX(), contentBounds.getY());
     }
 
     @Override protected void redraw() {

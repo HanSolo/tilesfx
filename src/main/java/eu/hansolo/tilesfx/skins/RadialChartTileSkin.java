@@ -227,12 +227,13 @@ public class RadialChartTileSkin extends TileSkin {
     }
 
     @Override protected void resize() {
+        super.resize();
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double canvasWidth  = width - size * 0.1;
-        double canvasHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double canvasWidth  = contentBounds.getWidth();
+        double canvasHeight = contentBounds.getHeight();
         double canvasSize   = canvasWidth < canvasHeight ? canvasWidth : canvasHeight;
 
         if (width > 0 && height > 0) {
@@ -242,7 +243,7 @@ public class RadialChartTileSkin extends TileSkin {
             chartCanvas.setWidth(canvasSize);
             chartCanvas.setHeight(canvasSize);
 
-            chartCanvas.relocate((width - canvasSize) * 0.5, height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - canvasSize) * 0.5);
+            chartCanvas.relocate((contentBounds.getWidth() - canvasSize) * 0.5, contentBounds.getY() + (contentBounds.getHeight() - canvasSize) * 0.5);
 
             resizeStaticText();
         }

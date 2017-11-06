@@ -247,7 +247,7 @@ public class PercentageTileSkin extends TileSkin {
         maxValueRect.setArcHeight(size * 0.025);
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
     }
 
     @Override protected void redraw() {

@@ -269,10 +269,10 @@ public class CalendarTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        double cellAreaWidth  = (width - size * 0.1);
-        double cellAreaHeight = height * 0.72;
+        double cellAreaWidth  = contentBounds.getWidth();
+        double cellAreaHeight = contentBounds.getHeight();
 
-        cellOffsetX = size * 0.05;
+        cellOffsetX = contentBounds.getX();
         cellOffsetY = (height - cellAreaHeight) * 0.5;
 
         cellWidth  = cellAreaWidth / 8.0;

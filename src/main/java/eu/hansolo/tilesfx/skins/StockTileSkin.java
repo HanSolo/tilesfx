@@ -440,7 +440,7 @@ public class StockTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        graphBounds = new Rectangle(size * 0.05, size * 0.6, width - size * 0.1, height - size * 0.71);
+        graphBounds = new Rectangle(inset, size * 0.6, width - doubleInset, height - size * 0.71);
 
         referenceLine.setStartX(graphBounds.getX());
         referenceLine.setEndX(graphBounds.getX() + graphBounds.getWidth());
@@ -467,12 +467,12 @@ public class StockTileSkin extends TileSkin {
         changeText.relocate(width - changeText.getPrefWidth() - size * 0.05, graphBounds.getY() - size * 0.175);
 
         changePercentageFlow.setPrefWidth(0.6 * width - size * 0.1);
-        changePercentageFlow.relocate(width - changePercentageFlow.getPrefWidth() - size * 0.05, graphBounds.getY() - size * 0.085);
+        changePercentageFlow.relocate(width - changePercentageFlow.getPrefWidth() - inset, graphBounds.getY() - size * 0.085);
 
-        valueUnitFlow.setMaxWidth(width - size * 0.1);
-        valueUnitFlow.setMinWidth(width - size * 0.1);
-        valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(width - valueUnitFlow.getPrefWidth() - size * 0.05, size * 0.15);
+        valueUnitFlow.setMaxWidth(contentBounds.getWidth());
+        valueUnitFlow.setMinWidth(contentBounds.getWidth());
+        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
+        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
     }
 
     @Override protected void redraw() {

@@ -543,7 +543,7 @@ public class SparkLineTileSkin extends TileSkin {
 
     @Override protected void resize() {
         super.resize();
-        graphBounds = new Rectangle(size * 0.05, size * 0.5, width - size * 0.1, height - size * 0.61);
+        graphBounds        = new Rectangle(contentBounds.getX(), titleText.isVisible() ? size * 0.5 : size * 0.4, contentBounds.getWidth(), titleText.isVisible() ? height - size * 0.61 : height - size * 0.51);
         tickLabelFontSize  = graphBounds.getHeight() * 0.1;
         Font tickLabelFont = Fonts.latoRegular(tickLabelFontSize);
         tickLabelsY.forEach(label -> {
@@ -575,7 +575,7 @@ public class SparkLineTileSkin extends TileSkin {
         resizeDynamicText();
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
     }
 
     @Override protected void redraw() {

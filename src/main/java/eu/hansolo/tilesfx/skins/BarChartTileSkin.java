@@ -157,7 +157,7 @@ public class BarChartTileSkin extends TileSkin {
             double maxY     = height - size * 0.25;
             for (int i = 0 ; i < noOfItems ; i++) {
                 BarChartItem item = items.get(i);
-                double y = size * 0.18 + i * 0.175 * size;
+                double y = i * 0.175 * size; //size * 0.18 + i * 0.175 * size;
                 if (y < maxY) {
                     item.setMaxValue(maxValue);
                     item.setManaged(true);
@@ -172,7 +172,7 @@ public class BarChartTileSkin extends TileSkin {
     }
 
     @Override protected void resizeStaticText() {
-        double maxWidth = size * 0.9;
+        double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
@@ -199,14 +199,16 @@ public class BarChartTileSkin extends TileSkin {
     private void resizeItems() {
         barChartPane.getChildren().forEach(node -> {
             BarChartItem item = (BarChartItem) node;
-            item.setParentSize(pane.getWidth(), pane.getHeight());
-            item.setPrefSize(pane.getWidth(), pane.getHeight());
+            item.setParentSize(width, height);
+            item.setPrefSize(width, height * 0.12);
+            item.setMaxSize(width, height * 0.12);
         });
     }
     @Override protected void resize() {
         super.resize();
-        barChartPane.setPrefSize(pane.getPrefWidth(), pane.getPrefHeight());
-
+        barChartPane.setPrefSize(width, contentBounds.getHeight());
+        barChartPane.relocate(0, contentBounds.getY());
+        resizeItems();
         updateChart();
     }
 

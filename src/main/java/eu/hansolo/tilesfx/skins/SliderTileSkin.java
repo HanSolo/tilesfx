@@ -213,7 +213,7 @@ public class SliderTileSkin extends TileSkin {
         super.resize();
 
         description.setPrefSize(width - size * 0.1, size * 0.43);
-        description.relocate(size * 0.05, height * 0.42);
+        description.relocate(size * 0.05, titleText.isVisible() ? height * 0.42 : height * 0.32);
 
         trackStart  = size * 0.14;
         trackLength = width - size * 0.28;
@@ -238,8 +238,8 @@ public class SliderTileSkin extends TileSkin {
         bar.setArcWidth(size * 0.0275);
         bar.setArcHeight(size * 0.0275);
 
-        valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
+        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
     }
 
     @Override protected void redraw() {

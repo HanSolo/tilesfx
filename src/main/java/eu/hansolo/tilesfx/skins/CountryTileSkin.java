@@ -174,15 +174,16 @@ public class CountryTileSkin extends TileSkin {
     }
 
     @Override protected void resize() {
+        super.resize();
         width  = tile.getWidth() - tile.getInsets().getLeft() - tile.getInsets().getRight();
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, size * 0.15);
+        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
+        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
 
-        double containerWidth  = width - size * 0.1;
-        double containerHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+        double containerWidth  = contentBounds.getWidth();
+        double containerHeight =contentBounds.getHeight();
         double containerSize   = containerWidth < containerHeight ? containerWidth : containerHeight;
 
         double countryWidth    = countryGroup.getLayoutBounds().getWidth();
@@ -197,7 +198,7 @@ public class CountryTileSkin extends TileSkin {
                 countryContainer.setMinSize(containerWidth, containerHeight);
                 countryContainer.setMaxSize(containerWidth, containerHeight);
                 countryContainer.setPrefSize(containerWidth, containerHeight);
-                countryContainer.relocate(size * 0.05, size * 0.15);
+                countryContainer.relocate(contentBounds.getX(), contentBounds.getY());
                 //double scaleFactor = (containerSize * 1.0) / countrySize;
                 double scaleFactor = containerSize / countrySize;
                 countryGroup.setScaleX(scaleFactor);

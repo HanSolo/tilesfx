@@ -149,7 +149,7 @@ public class LeaderBoardTileSkin extends TileSkin {
             double maxY = height - size * 0.25;
             for (int i = 0 ; i < noOfItems ; i++) {
                 LeaderBoardItem item = items.get(i);
-                double y = size * 0.18 + i * 0.175 * size;
+                double y = i * 0.175 * size; //size * 0.18 + i * 0.175 * size;
                 if (y < maxY) {
                     item.setManaged(true);
                     item.setVisible(true);
@@ -190,14 +190,19 @@ public class LeaderBoardTileSkin extends TileSkin {
     private void resizeItems() {
         leaderBoardPane.getChildren().forEach(node -> {
             LeaderBoardItem item = (LeaderBoardItem) node;
-            item.setParentSize(pane.getWidth(), pane.getHeight());
-            item.setPrefSize(pane.getWidth(), pane.getHeight());
+            //item.setParentSize(pane.getWidth(), pane.getHeight());
+            //item.setPrefSize(pane.getWidth(), pane.getHeight());
+            item.setParentSize(width, height);
+            item.setPrefSize(width, height * 0.12);
+            item.setMaxSize(width, height * 0.12);
         });
     }
     @Override protected void resize() {
         super.resize();
-        leaderBoardPane.setPrefSize(width, height);
-
+        //leaderBoardPane.setPrefSize(width, height);
+        leaderBoardPane.setPrefSize(width, contentBounds.getHeight());
+        leaderBoardPane.relocate(0, contentBounds.getY());
+        resizeItems();
         updateChart();
     }
 

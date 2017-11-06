@@ -269,39 +269,41 @@ public class RadialPercentageTileSkin extends TileSkin {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            double chartWidth  = width - size * 0.1;
-            double chartHeight = tile.isTextVisible() ? height - size * 0.28 : height - size * 0.205;
+            double chartWidth  = contentBounds.getWidth();
+            double chartHeight = contentBounds.getHeight();
             chartSize = chartWidth < chartHeight ? chartWidth : chartHeight;
 
-            double x = (width - chartSize) * 0.5;
             double y = height * 0.15 + (height * (tile.isTextVisible() ? 0.75 : 0.85) - chartSize) * 0.5;
+            //double radius = chartSize * 0.495 - contentBounds.getX();
 
-            barBackground.setCenterX(x + chartSize * 0.5);
-            barBackground.setCenterY(y + chartSize * 0.5);
-            barBackground.setRadiusX(chartSize * 0.4135);
-            barBackground.setRadiusY(chartSize * 0.4135);
+            double radius = chartSize * 0.4135;
+
+            barBackground.setCenterX(contentCenterX);
+            barBackground.setCenterY(contentCenterY);
+            barBackground.setRadiusX(radius);
+            barBackground.setRadiusY(radius);
             barBackground.setStrokeWidth(chartSize * 0.015);
 
-            proportionBar.setCenterX(x + chartSize * 0.5);
-            proportionBar.setCenterY(y + chartSize * 0.5);
+            proportionBar.setCenterX(contentCenterX);
+            proportionBar.setCenterY(contentCenterY);
             proportionBar.setRadiusX(chartSize * 0.456);
             proportionBar.setRadiusY(chartSize * 0.456);
             proportionBar.setStrokeWidth(chartSize * 0.015);
 
-            bar.setCenterX(x + chartSize * 0.5);
-            bar.setCenterY(y + chartSize * 0.5);
-            bar.setRadiusX(chartSize * 0.4135);
-            bar.setRadiusY(chartSize * 0.4135);
+            bar.setCenterX(contentCenterX);
+            bar.setCenterY(contentCenterY);
+            bar.setRadiusX(radius);
+            bar.setRadiusY(radius);
             bar.setStrokeWidth(chartSize * 0.1);
 
-            separator.setStartX(x + chartSize * 0.5);
+            separator.setStartX(contentCenterX);
             separator.setStartY(y + chartSize * 0.0365);
-            separator.setEndX(x + chartSize * 0.5);
+            separator.setEndX(contentCenterX);
             separator.setEndY(y + chartSize * 0.1365);
 
             resizeStaticText();
-            percentageFlow.setPrefWidth(width * 0.9);
-            percentageFlow.relocate(width * 0.05, bar.getCenterY() - chartSize * 0.2);
+            percentageFlow.setPrefWidth(contentBounds.getWidth());
+            percentageFlow.relocate(contentBounds.getX(), bar.getCenterY() - chartSize * 0.2);
 
             valueUnitFlow.setPrefWidth(width * 0.6);
             valueUnitFlow.relocate((width * 0.2), bar.getCenterY() + chartSize * 0.06);

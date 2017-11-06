@@ -46,6 +46,7 @@ public class SmoothedChartTileSkin extends TileSkin {
         super(TILE);
     }
 
+
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
@@ -66,7 +67,7 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setVerticalZeroLineVisible(false);
         chart.setCreateSymbols(false);
         chart.setSnapToTicks(tile.isSnapToTicks());
-        chart.setDataPointsVisible(tile.getDataPointsVisible());
+        chart.setSymbolsVisible(tile.getDataPointsVisible());
 
         switch(tile.getChartType()) {
             case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
@@ -106,7 +107,7 @@ public class SmoothedChartTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
         if ("VISIBILITY".equals(EVENT_TYPE)) {
-            chart.setDataPointsVisible(tile.getDataPointsVisible());
+            chart.setSymbolsVisible(tile.getDataPointsVisible());
         } else if ("SERIES".equals(EVENT_TYPE)) {
             switch(tile.getChartType()) {
                 case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
@@ -145,11 +146,11 @@ public class SmoothedChartTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        chart.setMinSize(width - size * 0.1, height - size * 0.1);
-        chart.setPrefSize(width - size * 0.1, height - size * 0.1);
-        chart.setMaxSize(width - size * 0.1, height - size * 0.1);
-        chart.setPadding(new Insets(titleText.getLayoutBounds().getHeight() + size * 0.05, 0, 0, 0));
-        chart.relocate(size * 0.05, size * 0.05);
+        chart.setMinSize(contentBounds.getWidth(), contentBounds.getHeight());
+        chart.setPrefSize(contentBounds.getWidth(), contentBounds.getHeight());
+        chart.setMaxSize(contentBounds.getWidth(), contentBounds.getHeight());
+        if (titleText.isVisible()) { chart.setPadding(new Insets(titleText.getLayoutBounds().getHeight() + contentBounds.getX(), 0, 0, 0)); }
+        chart.relocate(contentBounds.getX(), contentBounds.getY());
     }
 
     @Override protected void redraw() {
@@ -162,6 +163,7 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setSmoothed(tile.isSmoothing());
         chart.setAnimated(tile.isAnimated());
         chart.setTooltipTimeout(tile.getTooltipTimeout());
+        chart.setSymbolsVisible(tile.getDataPointsVisible());
 
         titleText.setFill(tile.getTitleColor());
 

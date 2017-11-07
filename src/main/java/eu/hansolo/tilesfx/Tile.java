@@ -1552,11 +1552,11 @@ public class Tile extends Control {
     public void setPoiLocations(final Location... LOCATIONS) { setPoiList(Arrays.asList(LOCATIONS)); }
     public void addPoiLocation(final Location LOCATION) {
         if (null == LOCATION) return;
-        getPoiList().add(LOCATION);
+        if (!getPoiList().contains(LOCATION)) { getPoiList().add(LOCATION); };
     }
     public void removePoiLocation(final Location LOCATION) {
         if (null == LOCATION) return;
-        getPoiList().remove(LOCATION);
+        if (getPoiList().contains(LOCATION)) { getPoiList().remove(LOCATION); }
     }
     public void clearPoiLocations() {
         getPoiList().clear();
@@ -4841,6 +4841,7 @@ public class Tile extends Control {
                 break;
             case SMOOTH_AREA_CHART:
                 setSmoothing(true);
+                setChartType(ChartType.AREA);
                 break;
             case RADAR_CHART:
                 break;

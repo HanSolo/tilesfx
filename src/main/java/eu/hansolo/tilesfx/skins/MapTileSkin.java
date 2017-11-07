@@ -30,7 +30,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import netscape.javascript.JSObject;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -178,7 +177,7 @@ public class MapTileSkin extends TileSkin {
                 double lon   = POI.getLongitude();
                 String name  = POI.getName();
                 String info  = POI.getInfo();
-                String color = POI.getColor().styleName;
+                String color = POI.getColor().toString().replace("0x", "#");
                 StringBuilder scriptCommand = new StringBuilder();
                 scriptCommand.append("window.lat = ").append(lat).append(";")
                              .append("window.lon = ").append(lon).append(";")
@@ -205,7 +204,7 @@ public class MapTileSkin extends TileSkin {
     private void updateLocationColor() {
         if (readyToGo) {
             Platform.runLater(() -> {
-                String locationColor = tile.getCurrentLocation().getColor().styleName;
+                String locationColor = tile.getCurrentLocation().getColor().toString().replace("0x", "#");
                 StringBuilder scriptCommand = new StringBuilder();
                 scriptCommand.append("window.locationColor = '").append(locationColor).append("';")
                              .append("document.setLocationColor(window.locationColor);");

@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.events.TileEvent;
@@ -133,6 +134,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         strokePath.setClip(strokeClip);
         strokePath.setMouseTransparent(true);
 
+        Helper.enableNode(fillPath, ChartType.AREA == tile.getChartType());
+
         canvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         canvas.setMouseTransparent(true);
         ctx    = canvas.getGraphicsContext2D();
@@ -201,6 +204,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             dataPointsVisible = tile.getDataPointsVisible();
             if (dataPointsVisible) { drawChart(points); } else { ctx.clearRect(0, 0, width, height); }
+        } else if ("SERIES".equals(EVENT_TYPE)) {
+            Helper.enableNode(fillPath, ChartType.AREA == tile.getChartType());
         }
     }
 
@@ -262,14 +267,15 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     }
 
     private void drawDataPoint(final double X, final double Y, final Color COLOR) {
-        double symbolSize     = size * 0.03;
+        double borderSize     = size * 0.06;
+        double symbolSize     = size * 0.04;
+        double halfBorderSize = borderSize * 0.5;
         double halfSymbolSize = symbolSize * 0.5;
         ctx.save();
-        ctx.setLineWidth(size * 0.0075);
         ctx.setFill(tile.getBackgroundColor());
+        ctx.fillOval(X -halfBorderSize, Y - halfBorderSize, borderSize, borderSize);
+        ctx.setFill(COLOR);
         ctx.fillOval(X - halfSymbolSize, Y - halfSymbolSize, symbolSize, symbolSize);
-        ctx.setStroke(COLOR);
-        ctx.strokeOval(X - halfSymbolSize, Y - halfSymbolSize, symbolSize, symbolSize);
         ctx.restore();
     }
 

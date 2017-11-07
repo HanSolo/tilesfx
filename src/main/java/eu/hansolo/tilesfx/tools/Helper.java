@@ -695,6 +695,9 @@ public class Helper {
     }
 
     public static double[] latLonToXY(final double LATITUDE, final double LONGITUDE) {
+        return latLonToXY(LATITUDE, LONGITUDE, MAP_OFFSET_X, MAP_OFFSET_Y);
+    }
+    public static double[] latLonToXY(final double LATITUDE, final double LONGITUDE, final double MAP_OFFSET_X, final double MAP_OFFSET_Y) {
         double x = (LONGITUDE + 180) * (MAP_WIDTH / 360) + MAP_OFFSET_X;
         double y = (MAP_HEIGHT / 2) - (MAP_WIDTH * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(LATITUDE) / 2)))) / (2 * Math.PI)) + MAP_OFFSET_Y;
         return new double[]{ x, y };

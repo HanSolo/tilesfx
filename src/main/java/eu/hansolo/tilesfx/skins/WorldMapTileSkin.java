@@ -21,20 +21,29 @@ import eu.hansolo.tilesfx.CountryPath;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.events.LocationEvent;
 import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.Location;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableMap;
+import javafx.collections.WeakListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
@@ -46,25 +55,116 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 public class WorldMapTileSkin extends TileSkin {
     protected static final double                                     PREFERRED_WIDTH  = 500; //380; //510;
     protected static final double                                     PREFERRED_HEIGHT = 250;
+    private   static final double                                     MAP_ASPECT_RATIO = Helper.MAP_HEIGHT / Helper.MAP_WIDTH;
     private                Text                                       titleText;
     private                Text                                       text;
     private                Pane                                       worldPane;
     private                Group                                      group;
     private                Map<String, List<CountryPath>>             countryPaths;
+    private                ObservableMap<Location, Circle>            chartDataLocations;
+    private                ObservableMap<Location, Circle>            poiLocations;
     private                Map<CountryPath, EventHandler<MouseEvent>> handlerMap;
+    private                ListChangeListener<Location>               poiListener;
+    private                ListChangeListener<ChartData>              chartDataListener;
+    private                Map<Circle, EventHandler<MouseEvent>>      circleHandlerMap;
 
 
+    // ******************** Constructors **************************************
     public WorldMapTileSkin(final Tile TILE) {
         super(TILE);
     }
+
 
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        handlerMap = new HashMap<>();
+        poiLocations       = FXCollections.observableHashMap();
+        chartDataLocations = FXCollections.observableHashMap();
+
+        handlerMap       = new HashMap<>();
+        circleHandlerMap = new HashMap<>();
 
         countryPaths = tile.getCountryPaths();
+
+        String formatString = new StringBuilder("%.").append(tile.getDecimals()).append("f").toString();
+
+        poiListener = new WeakListChangeListener<>(change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(addedPoi -> {
+                        String tooltipText = new StringBuilder(addedPoi.getName()).append("\n")
+                                                                                  .append(addedPoi.getInfo())
+                                                                                  .toString();
+                        EventHandler<MouseEvent> handler = e -> addedPoi.fireLocationEvent(new LocationEvent(addedPoi));
+                        Circle circle = new Circle(3, addedPoi.getColor());
+                        Tooltip.install(circle, new Tooltip(tooltipText));
+                        circleHandlerMap.put(circle, handler);
+                        poiLocations.put(addedPoi, circle);
+                        circle.setOnMousePressed(handler);
+                        getPane().getChildren().add(circle);
+                    });
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().forEach(removedPoi -> {
+                        if (circleHandlerMap.get(removedPoi) != null) {
+                            poiLocations.get(removedPoi).removeEventHandler(MouseEvent.MOUSE_PRESSED, circleHandlerMap.get(removedPoi));
+                        }
+                        getPane().getChildren().remove(removedPoi);
+                    });
+                }
+            }
+            resize();
+        });
+        chartDataListener = new WeakListChangeListener<>(change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(addedData -> {
+                        String tooltipText = new StringBuilder(addedData.getName()).append("\n")
+                                                                                   .append(String.format(Locale.US, formatString, addedData.getValue()))
+                                                                                   .toString();
+                        EventHandler<MouseEvent> handler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, addedData));
+                        Circle circle = new Circle(3, addedData.getLocation().getColor());
+                        Tooltip.install(circle, new Tooltip(tooltipText));
+                        circleHandlerMap.put(circle, handler);
+                        chartDataLocations.put(addedData.getLocation(), circle);
+                        circle.setOnMousePressed(handler);
+                        getPane().getChildren().add(circle);
+                    });
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().forEach(removedData -> {
+                        if (circleHandlerMap.get(removedData) != null) {
+                            chartDataLocations.get(removedData).removeEventHandler(MouseEvent.MOUSE_PRESSED, circleHandlerMap.get(removedData));
+                        }
+                        getPane().getChildren().remove(removedData);
+                    });
+                }
+            }
+            resize();
+        });
+
+        tile.getPoiList()
+            .forEach(poi -> {
+                String tooltipText = new StringBuilder(poi.getName()).append("\n")
+                                                                     .append(poi.getInfo())
+                                                                     .toString();
+                Circle circle = new Circle(3, poi.getColor());
+                circle.setOnMousePressed(e -> poi.fireLocationEvent(new LocationEvent(poi)));
+                Tooltip.install(circle, new Tooltip(tooltipText));
+                poiLocations.put(poi, circle);
+            });
+
+        tile.getChartData()
+            .stream()
+            .filter(chartData -> chartData.getLocation() != null)
+            .forEach(chartData -> {
+                String tooltipText = new StringBuilder(chartData.getName()).append("\n")
+                                                                           .append(String.format(Locale.US, formatString, chartData.getValue()))
+                                                                           .toString();
+                Circle circle = new Circle(3, chartData.getLocation().getColor());
+                circle.setOnMousePressed(e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, chartData)));
+                Tooltip.install(circle, new Tooltip(tooltipText));
+                chartDataLocations.put(chartData.getLocation(), circle);
+            });
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -92,6 +192,8 @@ public class WorldMapTileSkin extends TileSkin {
         group = new Group(worldPane);
 
         getPane().getChildren().addAll(group, titleText, text);
+        getPane().getChildren().addAll(chartDataLocations.values());
+        getPane().getChildren().addAll(poiLocations.values());
     }
 
     @Override protected void registerListeners() {
@@ -104,6 +206,8 @@ public class WorldMapTileSkin extends TileSkin {
                 path.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
             });
         });
+        tile.getPoiList().addListener(poiListener);
+        tile.getChartData().addListener(chartDataListener);
     }
 
 
@@ -121,7 +225,10 @@ public class WorldMapTileSkin extends TileSkin {
 
     @Override public void dispose() {
         countryPaths.forEach((name, pathList) -> pathList.forEach(path -> path.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(path))));
+        tile.getPoiList().removeListener(poiListener);
+        tile.getChartData().removeListener(chartDataListener);
         handlerMap.clear();
+        circleHandlerMap.clear();
         super.dispose();
     }
 
@@ -183,19 +290,37 @@ public class WorldMapTileSkin extends TileSkin {
             resizeStaticText();
             resizeDynamicText();
 
-            double worldMapHeight = clamp(0, containerWidth * 0.65906838, containerHeight);
-            double worldMapWidth  = clamp(0, width, containerHeight / 0.65906838);
+            double worldMapHeight = clamp(0, containerWidth * MAP_ASPECT_RATIO, containerHeight);
+            double worldMapWidth  = clamp(0, containerWidth, containerHeight / MAP_ASPECT_RATIO);
 
             worldPane.setCache(true);
             worldPane.setCacheHint(CacheHint.SCALE);
 
-            worldPane.setScaleX(worldMapWidth / 1009 * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
-            worldPane.setScaleY(worldMapHeight / 665 * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
+            worldPane.setScaleX(worldMapWidth / Helper.MAP_WIDTH * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
+            worldPane.setScaleY(worldMapHeight / Helper.MAP_HEIGHT * (TextSize.NORMAL == textSize ? 1.0 : 0.95));
 
             group.resize(worldMapWidth, worldMapHeight);
-            group.relocate((width - worldMapWidth) * 0.5, contentBounds.getY());
+            group.relocate((width - worldMapWidth) * 0.5, contentBounds.getY() + (contentBounds.getHeight() - worldMapHeight) * 0.5);
 
             worldPane.setCache(false);
+
+            chartDataLocations.forEach((location, circle) -> {
+                double[] xy = Helper.latLonToXY(location.getLatitude(), location.getLongitude());
+                double   x  = xy[0] * worldPane.getScaleX() + group.getBoundsInParent().getMinX();
+                double   y  = xy[1] * worldPane.getScaleY() + group.getBoundsInParent().getMinY();
+                circle.setCenterX(x);
+                circle.setCenterY(y);
+                circle.setRadius(size * 0.0075);
+            });
+
+            poiLocations.forEach((location, circle) -> {
+                double[] xy = Helper.latLonToXY(location.getLatitude(), location.getLongitude());
+                double   x  = xy[0] * worldPane.getScaleX() + group.getBoundsInParent().getMinX();
+                double   y  = xy[1] * worldPane.getScaleY() + group.getBoundsInParent().getMinY();
+                circle.setCenterX(x);
+                circle.setCenterY(y);
+                circle.setRadius(size * 0.0075);
+            });
         }
     }
 

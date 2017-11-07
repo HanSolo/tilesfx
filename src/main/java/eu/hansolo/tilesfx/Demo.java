@@ -281,6 +281,7 @@ public class Demo extends Application {
                                                   new Stop(0.5, Tile.YELLOW),
                                                   new Stop(1.0, Tile.RED))
                                    .strokeWithGradient(true)
+                                   //.smoothing(true)
                                    .build();
 
         //sparkLineTile.valueProperty().bind(value);
@@ -559,6 +560,7 @@ public class Demo extends Application {
                                                 chartData5, chartData6, chartData7, chartData8)
                                      .tooltipText("")
                                      .animated(true)
+                                     //.smoothing(true)
                                      .build();
 
         smoothAreaChartTile = TileBuilder.create().skinType(SkinType.SMOOTH_AREA_CHART)

@@ -565,6 +565,8 @@ public class Demo extends Application {
                                          .title("SmoothAreaChart")
                                          .unit("Unit")
                                          .text("Test")
+                                         //.chartType(ChartType.LINE)
+                                         //.dataPointsVisible(true)
                                          .chartData(smoothChartData1, smoothChartData2, smoothChartData3, smoothChartData4)
                                          .tooltipText("")
                                          .animated(true)

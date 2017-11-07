@@ -136,6 +136,8 @@ public class Demo extends Application {
     private Tile            dateTile;
     private Tile            calendarTile;
     private Tile            sunburstTile;
+    private Tile            matrixTile;
+    private Tile            radialPercentageTile;
 
 
     private long            lastTimerCall;
@@ -670,6 +672,34 @@ public class Demo extends Application {
                                   .sunburstInteractive(true)
                                   .build();
 
+        matrixTile = TileBuilder.create().skinType(SkinType.MATRIX)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                .title("MatrixTileSkin")
+                                .text("Any Text")
+                                .textVisible(false)
+                                .animated(true)
+                                .matrixSize(8, 50)
+                                .chartData(chartData1, chartData2, chartData3, chartData4, chartData5, chartData6, chartData7, chartData8)
+                                .build();
+
+        radialPercentageTile = TileBuilder.create().skinType(SkinType.RADIAL_PERCENTAGE)
+                                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                          .backgroundColor(Color.web("#26262D"))
+                                          .maxValue(1000)
+                                          .title("RadialPercentageSkin")
+                                          .description("Product 1")
+                                          .textVisible(false)
+                                          .chartData(chartData1, chartData2, chartData3)
+                                          .animated(true)
+                                          .referenceValue(100)
+                                          .value(chartData1.getValue())
+                                          .descriptionColor(Tile.GRAY)
+                                          //.valueColor(Tile.BLUE)
+                                          //.unitColor(Tile.BLUE)
+                                          .barColor(Tile.BLUE)
+                                          .decimals(0)
+                                          .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -716,6 +746,8 @@ public class Demo extends Application {
 
                     flipTile.setFlipText(Helper.TIME_0_TO_5[RND.nextInt(Helper.TIME_0_TO_5.length - 1)]);
 
+                    radialPercentageTile.setValue(chartData1.getValue());
+
                     lastTimerCall = now;
                 }
             }
@@ -723,7 +755,7 @@ public class Demo extends Application {
     }
 
     @Override public void start(Stage stage) {
-        FlowGridPane pane = new FlowGridPane(7, 5,
+        FlowGridPane pane = new FlowGridPane(8, 5,
                                              percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                              lineChartTile, timerControlTile, numberTile, textTile,
                                              highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
@@ -731,7 +763,8 @@ public class Demo extends Application {
                                              radialChartTile, donutChartTile, circularProgressTile, stockTile,
                                              gaugeSparkLineTile, radarChartTile1, radarChartTile2,
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
-                                             flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile);//, weatherTile);
+                                             flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
+                                             matrixTile, radialPercentageTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

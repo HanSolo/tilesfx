@@ -1548,21 +1548,15 @@ public class Tile extends Control {
         if (null == poiList) { poiList = FXCollections.observableArrayList(); }
         return poiList;
     }
-    public void setPoiList(final List<Location> POI_LIST) {
-        getPoiList().clear();
-        getPoiList().addAll(POI_LIST);
-        fireTileEvent(LOCATION_EVENT);
-    }
+    public void setPoiList(final List<Location> POI_LIST) { getPoiList().setAll(POI_LIST); }
     public void setPoiLocations(final Location... LOCATIONS) { setPoiList(Arrays.asList(LOCATIONS)); }
     public void addPoiLocation(final Location LOCATION) {
         if (null == LOCATION) return;
         getPoiList().add(LOCATION);
-        fireTileEvent(LOCATION_EVENT);
     }
     public void removePoiLocation(final Location LOCATION) {
         if (null == LOCATION) return;
         getPoiList().remove(LOCATION);
-        fireTileEvent(LOCATION_EVENT);
     }
     public void clearPoiLocations() {
         getPoiList().clear();
@@ -4462,7 +4456,9 @@ public class Tile extends Control {
      * Returns a list of path elements that define the countries
      * @return a list of path elements that define the countries
      */
-    public Map<String, List<CountryPath>> getCountryPaths() { return Helper.getLoresCountryPaths(); }
+    public Map<String, List<CountryPath>> getCountryPaths() {
+        return Helper.getLoresCountryPaths();
+    }
 
     /**
      * Returns true if a gradient defined by gradientStops will be

@@ -16,7 +16,6 @@
 
 package eu.hansolo.tilesfx.tools;
 
-import eu.hansolo.tilesfx.CountryPath;
 import eu.hansolo.tilesfx.Section;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -51,6 +50,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 
+import static eu.hansolo.tilesfx.tools.Country.*;
+
 
 /**
  * Created by hansolo on 11.12.15.
@@ -68,6 +69,17 @@ public class Helper {
     public static final double   MAP_HEIGHT        = 665.2420043945312;
     public static final double   MAP_OFFSET_X      = -MAP_WIDTH * 0.0285;
     public static final double   MAP_OFFSET_Y      = MAP_HEIGHT * 0.195;
+
+    public static final CountryGroup AMERICAS = new CountryGroup("AMERICAS", AI, AG, AR, AW, BS, BB, BZ, BM, BO, BR, CA, KY, CL, CO, CR, CU, DM, DO, EC, SV, GF, GD, GP, GT, GY, HT, HN, JM, MQ, MX, MS, NI, PA, PY, PE, PR, BL, KN, LC, MF, PM, VC, SR, TT, TC, US, UY, VE, VG, VI);
+    public static final CountryGroup APAC     = new CountryGroup("APAC", AS, AU, BD, BN, BT, CC, CK, CN, CX, FJ, FM, GU, HK, ID, IN, IO, JP, KH, KI, KP, KR, LA, LK, MH, MM, MN, MO, MP, MV, MY, NC, NF, NP, NR, NU, NZ, PF, PG, PH, PK, PN, PW, SB, SG, TH, TK, TL, TO, TV, TW, VN, VU, WF, WS);
+    public static final CountryGroup APJC     = new CountryGroup("APJC", AS, AU, BD, BN, BT, CC, CK, CN, CX, FJ, FM, GU, HK, HM, ID, IN, IO, JP, KH, KI, KP, KR, LA, LK, MH, MM, MN, MO, MP, MV, MY, NC, NF, NP, NR, NU, NZ, PF, PG, PH, PN, PW, SB, SG, TH, TK, TL, TO, TV, TW, VN, VU, WS);
+    public static final CountryGroup ANZ      = new CountryGroup("ANZ", AU, NZ);
+    public static final CountryGroup BENELUX  = new CountryGroup("BENELUX", BE, NL, LU);
+    public static final CountryGroup BRICS    = new CountryGroup("BRICS", RU, BR, CN, IN, ZA);
+    public static final CountryGroup DACH     = new CountryGroup("DACH", DE, AT, CH);
+    public static final CountryGroup EMEA     = new CountryGroup("EMEA", AF, AX, AL, DZ, AD, AO, AM, AT, AZ, BH, BY, BE, BJ, BA, BW, BV, BG, BF, BI, CM, CV, CF, TD, KM, CD, CG, HR, CY, CZ, DK, DJ, EG, GQ, ER, EE, ET, FK, FO, FI, FR, GA, GM, GE, DE, GH, GI, GR, GL, GG, GW, HU, IS, IR, IQ, IE, IM, IL, IT, CI, JE, JO, KZ, KE, XK, KW, KG, LV, LB, LS, LR, LY, LI, LT, LU, MK, MG, MW, ML, MT, MR, MU, YT, MD, MC, ME, MA, MZ, NA, NL, NE, NG, NO, OM, PK, PS, PL, PT, QA, RE, RO, RU, RW, SH, SM, ST, SA, SN, RS, SC, SL, SK, SI, SO, ZA, GS, ES, SD, SJ, SZ, SE, CH, SY, TJ, TZ, TG, TN, TR, TM, UG, UA, AE, GB, UZ, VA, EH, YE, ZM, ZW);
+    public static final CountryGroup EU       = new CountryGroup("EU", BE, GR, LT, PT, BG, ES, LU, RO, CZ, FR, HU, SI, DK, HR, MT, SK, DE, IT, NL, FI, EE, CY, AT, SE, IE, LV, PL, GB);
+    public static final CountryGroup NORAM    = new CountryGroup("NORAM", US, CA, MX, GT, BZ, CU, DO, HT, HN, SV, NI, CR, PA);
 
     public static final String[] TIME_0_TO_5       = {"1", "2", "3", "4", "5", "0"};
     public static final String[] TIME_5_TO_0       = {"5", "4", "3", "2", "1", "0"};

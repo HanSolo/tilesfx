@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package eu.hansolo.tilesfx;
+package eu.hansolo.tilesfx.tools;
 
+import eu.hansolo.tilesfx.ValueObject;
 import javafx.scene.paint.Color;
 
 
@@ -148,7 +149,7 @@ public enum Country {
     KN("Saint Kitts And Nevis"),
     KP("North Korea"),
     KR("South Korea"),
-    XK(""),
+    XK("Kosovo"), // might change to KV where XK is temporary
     KW("Kuwait"),
     KY("Cayman Islands"),
     KZ("Kazakhstan"),

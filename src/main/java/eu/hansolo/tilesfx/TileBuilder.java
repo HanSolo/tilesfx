@@ -31,6 +31,8 @@ import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.tools.Country;
+import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.TreeNode;
 import eu.hansolo.tilesfx.weather.DarkSky;
@@ -756,6 +758,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B countryGroup(final CountryGroup COUNTRY_GROUP) {
+        properties.put("countryGroup", new SimpleObjectProperty(COUNTRY_GROUP));
+        return (B)this;
+    }
+
     public final B sortedData(final boolean SORTED) {
         properties.put("sortedData", new SimpleBooleanProperty(SORTED));
         return (B)this;
@@ -1370,6 +1377,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("country".equals(key)) {
                 CONTROL.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
+            } else if ("countryGroup".equals(key)) {
+                CONTROL.setCountryGroup(((ObjectProperty<CountryGroup>) properties.get(key)).get());
             } else if ("sortedData".equals(key)) {
                 CONTROL.setSortedData(((BooleanProperty) properties.get(key)).get());
             } else if ("flipTimeInMS".equals(key)) {

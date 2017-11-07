@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.hansolo.tilesfx;
+package eu.hansolo.tilesfx.tools;
 
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.SVGPath;

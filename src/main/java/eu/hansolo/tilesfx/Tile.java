@@ -32,6 +32,9 @@ import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.*;
+import eu.hansolo.tilesfx.tools.Country;
+import eu.hansolo.tilesfx.tools.CountryGroup;
+import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MovingAverage;
@@ -452,6 +455,8 @@ public class Tile extends Control {
     private              ObjectProperty<Color>                         chartGridColor;
     private              Country                                       _country;
     private              ObjectProperty<Country>                       country;
+    private              CountryGroup                                  _countryGroup;
+    private              ObjectProperty<CountryGroup>                  countryGroup;
     private              boolean                                       _sortedData;
     private              BooleanProperty                               sortedData;
     private              boolean                                       _dataPointsVisible;
@@ -646,7 +651,6 @@ public class Tile extends Control {
         _yAxis                              = new NumberAxis();
         _radarChartMode                     = Mode.POLYGON;
         _chartGridColor                     = Tile.GRAY;
-        _country                            = Country.DE;
         _sortedData                         = true;
         _dataPointsVisible                  = false;
         _snapToTicks                        = false;
@@ -4246,7 +4250,10 @@ public class Tile extends Control {
      * in the CountryTileSkin
      * @return the Locale that will be used to visualize the country in the CountryTileSkin
      */
-    public Country getCountry() { return null == country ? _country : country.get(); }
+    public Country getCountry() {
+        if (null == _country && null == country) { _country = Country.DE; }
+        return null == country ? _country : country.get();
+    }
     /**
      * Defines the Locale that will be used to visualize the country
      * in the CountryTileSkin
@@ -4270,6 +4277,30 @@ public class Tile extends Control {
             _country = null;
         }
         return country;
+    }
+
+    public CountryGroup getCountryGroup() {
+        if (null == _countryGroup && null == countryGroup) { _countryGroup = Helper.EU; }
+        return null == countryGroup ? _countryGroup : countryGroup.get();
+    }
+    public void setCountryGroup(final CountryGroup GROUP) {
+        if (null == countryGroup) {
+            _countryGroup = GROUP;
+            fireTileEvent(RECALC_EVENT);
+        } else {
+            countryGroup.set(GROUP);
+        }
+    }
+    public ObjectProperty<CountryGroup> countryGroupProperty() {
+        if (null == countryGroup) {
+            countryGroup = new ObjectPropertyBase<CountryGroup>(_countryGroup) {
+                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "countryGroup"; }
+            };
+            _countryGroup = null;
+        }
+        return countryGroup;
     }
 
     public boolean isSortedData() { return null == sortedData ? _sortedData : sortedData.get(); }

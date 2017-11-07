@@ -304,7 +304,7 @@ public class WorldMapTileSkin extends TileSkin {
 
             worldPane.setCache(false);
 
-            chartDataLocations.forEach((location, circle) -> {
+            poiLocations.forEach((location, circle) -> {
                 double[] xy = Helper.latLonToXY(location.getLatitude(), location.getLongitude());
                 double   x  = xy[0] * worldPane.getScaleX() + group.getBoundsInParent().getMinX();
                 double   y  = xy[1] * worldPane.getScaleY() + group.getBoundsInParent().getMinY();
@@ -313,7 +313,7 @@ public class WorldMapTileSkin extends TileSkin {
                 circle.setRadius(size * 0.0075);
             });
 
-            poiLocations.forEach((location, circle) -> {
+            chartDataLocations.forEach((location, circle) -> {
                 double[] xy = Helper.latLonToXY(location.getLatitude(), location.getLongitude());
                 double   x  = xy[0] * worldPane.getScaleX() + group.getBoundsInParent().getMinX();
                 double   y  = xy[1] * worldPane.getScaleY() + group.getBoundsInParent().getMinY();

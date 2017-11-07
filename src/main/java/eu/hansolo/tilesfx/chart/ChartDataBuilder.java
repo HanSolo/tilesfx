@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.chart;
 
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.tools.Location;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -65,6 +66,11 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
         return (B)this;
     }
 
+    public final B location(final Location LOCATION) {
+        properties.put("location", new SimpleObjectProperty(LOCATION));
+        return (B)this;
+    }
+
     public final B fillColor(final Color COLOR) {
         properties.put("fillColor", new SimpleObjectProperty(COLOR));
         return (B)this;
@@ -100,6 +106,8 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
                 DATA.setValue(((DoubleProperty) properties.get(key)).get());
             } else if ("timestamp".equals(key)) {
                 DATA.setTimestamp(((ObjectProperty<Instant>) properties.get(key)).get());
+            } else if ("location".equals(key)) {
+                DATA.setLocation(((ObjectProperty<Location>) properties.get(key)).get());
             } else if ("fillColor".equals(key)) {
                 DATA.setFillColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("strokeColor".equals(key)) {

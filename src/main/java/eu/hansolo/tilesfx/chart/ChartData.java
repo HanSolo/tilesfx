@@ -20,6 +20,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.tools.Location;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -52,6 +53,7 @@ public class ChartData implements Comparable<ChartData> {
     private       Color                        strokeColor;
     private       Color                        textColor;
     private       Instant                      timestamp;
+    private       Location                     location;
     private       boolean                      animated;
     private       long                         animationDuration;
     private       List<ChartDataEventListener> listenerList = new CopyOnWriteArrayList<>();
@@ -125,6 +127,7 @@ public class ChartData implements Comparable<ChartData> {
     public String getName() { return name; }
     public void setName(final String NAME) {
         name = NAME;
+        if (null != location) { location.setName(NAME); }
         fireChartDataEvent(UPDATE_EVENT);
     }
 
@@ -150,6 +153,7 @@ public class ChartData implements Comparable<ChartData> {
     public Color getFillColor() { return fillColor; }
     public void setFillColor(final Color COLOR) {
         fillColor = COLOR;
+        if (null != location) { location.setColor(COLOR); }
         fireChartDataEvent(UPDATE_EVENT);
     }
 
@@ -168,6 +172,14 @@ public class ChartData implements Comparable<ChartData> {
     public Instant getTimestamp() { return timestamp; }
     public void setTimestamp(final Instant TIMESTAMP) {
         timestamp = TIMESTAMP;
+        fireChartDataEvent(UPDATE_EVENT);
+    }
+
+    public Location getLocation() { return location; }
+    public void setLocation(final Location LOCATION) {
+        location = LOCATION;
+        location.setName(getName());
+        location.setColor(getFillColor());
         fireChartDataEvent(UPDATE_EVENT);
     }
 

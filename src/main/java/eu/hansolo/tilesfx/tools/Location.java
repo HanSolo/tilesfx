@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.tools;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.events.LocationEvent;
 import eu.hansolo.tilesfx.events.LocationEventListener;
+import javafx.scene.paint.Color;
 import org.json.simple.JSONObject;
 
 import java.time.Instant;
@@ -69,37 +70,37 @@ public class Location {
     private double                      longitude;
     private double                      altitude;
     private String                      info;
-    private TileColor                   color;
+    private Color                       color;
     private int                         zoomLevel;
     private List<LocationEventListener> listenerList;
 
 
     // ******************** Constructors **************************************
     public Location() {
-        this(0, 0, 0, Instant.now(), "", "", TileColor.BLUE);
+        this(0, 0, 0, Instant.now(), "", "", TileColor.BLUE.color);
     }
     public Location(final double LATITUDE, final double LONGITUDE) {
-        this(LATITUDE, LONGITUDE, 0, Instant.now(), "", "", TileColor.BLUE);
+        this(LATITUDE, LONGITUDE, 0, Instant.now(), "", "", TileColor.BLUE.color);
     }
     public Location(final double LATITUDE, final double LONGITUDE, final String NAME) {
-        this(LATITUDE, LONGITUDE, 0, Instant.now() ,NAME, "", TileColor.BLUE);
+        this(LATITUDE, LONGITUDE, 0, Instant.now() ,NAME, "", TileColor.BLUE.color);
     }
-    public Location(final double LATITUDE, final double LONGITUDE, final String NAME, final TileColor COLOR) {
+    public Location(final double LATITUDE, final double LONGITUDE, final String NAME, final Color COLOR) {
         this(LATITUDE, LONGITUDE, 0, Instant.now() ,NAME, "", COLOR);
     }
     public Location(final double LATITUDE, final double LONGITUDE, final String NAME, final String INFO) {
-        this(LATITUDE, LONGITUDE, 0, Instant.now() ,NAME, INFO, TileColor.BLUE);
+        this(LATITUDE, LONGITUDE, 0, Instant.now() ,NAME, INFO, TileColor.BLUE.color);
     }
-    public Location(final double LATITUDE, final double LONGITUDE, final String NAME, final String INFO, final TileColor COLOR) {
+    public Location(final double LATITUDE, final double LONGITUDE, final String NAME, final String INFO, final Color COLOR) {
         this(LATITUDE, LONGITUDE, 0, Instant.now() ,NAME, INFO, COLOR);
     }
     public Location(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final String NAME) {
-        this(LATITUDE, LONGITUDE, ALTITUDE, Instant.now(), NAME, "", TileColor.BLUE);
+        this(LATITUDE, LONGITUDE, ALTITUDE, Instant.now(), NAME, "", TileColor.BLUE.color);
     }
     public Location(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final Instant TIMESTAMP, final String NAME) {
-        this(LATITUDE, LONGITUDE, ALTITUDE, TIMESTAMP, NAME, "", TileColor.BLUE);
+        this(LATITUDE, LONGITUDE, ALTITUDE, TIMESTAMP, NAME, "", TileColor.BLUE.color);
     }
-    public Location(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final Instant TIMESTAMP, final String NAME, final String INFO, final TileColor COLOR) {
+    public Location(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final Instant TIMESTAMP, final String NAME, final String INFO, final Color COLOR) {
         name         = NAME;
         latitude     = LATITUDE;
         longitude    = LONGITUDE;
@@ -141,8 +142,8 @@ public class Location {
     public String getInfo() { return info; }
     public void setInfo(final String INFO) { info = INFO; }
 
-    public TileColor getColor() { return color; }
-    public void setColor(final TileColor COLOR) {
+    public Color getColor() { return color; }
+    public void setColor(final Color COLOR) {
         color = COLOR;
         fireLocationEvent(new LocationEvent(Location.this));
     }
@@ -257,7 +258,7 @@ public class Location {
 
 
     // ******************** Event Handling ************************************
-    public void setOnLocation(final LocationEventListener LISTENER) { addLocationEventListener(LISTENER); }
+    public void setOnLocationEvent(final LocationEventListener LISTENER) { addLocationEventListener(LISTENER); }
     public void addLocationEventListener(final LocationEventListener LISTENER) { if (!listenerList.contains(LISTENER)) listenerList.add(LISTENER); }
     public void removeLocationEventListener(final LocationEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
 

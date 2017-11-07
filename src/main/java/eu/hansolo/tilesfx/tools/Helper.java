@@ -64,6 +64,10 @@ public class Helper {
     private static       Properties                     loresCountryProperties;
     private static       Map<String, List<CountryPath>> loresCountryPaths;
 
+    public static final double   MAP_WIDTH         = 1009.1149817705154 - 1.154000163078308;
+    public static final double   MAP_HEIGHT        = 665.2420043945312;
+    public static final double   MAP_OFFSET_X      = -MAP_WIDTH * 0.0285;
+    public static final double   MAP_OFFSET_Y      = MAP_HEIGHT * 0.195;
 
     public static final String[] TIME_0_TO_5       = {"1", "2", "3", "4", "5", "0"};
     public static final String[] TIME_5_TO_0       = {"5", "4", "3", "2", "1", "0"};
@@ -688,5 +692,11 @@ public class Helper {
         theta              = Double.compare(theta, 0.0) >= 0 ? Math.toDegrees(theta) : Math.toDegrees((theta)) + 360.0;
         double angle       = (theta + ANGLE_OFFSET) % 360;
         return angle;
+    }
+
+    public static double[] latLonToXY(final double LATITUDE, final double LONGITUDE) {
+        double x = (LONGITUDE + 180) * (MAP_WIDTH / 360) + MAP_OFFSET_X;
+        double y = (MAP_HEIGHT / 2) - (MAP_WIDTH * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(LATITUDE) / 2)))) / (2 * Math.PI)) + MAP_OFFSET_Y;
+        return new double[]{ x, y };
     }
 }

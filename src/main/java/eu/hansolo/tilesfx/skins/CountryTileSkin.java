@@ -40,16 +40,25 @@ import java.util.List;
  * Created by hansolo on 11.06.17.
  */
 public class CountryTileSkin extends TileSkin {
-    private Text                     titleText;
-    private Text                     text;
-    private Text                     valueText;
-    private Text                     unitText;
-    private TextFlow                 valueUnitFlow;
-    private Country                  country;
-    private StackPane                countryContainer;
-    private Group                    countryGroup;
-    private EventHandler<MouseEvent> clickHandler;
-    private List<CountryPath>        countryPaths;
+    private Text                                       titleText;
+    private Text                                       text;
+    private Text                                       valueText;
+    private Text                                       unitText;
+    private TextFlow                                   valueUnitFlow;
+    private Country                                    country;
+    private StackPane                                  countryContainer;
+    private Group                                      countryGroup;
+    private EventHandler<MouseEvent>                   clickHandler;
+    private List<CountryPath>                          countryPaths;
+    private double                                     countryMinX;
+    private double                                     countryMinY;
+    private double                                     countryMaxX;
+    private double                                     countryMaxY;
+    //private ObservableMap<Location, Circle>            chartDataLocations;
+    //private ObservableMap<Location, Circle>            poiLocations;
+    //private ListChangeListener<Location>               poiListener;
+    //private ListChangeListener<ChartData>              chartDataListener;
+    //private Map<Circle, EventHandler<MouseEvent>>      circleHandlerMap;
 
 
     // ******************** Constructors **************************************
@@ -62,13 +71,42 @@ public class CountryTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
+        //poiLocations       = FXCollections.observableHashMap();
+        //chartDataLocations = FXCollections.observableHashMap();
+
+        //circleHandlerMap   = new HashMap<>();
+
         country = tile.getCountry();
         if (null == country) { country = Country.DE; }
 
         clickHandler = event -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getColor())));
 
         countryPaths = Helper.getHiresCountryPaths().get(country.name());
-        countryPaths.forEach(path -> path.setFill(tile.getBarColor()));
+
+        countryMinX = Helper.MAP_WIDTH;
+        countryMinY = Helper.MAP_HEIGHT;
+        countryMaxX = 0;
+        countryMaxY = 0;
+        countryPaths.forEach(path -> {
+            path.setFill(tile.getBarColor());
+            countryMinX = Math.min(countryMinX, path.getBoundsInParent().getMinX());
+            countryMinY = Math.min(countryMinY, path.getBoundsInParent().getMinY());
+            countryMaxX = Math.max(countryMaxX, path.getBoundsInParent().getMaxX());
+            countryMaxY = Math.max(countryMaxY, path.getBoundsInParent().getMaxY());
+        });
+
+        /*
+        tile.getPoiList()
+            .forEach(poi -> {
+                String tooltipText = new StringBuilder(poi.getName()).append("\n")
+                                                                     .append(poi.getInfo())
+                                                                     .toString();
+                Circle circle = new Circle(3, poi.getColor());
+                circle.setOnMousePressed(e -> poi.fireLocationEvent(new LocationEvent(poi)));
+                Tooltip.install(circle, new Tooltip(tooltipText));
+                poiLocations.put(poi, circle);
+            });
+        */
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -99,8 +137,10 @@ public class CountryTileSkin extends TileSkin {
 
         valueUnitFlow = new TextFlow(valueText, unitText);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+        valueUnitFlow.setMouseTransparent(true);
 
         getPane().getChildren().addAll(titleText, countryContainer, valueUnitFlow, text);
+        //getPane().getChildren().addAll(poiLocations.values());
     }
 
     @Override protected void registerListeners() {
@@ -183,7 +223,7 @@ public class CountryTileSkin extends TileSkin {
         valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
 
         double containerWidth  = contentBounds.getWidth();
-        double containerHeight =contentBounds.getHeight();
+        double containerHeight = contentBounds.getHeight();
         double containerSize   = containerWidth < containerHeight ? containerWidth : containerHeight;
 
         double countryWidth    = countryGroup.getLayoutBounds().getWidth();
@@ -199,11 +239,22 @@ public class CountryTileSkin extends TileSkin {
                 countryContainer.setMaxSize(containerWidth, containerHeight);
                 countryContainer.setPrefSize(containerWidth, containerHeight);
                 countryContainer.relocate(contentBounds.getX(), contentBounds.getY());
-                //double scaleFactor = (containerSize * 1.0) / countrySize;
                 double scaleFactor = containerSize / countrySize;
                 countryGroup.setScaleX(scaleFactor);
                 countryGroup.setScaleY(scaleFactor);
             }
+
+            /*
+            poiLocations.forEach((location, circle) -> {
+                double[] xy = Helper.latLonToXY(location.getLatitude(), location.getLongitude());
+                double   x  = (xy[0] - countryMinX) * countryGroup.getScaleX() + countryGroup.getBoundsInParent().getMinX();
+                double   y  = (xy[1] - countryMinY) * countryGroup.getScaleY() + countryGroup.getBoundsInParent().getMinY();
+                circle.setCenterX(x);
+                circle.setCenterY(y);
+                circle.setRadius(size * 0.01);
+            });
+            */
+
             resizeStaticText();
         }
     }

@@ -996,6 +996,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case SMOOTH_AREA_CHART:
                     CONTROL.setSmoothing(true);
+                    CONTROL.setChartType(ChartType.AREA);
                     break;
                 case RADAR_CHART:
                     break;

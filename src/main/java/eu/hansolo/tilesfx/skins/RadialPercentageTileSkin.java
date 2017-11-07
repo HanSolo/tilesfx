@@ -181,6 +181,7 @@ public class RadialPercentageTileSkin extends TileSkin {
         if ("RECALC".equals(EVENT_TYPE)) {
             referenceValue = tile.getReferenceValue() < maxValue ? maxValue : tile.getReferenceValue();
             angleStep      = ANGLE_RANGE / range;
+            sum            = dataList.stream().mapToDouble(ChartData::getValue).sum();
             sections       = tile.getSections();
             redraw();
             setBar(tile.getCurrentValue());
@@ -204,7 +205,8 @@ public class RadialPercentageTileSkin extends TileSkin {
     }
 
     private void setProportionBar() {
-        proportionBar.setLength(-sum * ANGLE_RANGE / tile.getReferenceValue());
+        sum = dataList.stream().mapToDouble(ChartData::getValue).sum();
+        proportionBar.setLength(-sum * ANGLE_RANGE / referenceValue);
     }
 
     @Override public void dispose() {
@@ -302,6 +304,8 @@ public class RadialPercentageTileSkin extends TileSkin {
             separator.setEndY(y + chartSize * 0.1365);
 
             resizeStaticText();
+            resizeDynamicText();
+
             percentageFlow.setPrefWidth(contentBounds.getWidth());
             percentageFlow.relocate(contentBounds.getX(), bar.getCenterY() - chartSize * 0.2);
 
@@ -334,6 +338,8 @@ public class RadialPercentageTileSkin extends TileSkin {
         descriptionText.setText(tile.getDescription());
         text.setText(tile.getText());
         unitText.setText(tile.getUnit());
+
+        referenceValue = tile.getReferenceValue() < maxValue ? maxValue : tile.getReferenceValue();
 
         resizeStaticText();
         resizeDynamicText();

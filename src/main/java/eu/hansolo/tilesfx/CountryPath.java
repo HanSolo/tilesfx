@@ -16,7 +16,6 @@
 
 package eu.hansolo.tilesfx;
 
-import eu.hansolo.tilesfx.tools.Helper;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.SVGPath;
 

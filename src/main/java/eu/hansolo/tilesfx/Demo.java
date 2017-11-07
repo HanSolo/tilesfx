@@ -441,10 +441,10 @@ public class Demo extends Application {
                              .title("Map")
                              .text("Some text")
                              .description("Description")
-                             .currentLocation(new Location(51.91178, 7.63379, "Home", TileColor.MAGENTA))
-                             .pointsOfInterest(new Location(51.914405, 7.635732, "POI 1", TileColor.RED),
-                                               new Location(51.912529, 7.631752, "POI 2", TileColor.BLUE),
-                                               new Location(51.923993, 7.628906, "POI 3", TileColor.YELLOW_ORANGE))
+                             .currentLocation(new Location(51.91178, 7.63379, "Home", TileColor.MAGENTA.color))
+                             .pointsOfInterest(new Location(51.914405, 7.635732, "POI 1", TileColor.RED.color),
+                                               new Location(51.912529, 7.631752, "POI 2", TileColor.BLUE.color),
+                                               new Location(51.923993, 7.628906, "POI 3", TileColor.YELLOW_ORANGE.color))
                              .mapProvider(MapProvider.TOPO)
                              .build();
 

@@ -21,8 +21,11 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.CtxBounds;
+import eu.hansolo.tilesfx.tools.NotifyRegion;
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.effect.BlurType;
@@ -35,53 +38,57 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.Locale;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
+import static eu.hansolo.tilesfx.tools.Helper.enableNode;
 
 
 /**
  * Created by hansolo on 19.12.16.
  */
 public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
-    protected static final double               PREFERRED_WIDTH  = 250;
-    protected static final double               PREFERRED_HEIGHT = 250;
-    protected static final double               MINIMUM_WIDTH    = 50;
-    protected static final double               MINIMUM_HEIGHT   = 50;
-    protected static final double               MAXIMUM_WIDTH    = 1024;
-    protected static final double               MAXIMUM_HEIGHT   = 1024;
-    protected              double               width;
-    protected              double               height;
-    protected              double               size;
-    protected              double               inset;
-    protected              double               doubleInset;
-    protected              CtxBounds            contentBounds;
-    protected              double               contentCenterX;
-    protected              double               contentCenterY;
-    protected              Pane                 pane;
-    protected              double               minValue;
-    protected              double               maxValue;
-    protected              double               range;
-    protected              double               threshold;
-    protected              double               stepSize;
-    protected              double               angleRange;
-    protected              double               angleStep;
-    protected              boolean              highlightSections;
-    protected              String               formatString;
-    protected              Locale               locale;
-    protected              List<Section>        sections;
-    protected              boolean              sectionsVisible;
-    protected              TextSize             textSize;
-    protected              DropShadow           shadow;
-    protected              InvalidationListener sizeListener;
-    protected              TileEventListener    tileEventListener;
-    protected              InvalidationListener currentValueListener;
-    protected              InvalidationListener currentTimeListener;
-    protected              InvalidationListener timeListener;
-    protected              Tile                 tile;
+    protected static final double                   PREFERRED_WIDTH  = 250;
+    protected static final double                   PREFERRED_HEIGHT = 250;
+    protected static final double                   MINIMUM_WIDTH    = 50;
+    protected static final double                   MINIMUM_HEIGHT   = 50;
+    protected static final double                   MAXIMUM_WIDTH    = 1024;
+    protected static final double                   MAXIMUM_HEIGHT   = 1024;
+    protected              double                   width;
+    protected              double                   height;
+    protected              double                   size;
+    protected              double                   inset;
+    protected              double                   doubleInset;
+    protected              CtxBounds                contentBounds;
+    protected              double                   contentCenterX;
+    protected              double                   contentCenterY;
+    protected              Pane                     pane;
+    protected              double                   minValue;
+    protected              double                   maxValue;
+    protected              double                   range;
+    protected              double                   threshold;
+    protected              double                   stepSize;
+    protected              double                   angleRange;
+    protected              double                   angleStep;
+    protected              boolean                  highlightSections;
+    protected              String                   formatString;
+    protected              Locale                   locale;
+    protected              List<Section>            sections;
+    protected              boolean                  sectionsVisible;
+    protected              TextSize                 textSize;
+    protected              DropShadow               shadow;
+    protected              InvalidationListener     sizeListener;
+    protected              TileEventListener        tileEventListener;
+    protected              InvalidationListener     currentValueListener;
+    protected              InvalidationListener     currentTimeListener;
+    protected              InvalidationListener     timeListener;
+    protected              Tile                     tile;
+    private                NotifyRegion             notifyRegion;
+    private                ListChangeListener<Node> childrenListener;
 
 
     // ******************** Constructors **************************************
@@ -104,6 +111,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         sizeListener         = o -> handleEvents("RESIZE");
         tileEventListener    = e -> handleEvents(e.getEventType().name());
         currentValueListener = o -> handleCurrentValue(tile.getCurrentValue());
+        childrenListener     = c -> notifyRegion.toFront();
         contentBounds        = new CtxBounds();
 
         initGraphics();
@@ -125,7 +133,10 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
 
         shadow = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 3, 0, 0, 0);
 
-        pane = new Pane();
+        notifyRegion = new NotifyRegion();
+        enableNode(notifyRegion, false);
+
+        pane = new Pane(notifyRegion);
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(tile.getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
 
@@ -137,6 +148,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         tile.heightProperty().addListener(sizeListener);
         tile.setOnTileEvent(tileEventListener);
         tile.currentValueProperty().addListener(currentValueListener);
+        pane.getChildren().addListener(childrenListener);
     }
 
 
@@ -169,6 +181,10 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             handleCurrentValue(tile.getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = tile.getSections();
+        } else if ("SHOW_NOTIFIER".equals(EVENT_TYPE)) {
+            enableNode(notifyRegion, true);
+        } else if ("HIDE_NOTIFIER".equals(EVENT_TYPE)) {
+            enableNode(notifyRegion, false);
         }
     }
 
@@ -179,6 +195,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         tile.heightProperty().removeListener(sizeListener);
         tile.removeTileEventListener(tileEventListener);
         tile.currentValueProperty().removeListener(currentValueListener);
+        pane.getChildren().removeListener(childrenListener);
         tile = null;
     }
     
@@ -215,6 +232,9 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
+            notifyRegion.setPrefSize(size * 0.13, size * 0.13);
+            notifyRegion.relocate(width - size * 0.13, 0);
+
             resizeStaticText();
             resizeDynamicText();
         }
@@ -223,6 +243,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected void redraw() {
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, tile.getRoundedCorners() ? new CornerRadii(clamp(0, Double.MAX_VALUE, size * 0.025)) : CornerRadii.EMPTY, new BorderWidths(clamp(0, Double.MAX_VALUE, tile.getBorderWidth() / PREFERRED_WIDTH * size)))));
         pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), tile.getRoundedCorners() ? new CornerRadii(clamp(0, Double.MAX_VALUE, size * 0.025)) : CornerRadii.EMPTY, Insets.EMPTY)));
+        notifyRegion.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, tile.getRoundedCorners() ? new CornerRadii(0, PREFERRED_WIDTH * 0.025, 0, 0, false) : CornerRadii.EMPTY, Insets.EMPTY)));
 
         locale          = tile.getLocale();
         formatString    = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();

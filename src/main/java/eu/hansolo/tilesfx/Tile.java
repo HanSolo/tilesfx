@@ -190,6 +190,8 @@ public class Tile extends Control {
     public  static final int         LONG_INTERVAL         = 1000;
     private static final int         MAX_NO_OF_DECIMALS    = 3;
 
+    private        final TileEvent   SHOW_NOTIFIER_EVENT   = new TileEvent(EventType.SHOW_NOTIFIER);
+    private        final TileEvent   HIDE_NOTIFIER_EVENT   = new TileEvent(EventType.HIDE_NOTIFIER);
     private        final TileEvent   EXCEEDED_EVENT        = new TileEvent(EventType.THRESHOLD_EXCEEDED);
     private        final TileEvent   UNDERRUN_EVENT        = new TileEvent(EventType.THRESHOLD_UNDERRUN);
     private        final TileEvent   MAX_VALUE_EXCEEDED    = new TileEvent(EventType.MAX_VALUE_EXCEEDED);
@@ -4566,6 +4568,8 @@ public class Tile extends Control {
             throw new IllegalArgumentException("Do you use a valid DarkSKY API key?");
         }
     }
+
+    public void showNotifier(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFIER_EVENT : HIDE_NOTIFIER_EVENT); }
 
     private Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();

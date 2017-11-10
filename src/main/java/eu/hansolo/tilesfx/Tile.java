@@ -471,6 +471,8 @@ public class Tile extends Control {
     private              ChartType                                     _chartType;
     private              double                                        _tooltipTimeout;
     private              DoubleProperty                                tooltipTimeout;
+    private              Color                                         _notificationBackgroundColor;
+    private              Color                                         _notificationForegroundColor;
 
     private volatile     ScheduledFuture<?>                            periodicTickTask;
     private static       ScheduledExecutorService                      periodicTickExecutorService;
@@ -661,6 +663,8 @@ public class Tile extends Control {
         _matrixSize                         = new int[]{ 30, 25 };
         _chartType                          = ChartType.LINE;
         _tooltipTimeout                     = 2000;
+        _notificationBackgroundColor        = Tile.YELLOW;
+        _notificationForegroundColor        = Tile.BACKGROUND;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -4567,6 +4571,18 @@ public class Tile extends Control {
             //System.out.println("Wrong or missing DarkSky API key");
             throw new IllegalArgumentException("Do you use a valid DarkSKY API key?");
         }
+    }
+
+    public Color getNotificationBackgroundColor() { return _notificationBackgroundColor; }
+    public void setNotificationBackgroundColor(final Color COLOR) {
+        _notificationBackgroundColor = COLOR;
+        fireTileEvent(REDRAW_EVENT);
+    }
+
+    public Color getNotificationForegroundColor() { return _notificationForegroundColor; }
+    public void setNotificationForegroundColor(final Color COLOR) {
+        _notificationForegroundColor = COLOR;
+        fireTileEvent(REDRAW_EVENT);
     }
 
     public void showNotifier(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFIER_EVENT : HIDE_NOTIFIER_EVENT); }

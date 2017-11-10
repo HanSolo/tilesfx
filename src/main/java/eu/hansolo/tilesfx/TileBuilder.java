@@ -840,6 +840,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B notificationBackgroundColor(final Color COLOR) {
+        properties.put("notificationBackgroundColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B notificationForegroundColor(final Color COLOR) {
+        properties.put("notificationForegroundColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -1419,6 +1429,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setChartType(((ObjectProperty<ChartType>) properties.get(key)).get());
             } else if ("tooltipTimeout".equals(key)) {
                 CONTROL.setTooltipTimeout(((DoubleProperty) properties.get(key)).get());
+            } else if ("notificationBackgroundColor".equals(key)) {
+                CONTROL.setNotificationBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("notificationForegroundColor".equals(key)) {
+                CONTROL.setNotificationForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             }
         }
         properties.clear();

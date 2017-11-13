@@ -49,7 +49,7 @@ public class MatrixTileSkin extends TileSkin {
     private ChartDataEventListener        chartEventListener;
     private Tooltip                       selectionTooltip;
     private PixelMatrixEventListener      matrixListener;
-    private EventHandler<MouseEvent>      moveHandler;
+    private EventHandler<MouseEvent>      mouseHandler;
 
 
     // ******************** Constructors **************************************
@@ -108,7 +108,16 @@ public class MatrixTileSkin extends TileSkin {
 
             tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data));
         };
-        moveHandler       = e -> matrix.checkForClick(e);
+        mouseHandler = e -> {
+            final javafx.event.EventType<? extends MouseEvent> TYPE = e.getEventType();
+            if (MouseEvent.MOUSE_CLICKED.equals(TYPE)) {
+                matrix.checkForClick(e);
+            } else if (MouseEvent.MOUSE_MOVED.equals(TYPE)) {
+                selectionTooltip.hide();
+            } else if (MouseEvent.MOUSE_EXITED.equals(TYPE)) {
+                selectionTooltip.hide();
+            }
+        };
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -130,7 +139,9 @@ public class MatrixTileSkin extends TileSkin {
         super.registerListeners();
         tile.getChartData().addListener(chartDataListener);
         matrix.addPixelMatrixEventListener(matrixListener);
-        matrix.addEventHandler(MouseEvent.MOUSE_MOVED, moveHandler);
+        matrix.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseHandler);
+        matrix.addEventHandler(MouseEvent.MOUSE_MOVED, mouseHandler);
+        matrix.addEventHandler(MouseEvent.MOUSE_EXITED, mouseHandler);
     }
 
 
@@ -149,7 +160,9 @@ public class MatrixTileSkin extends TileSkin {
 
     @Override public void dispose() {
         matrix.removeAllPixelMatrixEventListeners();
-        matrix.removeEventHandler(MouseEvent.MOUSE_MOVED, moveHandler);
+        matrix.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseHandler);
+        matrix.removeEventHandler(MouseEvent.MOUSE_MOVED, mouseHandler);
+        matrix.removeEventHandler(MouseEvent.MOUSE_EXITED, mouseHandler);
         matrix.dispose();
         tile.getChartData().removeListener(chartDataListener);
         tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));

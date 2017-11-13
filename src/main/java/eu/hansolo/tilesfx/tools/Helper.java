@@ -357,6 +357,16 @@ public class Helper {
         return palette;
     }
 
+    public static final Color[] createColorVariations(final Color COLOR, final int NO_OF_COLORS) {
+        int    noOfColors = clamp(1, 12, NO_OF_COLORS);
+        double step       = 0.8 / noOfColors;
+        double hue        = COLOR.getHue();
+        double brg        = COLOR.getBrightness();
+        Color[] colors = new Color[noOfColors];
+        for (int i = 0 ; i < noOfColors ; i++) { colors[i] = Color.hsb(hue, 0.2 + i * step, brg); }
+        return colors;
+    }
+
     public static final Color getColorAt(final List<Stop> STOP_LIST, final double POSITION_OF_COLOR) {
         Map<Double, Stop> STOPS = new TreeMap<>();
         for (Stop stop : STOP_LIST) { STOPS.put(stop.getOffset(), stop); }

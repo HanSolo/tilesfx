@@ -32,7 +32,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -58,7 +57,6 @@ public class PixelMatrix extends Region {
     private              double                                         height;
     private              Canvas                                         canvas;
     private              GraphicsContext                                ctx;
-    private              StackPane                                      pane;
     private              int                                            pixelOnColor;
     private              int                                            pixelOffColor;
     private              PixelShape                                     pixelShape;
@@ -139,9 +137,7 @@ public class PixelMatrix extends Region {
         canvas = new Canvas(preferredWidth, preferredHeight);
         ctx = canvas.getGraphicsContext2D();
 
-        pane = new StackPane(canvas);
-
-        getChildren().setAll(pane);
+        getChildren().setAll(canvas);
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
     }
 
@@ -449,10 +445,6 @@ public class PixelMatrix extends Region {
 
 
         if (width > 0 && height > 0) {
-            pane.setMaxSize(width, height);
-            pane.setPrefSize(width, height);
-            pane.relocate((getWidth() - width) * 0.5, (getHeight() - height) * 0.5);
-
             if (squarePixels) {
                 pixelWidth                   = pixelSize;
                 pixelHeight                  = pixelSize;
@@ -461,6 +453,8 @@ public class PixelMatrix extends Region {
             }
             canvas.setWidth(cols * pixelWidth);
             canvas.setHeight(rows * pixelHeight);
+
+            canvas.relocate((getWidth() - (cols *pixelWidth)) * 0.5, (getHeight() - (rows * pixelHeight)) * 0.5);
 
             drawMatrix();
         }

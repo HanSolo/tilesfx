@@ -194,7 +194,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
     public void setMaxValue(final double MAX_VALUE) {
         maxValue = MAX_VALUE;
-        stepSize = width * 0.85 / maxValue;
+        stepSize = (parentWidth - size * 0.15) / maxValue;
         updateBar(getValue());
     }
 
@@ -242,7 +242,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         }
 
         if (width > 0 && height > 0) {
-            stepSize = (width - size * 0.15) / maxValue;
+            stepSize = (parentWidth - size * 0.15) / maxValue;
 
             pane.setMaxSize(parentWidth, height * 0.12);
             pane.setPrefSize(parentWidth, height * 0.12);

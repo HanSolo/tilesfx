@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
+import eu.hansolo.tilesfx.tools.Point;
 import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.VPos;
@@ -269,7 +270,7 @@ public class SparkLineTileSkin extends TileSkin {
         double tickStartY       = maxY - tickStepY;
         if (tickSpacingY < low) {
             tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
-            tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+            tickStartY       = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
         }
 
         horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
@@ -278,7 +279,8 @@ public class SparkLineTileSkin extends TileSkin {
         for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
             Line line  = horizontalTickLines.get(lineCountY);
             Text label = tickLabelsY.get(lineCountY);
-            label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
+            //label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
+            label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
             label.setY(y + graphBounds.getHeight() * 0.03);
             label.setFill(tickLineColor);
             horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
@@ -312,12 +314,12 @@ public class SparkLineTileSkin extends TileSkin {
 
                 dot.setCenterX(maxX);
                 dot.setCenterY(end.getY());
+            }
 
-                if (tile.isStrokeWithGradient()) {
-                    setupGradient();
-                    dot.setFill(gradient);
-                    sparkLine.setStroke(gradient);
-                }
+            if (tile.isStrokeWithGradient()) {
+                setupGradient();
+                dot.setFill(gradient);
+                sparkLine.setStroke(gradient);
             }
 
             double average  = tile.getAverage();
@@ -395,12 +397,9 @@ public class SparkLineTileSkin extends TileSkin {
         super.dispose();
     }
 
-
-    // ******************** Smoothing *****************************************
-    public void smooth(final List<Double> DATA_LIST) {
-        int      size = DATA_LIST.size();
-        double[] x    = new double[size];
-        double[] y    = new double[size];
+    private void smooth(final List<Double> DATA_LIST) {
+        int      size   = DATA_LIST.size();
+        Point[]  points = new Point[size];
 
         low  = Statistics.getMin(DATA_LIST);
         high = Statistics.getMax(DATA_LIST);
@@ -418,66 +417,18 @@ public class SparkLineTileSkin extends TileSkin {
         double stepY = graphBounds.getHeight() / range;
 
         for (int i = 0 ; i < size ; i++) {
-            x[i] = minX + i * stepX;
-            y[i] = maxY - Math.abs(low - DATA_LIST.get(i)) * stepY;
+            points[i] = new Point(minX + i * stepX, maxY - Math.abs(low - DATA_LIST.get(i)) * stepY);
         }
 
-        Pair<Double[], Double[]> px = computeControlPoints(x);
-        Pair<Double[], Double[]> py = computeControlPoints(y);
-
+        Point[] smoothedPoints = Helper.subdividePoints(points, 16);
+        int length = smoothedPoints.length;
         sparkLine.getElements().clear();
-        for (int i = 0 ; i < size - 1 ; i++) {
-            sparkLine.getElements().add(new MoveTo(x[i], y[i]));
-            sparkLine.getElements().add(new CubicCurveTo(px.getKey()[i], py.getKey()[i], px.getValue()[i], py.getValue()[i], x[i + 1], y[i + 1]));
+        sparkLine.getElements().add(new MoveTo(smoothedPoints[0].getX(), smoothedPoints[0].getY()));
+        for (int i = 1 ; i < length - 1 ; i++) {
+            sparkLine.getElements().add(new LineTo(smoothedPoints[i].getX(), smoothedPoints[i].getY()));
         }
-        dot.setCenterX(maxX);
-        dot.setCenterY(y[size - 1]);
-    }
-    private Pair<Double[], Double[]> computeControlPoints(final double[] K) {
-        int      n  = K.length - 1;
-        Double[] p1 = new Double[n];
-        Double[] p2 = new Double[n];
-
-	    /*rhs vector*/
-        double[] a = new double[n];
-        double[] b = new double[n];
-        double[] c = new double[n];
-        double[] r = new double[n];
-
-	    /*left most segment*/
-        a[0] = 0;
-        b[0] = 2;
-        c[0] = 1;
-        r[0] = K[0]+2*K[1];
-
-	    /*internal segments*/
-        for (int i = 1; i < n - 1; i++) {
-            a[i] = 1;
-            b[i] = 4;
-            c[i] = 1;
-            r[i] = 4 * K[i] + 2 * K[i + 1];
-        }
-
-	    /*right segment*/
-        a[n-1] = 2;
-        b[n-1] = 7;
-        c[n-1] = 0;
-        r[n-1] = 8 * K[n - 1] + K[n];
-
-	    /*solves Ax = b with the Thomas algorithm*/
-        for (int i = 1; i < n; i++) {
-            double m = a[i] / b[i - 1];
-            b[i] = b[i] - m * c[i - 1];
-            r[i] = r[i] - m * r[i - 1];
-        }
-
-        p1[n-1] = r[n-1] / b[n-1];
-        for (int i = n - 2; i >= 0; --i) { p1[i] = (r[i] - c[i] * p1[i + 1]) / b[i]; }
-
-        for (int i = 0 ; i < n - 1 ; i++) { p2[i] = 2 * K[i + 1] - p1[i + 1]; }
-        p2[n - 1] = 0.5 * (K[n] + p1[n - 1]);
-
-        return new Pair<>(p1, p2);
+        dot.setCenterX(smoothedPoints[length - 1].getX());
+        dot.setCenterY(smoothedPoints[length - 1].getY());
     }
 
 

@@ -204,6 +204,7 @@ public class BarChartTileSkin extends TileSkin {
             item.setMaxSize(width, height * 0.12);
         });
     }
+
     @Override protected void resize() {
         super.resize();
         barChartPane.setPrefSize(width, contentBounds.getHeight());

@@ -46,9 +46,25 @@ public class CtxBounds {
     public double getY() { return y; }
     public void setY(final double Y) { y = Y; }
 
+    public double getMinX() { return x; }
+    public double getMaxX() { return x + width; }
+
+    public double getMinY() { return y; }
+    public double getMaxY() { return y + height; }
+
     public double getWidth() { return width; }
     public void setWidth(final double WIDTH) { width = Helper.clamp(0, Double.MAX_VALUE, WIDTH); }
 
     public double getHeight() { return height; }
     public void setHeight(final double HEIGHT) { height = Helper.clamp(0, Double.MAX_VALUE, HEIGHT); }
+
+    public void set(final CtxBounds BOUNDS) {
+        set(BOUNDS.getX(), BOUNDS.getY(), BOUNDS.getWidth(), BOUNDS.getHeight());
+    }
+    public void set(final double X, final double Y, final double WIDTH, final double HEIGHT) {
+        x      = X;
+        y      = Y;
+        width  = WIDTH;
+        height = HEIGHT;
+    }
 }

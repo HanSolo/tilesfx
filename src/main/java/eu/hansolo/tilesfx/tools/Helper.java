@@ -49,6 +49,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.Predicate;
 
 import static eu.hansolo.tilesfx.tools.Country.*;
 
@@ -408,10 +409,10 @@ public class Helper {
         final double DELTA_BLUE    = (UPPER_BOUND.getColor().getBlue()    - LOWER_BOUND.getColor().getBlue())    * POS;
         final double DELTA_OPACITY = (UPPER_BOUND.getColor().getOpacity() - LOWER_BOUND.getColor().getOpacity()) * POS;
 
-        double red     = clamp(0d, 1d, (LOWER_BOUND.getColor().getRed()     + DELTA_RED));
-        double green   = clamp(0d, 1d, (LOWER_BOUND.getColor().getGreen()   + DELTA_GREEN));
-        double blue    = clamp(0d, 1d, (LOWER_BOUND.getColor().getBlue()    + DELTA_BLUE));
-        double opacity = clamp(0d, 1d, (LOWER_BOUND.getColor().getOpacity() + DELTA_OPACITY));
+        double red     = clamp(0, 1, (LOWER_BOUND.getColor().getRed()     + DELTA_RED));
+        double green   = clamp(0, 1, (LOWER_BOUND.getColor().getGreen()   + DELTA_GREEN));
+        double blue    = clamp(0, 1, (LOWER_BOUND.getColor().getBlue()    + DELTA_BLUE));
+        double opacity = clamp(0, 1, (LOWER_BOUND.getColor().getOpacity() + DELTA_OPACITY));
 
         return Color.color(red, green, blue, opacity);
     }
@@ -724,4 +725,6 @@ public class Helper {
         double y = (MAP_HEIGHT / 2) - (MAP_WIDTH * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(LATITUDE) / 2)))) / (2 * Math.PI)) + MAP_OFFSET_Y;
         return new double[]{ x, y };
     }
+
+    public static <T> Predicate<T> not(Predicate<T> predicate) { return predicate.negate(); }
 }

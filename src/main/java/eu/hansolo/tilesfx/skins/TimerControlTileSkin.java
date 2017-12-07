@@ -386,6 +386,7 @@ public class TimerControlTileSkin extends TileSkin {
         clockSize      = size * CLOCK_SCALE_FACTOR * (TextSize.NORMAL == textSize ? 1.0 : 0.95);
         double centerX = width * 0.5;
         double centerY = height * 0.5;
+        double knobRadius = clockSize * 0.0225;
 
         sectionsPane.setMinSize(clockSize, clockSize);
         sectionsPane.relocate((width - clockSize) * 0.5, (height - clockSize) * 0.5);
@@ -409,7 +410,7 @@ public class TimerControlTileSkin extends TileSkin {
         hour.setArcHeight(clockSize * 0.015);
         hour.setCache(true);
         hour.setCacheHint(CacheHint.ROTATE);
-        hour.relocate((width - hour.getWidth()) * 0.5, centerY - size * 0.165 / CLOCK_SCALE_FACTOR);
+        hour.relocate((width - hour.getWidth()) * 0.5, (centerY - size * 0.165 / CLOCK_SCALE_FACTOR) + knobRadius);
 
         minute.setFill(tile.getMinuteColor());
         minute.setCache(false);
@@ -419,7 +420,7 @@ public class TimerControlTileSkin extends TileSkin {
         minute.setArcHeight(clockSize * 0.015);
         minute.setCache(true);
         minute.setCacheHint(CacheHint.ROTATE);
-        minute.relocate((width - minute.getWidth()) * 0.5, centerY - size * 0.265 / CLOCK_SCALE_FACTOR);
+        minute.relocate((width - minute.getWidth()) * 0.5, (centerY - size * 0.265 / CLOCK_SCALE_FACTOR) + knobRadius);
 
         second.setFill(tile.getSecondColor());
         second.setCache(false);
@@ -429,10 +430,10 @@ public class TimerControlTileSkin extends TileSkin {
         second.setArcHeight(clockSize * 0.015);
         second.setCache(true);
         second.setCacheHint(CacheHint.ROTATE);
-        second.relocate((width - second.getWidth()) * 0.5, centerY - size * 0.265 / CLOCK_SCALE_FACTOR);
+        second.relocate((width - second.getWidth()) * 0.5, (centerY - size * 0.265 / CLOCK_SCALE_FACTOR) + knobRadius);
 
         knob.setFill(tile.getKnobColor());
-        knob.setRadius(clockSize * 0.0225);
+        knob.setRadius(knobRadius);
         knob.setCenterX(centerX);
         knob.setCenterY(centerY);
 

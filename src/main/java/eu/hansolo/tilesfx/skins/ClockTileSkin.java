@@ -54,7 +54,10 @@ public class ClockTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        currentValueListener = o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(tile.getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())));
+        currentValueListener = o -> {
+            if (tile.isRunning()) { return; } // Update time only if clock is not already running
+            updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(tile.getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())));
+        };
         timeListener         = o -> updateTime(tile.getTime());
 
         timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
@@ -83,11 +86,7 @@ public class ClockTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        if (tile.isAnimated()) {
-            tile.currentTimeProperty().addListener(currentTimeListener);
-        } else {
-            tile.timeProperty().addListener(timeListener);
-        }
+        if (!tile.isAnimated()) { tile.timeProperty().addListener(timeListener); }
     }
 
 
@@ -113,11 +112,7 @@ public class ClockTileSkin extends TileSkin {
     }
 
     @Override public void dispose() {
-        if (tile.isAnimated()) {
-            tile.currentTimeProperty().removeListener(currentTimeListener);
-        } else {
-            tile.timeProperty().removeListener(timeListener);
-        }
+        if (!tile.isAnimated()) { tile.timeProperty().removeListener(timeListener); }
         super.dispose();
     }
 

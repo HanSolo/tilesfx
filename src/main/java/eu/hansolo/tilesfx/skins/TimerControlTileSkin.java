@@ -89,7 +89,10 @@ public class TimerControlTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        currentValueListener = o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(tile.getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())));
+        currentValueListener = o -> {
+            if (tile.isRunning()) { return; } // Update time only if clock is not already running
+            updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(tile.getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())));
+        };
         timeListener         = o -> updateTime(tile.getTime());
 
         dateFormatter = DateTimeFormatter.ofPattern("EE d", tile.getLocale());
@@ -171,11 +174,7 @@ public class TimerControlTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        if (tile.isAnimated()) {
-            tile.currentTimeProperty().addListener(currentTimeListener);
-        } else {
-            tile.timeProperty().addListener(timeListener);
-        }
+        tile.timeProperty().addListener(timeListener);
     }
 
 
@@ -315,7 +314,7 @@ public class TimerControlTileSkin extends TileSkin {
             }
         }
 
-        amPmText.setText(tile.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        amPmText.setText(TIME.get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, 0.2 * size, size * 0.05);
         amPmText.setX((width - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(height * 0.5 - size * 0.1);
@@ -327,11 +326,7 @@ public class TimerControlTileSkin extends TileSkin {
     }
 
     @Override public void dispose() {
-        if (tile.isAnimated()) {
-            tile.currentTimeProperty().removeListener(currentTimeListener);
-        } else {
-            tile.timeProperty().removeListener(timeListener);
-        }
+        tile.timeProperty().removeListener(timeListener);
         super.dispose();
     }
 
@@ -408,7 +403,7 @@ public class TimerControlTileSkin extends TileSkin {
         hour.setArcHeight(clockSize * 0.015);
         hour.setCache(true);
         hour.setCacheHint(CacheHint.ROTATE);
-        hour.relocate(contentCenterX, contentCenterY - hour.getHeight());
+        hour.relocate(centerX - hour.getWidth() * 0.5, centerY - hour.getHeight());
 
         minute.setFill(tile.getMinuteColor());
         minute.setCache(false);
@@ -418,7 +413,7 @@ public class TimerControlTileSkin extends TileSkin {
         minute.setArcHeight(clockSize * 0.015);
         minute.setCache(true);
         minute.setCacheHint(CacheHint.ROTATE);
-        minute.relocate(contentCenterX, contentCenterY - minute.getHeight());
+        minute.relocate(centerX - minute.getWidth() * 0.5, centerY - minute.getHeight());
 
         second.setFill(tile.getSecondColor());
         second.setCache(false);
@@ -428,7 +423,7 @@ public class TimerControlTileSkin extends TileSkin {
         second.setArcHeight(clockSize * 0.015);
         second.setCache(true);
         second.setCacheHint(CacheHint.ROTATE);
-        second.relocate(contentCenterX, contentCenterY - second.getHeight());
+        second.relocate(centerX - second.getWidth() * 0.5, centerY - second.getHeight());
 
         knob.setFill(tile.getKnobColor());
         knob.setRadius(clockSize * 0.0225);
@@ -456,9 +451,7 @@ public class TimerControlTileSkin extends TileSkin {
         minuteTickMarks.setStroke(tile.getMinuteColor());
         hourTickMarks.setStroke(tile.getHourColor());
 
-        ZonedDateTime time = tile.getTime();
-
-        updateTime(time);
+        updateTime(tile.getTime());
 
         resizeDynamicText();
 

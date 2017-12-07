@@ -4665,12 +4665,11 @@ public class Tile extends Control {
     }
 
     private void tick() { Platform.runLater(() -> {
-        if (isAnimated()) return;
         ZonedDateTime oldTime = getTime();
         setTime(getTime().plus(java.time.Duration.ofMillis(updateInterval)));
         ZonedDateTime now = time.get();
         if (isAlarmsEnabled()) checkAlarms(now);
-        if (getCheckSectionsForValue()) {
+        if (getCheckSectionsForValue() && timeSections != null) {
             for (TimeSection timeSection : timeSections) { timeSection.checkForTimeAndDate(now); }
         }
 

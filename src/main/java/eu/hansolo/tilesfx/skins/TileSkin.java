@@ -38,7 +38,6 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -84,7 +83,6 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              InvalidationListener     sizeListener;
     protected              TileEventListener        tileEventListener;
     protected              InvalidationListener     currentValueListener;
-    protected              InvalidationListener     currentTimeListener;
     protected              InvalidationListener     timeListener;
     protected              Tile                     tile;
     private                NotifyRegion             notifyRegion;

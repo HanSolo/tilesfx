@@ -48,6 +48,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -85,6 +87,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -215,10 +218,12 @@ public class Tile extends Control {
     private        final TileEvent   FLIP_START_EVENT      = new TileEvent(EventType.FLIP_START);
     
     // Tile events
-    private List<TileEventListener>  tileEventListeners    = new CopyOnWriteArrayList<>();
-    private List<AlarmEventListener> alarmEventListeners   = new CopyOnWriteArrayList<>();
-    private List<TimeEventListener>  timeEventListeners    = new CopyOnWriteArrayList<>();
+    private              Queue<TileEvent>         tileEventQueue      = new LinkedBlockingQueue<>();
+    private              List<TileEventListener>  tileEventListeners  = new CopyOnWriteArrayList<>();
+    private              List<AlarmEventListener> alarmEventListeners = new CopyOnWriteArrayList<>();
+    private              List<TimeEventListener>  timeEventListeners  = new CopyOnWriteArrayList<>();
 
+    BooleanBinding       showing                                      = Bindings.selectBoolean(sceneProperty(), "window", "showing");
 
     // Data related
     private              DoubleProperty                                value;
@@ -694,6 +699,14 @@ public class Tile extends Control {
                 fireTileEvent(MIN_VALUE_UNDERRUN);
             } else {
                 fireTileEvent(VALUE_IN_RANGE);
+            }
+        });
+        showing.addListener((o, ov, nv) -> {
+            if (nv) {
+                while(tileEventQueue.peek() != null) {
+                    TileEvent event = tileEventQueue.poll();
+                    for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }
+                }
             }
         });
     }
@@ -4728,7 +4741,11 @@ public class Tile extends Control {
     public void removeAllTileEventListeners() { tileEventListeners.clear(); }
 
     public void fireTileEvent(final TileEvent EVENT) {
-        for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(EVENT); }
+        if (showing.get()) {
+            for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(EVENT); }
+        } else {
+            tileEventQueue.add(EVENT);
+        }
     }
 
     

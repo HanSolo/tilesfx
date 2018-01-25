@@ -850,6 +850,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B showNotifier(final boolean SHOW) {
+        properties.put("showNotifier", new SimpleBooleanProperty(SHOW));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -1433,6 +1438,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 CONTROL.setNotificationBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("notificationForegroundColor".equals(key)) {
                 CONTROL.setNotificationForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("showNotifier".equals(key)) {
+                CONTROL.showNotifier(((BooleanProperty) properties.get(key)).get());
             }
         }
         properties.clear();

@@ -152,8 +152,11 @@ public class CustomTileSkin extends TileSkin {
 		                    graphic.setScaleY(scale);
 	                    }
                     } else if (tile.getGraphic() instanceof ImageView) {
-                        ((ImageView) graphic).setFitWidth(containerWidth);
-                        ((ImageView) graphic).setFitHeight(containerHeight);
+                        ImageView imgView = (ImageView) graphic;
+                        imgView.setPreserveRatio(true);
+                        imgView.setFitHeight(containerHeight);
+                        //((ImageView) graphic).setFitWidth(containerWidth);
+                        //((ImageView) graphic).setFitHeight(containerHeight);
                     }
                 }
             }

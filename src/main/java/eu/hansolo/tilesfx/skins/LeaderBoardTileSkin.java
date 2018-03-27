@@ -24,6 +24,8 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
+import javafx.collections.WeakListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -119,6 +121,27 @@ public class LeaderBoardTileSkin extends TileSkin {
             handlerMap.put(item, clickHandler);
             item.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         });
+
+        tile.getLeaderBoardItems().addListener(new WeakListChangeListener<>((ListChangeListener<LeaderBoardItem>) change -> {
+            while (change.next()) {
+                if (change.wasPermutated()) {
+                } else if (change.wasUpdated()) {
+                } else if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(addedItem -> {
+                        addedItem.setFormatString(formatString);
+                        addedItem.addChartDataEventListener(updateHandler);
+                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
+                        handlerMap.put(addedItem, clickHandler);
+                        addedItem.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+                    });
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().forEach(removedItem -> {
+                        removedItem.removeChartDataEventListener(updateHandler);
+                        removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
+                    });
+                }
+            }
+        }));
     }
 
     private void sortItems() {

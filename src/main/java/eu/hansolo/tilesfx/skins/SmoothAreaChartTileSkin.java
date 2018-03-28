@@ -48,6 +48,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -368,7 +369,11 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
-        titleText.setFont(Fonts.latoRegular(fontSize));
+        boolean customFontEnabled = tile.isCustomFontEnabled();
+        Font    customFont        = tile.getCustomFont();
+        Font    font              = (customFontEnabled && customFont != null) ? Font.font(customFont.getFamily(), fontSize) : Fonts.latoRegular(fontSize);
+
+        titleText.setFont(font);
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
 
         switch(tile.getTitleAlignment()) {

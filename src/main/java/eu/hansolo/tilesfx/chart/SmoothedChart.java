@@ -154,6 +154,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
                         fillPath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
                         strokePath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
                         strokePaths.add(strokePath);
+
+                        series.getData().forEach(data -> data.YValueProperty().addListener(o -> layoutPlotChildren()));
                     });
                 } else if (change.wasRemoved()) {
                     change.getRemoved().forEach(removedItem -> {

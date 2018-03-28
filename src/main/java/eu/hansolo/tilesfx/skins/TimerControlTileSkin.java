@@ -38,6 +38,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
@@ -336,7 +337,11 @@ public class TimerControlTileSkin extends TileSkin {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
-        titleText.setFont(Fonts.latoRegular(fontSize));
+        boolean customFontEnabled = tile.isCustomFontEnabled();
+        Font    customFont        = tile.getCustomFont();
+        Font    font              = (customFontEnabled && customFont != null) ? Font.font(customFont.getFamily(), fontSize) : Fonts.latoRegular(fontSize);
+
+        titleText.setFont(font);
         titleText.setText(tile.getTitle());
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         switch(tile.getTitleAlignment()) {
@@ -348,23 +353,22 @@ public class TimerControlTileSkin extends TileSkin {
         titleText.setY(size * 0.05);
 
         maxWidth = width - size * 0.8;
-        fontSize = size * textSize.factor;
-        amPmText.setFont(Fonts.latoRegular(fontSize));
+        amPmText.setFont(font);
         amPmText.setText(tile.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, maxWidth, fontSize);
         amPmText.setX((width - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(height * 0.5 - size * 0.1);
 
         maxWidth = width - size * 0.4;
-        dateText.setFont(Fonts.latoRegular(fontSize));
+        dateText.setFont(font);
         if (dateText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(dateText, maxWidth, fontSize); }
         dateText.setX((width - dateText.getLayoutBounds().getWidth()) * 0.5);
         dateText.setY(height * 0.5 + size * 0.15);
 
         maxWidth = width - size * 0.1;
-        fontSize = size * textSize.factor;
+
         text.setText(tile.getText());
-        text.setFont(Fonts.latoRegular(fontSize));
+        text.setFont(font);
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         switch(tile.getTextAlignment()) {
             default    :

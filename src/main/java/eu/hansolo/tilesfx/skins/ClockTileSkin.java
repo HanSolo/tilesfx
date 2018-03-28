@@ -21,6 +21,7 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.VPos;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.time.Instant;
@@ -147,7 +148,11 @@ public class ClockTileSkin extends TileSkin {
         double maxWidth = size * 0.9;
         double fontSize = size * textSize.factor;
 
-        titleText.setFont(Fonts.latoRegular(fontSize));
+        boolean customFontEnabled = tile.isCustomFontEnabled();
+        Font    customFont        = tile.getCustomFont();
+        Font    font              = (customFontEnabled && customFont != null) ? Font.font(customFont.getFamily(), fontSize) : Fonts.latoRegular(fontSize);
+
+        titleText.setFont(font);
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         switch(tile.getTitleAlignment()) {
             default    :
@@ -157,9 +162,8 @@ public class ClockTileSkin extends TileSkin {
         }
 
         maxWidth = size * 0.9;
-        fontSize = size * textSize.factor;
         text.setText(tile.getText());
-        text.setFont(Fonts.latoRegular(fontSize));
+        text.setFont(font);
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         switch(tile.getTextAlignment()) {
             default    :

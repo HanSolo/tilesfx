@@ -565,7 +565,12 @@ public class GaugeSparkLineTileSkin extends TileSkin {
 
         maxWidth = width - size * 0.25;
         fontSize = size * 0.06;
-        text.setFont(Fonts.latoRegular(fontSize));
+
+        boolean customFontEnabled = tile.isCustomFontEnabled();
+        Font    customFont        = tile.getCustomFont();
+        Font    font              = (customFontEnabled && customFont != null) ? Font.font(customFont.getFamily(), fontSize) : Fonts.latoRegular(fontSize);
+
+        text.setFont(font);
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.relocate(width - size * 0.05 - text.getLayoutBounds().getWidth(), height - size * 0.1);
 
@@ -579,7 +584,11 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
 
-        titleText.setFont(Fonts.latoRegular(fontSize));
+        boolean customFontEnabled = tile.isCustomFontEnabled();
+        Font    customFont        = tile.getCustomFont();
+        Font    font              = (customFontEnabled && customFont != null) ? Font.font(customFont.getFamily(), fontSize) : Fonts.latoRegular(fontSize);
+
+        titleText.setFont(font);
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         switch(tile.getTitleAlignment()) {
             default    :

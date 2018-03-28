@@ -24,6 +24,7 @@ import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 
@@ -94,10 +95,14 @@ public class CustomTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
-        double maxWidth = width - size * 0.1;
-        double fontSize = size * textSize.factor;
+        double  maxWidth = width - size * 0.1;
+        double  fontSize = size * textSize.factor;
 
-        titleText.setFont(Fonts.latoRegular(fontSize));
+        boolean customFontEnabled = tile.isCustomFontEnabled();
+        Font    customFont        = tile.getCustomFont();
+        Font    font              = (customFontEnabled && customFont != null) ? Font.font(customFont.getFamily(), fontSize) : Fonts.latoRegular(fontSize);
+
+        titleText.setFont(font);
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         switch(tile.getTitleAlignment()) {
             default    :
@@ -106,7 +111,7 @@ public class CustomTileSkin extends TileSkin {
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
 
-        text.setFont(Fonts.latoRegular(fontSize));
+        text.setFont(font);
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         switch(tile.getTextAlignment()) {
             default    :

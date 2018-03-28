@@ -291,7 +291,7 @@ public class Demo extends Application {
                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                    .title("SmoothedChart Tile")
                                    .chartType(ChartType.AREA)
-                                   .animated(true)
+                                   //.animated(true)
                                    .smoothing(true)
                                    .tooltipTimeout(1000)
                                    .tilesFxSeries(new TilesFXSeries<>(series1,
@@ -306,7 +306,7 @@ public class Demo extends Application {
                                    .skinType(SkinType.SMOOTHED_CHART)
                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                    .title("SmoothedChart Tile")
-                                   .animated(true)
+                                   //.animated(true)
                                    .smoothing(false)
                                    .series(series2, series3)
                                    .build();

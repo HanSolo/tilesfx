@@ -74,7 +74,7 @@ public class Demo extends Application {
     private static final    Random RND = new Random();
     private static final    double TILE_WIDTH  = 150;
     private static final    double TILE_HEIGHT = 150;
-    private static          int    noOfNodes = 0;
+    private                 int    noOfNodes = 0;
 
     private BarChartItem    barChartItem1;
     private BarChartItem    barChartItem2;
@@ -799,12 +799,18 @@ public class Demo extends Application {
     }
 
     @Override public void stop() {
+
+        // useful for jpro
+        timer.stop();
+        clockTile.setRunning(false);
+        timerControlTile.setRunning(false);
+
         System.exit(0);
     }
 
 
     // ******************** Misc **********************************************
-    private static void calcNoOfNodes(Node node) {
+    private void calcNoOfNodes(Node node) {
         if (node instanceof Parent) {
             if (((Parent) node).getChildrenUnmodifiable().size() != 0) {
                 ObservableList<Node> tempChildren = ((Parent) node).getChildrenUnmodifiable();

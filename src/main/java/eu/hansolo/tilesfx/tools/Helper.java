@@ -62,9 +62,7 @@ public class Helper {
     private static final String                         HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
     private static final String                         LORES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/lowres.properties";
     private static       Properties                     hiresCountryProperties;
-    private static       Map<String, List<CountryPath>> hiresCountryPaths;
     private static       Properties                     loresCountryProperties;
-    private static       Map<String, List<CountryPath>> loresCountryPaths;
 
     public static final double   MAP_WIDTH         = 1009.1149817705154 - 1.154000163078308;
     public static final double   MAP_HEIGHT        = 665.2420043945312;
@@ -474,28 +472,25 @@ public class Helper {
 
     public static final Map<String, List<CountryPath>> getHiresCountryPaths() {
         if (null == hiresCountryProperties) { hiresCountryProperties = readProperties(HIRES_COUNTRY_PROPERTIES); }
-        if (null == hiresCountryPaths) {
-            hiresCountryPaths = new ConcurrentHashMap<>();
-            hiresCountryProperties.forEach((key, value) -> {
-                String            name     = key.toString();
-                List<CountryPath> pathList = new ArrayList<>();
-                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
-                hiresCountryPaths.put(name, pathList);
-            });
-        }
+
+        Map<String, List<CountryPath>> hiresCountryPaths = new ConcurrentHashMap<>();
+        hiresCountryProperties.forEach((key, value) -> {
+            String            name     = key.toString();
+            List<CountryPath> pathList = new ArrayList<>();
+            for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+            hiresCountryPaths.put(name, pathList);
+        });
         return hiresCountryPaths;
     }
     public static final Map<String, List<CountryPath>> getLoresCountryPaths() {
         if (null == loresCountryProperties) { loresCountryProperties = readProperties(LORES_COUNTRY_PROPERTIES); }
-        if (null == loresCountryPaths) {
-            loresCountryPaths = new ConcurrentHashMap<>();
-            loresCountryProperties.forEach((key, value) -> {
-                String            name     = key.toString();
-                List<CountryPath> pathList = new ArrayList<>();
-                for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
-                loresCountryPaths.put(name, pathList);
-            });
-        }
+        Map<String, List<CountryPath>> loresCountryPaths = new ConcurrentHashMap<>();
+        loresCountryProperties.forEach((key, value) -> {
+           String            name     = key.toString();
+           List<CountryPath> pathList = new ArrayList<>();
+           for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+           loresCountryPaths.put(name, pathList);
+        });
         return loresCountryPaths;
     }
     private static final Properties readProperties(final String FILE_NAME) {

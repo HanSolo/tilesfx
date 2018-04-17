@@ -251,15 +251,16 @@ public class Helper {
     public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
         final String FONT_NAME          = TEXT.getFont().getName();
         double       adjustableFontSize = FONT_SIZE;
-        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && adjustableFontSize > 0) {
-            adjustableFontSize -= 0.005;
+
+        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > 0) {
+            adjustableFontSize -= 0.05;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
     }
     public static final void adjustTextSize(final Label TEXT, final double MAX_WIDTH, double fontSize) {
         final String FONT_NAME = TEXT.getFont().getName();
-        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && fontSize > 0) {
-            fontSize -= 0.005;
+        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && fontSize > 0) {
+            fontSize -= 0.05;
             TEXT.setFont(new Font(FONT_NAME, fontSize));
         }
     }

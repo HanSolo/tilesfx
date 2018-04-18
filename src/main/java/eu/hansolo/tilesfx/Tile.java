@@ -86,6 +86,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -223,7 +224,7 @@ public class Tile extends Control {
     private              List<AlarmEventListener> alarmEventListeners = new CopyOnWriteArrayList<>();
     private              List<TimeEventListener>  timeEventListeners  = new CopyOnWriteArrayList<>();
 
-    BooleanBinding       showing                                      = Bindings.selectBoolean(sceneProperty(), "window", "showing");
+    BooleanBinding       showing;
 
     // Data related
     private              DoubleProperty                                value;
@@ -701,13 +702,20 @@ public class Tile extends Control {
                 fireTileEvent(VALUE_IN_RANGE);
             }
         });
-        showing.addListener((o, ov, nv) -> {
-            if (nv) {
-                while(tileEventQueue.peek() != null) {
-                    TileEvent event = tileEventQueue.poll();
-                    for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }
-                }
-            }
+        sceneProperty().addListener((o1, ov1, nv1) -> {
+            if (nv1 == null) { return; }
+            sceneProperty().get().windowProperty().addListener((o2, ov2, nv2) -> {
+                if (nv2 == null) { return; }
+                showing = Bindings.selectBoolean(sceneProperty(), "window", "showing");
+                showing.addListener((o3, ov3, nv3) -> {
+                    if (nv3) {
+                        while(tileEventQueue.peek() != null) {
+                            TileEvent event = tileEventQueue.poll();
+                            for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }
+                        }
+                    }
+                });
+            });
         });
     }
 
@@ -4741,7 +4749,7 @@ public class Tile extends Control {
     public void removeAllTileEventListeners() { tileEventListeners.clear(); }
 
     public void fireTileEvent(final TileEvent EVENT) {
-        if (showing.get()) {
+        if (null != showing && showing.get()) {
             for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(EVENT); }
         } else {
             tileEventQueue.add(EVENT);

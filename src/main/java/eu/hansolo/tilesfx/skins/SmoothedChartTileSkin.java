@@ -114,10 +114,12 @@ public class SmoothedChartTileSkin extends TileSkin {
                 case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
                 default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
             }
-            chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
-            tile.getTilesFXSeries()
-                .stream()
-                .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
+            if (chart.getData().isEmpty()) {
+                chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
+                tile.getTilesFXSeries()
+                    .stream()
+                    .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
+            }
         }
     }
 

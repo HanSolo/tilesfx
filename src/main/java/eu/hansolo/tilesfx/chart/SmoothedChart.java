@@ -16,6 +16,8 @@
 
 package eu.hansolo.tilesfx.chart;
 
+//import com.sun.javafx.charts.Legend;
+//import com.sun.javafx.charts.Legend.LegendItem;
 import eu.hansolo.tilesfx.events.SmoothedChartEvent;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Point;
@@ -483,6 +485,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         if (null != FILL)               { ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL); }
         if (null != STROKE)             { ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE); }
         if (null != SYMBOL_BACKGROUND)  { setSymbolFill(SERIES, SYMBOL_BACKGROUND); }
+        // If enabled the following line won't work in Java 9 because it makes use of com.sun packages!!!
+        //if (null != LEGEND_SYMBOL_FILL) { setLegendSymbolFill(SERIES, LEGEND_SYMBOL_FILL); }
     }
 
     public Dimension2D getSymbolSize(final Series<X, Y> SERIES) {
@@ -643,7 +647,31 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public List<StackPane> getSymbols(final Series<X, Y> SERIES) {
         return SERIES.getData().stream().map(node -> (StackPane) node.getNode()).collect(Collectors.toList());
     }
-    
+
+    /**
+     *  This method won't work in Java 9 any longer because it makes use of com.sun packages !!!
+     */
+    /*
+    public void setLegendSymbolFill(final Series<X, Y> SERIES, final Paint LEGEND_SYMBOL_FILL) {
+        if (getData().isEmpty()) { return; }
+        if (!getData().contains(SERIES)) { return; }
+
+        int seriesIndex = getData().indexOf(SERIES);
+        if (seriesIndex == -1) { return; }
+
+        Legend legend = (Legend) getLegend();
+        if (null == legend) { return; }
+
+        LegendItem item = legend.getItems().get(seriesIndex);
+        if (null == item) { return; }
+
+        Region symbol = (Region) item.getSymbol();
+        if (null == symbol) { return; }
+
+        symbol.setBackground(new Background(new BackgroundFill(LEGEND_SYMBOL_FILL, new CornerRadii(6), Insets.EMPTY)));
+    }
+    */
+
     public void dispose() {
         getData().removeListener(seriesListener);
     }

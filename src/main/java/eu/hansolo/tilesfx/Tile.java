@@ -1283,6 +1283,7 @@ public class Tile extends Control {
         if (null == averagingPeriod) {
             _averagingPeriod = Helper.clamp(0, MAX_PERIOD, PERIOD);
             getMovingAverage().setPeriod(_averagingPeriod); // MAX 1000 values
+            if (null == showing) return;
             fireTileEvent(AVERAGING_EVENT);
         } else {
             averagingPeriod.set(Helper.clamp(0, MAX_PERIOD, PERIOD));

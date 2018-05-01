@@ -702,21 +702,21 @@ public class Tile extends Control {
                 fireTileEvent(VALUE_IN_RANGE);
             }
         });
-        sceneProperty().addListener((o1, ov1, nv1) -> {
-            if (nv1 == null) { return; }
-            sceneProperty().get().windowProperty().addListener((o2, ov2, nv2) -> {
-                if (nv2 == null) { return; }
-                showing = Bindings.selectBoolean(sceneProperty(), "window", "showing");
-                showing.addListener((o3, ov3, nv3) -> {
-                    if (nv3) {
-                        while(tileEventQueue.peek() != null) {
-                            TileEvent event = tileEventQueue.poll();
-                            for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }
-                        }
-                    }
-                });
+        if (null != getScene()) {
+            setupBinding();
+        } else {
+            sceneProperty().addListener((o1, ov1, nv1) -> {
+                if (null == nv1) { return; }
+                if (null != getScene().getWindow()) {
+                    setupBinding();
+                } else {
+                    sceneProperty().get().windowProperty().addListener((o2, ov2, nv2) -> {
+                        if (null == nv2) { return; }
+                        setupBinding();
+                    });
+                }
             });
-        });
+        }
     }
 
 
@@ -4783,6 +4783,18 @@ public class Tile extends Control {
 
     public void setOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
     public void removeOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
+
+    private void setupBinding() {
+        showing = Bindings.selectBoolean(sceneProperty(), "window", "showing");
+        showing.addListener((o, ov, nv) -> {
+        if (nv) {
+            while(tileEventQueue.peek() != null) {
+                TileEvent event = tileEventQueue.poll();
+                    for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }
+                }
+            }
+        });
+    }
 
 
     // ******************** Style related *************************************

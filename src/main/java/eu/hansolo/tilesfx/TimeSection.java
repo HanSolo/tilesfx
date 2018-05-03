@@ -29,6 +29,8 @@ import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -45,26 +47,26 @@ import java.util.Set;
  * Created by hansolo on 31.01.16.
  */
 public class TimeSection implements Comparable<TimeSection> {
-    public final TimeSectionEvent ENTERED_EVENT = new TimeSectionEvent(this, null, TimeSectionEvent.TIME_SECTION_ENTERED);
-    public final TimeSectionEvent LEFT_EVENT    = new TimeSectionEvent(this, null, TimeSectionEvent.TIME_SECTION_LEFT);
-    private LocalTime                 _start;
-    private ObjectProperty<LocalTime> start;
-    private LocalTime                 _stop;
-    private ObjectProperty<LocalTime> stop;
-    private String                    _text;
-    private StringProperty            text;
-    private Image                     _icon;
-    private ObjectProperty<Image>     icon;
-    private Color                     _color;
-    private ObjectProperty<Color>     color;
-    private Color                     _highlightColor;
-    private ObjectProperty<Color>     highlightColor;
-    private Color                     _textColor;
-    private ObjectProperty<Color>     textColor;
-    private LocalTime                 checkedValue;
-    private boolean                   _active;
-    private BooleanProperty           active;
-    private Set<DayOfWeek>            days;
+    public  final TimeSectionEvent          ENTERED_EVENT = new TimeSectionEvent(this, null, TimeSectionEvent.TIME_SECTION_ENTERED);
+    public  final TimeSectionEvent          LEFT_EVENT    = new TimeSectionEvent(this, null, TimeSectionEvent.TIME_SECTION_LEFT);
+    private       LocalTime                 _start;
+    private       ObjectProperty<LocalTime> start;
+    private       LocalTime                 _stop;
+    private       ObjectProperty<LocalTime> stop;
+    private       String                    _text;
+    private       StringProperty            text;
+    private       Image                     _icon;
+    private       ObjectProperty<Image>     icon;
+    private       Color                     _color;
+    private       ObjectProperty<Color>     color;
+    private       Color                     _highlightColor;
+    private       ObjectProperty<Color>     highlightColor;
+    private       Color                     _textColor;
+    private       ObjectProperty<Color>     textColor;
+    private       LocalTime                 checkedValue;
+    private       boolean                   _active;
+    private       BooleanProperty           active;
+    private       Set<DayOfWeek>            days;
 
 
     // ******************** Constructors **************************************
@@ -74,6 +76,21 @@ public class TimeSection implements Comparable<TimeSection> {
      * to check a time against the defined range and fire events in case the
      * value enters or leaves the defined region.
      */
+    public TimeSection(final String JSON_STRING) {
+        Object     obj     = JSONValue.parse(JSON_STRING);
+        JSONObject jsonObj = (JSONObject) obj;
+        _start             = LocalTime.parse(jsonObj.getOrDefault("start", LocalTime.now()).toString());
+        _stop              = LocalTime.parse(jsonObj.getOrDefault("stop", LocalTime.now()).toString());
+        _text              = jsonObj.getOrDefault("text", "").toString();
+        _color             = Color.web(jsonObj.getOrDefault("color", "#00000000").toString());
+        _highlightColor    = Color.web(jsonObj.getOrDefault("highlightColor", "#00000000").toString());
+        _textColor         = Color.web(jsonObj.getOrDefault("textColor", "#00000000").toString());
+        _active            = Boolean.parseBoolean(jsonObj.getOrDefault("active", "false").toString());
+        _icon              = null;
+        checkedValue       = LocalTime.MIN;
+        days               = new HashSet<>(8);
+        days.addAll(Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
+    }
     public TimeSection() {
         this(LocalTime.now(), LocalTime.now(), "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, false, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }
@@ -369,6 +386,22 @@ public class TimeSection implements Comparable<TimeSection> {
             .append("\"textColor\":\"").append(getTextColor().toString().substring(0,8).replace("0x", "#")).append("\"\n")
             .append("}")
             .toString();
+    }
+
+    public JSONObject toJSON() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("start", getStart().toString());
+        jsonObject.put("stop", getStop().toString());
+        jsonObject.put("text", getText());
+        jsonObject.put("color", getColor().toString().replace("0x", "#"));
+        jsonObject.put("highlightColor", getHighlightColor().toString().replace("0x", "#"));
+        jsonObject.put("textColor", getTextColor().toString().replace("0x", "#"));
+        jsonObject.put("active", isActive());
+        return jsonObject;
+    }
+
+    public String toJSONString() {
+        return toJSON().toJSONString();
     }
 
 

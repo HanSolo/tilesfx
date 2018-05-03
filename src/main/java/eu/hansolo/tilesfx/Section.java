@@ -16,10 +16,13 @@
 
 package eu.hansolo.tilesfx;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.StringPropertyBase;
@@ -29,31 +32,35 @@ import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 
 /**
  * Created by hansolo on 19.12.16.
  */
 public class Section implements Comparable<Section> {
-    public final SectionEvent ENTERED_EVENT = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_ENTERED);
-    public final SectionEvent LEFT_EVENT    = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_LEFT);
-    public final SectionEvent UPDATE_EVENT  = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_UPDATE);
-    private double                _start;
-    private DoubleProperty        start;
-    private double                _stop;
-    private DoubleProperty        stop;
-    private String                _text;
-    private StringProperty        text;
-    private Image                 _icon;
-    private ObjectProperty<Image> icon;
-    private Color                 _color;
-    private ObjectProperty<Color> color;
-    private Color                 _highlightColor;
-    private ObjectProperty<Color> highlightColor;
-    private Color                 _textColor;
-    private ObjectProperty<Color> textColor;
-    private double                checkedValue;
-    private String                styleClass;
+    public  final SectionEvent          ENTERED_EVENT = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_ENTERED);
+    public  final SectionEvent          LEFT_EVENT    = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_LEFT);
+    public  final SectionEvent          UPDATE_EVENT  = new SectionEvent(this, null, SectionEvent.TILES_FX_SECTION_UPDATE);
+    private       double                _start;
+    private       DoubleProperty        start;
+    private       double                _stop;
+    private       DoubleProperty        stop;
+    private       String                _text;
+    private       StringProperty        text;
+    private       Image                 _icon;
+    private       ObjectProperty<Image> icon;
+    private       Color                 _color;
+    private       ObjectProperty<Color> color;
+    private       Color                 _highlightColor;
+    private       ObjectProperty<Color> highlightColor;
+    private       Color                 _textColor;
+    private       ObjectProperty<Color> textColor;
+    private       boolean               _active;
+    private       BooleanProperty       active;
+    private       double                checkedValue;
+    private       String                styleClass;
 
 
     // ******************** Constructors **************************************
@@ -63,6 +70,20 @@ public class Section implements Comparable<Section> {
      * to check a value against the defined range and fire events in case the
      * value enters or leaves the defined region.
      */
+    public Section(final String JSON_STRING) {
+        Object     obj     = JSONValue.parse(JSON_STRING);
+        JSONObject jsonObj = (JSONObject) obj;
+        _start             = Double.parseDouble(jsonObj.getOrDefault("start", "-1").toString());
+        _stop              = Double.parseDouble(jsonObj.getOrDefault("stop", "-1").toString());
+        _text              = jsonObj.getOrDefault("text", "").toString();
+        _color             = Color.web(jsonObj.getOrDefault("color", "#00000000").toString());
+        _highlightColor    = Color.web(jsonObj.getOrDefault("highlightColor", "#00000000").toString());
+        _textColor         = Color.web(jsonObj.getOrDefault("textColor", "#00000000").toString());
+        _active            = Boolean.parseBoolean(jsonObj.getOrDefault("active", "false").toString());
+        _icon              = null;
+        styleClass         = "";
+        checkedValue       = -Double.MAX_VALUE;
+    }
     public Section() {
         this(-1, -1, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, "");
     }
@@ -98,6 +119,7 @@ public class Section implements Comparable<Section> {
         _color          = COLOR;
         _highlightColor = HIGHLIGHT_COLOR;
         _textColor      = TEXT_COLOR;
+        _active         = true;
         checkedValue    = -Double.MAX_VALUE;
         styleClass      = STYLE_CLASS;
     }
@@ -305,6 +327,24 @@ public class Section implements Comparable<Section> {
         return textColor;
     }
 
+    public boolean isActive() { return null == active ? _active : active.get(); }
+    public void setActive(final boolean ACTIVE) {
+        if (null == active) {
+            _active = ACTIVE;
+        } else {
+            active.set(ACTIVE);
+        }
+    }
+    public ReadOnlyBooleanProperty activeProperty() {
+        if (null == active) {
+            active = new BooleanPropertyBase(_active) {
+                @Override public Object getBean() { return Section.this; }
+                @Override public String getName() { return "active"; }
+            };
+        }
+        return active;
+    }
+
     /**
      * Returns the style class that can be used to colorize the section.
      * This is not implemented in the current available skins.
@@ -368,6 +408,22 @@ public class Section implements Comparable<Section> {
             .append("\"textColor\":\"").append(getTextColor().toString().substring(0,8).replace("0x", "#")).append("\"\n")
             .append("}")
             .toString();
+    }
+
+    public JSONObject toJSON() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("start", getStart());
+        jsonObject.put("stop", getStop());
+        jsonObject.put("text", getText());
+        jsonObject.put("color", getColor().toString().replace("0x", "#"));
+        jsonObject.put("highlightColor", getHighlightColor().toString().replace("0x", "#"));
+        jsonObject.put("textColor", getTextColor().toString().replace("0x", "#"));
+        jsonObject.put("active", isActive());
+        return jsonObject;
+    }
+
+    public String toJSONString() {
+        return toJSON().toJSONString();
     }
 
 

@@ -17,8 +17,10 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.TimeSection.TimeSectionEvent;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -82,6 +84,11 @@ public class TimeSectionBuilder<B extends TimeSectionBuilder<B>> {
         return (B)this;
     }
 
+    public final B active(final boolean ACTIVE) {
+        properties.put("active", new SimpleBooleanProperty(ACTIVE));
+        return (B)this;
+    }
+
     public final B days(final DayOfWeek... DAYS) {
         properties.put("daysArray", new SimpleObjectProperty(DAYS));
         return (B)this;
@@ -119,6 +126,8 @@ public class TimeSectionBuilder<B extends TimeSectionBuilder<B>> {
                 SECTION.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("textColor".equals(key)) {
                 SECTION.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if("active".equals(key)) {
+                SECTION.setActive(((BooleanProperty) properties.get(key)).get());
             } else if ("onTimeSectionEntered".equals(key)) {
                 SECTION.setOnTimeSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("onTimeSectionLeft".equals(key)) {

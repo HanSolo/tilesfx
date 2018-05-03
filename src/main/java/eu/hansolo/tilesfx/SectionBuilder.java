@@ -17,9 +17,11 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Section.SectionEvent;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -82,6 +84,11 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
         return (B)this;
     }
 
+    public final B active(final boolean ACTIVE) {
+        properties.put("active", new SimpleBooleanProperty(ACTIVE));
+        return (B)this;
+    }
+
     public final B styleClass(final String STYLE_CLASS) {
         properties.put("styleClass", new SimpleStringProperty(STYLE_CLASS));
         return (B)this;
@@ -114,6 +121,8 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
                 SECTION.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("textColor".equals(key)) {
                 SECTION.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if("active".equals(key)) {
+                SECTION.setActive(((BooleanProperty) properties.get(key)).get());
             } else if ("onSectionEntered".equals(key)) {
                 SECTION.setOnSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("onSectionLeft".equals(key)) {

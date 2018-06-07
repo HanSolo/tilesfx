@@ -224,7 +224,7 @@ public class Tile extends Control {
     private              List<AlarmEventListener> alarmEventListeners = new CopyOnWriteArrayList<>();
     private              List<TimeEventListener>  timeEventListeners  = new CopyOnWriteArrayList<>();
 
-    BooleanBinding       showing;
+    private              BooleanBinding                                showing;
 
     // Data related
     private              DoubleProperty                                value;

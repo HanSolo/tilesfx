@@ -67,4 +67,12 @@ public class CtxBounds {
         width  = WIDTH;
         height = HEIGHT;
     }
+
+    @Override public String toString() {
+        return new StringBuilder().append("[x:").append(getX()).append(", ")
+                                  .append("y:").append(getY()).append(", ")
+                                  .append("w:").append(getWidth()).append(", ")
+                                  .append("h:").append(getHeight()).append("]")
+                                  .toString();
+    }
 }

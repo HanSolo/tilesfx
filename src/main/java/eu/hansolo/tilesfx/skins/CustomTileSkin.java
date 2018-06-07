@@ -144,14 +144,17 @@ public class CustomTileSkin extends TileSkin {
                 if (null != tile) {
                     Node graphic = tile.getGraphic();
                     if (tile.getGraphic() instanceof Shape) {
-                        double width   = graphic.getBoundsInLocal().getWidth();
-                        double height  = graphic.getBoundsInLocal().getHeight();
+                        double graphicWidth  = graphic.getBoundsInLocal().getWidth();
+                        double graphicHeight = graphic.getBoundsInLocal().getHeight();
 
-	                    if (width > containerWidth || height > containerHeight) {
-		                    double scale;
-		                    if (width - containerWidth > height - containerHeight) {
-			                    scale = containerWidth / width;
-		                    } else scale = containerHeight / height;
+	                    if (graphicWidth > containerWidth || graphicHeight > containerHeight) {
+		                    double scale = 1;
+
+		                    if (graphicWidth - containerWidth > graphicHeight - containerHeight) {
+			                    scale = containerWidth / graphicWidth;
+		                    } else {
+		                        scale = containerHeight / graphicHeight;
+                            }
 
 		                    graphic.setScaleX(scale);
 		                    graphic.setScaleY(scale);
@@ -159,6 +162,7 @@ public class CustomTileSkin extends TileSkin {
                     } else if (tile.getGraphic() instanceof ImageView) {
                         ImageView imgView = (ImageView) graphic;
                         imgView.setPreserveRatio(true);
+                        imgView.setFitWidth(containerWidth);
                         imgView.setFitHeight(containerHeight);
                         //((ImageView) graphic).setFitWidth(containerWidth);
                         //((ImageView) graphic).setFitHeight(containerHeight);

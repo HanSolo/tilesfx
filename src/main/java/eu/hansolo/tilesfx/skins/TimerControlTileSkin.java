@@ -17,7 +17,6 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.TimeSection;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -244,12 +243,12 @@ public class TimerControlTileSkin extends TileSkin {
 
     private void drawTimeSections() {
         if (sectionMap.isEmpty()) return;
-        ZonedDateTime     time              = tile.getTime();
-        DayOfWeek         day               = time.getDayOfWeek();
-        boolean           isAM              = time.get(ChronoField.AMPM_OF_DAY) == 0;
-        double            offset            = 90;
-        double            angleStep         = 360.0 / 60.0;
-        boolean           highlightSections = tile.isHighlightSections();
+        ZonedDateTime time              = tile.getTime();
+        DayOfWeek     day               = time.getDayOfWeek();
+        boolean       isAM              = time.get(ChronoField.AMPM_OF_DAY) == 0;
+        double        offset            = 90;
+        double        angleStep         = 360.0 / 60.0;
+        boolean       highlightSections = tile.isHighlightSections();
         for (TimeSection section : sectionMap.keySet()) {
             LocalTime   start     = section.getStart();
             LocalTime   stop      = section.getStop();
@@ -313,6 +312,7 @@ public class TimerControlTileSkin extends TileSkin {
                     sectionMap.get(section).setStroke(section.getColor());
                 }
             }
+            drawTimeSections();
         }
 
         amPmText.setText(TIME.get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");

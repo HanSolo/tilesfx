@@ -2190,7 +2190,6 @@ public class Tile extends Control {
     }
 
     public Color getActiveColor() { return null == activeColor ? _activeColor : activeColor.get(); }
-
     public void setActiveColor(final Color COLOR) {
         if (null == activeColor) {
             _activeColor = COLOR;

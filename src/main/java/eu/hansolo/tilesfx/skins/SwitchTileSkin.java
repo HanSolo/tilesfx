@@ -200,7 +200,7 @@ public class SwitchTileSkin extends TileSkin {
         switchBackground.relocate((width - switchBackground.getWidth()) * 0.5, tile.getDescription().isEmpty() ? (height - switchBackground.getHeight()) * 0.5 : height - size * 0.39);
 
         thumb.setRadius(size * 0.09);
-        thumb.setCenterX(tile.isActive() ? width * 0.6125 : width * 0.3875);
+        //thumb.setCenterX(tile.isActive() ? width * 0.6125 : width * 0.3875);
         thumb.setCenterX(tile.isActive() ? switchBackground.getLayoutX() + switchBackground.getWidth() - size * 0.1 : switchBackground.getLayoutX() + size * 0.1);
         thumb.setCenterY(tile.getDescription().isEmpty() ? height * 0.5 : height - size * 0.29);
     }

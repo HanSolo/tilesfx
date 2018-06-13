@@ -292,7 +292,7 @@ public class Switch extends Region {
             pane.setPrefSize(width, height);
             pane.relocate((getWidth() - width) * 0.5, (getHeight() - height) * 0.5);
 
-            shadow.setRadius(size * 0.012);
+            shadow.setRadius(width * 0.012);
 
             switchBorder.setWidth(width);
             switchBorder.setHeight(height);

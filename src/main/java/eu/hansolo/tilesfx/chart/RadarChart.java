@@ -908,8 +908,9 @@ public class RadarChart extends Region {
         overlayCtx.setFont(Fonts.latoRegular(0.04 * size));
         overlayCtx.setTextAlign(TextAlignment.CENTER);
         overlayCtx.setTextBaseline(VPos.CENTER);
-        overlayCtx.setFill(getChartForegroundColor());
+        if (NO_OF_SECTORS == 0) { overlayCtx.setFill(getChartForegroundColor()); }
         for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
+            overlayCtx.setFill(data.get(i).getTextColor());
             overlayCtx.fillText(data.get(i).getName(), CENTER_X, size * 0.02);
             overlayCtx.translate(CENTER_X, CENTER_Y);
             overlayCtx.rotate(angleStep);

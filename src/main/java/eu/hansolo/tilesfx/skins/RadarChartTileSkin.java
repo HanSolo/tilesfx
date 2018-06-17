@@ -180,7 +180,7 @@ public class RadarChartTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
         radarChart.setGridColor(tile.getForegroundColor());
-        radarChart.setChartTextColor(tile.getTextColor());
+        radarChart.setChartTextColor(tile.getForegroundColor());
         radarChart.setThresholdColor(tile.getThresholdColor());
         radarChart.setGradientStops(tile.getGradientStops());
         radarChart.setGridColor(tile.getChartGridColor());

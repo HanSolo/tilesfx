@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 by Gerrit Grunwald
+ * Copyright (c) 2018 by Gerrit Grunwald
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,12 @@ import javafx.event.EventTarget;
 import javafx.event.EventType;
 
 
-/**
- * Created by hansolo on 26.12.16.
- */
-public class SwitchEvent extends Event {
-    public static final EventType<SwitchEvent> SWITCH_PRESSED  = new EventType<>(ANY, "SWITCH_PRESSED");
-    public static final EventType<SwitchEvent> SWITCH_RELEASED = new EventType<>(ANY, "SWITCH_RELEASED");
+public class IndicatorEvent extends Event {
+    public static final EventType<IndicatorEvent> INDICATOR_ON  = new EventType<>(ANY, "INDICATOR_ON");
+    public static final EventType<IndicatorEvent> INDICATOR_OFF = new EventType<>(ANY, "INDICATOR_OFF");
 
 
     // ******************** Constructors **************************************
-    public SwitchEvent(final EventType<SwitchEvent> TYPE) { super(TYPE); }
-    public SwitchEvent(final Object SOURCE, final EventTarget TARGET, EventType<SwitchEvent> TYPE) { super(SOURCE, TARGET, TYPE); }
+    public IndicatorEvent(final EventType<IndicatorEvent> TYPE) { super(TYPE); }
+    public IndicatorEvent(final Object SOURCE, final EventTarget TARGET, EventType<IndicatorEvent> TYPE) { super(SOURCE, TARGET, TYPE); }
 }

@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.addons;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.IndicatorEvent;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
@@ -38,6 +39,8 @@ import javafx.scene.shape.StrokeType;
  */
 @DefaultProperty("children")
 public class Indicator extends Region {
+    private static final IndicatorEvent        INDICATOR_ON     = new IndicatorEvent(IndicatorEvent.INDICATOR_ON);
+    private static final IndicatorEvent        INDICATOR_OFF    = new IndicatorEvent(IndicatorEvent.INDICATOR_OFF);
     private static final double                PREFERRED_WIDTH  = 64;
     private static final double                PREFERRED_HEIGHT = 64;
     private static final double                MINIMUM_WIDTH    = 16;
@@ -153,6 +156,7 @@ public class Indicator extends Region {
     public void setOn(final boolean ON) {
         if (null == on) {
             _on = ON;
+            fireEvent(_on ? INDICATOR_ON : INDICATOR_OFF);
             redraw();
         } else {
             on.set(ON);
@@ -161,6 +165,7 @@ public class Indicator extends Region {
     public BooleanProperty onProperty() {
         if (null == on) {
             on = new BooleanPropertyBase(_on) {
+                @Override protected void invalidated() { fireEvent(get() ? INDICATOR_ON : INDICATOR_OFF); }
                 @Override public Object getBean() { return Indicator.this; }
                 @Override public String getName() { return "on"; }
             };

@@ -54,8 +54,10 @@ public class Indicator extends Region {
     private              Circle                dot;
     private              Color                 _ringColor;
     private              ObjectProperty<Color> ringColor;
-    private              Color                 _dotColor;
-    private              ObjectProperty<Color> dotColor;
+    private              Color                 _dotOnColor;
+    private              ObjectProperty<Color> dotOnColor;
+    private              Color                 _dotOffColor;
+    private              ObjectProperty<Color> dotOffColor;
     private              boolean               _on;
     private              BooleanProperty       on;
     private              Pane                  pane;
@@ -63,16 +65,20 @@ public class Indicator extends Region {
 
     // ******************** Constructors **************************************
     public Indicator() {
-        this(Tile.FOREGROUND, Tile.RED);
+        this(Tile.FOREGROUND, Tile.BLUE, Color.TRANSPARENT);
     }
-    public Indicator(final Color DOT_COLOR) {
-        this(Tile.FOREGROUND, DOT_COLOR);
+    public Indicator(final Color DOT_ON_COLOR) {
+        this(Tile.FOREGROUND, DOT_ON_COLOR, Color.TRANSPARENT);
     }
-    public Indicator(final Color RING_COLOR, final Color DOT_COLOR) {
+    public Indicator(final Color DOT_ON_COLOR, final Color DOT_OFF_COLOR) {
+        this(Tile.FOREGROUND, DOT_ON_COLOR, DOT_OFF_COLOR);
+    }
+    public Indicator(final Color RING_COLOR, final Color DOT_ON_COLOR, final Color DOT_OFF_COLOR) {
         getStylesheets().add(Indicator.class.getResource("indicator.css").toExternalForm());
-        _ringColor = RING_COLOR;
-        _dotColor  = DOT_COLOR;
-        _on        = false;
+        _ringColor   = RING_COLOR;
+        _dotOnColor  = DOT_ON_COLOR;
+        _dotOffColor = DOT_OFF_COLOR;
+        _on          = false;
         initGraphics();
         registerListeners();
     }
@@ -98,7 +104,7 @@ public class Indicator extends Region {
         ring.setFill(Color.TRANSPARENT);
 
         dot = new Circle(PREFERRED_WIDTH * 0.3125);
-        dot.setFill(getDotColor());
+        dot.setFill(getDotOnColor());
 
         pane = new Pane(ring, dot);
 
@@ -132,24 +138,44 @@ public class Indicator extends Region {
         return ringColor;
     }
     
-    public Color getDotColor() { return null == dotColor ? _dotColor : dotColor.get(); }
-    public void setDotColor(final Color COLOR) {
-        if (null == dotColor) {
-            _dotColor = COLOR;
+    public Color getDotOnColor() { return null == dotOnColor ? _dotOnColor : dotOnColor.get(); }
+    public void setDotOnColor(final Color COLOR) {
+        if (null == dotOnColor) {
+            _dotOnColor = COLOR;
             redraw();
         } else {
-            dotColor.set(COLOR);
+            dotOnColor.set(COLOR);
         }
     }
-    public ObjectProperty<Color> dotColorProperty() {
-        if (null == dotColor) {
-            dotColor = new ObjectPropertyBase<Color>(_dotColor) {
+    public ObjectProperty<Color> dotOnColorProperty() {
+        if (null == dotOnColor) {
+            dotOnColor = new ObjectPropertyBase<Color>(_dotOnColor) {
                 @Override public Object getBean() { return Indicator.this; }
-                @Override public String getName() { return "dotColor"; }
+                @Override public String getName() { return "dotOnColor"; }
             };
-            _dotColor = null;
+            _dotOnColor = null;
         }
-        return dotColor;
+        return dotOnColor;
+    }
+
+    public Color getDotOffColor() { return null == dotOffColor ? _dotOffColor : dotOffColor.get(); }
+    public void setDotOffColor(final Color COLOR) {
+        if (null == dotOffColor) {
+            _dotOffColor = COLOR;
+            redraw();
+        } else {
+            dotOffColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> dotOffColorProperty() {
+        if (null == dotOffColor) {
+            dotOffColor = new ObjectPropertyBase<Color>(_dotOffColor) {
+                @Override public Object getBean() { return Indicator.this; }
+                @Override public String getName() { return "dotOffColor"; }
+            };
+            _dotOffColor = null;
+        }
+        return dotOffColor;
     }
 
     public boolean isOn() { return null == on ? _on : on.get(); }
@@ -217,6 +243,6 @@ public class Indicator extends Region {
 
     private void redraw() {
         ring.setStroke(getRingColor());
-        dot.setFill(isOn() ? getDotColor() : Color.TRANSPARENT);
+        dot.setFill(isOn() ? getDotOnColor() : getDotOffColor());
     }
 }

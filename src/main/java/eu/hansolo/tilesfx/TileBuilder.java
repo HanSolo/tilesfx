@@ -855,6 +855,51 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B leftText(final String TEXT) {
+        properties.put("leftText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
+    public final B middleText(final String TEXT) {
+        properties.put("middleText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
+    public final B rightText(final String TEXT) {
+        properties.put("rightText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
+    public final B leftValue(final double VALUE) {
+        properties.put("leftValue", new SimpleDoubleProperty(VALUE));
+        return (B)this;
+    }
+
+    public final B middleValue(final double VALUE) {
+        properties.put("middleValue", new SimpleDoubleProperty(VALUE));
+        return (B)this;
+    }
+
+    public final B rightValue(final double VALUE) {
+        properties.put("rightValue", new SimpleDoubleProperty(VALUE));
+        return (B)this;
+    }
+
+    public final B leftGraphics(final Node NODE) {
+        properties.put("leftGraphics", new SimpleObjectProperty(NODE));
+        return (B)this;
+    }
+
+    public final B middleGraphics(final Node NODE) {
+        properties.put("middleGraphics", new SimpleObjectProperty(NODE));
+        return (B)this;
+    }
+
+    public final B rightGraphics(final Node NODE) {
+        properties.put("rightGraphics", new SimpleObjectProperty(NODE));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -928,10 +973,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
     }
 
     public final Tile build() {
-        final Tile CONTROL;
+        final Tile TILE;
         if (properties.containsKey("skinType")) {
             SkinType skinType = ((ObjectProperty<SkinType>) properties.get("skinType")).get();
-            CONTROL = new Tile(skinType);
+            TILE = new Tile(skinType);
             switch (skinType) {
                 case SMOOTHED_CHART:
                     break;
@@ -940,44 +985,44 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case CLOCK:
                     break;
                 case GAUGE:
-                    CONTROL.setAnimated(true);
-                    CONTROL.setTickLabelDecimals(0);
-                    CONTROL.setBarColor(Tile.FOREGROUND);
-                    CONTROL.setThresholdColor(Tile.BLUE);
-                    CONTROL.setThresholdVisible(true);
+                    TILE.setAnimated(true);
+                    TILE.setTickLabelDecimals(0);
+                    TILE.setBarColor(Tile.FOREGROUND);
+                    TILE.setThresholdColor(Tile.BLUE);
+                    TILE.setThresholdVisible(true);
                     break;
                 case HIGH_LOW:
-                    CONTROL.setMaxValue(Double.MAX_VALUE);
-                    CONTROL.setDecimals(2);
-                    CONTROL.setTickLabelDecimals(1);
+                    TILE.setMaxValue(Double.MAX_VALUE);
+                    TILE.setDecimals(2);
+                    TILE.setTickLabelDecimals(1);
                     break;
                 case PERCENTAGE:
-                    CONTROL.setAnimated(true);
-                    CONTROL.setThresholdColor(Tile.GRAY);
-                    CONTROL.setTickLabelDecimals(0);
+                    TILE.setAnimated(true);
+                    TILE.setThresholdColor(Tile.GRAY);
+                    TILE.setTickLabelDecimals(0);
                     break;
                 case PLUS_MINUS:
                     break;
                 case SLIDER:
-                    CONTROL.setBarBackgroundColor(Tile.FOREGROUND);
+                    TILE.setBarBackgroundColor(Tile.FOREGROUND);
                     break;
                 case SPARK_LINE:
-                    CONTROL.setTextVisible(false);
-                    CONTROL.setAnimated(false);
-                    CONTROL.setAveragingEnabled(true);
-                    CONTROL.setAveragingPeriod(10);
-                    CONTROL.setDecimals(0);
-                    CONTROL.setTickLabelDecimals(0);
+                    TILE.setTextVisible(false);
+                    TILE.setAnimated(false);
+                    TILE.setAveragingEnabled(true);
+                    TILE.setAveragingPeriod(10);
+                    TILE.setDecimals(0);
+                    TILE.setTickLabelDecimals(0);
                     break;
                 case SWITCH:
                     break;
                 case WORLDMAP:
-                    CONTROL.setPrefSize(380, 250);
+                    TILE.setPrefSize(380, 250);
                     break;
                 case TIMER_CONTROL:
-                    CONTROL.setSectionsVisible(true);
-                    CONTROL.setHighlightSections(true);
-                    CONTROL.setCheckSectionsForValue(true);
+                    TILE.setSectionsVisible(true);
+                    TILE.setHighlightSections(true);
+                    TILE.setCheckSectionsForValue(true);
                     break;
                 case NUMBER:
                     break;
@@ -994,31 +1039,31 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case MAP:
                     break;
                 case RADIAL_CHART:
-                    CONTROL.setAnimated(true);
+                    TILE.setAnimated(true);
                     break;
                 case DONUT_CHART:
-                    CONTROL.setAnimated(true);
+                    TILE.setAnimated(true);
                     break;
                 case CIRCULAR_PROGRESS:
-                    CONTROL.setBarBackgroundColor(CONTROL.getBackgroundColor().brighter());
-                    CONTROL.setAnimated(true);
+                    TILE.setBarBackgroundColor(TILE.getBackgroundColor().brighter());
+                    TILE.setAnimated(true);
                     break;
                 case STOCK:
-                    CONTROL.setAnimated(false);
-                    CONTROL.setAveragingPeriod(720);
-                    CONTROL.setAveragingEnabled(true);
-                    CONTROL.setDecimals(2);
-                    CONTROL.setTickLabelDecimals(2);
-                    CONTROL.setThresholdColor(Tile.GRAY);
-                    CONTROL.setTextVisible(false);
+                    TILE.setAnimated(false);
+                    TILE.setAveragingPeriod(720);
+                    TILE.setAveragingEnabled(true);
+                    TILE.setDecimals(2);
+                    TILE.setTickLabelDecimals(2);
+                    TILE.setThresholdColor(Tile.GRAY);
+                    TILE.setTextVisible(false);
                     break;
                 case GAUGE_SPARK_LINE:
-                    CONTROL.setBarColor(Tile.BLUE);
-                    CONTROL.setAngleRange(270);
+                    TILE.setBarColor(Tile.BLUE);
+                    TILE.setAngleRange(270);
                     break;
                 case SMOOTH_AREA_CHART:
-                    CONTROL.setSmoothing(true);
-                    CONTROL.setChartType(ChartType.AREA);
+                    TILE.setSmoothing(true);
+                    TILE.setChartType(ChartType.AREA);
                     break;
                 case RADAR_CHART:
                     break;
@@ -1031,418 +1076,439 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case FLIP:
                     break;
                 case SWITCH_SLIDER:
-                    CONTROL.setBarBackgroundColor(Tile.FOREGROUND);
+                    TILE.setBarBackgroundColor(Tile.FOREGROUND);
                     break;
                 case DATE:
-                    CONTROL.setTitleAlignment(TextAlignment.CENTER);
-                    CONTROL.setTextAlignment(TextAlignment.CENTER);
+                    TILE.setTitleAlignment(TextAlignment.CENTER);
+                    TILE.setTextAlignment(TextAlignment.CENTER);
                     break;
                 case CALENDAR:
-                    CONTROL.setTitleAlignment(TextAlignment.CENTER);
-                    CONTROL.setTextAlignment(TextAlignment.CENTER);
+                    TILE.setTitleAlignment(TextAlignment.CENTER);
+                    TILE.setTextAlignment(TextAlignment.CENTER);
                     break;
                 case SUNBURST:
                     break;
                 case MATRIX:
                     break;
                 case RADIAL_PERCENTAGE:
-                    CONTROL.setBarBackgroundColor(CONTROL.getBackgroundColor().brighter());
-                    CONTROL.setAnimated(true);
+                    TILE.setBarBackgroundColor(TILE.getBackgroundColor().brighter());
+                    TILE.setAnimated(true);
+                    break;
+                case STATUS:
+                    TILE.setDescriptionAlignment(Pos.TOP_CENTER);
                     break;
                 default:
                     break;
             }
         } else {
-            CONTROL = new Tile();
+            TILE = new Tile();
         }
 
         // Make sure that sections, areas and markers will be added first
         if (properties.keySet().contains("sectionsArray")) {
-            CONTROL.setSections(((ObjectProperty<Section[]>) properties.get("sectionsArray")).get());
+            TILE.setSections(((ObjectProperty<Section[]>) properties.get("sectionsArray")).get());
         }
         if(properties.keySet().contains("sectionsList")) {
-            CONTROL.setSections(((ObjectProperty<List<Section>>) properties.get("sectionsList")).get());
+            TILE.setSections(((ObjectProperty<List<Section>>) properties.get("sectionsList")).get());
         }
 
         if (properties.keySet().contains("characterArray")) {
-            CONTROL.setCharacters(((ObjectProperty<String[]>) properties.get("characterArray")).get());
+            TILE.setCharacters(((ObjectProperty<String[]>) properties.get("characterArray")).get());
         }
 
         if(properties.keySet().contains("foregroundBaseColor")) {
-            CONTROL.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
+            TILE.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
         }
 
         if (properties.keySet().contains("minValue")) {
-            CONTROL.setMinValue(((DoubleProperty) properties.get("minValue")).get());
+            TILE.setMinValue(((DoubleProperty) properties.get("minValue")).get());
         }
         if (properties.keySet().contains("maxValue")) {
-            CONTROL.setMaxValue(((DoubleProperty) properties.get("maxValue")).get());
+            TILE.setMaxValue(((DoubleProperty) properties.get("maxValue")).get());
         }
 
         if (properties.keySet().contains("alarmsArray")) {
-            CONTROL.setAlarms(((ObjectProperty<Alarm[]>) properties.get("alarmsArray")).get());
+            TILE.setAlarms(((ObjectProperty<Alarm[]>) properties.get("alarmsArray")).get());
         }
         if(properties.keySet().contains("alarmsList")) {
-            CONTROL.setAlarms(((ObjectProperty<List<Alarm>>) properties.get("alarmsList")).get());
+            TILE.setAlarms(((ObjectProperty<List<Alarm>>) properties.get("alarmsList")).get());
         }
 
         if (properties.keySet().contains("timeSectionsArray")) {
-            CONTROL.setTimeSections(((ObjectProperty<TimeSection[]>) properties.get("timeSectionsArray")).get());
+            TILE.setTimeSections(((ObjectProperty<TimeSection[]>) properties.get("timeSectionsArray")).get());
         }
         if(properties.keySet().contains("timeSectionsList")) {
-            CONTROL.setTimeSections(((ObjectProperty<List<TimeSection>>) properties.get("timeSectionsList")).get());
+            TILE.setTimeSections(((ObjectProperty<List<TimeSection>>) properties.get("timeSectionsList")).get());
         }
 
         if (properties.keySet().contains("seriesArray")) {
-            CONTROL.setSeries(((ObjectProperty<Series<String, Number>[]>) properties.get("seriesArray")).get());
+            TILE.setSeries(((ObjectProperty<Series<String, Number>[]>) properties.get("seriesArray")).get());
         }
 
         if (properties.keySet().contains("seriesList")) {
-            CONTROL.setSeries(((ObjectProperty<List<Series<String, Number>>>) properties.get("seriesList")).get());
+            TILE.setSeries(((ObjectProperty<List<Series<String, Number>>>) properties.get("seriesList")).get());
         }
 
         if (properties.keySet().contains("tilesFxSeriesArray")) {
-            CONTROL.setTilesFXSeries(((ObjectProperty<TilesFXSeries<String, Number>[]>) properties.get("tilesFxSeriesArray")).get());
+            TILE.setTilesFXSeries(((ObjectProperty<TilesFXSeries<String, Number>[]>) properties.get("tilesFxSeriesArray")).get());
         }
 
         if (properties.keySet().contains("tilesFxSeriesList")) {
-            CONTROL.setTilesFXSeries(((ObjectProperty<List<TilesFXSeries<String, Number>>>) properties.get("tilesFxSeriesList")).get());
+            TILE.setTilesFXSeries(((ObjectProperty<List<TilesFXSeries<String, Number>>>) properties.get("tilesFxSeriesList")).get());
         }
 
         if (properties.keySet().contains("barChartItemsArray")) {
-            CONTROL.setBarChartItems(((ObjectProperty<BarChartItem[]>) properties.get("barChartItemsArray")).get());
+            TILE.setBarChartItems(((ObjectProperty<BarChartItem[]>) properties.get("barChartItemsArray")).get());
         }
         if(properties.keySet().contains("barChartItemsList")) {
-            CONTROL.setBarChartItems(((ObjectProperty<List<BarChartItem>>) properties.get("barChartItemsList")).get());
+            TILE.setBarChartItems(((ObjectProperty<List<BarChartItem>>) properties.get("barChartItemsList")).get());
         }
 
         if (properties.keySet().contains("leaderBoardItemsArray")) {
-            CONTROL.setLeaderBoardItems(((ObjectProperty<LeaderBoardItem[]>) properties.get("leaderBoardItemsArray")).get());
+            TILE.setLeaderBoardItems(((ObjectProperty<LeaderBoardItem[]>) properties.get("leaderBoardItemsArray")).get());
         }
         if(properties.keySet().contains("leaderBoardItemsList")) {
-            CONTROL.setLeaderBoardItems(((ObjectProperty<List<LeaderBoardItem>>) properties.get("leaderBoardItemsList")).get());
+            TILE.setLeaderBoardItems(((ObjectProperty<List<LeaderBoardItem>>) properties.get("leaderBoardItemsList")).get());
         }
 
         if (properties.keySet().contains("gradientStopsArray")) {
-            CONTROL.setGradientStops(((ObjectProperty<Stop[]>) properties.get("gradientStopsArray")).get());
+            TILE.setGradientStops(((ObjectProperty<Stop[]>) properties.get("gradientStopsArray")).get());
         }
         if (properties.keySet().contains("gradientStopsList")) {
-            CONTROL.setGradientStops(((ObjectProperty<List<Stop>>) properties.get("gradientStopsList")).get());
+            TILE.setGradientStops(((ObjectProperty<List<Stop>>) properties.get("gradientStopsList")).get());
         }
 
         if (properties.keySet().contains("chartDataArray")) {
-            CONTROL.setChartData(((ObjectProperty<ChartData[]>) properties.get("chartDataArray")).get());
+            TILE.setChartData(((ObjectProperty<ChartData[]>) properties.get("chartDataArray")).get());
         }
         if (properties.keySet().contains("chartDataList")) {
-            CONTROL.setChartData(((ObjectProperty<List<ChartData>>) properties.get("chartDataList")).get());
+            TILE.setChartData(((ObjectProperty<List<ChartData>>) properties.get("chartDataList")).get());
         }
 
         if (properties.keySet().contains("poiArray")) {
-            CONTROL.setPoiLocations(((ObjectProperty<Location[]>) properties.get("poiArray")).get());
+            TILE.setPoiLocations(((ObjectProperty<Location[]>) properties.get("poiArray")).get());
         }
         if (properties.keySet().contains("poiList")) {
-            CONTROL.setPoiList(((ObjectProperty<List<Location>>) properties.get("poiList")).get());
+            TILE.setPoiList(((ObjectProperty<List<Location>>) properties.get("poiList")).get());
         }
 
         if (properties.keySet().contains("trackArray")) {
-            CONTROL.setTrack(((ObjectProperty<Location[]>) properties.get("trackArray")).get());
+            TILE.setTrack(((ObjectProperty<Location[]>) properties.get("trackArray")).get());
         }
         if (properties.keySet().contains("trackList")) {
-            CONTROL.setTrack(((ObjectProperty<List<Location>>) properties.get("trackList")).get());
+            TILE.setTrack(((ObjectProperty<List<Location>>) properties.get("trackList")).get());
         }
 
         for (String key : properties.keySet()) {
             if ("prefSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
+                TILE.setPrefSize(dim.getWidth(), dim.getHeight());
             } else if("minSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setMinSize(dim.getWidth(), dim.getHeight());
+                TILE.setMinSize(dim.getWidth(), dim.getHeight());
             } else if("maxSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setMaxSize(dim.getWidth(), dim.getHeight());
+                TILE.setMaxSize(dim.getWidth(), dim.getHeight());
             } else if("prefWidth".equals(key)) {
-                CONTROL.setPrefWidth(((DoubleProperty) properties.get(key)).get());
+                TILE.setPrefWidth(((DoubleProperty) properties.get(key)).get());
             } else if("prefHeight".equals(key)) {
-                CONTROL.setPrefHeight(((DoubleProperty) properties.get(key)).get());
+                TILE.setPrefHeight(((DoubleProperty) properties.get(key)).get());
             } else if("minWidth".equals(key)) {
-                CONTROL.setMinWidth(((DoubleProperty) properties.get(key)).get());
+                TILE.setMinWidth(((DoubleProperty) properties.get(key)).get());
             } else if("minHeight".equals(key)) {
-                CONTROL.setMinHeight(((DoubleProperty) properties.get(key)).get());
+                TILE.setMinHeight(((DoubleProperty) properties.get(key)).get());
             } else if("maxWidth".equals(key)) {
-                CONTROL.setMaxWidth(((DoubleProperty) properties.get(key)).get());
+                TILE.setMaxWidth(((DoubleProperty) properties.get(key)).get());
             } else if("maxHeight".equals(key)) {
-                CONTROL.setMaxHeight(((DoubleProperty) properties.get(key)).get());
+                TILE.setMaxHeight(((DoubleProperty) properties.get(key)).get());
             } else if("scaleX".equals(key)) {
-                CONTROL.setScaleX(((DoubleProperty) properties.get(key)).get());
+                TILE.setScaleX(((DoubleProperty) properties.get(key)).get());
             } else if("scaleY".equals(key)) {
-                CONTROL.setScaleY(((DoubleProperty) properties.get(key)).get());
+                TILE.setScaleY(((DoubleProperty) properties.get(key)).get());
             } else if ("layoutX".equals(key)) {
-                CONTROL.setLayoutX(((DoubleProperty) properties.get(key)).get());
+                TILE.setLayoutX(((DoubleProperty) properties.get(key)).get());
             } else if ("layoutY".equals(key)) {
-                CONTROL.setLayoutY(((DoubleProperty) properties.get(key)).get());
+                TILE.setLayoutY(((DoubleProperty) properties.get(key)).get());
             } else if ("translateX".equals(key)) {
-                CONTROL.setTranslateX(((DoubleProperty) properties.get(key)).get());
+                TILE.setTranslateX(((DoubleProperty) properties.get(key)).get());
             } else if ("translateY".equals(key)) {
-                CONTROL.setTranslateY(((DoubleProperty) properties.get(key)).get());
+                TILE.setTranslateY(((DoubleProperty) properties.get(key)).get());
             } else if ("padding".equals(key)) {
-                CONTROL.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
+                TILE.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
             } else if("styleClass".equals(key)) {
-                CONTROL.getStyleClass().setAll("tile");
-                CONTROL.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
+                TILE.getStyleClass().setAll("tile");
+                TILE.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
             } else if ("autoScale".equals(key)) {
-                CONTROL.setAutoScale(((BooleanProperty) properties.get(key)).get());
+                TILE.setAutoScale(((BooleanProperty) properties.get(key)).get());
             } else if("value".equals(key)) {
-                CONTROL.setValue(((DoubleProperty) properties.get(key)).get());
+                TILE.setValue(((DoubleProperty) properties.get(key)).get());
             } else if("decimals".equals(key)) {
-                CONTROL.setDecimals(((IntegerProperty) properties.get(key)).get());
+                TILE.setDecimals(((IntegerProperty) properties.get(key)).get());
             } else if("tickLabelDecimals".equals(key)) {
-                CONTROL.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
+                TILE.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
             } else if("title".equals(key)) {
-                CONTROL.setTitle(((StringProperty) properties.get(key)).get());
+                TILE.setTitle(((StringProperty) properties.get(key)).get());
             } else if("titleAlignment".equals(key)) {
-                CONTROL.setTitleAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
+                TILE.setTitleAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
             } else if("description".equals(key)) {
-                CONTROL.setDescription(((StringProperty) properties.get(key)).get());
+                TILE.setDescription(((StringProperty) properties.get(key)).get());
             } else if ("descriptionAlignment".equals(key)) {
-                CONTROL.setDescriptionAlignment(((ObjectProperty<Pos>) properties.get(key)).get());
+                TILE.setDescriptionAlignment(((ObjectProperty<Pos>) properties.get(key)).get());
             } else if("unit".equals(key)) {
-                CONTROL.setUnit(((StringProperty) properties.get(key)).get());
+                TILE.setUnit(((StringProperty) properties.get(key)).get());
             } else if ("selected".equals(key)) {
-                CONTROL.setActive(((BooleanProperty) properties.get(key)).get());
+                TILE.setActive(((BooleanProperty) properties.get(key)).get());
             } else if("averagingEnabled".equals(key)) {
-                CONTROL.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
+                TILE.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
             } else if("averagingPeriod".equals(key)) {
-                CONTROL.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
+                TILE.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
-                CONTROL.setStartFromZero(((BooleanProperty) properties.get(key)).get());
+                TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {
-                CONTROL.setReturnToZero(((BooleanProperty) properties.get(key)).get());
+                TILE.setReturnToZero(((BooleanProperty) properties.get(key)).get());
             } else if ("minMeasuredValueVisible".equals(key)) {
-                CONTROL.setMinMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setMinMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("maxMeasuredValueVisible".equals(key)) {
-                CONTROL.setMaxMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setMaxMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("oldValueVisible".equals(key)) {
-                CONTROL.setOldValueVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setOldValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("valueVisible".equals(key)) {
-                CONTROL.setValueVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("foregroundColor".equals(key)) {
-                CONTROL.setForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("backgroundColor".equals(key)) {
-                CONTROL.setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("borderColor".equals(key)) {
-                CONTROL.setBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("borderWidth".equals(key)) {
-                CONTROL.setBorderWidth(((DoubleProperty) properties.get(key)).get());
+                TILE.setBorderWidth(((DoubleProperty) properties.get(key)).get());
             } else if ("knobColor".equals(key)) {
-                CONTROL.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("animated".equals(key)) {
-                CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
+                TILE.setAnimated(((BooleanProperty) properties.get(key)).get());
             } else if("animationDuration".equals(key)) {
-                CONTROL.setAnimationDuration(((LongProperty) properties.get(key)).get());
+                TILE.setAnimationDuration(((LongProperty) properties.get(key)).get());
             } else if("startAngle".equals(key)) {
-                CONTROL.setStartAngle(((DoubleProperty) properties.get(key)).get());
+                TILE.setStartAngle(((DoubleProperty) properties.get(key)).get());
             } else if("angleRange".equals(key)) {
-                CONTROL.setAngleRange(((DoubleProperty) properties.get(key)).get());
+                TILE.setAngleRange(((DoubleProperty) properties.get(key)).get());
             } else if("needleColor".equals(key)) {
-                CONTROL.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("barColor".equals(key)) {
-                CONTROL.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("barBackgroundColor".equals(key)) {
-                CONTROL.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("locale".equals(key)) {
-                CONTROL.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
+                TILE.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
             } else if("numberFormat".equals(key)) {
-                CONTROL.setNumberFormat(((ObjectProperty<NumberFormat>) properties.get(key)).get());
+                TILE.setNumberFormat(((ObjectProperty<NumberFormat>) properties.get(key)).get());
             } else if("shadowsEnabled".equals(key)) {
-                CONTROL.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
+                TILE.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("style".equals(key)) {
-                CONTROL.setStyle(((StringProperty) properties.get(key)).get());
+                TILE.setStyle(((StringProperty) properties.get(key)).get());
             } else if ("innerShadowEnabled".equals(key)) {
-                CONTROL.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
+                TILE.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("thresholdVisible".equals(key)) {
-                CONTROL.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("averageVisible".equals(key)) {
-                CONTROL.setAverageVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setAverageVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsVisible".equals(key)) {
-                CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsAlwaysVisible".equals(key)) {
-                CONTROL.setSectionsAlwaysVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setSectionsAlwaysVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionTextVisible".equals(key)) {
-                CONTROL.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionIconsVisible".equals(key)) {
-                CONTROL.setSectionIconsVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setSectionIconsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("highlightSections".equals(key)) {
-                CONTROL.setHighlightSections(((BooleanProperty) properties.get(key)).get());
+                TILE.setHighlightSections(((BooleanProperty) properties.get(key)).get());
             } else if ("titleColor".equals(key)) {
-                CONTROL.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("descriptionColor".equals(key)) {
-                CONTROL.setDescriptionColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setDescriptionColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("unitColor".equals(key)) {
-                CONTROL.setUnitColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setUnitColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("valueColor".equals(key)) {
-                CONTROL.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("thresholdColor".equals(key)) {
-                CONTROL.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("orientation".equals(key)) {
-                CONTROL.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
+                TILE.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
             } else if ("checkSectionsForValue".equals(key)) {
-                CONTROL.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
+                TILE.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
             } else if ("checkThreshold".equals(key)) {
-                CONTROL.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
+                TILE.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
             } else if ("onValueChanged".equals(key)) {
-                CONTROL.currentValueProperty().addListener(((ObjectProperty<InvalidationListener>) properties.get(key)).get());
+                TILE.currentValueProperty().addListener(((ObjectProperty<InvalidationListener>) properties.get(key)).get());
             } else if ("keepAspect".equals(key)) {
-                CONTROL.setKeepAspect(((BooleanProperty) properties.get(key)).get());
+                TILE.setKeepAspect(((BooleanProperty) properties.get(key)).get());
             } else if ("threshold".equals(key)) {
-                CONTROL.setThreshold(((DoubleProperty) properties.get(key)).get());
+                TILE.setThreshold(((DoubleProperty) properties.get(key)).get());
             } else if ("referenceValue".equals(key)) {
-                CONTROL.setReferenceValue(((DoubleProperty) properties.get(key)).get());
+                TILE.setReferenceValue(((DoubleProperty) properties.get(key)).get());
             } else if ("autoReferenceValue".equals(key)) {
-                CONTROL.setAutoReferenceValue(((BooleanProperty) properties.get(key)).get());
+                TILE.setAutoReferenceValue(((BooleanProperty) properties.get(key)).get());
             } else if ("customFontEnabled".equals(key)) {
-                CONTROL.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
+                TILE.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("customFont".equals(key)) {
-                CONTROL.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
+                TILE.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
             } else if ("alertMessage".equals(key)) {
-                CONTROL.setAlertMessage(((StringProperty) properties.get(key)).get());
+                TILE.setAlertMessage(((StringProperty) properties.get(key)).get());
             } else if ("smoothing".equals(key)) {
-                CONTROL.setSmoothing(((BooleanProperty) properties.get(key)).get());
+                TILE.setSmoothing(((BooleanProperty) properties.get(key)).get());
             } else if ("time".equals(key)) {
-                CONTROL.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
+                TILE.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
             } else if ("text".equals(key)) {
-                CONTROL.setText(((StringProperty) properties.get(key)).get());
+                TILE.setText(((StringProperty) properties.get(key)).get());
             } else if ("textAlignment".equals(key)) {
-                CONTROL.setTextAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
+                TILE.setTextAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
             } else if ("discreteSeconds".equals(key)) {
-                CONTROL.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
+                TILE.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
             } else if ("discreteMinutes".equals(key)) {
-                CONTROL.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
+                TILE.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
             } else if ("discreteHours".equals(key)) {
-                CONTROL.setDiscreteHours(((BooleanProperty) properties.get(key)).get());
+                TILE.setDiscreteHours(((BooleanProperty) properties.get(key)).get());
             } else if ("secondsVisible".equals(key)) {
-                CONTROL.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("textVisible".equals(key)) {
-                CONTROL.setTextVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setTextVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("dateVisible".equals(key)) {
-                CONTROL.setDateVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setDateVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("textColor".equals(key)) {
-                CONTROL.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("dateColor".equals(key)) {
-                CONTROL.setDateColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setDateColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("hourTickMarkColor".equals(key)) {
-                CONTROL.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("minuteTickMarkColor".equals(key)) {
-                CONTROL.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("alarmColor".equals(key)) {
-                CONTROL.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("hourTickMarksVisible".equals(key)) {
-                CONTROL.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("minuteTickMarksVisible".equals(key)) {
-                CONTROL.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("hourColor".equals(key)) {
-                CONTROL.setHourColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setHourColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("minuteColor".equals(key)) {
-                CONTROL.setMinuteColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setMinuteColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("secondColor".equals(key)) {
-                CONTROL.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("onAlarm".equals(key)) {
-                CONTROL.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
+                TILE.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
             } else if ("onTimeEvent".equals(key)) {
-                CONTROL.setOnTimeEvent(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
+                TILE.setOnTimeEvent(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
-                CONTROL.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
+                TILE.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("alarmsVisible".equals(key)) {
-                CONTROL.setAlarmsVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setAlarmsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("running".equals(key)) {
-                CONTROL.setRunning(((BooleanProperty) properties.get(key)).get());
+                TILE.setRunning(((BooleanProperty) properties.get(key)).get());
             } else if ("increment".equals(key)) {
-                CONTROL.setIncrement(((DoubleProperty) properties.get(key)).get());
+                TILE.setIncrement(((DoubleProperty) properties.get(key)).get());
             } else if ("activeColor".equals(key)) {
-                CONTROL.setActiveColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setActiveColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("darkSky".equals(key)) {
-                CONTROL.setDarkSky(((ObjectProperty<DarkSky>) properties.get(key)).get());
+                TILE.setDarkSky(((ObjectProperty<DarkSky>) properties.get(key)).get());
             } else if ("duration".equals(key)) {
-                CONTROL.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
+                TILE.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
             } else if ("strokeWithGradient".equals(key)) {
-                CONTROL.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
+                TILE.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
             } else if ("fillWithGradient".equals(key)) {
-                CONTROL.setFillWithGradient(((BooleanProperty) properties.get(key)).get());
+                TILE.setFillWithGradient(((BooleanProperty) properties.get(key)).get());
             } else if ("graphic".equals(key)) {
-                CONTROL.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
+                TILE.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
             } else if ("roundedCorners".equals(key)) {
-                CONTROL.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
+                TILE.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
             } else if ("textSize".equals(key)) {
-                CONTROL.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
+                TILE.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
             } else if ("currentLocation".equals(key)) {
-                CONTROL.setCurrentLocation(((ObjectProperty<Location>) properties.get(key)).get());
+                TILE.setCurrentLocation(((ObjectProperty<Location>) properties.get(key)).get());
             } else if ("trackColor".equals(key)) {
-                CONTROL.setTrackColor(((ObjectProperty<TileColor>) properties.get(key)).get());
+                TILE.setTrackColor(((ObjectProperty<TileColor>) properties.get(key)).get());
             } else if ("mapProvider".equals(key)) {
-                CONTROL.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
+                TILE.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
             } else if ("tooltipText".equals(key)) {
-                CONTROL.setTooltipText(((StringProperty) properties.get(key)).get());
+                TILE.setTooltipText(((StringProperty) properties.get(key)).get());
             } else if ("xAxis".equals(key)) {
-                CONTROL.setXAxis(((ObjectProperty<Axis>) properties.get(key)).get());
+                TILE.setXAxis(((ObjectProperty<Axis>) properties.get(key)).get());
             } else if ("yAxis".equals(key)) {
-                CONTROL.setYAxis(((ObjectProperty<Axis>) properties.get(key)).get());
+                TILE.setYAxis(((ObjectProperty<Axis>) properties.get(key)).get());
             } else if ("radarChartMode".equals(key)) {
-                CONTROL.setRadarChartMode(((ObjectProperty<RadarChart.Mode>) properties.get(key)).get());
+                TILE.setRadarChartMode(((ObjectProperty<RadarChart.Mode>) properties.get(key)).get());
             } else if ("chartGridColor".equals(key)) {
-                CONTROL.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("country".equals(key)) {
-                CONTROL.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
+                TILE.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
             } else if ("countryGroup".equals(key)) {
-                CONTROL.setCountryGroup(((ObjectProperty<CountryGroup>) properties.get(key)).get());
+                TILE.setCountryGroup(((ObjectProperty<CountryGroup>) properties.get(key)).get());
             } else if ("sortedData".equals(key)) {
-                CONTROL.setSortedData(((BooleanProperty) properties.get(key)).get());
+                TILE.setSortedData(((BooleanProperty) properties.get(key)).get());
             } else if ("flipTimeInMS".equals(key)) {
-                CONTROL.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
+                TILE.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
             } else if ("flipText".equals(key)) {
-                CONTROL.setFlipText(((StringProperty) properties.get(key)).get());
+                TILE.setFlipText(((StringProperty) properties.get(key)).get());
             } else if ("dataPointsVisible".equals(key)) {
-                CONTROL.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
+                TILE.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sunburstTree".equals(key)) {
-                CONTROL.getSunburstChart().setTree(((ObjectProperty<TreeNode>) properties.get(key)).get());
+                TILE.getSunburstChart().setTree(((ObjectProperty<TreeNode>) properties.get(key)).get());
             } else if ("sunburstBackgroundColor".equals(key)) {
-                CONTROL.getSunburstChart().setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.getSunburstChart().setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("sunburstTextColor".equals(key)) {
-                CONTROL.getSunburstChart().setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.getSunburstChart().setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("sunburstUseColorFromParent".equals(key)) {
-                CONTROL.getSunburstChart().setUseColorFromParent(((BooleanProperty) properties.get(key)).get());
+                TILE.getSunburstChart().setUseColorFromParent(((BooleanProperty) properties.get(key)).get());
             } else if ("sunburstTextOrientation".equals(key)) {
-                CONTROL.getSunburstChart().setTextOrientation(((ObjectProperty<TextOrientation>) properties.get(key)).get());
+                TILE.getSunburstChart().setTextOrientation(((ObjectProperty<TextOrientation>) properties.get(key)).get());
             } else if("sunburstVisibleData".equals(key)) {
-                CONTROL.getSunburstChart().setVisibleData(((ObjectProperty<VisibleData>) properties.get(key)).get());
+                TILE.getSunburstChart().setVisibleData(((ObjectProperty<VisibleData>) properties.get(key)).get());
             } else if ("sunburstInteractive".equals(key)) {
-                CONTROL.getSunburstChart().setInteractive(((BooleanProperty) properties.get(key)).get());
+                TILE.getSunburstChart().setInteractive(((BooleanProperty) properties.get(key)).get());
             } else if ("sunburstAutoTextColor".equals(key)) {
-                CONTROL.getSunburstChart().setAutoTextColor(((BooleanProperty) properties.get(key)).get());
+                TILE.getSunburstChart().setAutoTextColor(((BooleanProperty) properties.get(key)).get());
             } else if ("sunburstUseChartDataTextColor".equals(key)) {
-                CONTROL.getSunburstChart().setUseChartDataTextColor(((BooleanProperty) properties.get(key)).get());
+                TILE.getSunburstChart().setUseChartDataTextColor(((BooleanProperty) properties.get(key)).get());
             } else if ("snapToTicks".equals(key)) {
-                CONTROL.setSnapToTicks(((BooleanProperty) properties.get(key)).get());
+                TILE.setSnapToTicks(((BooleanProperty) properties.get(key)).get());
             } else if ("minorTickCount".equals(key)) {
-                CONTROL.setMinorTickCount(((IntegerProperty) properties.get(key)).get());
+                TILE.setMinorTickCount(((IntegerProperty) properties.get(key)).get());
             } else if ("majorTickUnit".equals(key)) {
-                CONTROL.setMajorTickUnit(((DoubleProperty) properties.get(key)).get());
+                TILE.setMajorTickUnit(((DoubleProperty) properties.get(key)).get());
             } else if ("matrixSize".equals(key)) {
                 final int COLS = ((IntegerProperty) properties.get("matrixColumns")).get();
                 final int ROWS = ((IntegerProperty) properties.get("matrixRows")).get();
-                CONTROL.setMatrixSize(COLS, ROWS);
+                TILE.setMatrixSize(COLS, ROWS);
             } else if ("chartType".equals(key)) {
-                CONTROL.setChartType(((ObjectProperty<ChartType>) properties.get(key)).get());
+                TILE.setChartType(((ObjectProperty<ChartType>) properties.get(key)).get());
             } else if ("tooltipTimeout".equals(key)) {
-                CONTROL.setTooltipTimeout(((DoubleProperty) properties.get(key)).get());
+                TILE.setTooltipTimeout(((DoubleProperty) properties.get(key)).get());
             } else if ("notificationBackgroundColor".equals(key)) {
-                CONTROL.setNotificationBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setNotificationBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("notificationForegroundColor".equals(key)) {
-                CONTROL.setNotificationForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                TILE.setNotificationForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("showNotifier".equals(key)) {
-                CONTROL.showNotifier(((BooleanProperty) properties.get(key)).get());
+                TILE.showNotifier(((BooleanProperty) properties.get(key)).get());
+            } else if ("leftText".equals(key)) {
+                TILE.setLeftText(((StringProperty) properties.get(key)).get());
+            } else if ("middleText".equals(key)) {
+                TILE.setMiddleText(((StringProperty) properties.get(key)).get());
+            } else if ("rightText".equals(key)) {
+                TILE.setRightText(((StringProperty) properties.get(key)).get());
+            } else if ("leftValue".equals(key)) {
+                TILE.setLeftValue(((DoubleProperty) properties.get(key)).get());
+            } else if ("middleValue".equals(key)) {
+                TILE.setMiddleValue(((DoubleProperty) properties.get(key)).get());
+            } else if ("rightValue".equals(key)) {
+                TILE.setRightValue(((DoubleProperty) properties.get(key)).get());
+            } else if ("leftGraphics".equals(key)) {
+                TILE.setLeftGraphics(((ObjectProperty<Node>) properties.get(key)).get());
+            } else if ("middleGraphics".equals(key)) {
+                TILE.setMiddleGraphics(((ObjectProperty<Node>) properties.get(key)).get());
+            } else if ("rightGraphics".equals(key)) {
+                TILE.setRightGraphics(((ObjectProperty<Node>) properties.get(key)).get());
             }
         }
         properties.clear();
-        return CONTROL;
+        return TILE;
     }
 }

@@ -119,7 +119,8 @@ public class Tile extends Control {
                            RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris"),
                            CHARACTER("Character"), FLIP("Flip"), SWITCH_SLIDER("SwitchSlider"),
                            DATE("Date"), CALENDAR("Calendar"), SUNBURST("Sunburst"), MATRIX("Matrix"),
-                           RADIAL_PERCENTAGE("RadialPercentage");
+                           RADIAL_PERCENTAGE("RadialPercentage"),
+                           STATUS("Status");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -480,6 +481,25 @@ public class Tile extends Control {
     private              Color                                         _notificationBackgroundColor;
     private              Color                                         _notificationForegroundColor;
 
+    private              String                                        _leftText;
+    private              StringProperty                                leftText;
+    private              String                                        _middleText;
+    private              StringProperty                                middleText;
+    private              String                                        _rightText;
+    private              StringProperty                                rightText;
+    private              double                                        _leftValue;
+    private              DoubleProperty                                leftValue;
+    private              double                                        _middleValue;
+    private              DoubleProperty                                middleValue;
+    private              double                                        _rightValue;
+    private              DoubleProperty                                rightValue;
+    private              Node                                          _leftGraphics;
+    private              ObjectProperty<Node>                          leftGraphics;
+    private              Node                                          _middleGraphics;
+    private              ObjectProperty<Node>                          middleGraphics;
+    private              Node                                          _rightGraphics;
+    private              ObjectProperty<Node>                          rightGraphics;
+
     private volatile     ScheduledFuture<?>                            periodicTickTask;
     private static       ScheduledExecutorService                      periodicTickExecutorService;
 
@@ -671,6 +691,15 @@ public class Tile extends Control {
         _tooltipTimeout                     = 2000;
         _notificationBackgroundColor        = Tile.YELLOW;
         _notificationForegroundColor        = Tile.BACKGROUND;
+        _leftText                           = "";
+        _middleText                         = "";
+        _rightText                          = "";
+        _leftValue                          = 0;
+        _middleValue                        = 0;
+        _rightValue                         = 0;
+        _leftGraphics                       = null;
+        _middleGraphics                     = null;
+        _rightGraphics                      = null;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -4606,6 +4635,192 @@ public class Tile extends Control {
         fireTileEvent(REDRAW_EVENT);
     }
 
+    public String getLeftText() { return null == leftText ? _leftText : leftText.get(); }
+    public void setLeftText(final String TEXT) {
+        if (null == leftText) {
+            _leftText = TEXT;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            leftText.set(TEXT);
+        }
+    }
+    public StringProperty leftTextProperty() {
+        if (null == leftText) {
+            leftText = new StringPropertyBase(_leftText) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "leftText"; }
+            };
+            _leftText = null;
+        }
+        return leftText;
+    }
+
+    public String getMiddleText() { return null == middleText ? _middleText : middleText.get(); }
+    public void setMiddleText(final String TEXT) {
+        if (null == middleText) {
+            _middleText = TEXT;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            middleText.set(TEXT);
+        }
+    }
+    public StringProperty middleTextProperty() {
+        if (null == middleText) {
+            middleText = new StringPropertyBase(_middleText) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "middleText"; }
+            };
+            _middleText = null;
+        }
+        return middleText;
+    }
+
+    public String getRightText() { return null == rightText ? _rightText : rightText.get(); }
+    public void setRightText(final String TEXT) {
+        if (null == rightText) {
+            _rightText = TEXT;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            rightText.set(TEXT);
+        }
+    }
+    public StringProperty rightTextProperty() {
+        if (null == rightText) {
+            rightText = new StringPropertyBase(_rightText) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "rightText"; }
+            };
+            _rightText = null;
+        }
+        return rightText;
+    }
+    
+    public double getLeftValue() { return null == leftValue ? _leftValue : leftValue.get(); }
+    public void setLeftValue(final double VALUE) {
+        if (null == leftValue) {
+            _leftValue = VALUE;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            leftValue.set(VALUE);
+        }
+    }
+    public DoubleProperty leftValueProperty() {
+        if (null == leftValue) {
+            leftValue = new DoublePropertyBase(_leftValue) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "leftValue"; }
+            };
+        }
+        return leftValue;
+    }
+
+    public double getMiddleValue() { return null == middleValue ? _middleValue : middleValue.get(); }
+    public void setMiddleValue(final double VALUE) {
+        if (null == middleValue) {
+            _middleValue = VALUE;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            middleValue.set(VALUE);
+        }
+    }
+    public DoubleProperty middleValueProperty() {
+        if (null == middleValue) {
+            middleValue = new DoublePropertyBase(_middleValue) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "middleValue"; }
+            };
+        }
+        return middleValue;
+    }
+
+    public double getRightValue() { return null == rightValue ? _rightValue : rightValue.get(); }
+    public void setRightValue(final double VALUE) {
+        if (null == rightValue) {
+            _rightValue = VALUE;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            rightValue.set(VALUE);
+        }
+    }
+    public DoubleProperty rightValueProperty() {
+        if (null == rightValue) {
+            rightValue = new DoublePropertyBase(_rightValue) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "rightValue"; }
+            };
+        }
+        return rightValue;
+    }
+    
+    public Node getLeftGraphics() { return null == leftGraphics ? _leftGraphics : leftGraphics.get(); }
+    public void setLeftGraphics(final Node NODE) {
+        if (null == leftGraphics) {
+            _leftGraphics = NODE;
+            fireTileEvent(RECALC_EVENT);
+        } else {
+            leftGraphics.set(NODE);
+        }
+    }
+    public ObjectProperty<Node> leftGraphicsProperty() {
+        if (null == leftGraphics) {
+            leftGraphics = new ObjectPropertyBase<Node>(_leftGraphics) {
+                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "leftGraphics"; }
+            };
+            _leftGraphics = null;
+        }
+        return leftGraphics;
+    }
+
+    public Node getMiddleGraphics() { return null == middleGraphics ? _middleGraphics : middleGraphics.get(); }
+    public void setMiddleGraphics(final Node NODE) {
+        if (null == middleGraphics) {
+            _middleGraphics = NODE;
+            fireTileEvent(RECALC_EVENT);
+        } else {
+            middleGraphics.set(NODE);
+        }
+    }
+    public ObjectProperty<Node> middleGraphicsProperty() {
+        if (null == middleGraphics) {
+            middleGraphics = new ObjectPropertyBase<Node>(_middleGraphics) {
+                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "middleGraphics"; }
+            };
+            _middleGraphics = null;
+        }
+        return middleGraphics;
+    }
+
+    public Node getRightGraphics() { return null == rightGraphics ? _rightGraphics : rightGraphics.get(); }
+    public void setRightGraphics(final Node NODE) {
+        if (null == rightGraphics) {
+            _rightGraphics = NODE;
+            fireTileEvent(RECALC_EVENT);
+        } else {
+            rightGraphics.set(NODE);
+        }
+    }
+    public ObjectProperty<Node> rightGraphicsProperty() {
+        if (null == rightGraphics) {
+            rightGraphics = new ObjectPropertyBase<Node>(_rightGraphics) {
+                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "rightGraphics"; }
+            };
+            _rightGraphics = null;
+        }
+        return rightGraphics;
+    }
+    
     public void showNotifier(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFIER_EVENT : HIDE_NOTIFIER_EVENT); }
 
     private Properties readProperties(final String FILE_NAME) {
@@ -4835,6 +5050,7 @@ public class Tile extends Control {
             case SUNBURST         : return new SunburstChartTileSkin(Tile.this);
             case MATRIX           : return new MatrixTileSkin(Tile.this);
             case RADIAL_PERCENTAGE: return new RadialPercentageTileSkin(Tile.this);
+            case STATUS           : return new StatusTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -4959,6 +5175,9 @@ public class Tile extends Control {
                 setBarBackgroundColor(getBackgroundColor().brighter());
                 setAnimated(true);
                 break;
+            case STATUS:
+                setDescriptionAlignment(Pos.TOP_CENTER);
+                break;
             default:
                 break;
         }
@@ -5003,6 +5222,7 @@ public class Tile extends Control {
             case SUNBURST         : setSkin(new SunburstChartTileSkin(Tile.this)); break;
             case MATRIX           : setSkin(new MatrixTileSkin(Tile.this)); break;
             case RADIAL_PERCENTAGE: setSkin(new RadialPercentageTileSkin(Tile.this)); break;
+            case STATUS           : setSkin(new StatusTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

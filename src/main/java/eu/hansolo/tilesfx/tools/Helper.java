@@ -69,6 +69,8 @@ public class Helper {
     public static final double   MAP_OFFSET_X      = -MAP_WIDTH * 0.0285;
     public static final double   MAP_OFFSET_Y      = MAP_HEIGHT * 0.195;
 
+    public static final double   MIN_FONT_SIZE     = 5;
+
     public static final CountryGroup AMERICAS = new CountryGroup("AMERICAS", AI, AG, AR, AW, BS, BB, BZ, BM, BO, BR, CA, KY, CL, CO, CR, CU, DM, DO, EC, SV, GF, GD, GP, GT, GY, HT, HN, JM, MQ, MX, MS, NI, PA, PY, PE, PR, BL, KN, LC, MF, PM, VC, SR, TT, TC, US, UY, VE, VG, VI);
     public static final CountryGroup APAC     = new CountryGroup("APAC", AS, AU, BD, BN, BT, CC, CK, CN, CX, FJ, FM, GU, HK, ID, IN, IO, JP, KH, KI, KP, KR, LA, LK, MH, MM, MN, MO, MP, MV, MY, NC, NF, NP, NR, NU, NZ, PF, PG, PH, PK, PN, PW, SB, SG, TH, TK, TL, TO, TV, TW, VN, VU, WF, WS);
     public static final CountryGroup APJC     = new CountryGroup("APJC", AS, AU, BD, BN, BT, CC, CK, CN, CX, FJ, FM, GU, HK, HM, ID, IN, IO, JP, KH, KI, KP, KR, LA, LK, MH, MM, MN, MO, MP, MV, MY, NC, NF, NP, NR, NU, NZ, PF, PG, PH, PN, PW, SB, SG, TH, TK, TL, TO, TV, TW, VN, VU, WS);
@@ -252,7 +254,7 @@ public class Helper {
         final String FONT_NAME          = TEXT.getFont().getName();
         double       adjustableFontSize = FONT_SIZE;
 
-        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > 0) {
+        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > MIN_FONT_SIZE) {
             adjustableFontSize -= 0.05;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
@@ -261,7 +263,7 @@ public class Helper {
         final String FONT_NAME          = TEXT.getFont().getName();
         double       adjustableFontSize = FONT_SIZE;
 
-        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > 0) {
+        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > MIN_FONT_SIZE) {
             adjustableFontSize -= 0.05;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }

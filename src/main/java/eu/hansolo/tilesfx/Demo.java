@@ -20,6 +20,7 @@ import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
+import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
@@ -138,6 +139,7 @@ public class Demo extends Application {
     private Tile            sunburstTile;
     private Tile            matrixTile;
     private Tile            radialPercentageTile;
+    private Tile            statusTile;
 
 
     private long            lastTimerCall;
@@ -686,7 +688,7 @@ public class Demo extends Application {
 
         radialPercentageTile = TileBuilder.create().skinType(SkinType.RADIAL_PERCENTAGE)
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                          .backgroundColor(Color.web("#26262D"))
+                                          //.backgroundColor(Color.web("#26262D"))
                                           .maxValue(1000)
                                           .title("RadialPercentageSkin")
                                           .description("Product 1")
@@ -701,6 +703,29 @@ public class Demo extends Application {
                                           .barColor(Tile.BLUE)
                                           .decimals(0)
                                           .build();
+
+        Indicator leftGraphics = new Indicator(Tile.RED);
+        leftGraphics.setOn(true);
+
+        Indicator middleGraphics = new Indicator(Tile.YELLOW);
+        middleGraphics.setOn(true);
+
+        Indicator rightGraphics = new Indicator(Tile.GREEN);
+        rightGraphics.setOn(true);
+
+        statusTile = TileBuilder.create()
+                                .skinType(SkinType.STATUS)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                .title("Status Tile")
+                                .description("Notifications")
+                                .leftText("CRITICAL")
+                                .middleText("WARNING")
+                                .rightText("INFORMATION")
+                                .leftGraphics(leftGraphics)
+                                .middleGraphics(middleGraphics)
+                                .rightGraphics(rightGraphics)
+                                .text("Text")
+                                .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -750,6 +775,13 @@ public class Demo extends Application {
 
                     radialPercentageTile.setValue(chartData1.getValue());
 
+                    if (statusTile.getLeftValue() > 1000) { statusTile.setLeftValue(0); }
+                    if (statusTile.getMiddleValue() > 1000) { statusTile.setMiddleValue(0); }
+                    if (statusTile.getRightValue() > 1000) { statusTile.setRightValue(0); }
+                    statusTile.setLeftValue(statusTile.getLeftValue() + RND.nextInt(4));
+                    statusTile.setMiddleValue(statusTile.getMiddleValue() + RND.nextInt(3));
+                    statusTile.setRightValue(statusTile.getRightValue() + RND.nextInt(3));
+
                     lastTimerCall = now;
                 }
             }
@@ -766,7 +798,7 @@ public class Demo extends Application {
                                              gaugeSparkLineTile, radarChartTile1, radarChartTile2,
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
-                                             matrixTile, radialPercentageTile);//, weatherTile);
+                                             matrixTile, radialPercentageTile, statusTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

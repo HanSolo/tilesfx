@@ -258,8 +258,6 @@ public class Helper {
             adjustableFontSize -= 0.05;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
-
-        fitNodeWidth(TEXT, MAX_WIDTH);
     }
     public static final void adjustTextSize(final Label TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
         final String FONT_NAME          = TEXT.getFont().getName();
@@ -269,8 +267,6 @@ public class Helper {
             adjustableFontSize -= 0.05;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
-
-        fitNodeWidth(TEXT, MAX_WIDTH);
     }
 
     public static final void fitNodeWidth(final Node NODE, final double MAX_WIDTH) {

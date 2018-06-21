@@ -258,6 +258,8 @@ public class Helper {
             adjustableFontSize -= 0.05;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
+
+        fitNodeWidth(TEXT, MAX_WIDTH);
     }
     public static final void adjustTextSize(final Label TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
         final String FONT_NAME          = TEXT.getFont().getName();
@@ -267,6 +269,13 @@ public class Helper {
             adjustableFontSize -= 0.05;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
+
+        fitNodeWidth(TEXT, MAX_WIDTH);
+    }
+
+    public static final void fitNodeWidth(final Node NODE, final double MAX_WIDTH) {
+        NODE.setVisible(NODE.getLayoutBounds().getWidth() < MAX_WIDTH);
+        //enableNode(NODE, NODE.getLayoutBounds().getWidth() < MAX_WIDTH);
     }
 
     public static final DateTimeFormatter getDateFormat(final Locale LOCALE) {
@@ -718,14 +727,14 @@ public class Helper {
         return angle;
     }
 
-    public static double[] latLonToXY(final double LATITUDE, final double LONGITUDE) {
+    public static final double[] latLonToXY(final double LATITUDE, final double LONGITUDE) {
         return latLonToXY(LATITUDE, LONGITUDE, MAP_OFFSET_X, MAP_OFFSET_Y);
     }
-    public static double[] latLonToXY(final double LATITUDE, final double LONGITUDE, final double MAP_OFFSET_X, final double MAP_OFFSET_Y) {
+    public static final double[] latLonToXY(final double LATITUDE, final double LONGITUDE, final double MAP_OFFSET_X, final double MAP_OFFSET_Y) {
         double x = (LONGITUDE + 180) * (MAP_WIDTH / 360) + MAP_OFFSET_X;
         double y = (MAP_HEIGHT / 2) - (MAP_WIDTH * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(LATITUDE) / 2)))) / (2 * Math.PI)) + MAP_OFFSET_Y;
         return new double[]{ x, y };
     }
 
-    public static <T> Predicate<T> not(Predicate<T> predicate) { return predicate.negate(); }
+    public static final <T> Predicate<T> not(Predicate<T> predicate) { return predicate.negate(); }
 }

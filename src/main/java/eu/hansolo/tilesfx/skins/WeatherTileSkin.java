@@ -143,6 +143,8 @@ public class WeatherTileSkin extends TileSkin {
         text.setX(size * 0.05);
         text.setY(height - size * 0.05);
 
+        Helper.fitNodeWidth(text, maxWidth);
+
         maxWidth = width - size * 0.705;
         fontSize = size * 0.06;
 

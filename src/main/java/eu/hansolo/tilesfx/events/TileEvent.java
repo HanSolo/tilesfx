@@ -24,13 +24,13 @@ import eu.hansolo.tilesfx.chart.ChartData;
  * Created by hansolo on 19.12.16.
  */
 public class TileEvent {
-    public enum EventType { SHOW_NOTIFIER, HIDE_NOTIFIER,
+    public enum EventType { SHOW_NOTIFY_REGION, HIDE_NOTIFY_REGION, SHOW_INFO_REGION, HIDE_INFO_REGION,
                             RECALC, REDRAW, REFRESH, RESIZE, VISIBILITY, SECTION, ALERT, VALUE,
                             THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN,
                             MAX_VALUE_EXCEEDED, MIN_VALUE_UNDERRUN, VALUE_IN_RANGE,
                             FINISHED, SERIES, DATA, GRAPHIC, UPDATE, AVERAGING, LOCATION, TRACK, MAP_PROVIDER,
                             TOOLTIP_TEXT, VALUE_CHANGING, VALUE_CHANGED, FLIP_START, FLIP_FINISHED,
-                            SELECTED_CHART_DATA}
+                            SELECTED_CHART_DATA, BACKGROUND_IMAGE, REGIONS_ON_TOP, INFO_REGION_HANDLER }
 
     private final EventType EVENT_TYPE;
     private final ChartData DATA;

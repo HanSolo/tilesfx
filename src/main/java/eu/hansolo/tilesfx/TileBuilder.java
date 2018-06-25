@@ -50,6 +50,7 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -57,6 +58,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
@@ -840,21 +843,36 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B notificationBackgroundColor(final Color COLOR) {
-        properties.put("notificationBackgroundColor", new SimpleObjectProperty(COLOR));
+    public final B notifyRegionBackgroundColor(final Color COLOR) {
+        properties.put("notifyRegionBackgroundColor", new SimpleObjectProperty(COLOR));
         return (B)this;
     }
 
-    public final B notificationForegroundColor(final Color COLOR) {
-        properties.put("notificationForegroundColor", new SimpleObjectProperty(COLOR));
+    public final B notifyRegionForegroundColor(final Color COLOR) {
+        properties.put("notifyRegionForegroundColor", new SimpleObjectProperty(COLOR));
         return (B)this;
     }
 
-    public final B showNotifier(final boolean SHOW) {
-        properties.put("showNotifier", new SimpleBooleanProperty(SHOW));
+    public final B showNotifyRegion(final boolean SHOW) {
+        properties.put("showNotifyRegion", new SimpleBooleanProperty(SHOW));
         return (B)this;
     }
 
+    public final B infoRegionBackgroundColor(final Color COLOR) {
+        properties.put("infoRegionBackgroundColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B infoRegionForegroundColor(final Color COLOR) {
+        properties.put("infoRegionForegroundColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B showInfoRegion(final boolean SHOW) {
+        properties.put("showInfoRegion", new SimpleBooleanProperty(SHOW));
+        return (B)this;
+    }
+    
     public final B leftText(final String TEXT) {
         properties.put("leftText", new SimpleStringProperty(TEXT));
         return (B)this;
@@ -897,6 +915,21 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B rightGraphics(final Node NODE) {
         properties.put("rightGraphics", new SimpleObjectProperty(NODE));
+        return (B)this;
+    }
+
+    public final B backgroundImage(final Image IMAGE) {
+        properties.put("backgroundImage", new SimpleObjectProperty(IMAGE));
+        return (B)this;
+    }
+
+    public final B backgroundImageOpacity(final double OPACITY) {
+        properties.put("backgroundImageOpacity", new SimpleDoubleProperty(OPACITY));
+        return (B)this;
+    }
+
+    public final B infoRegionEventHandler(final EventHandler<MouseEvent> HANDLER) {
+        properties.put("infoRegionEventHandler", new SimpleObjectProperty(HANDLER));
         return (B)this;
     }
 
@@ -1120,11 +1153,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
             TILE.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
         }
 
-        if (properties.keySet().contains("minValue")) {
-            TILE.setMinValue(((DoubleProperty) properties.get("minValue")).get());
-        }
         if (properties.keySet().contains("maxValue")) {
             TILE.setMaxValue(((DoubleProperty) properties.get("maxValue")).get());
+        }
+        if (properties.keySet().contains("minValue")) {
+            TILE.setMinValue(((DoubleProperty) properties.get("minValue")).get());
         }
 
         if (properties.keySet().contains("alarmsArray")) {
@@ -1482,12 +1515,18 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setChartType(((ObjectProperty<ChartType>) properties.get(key)).get());
             } else if ("tooltipTimeout".equals(key)) {
                 TILE.setTooltipTimeout(((DoubleProperty) properties.get(key)).get());
-            } else if ("notificationBackgroundColor".equals(key)) {
-                TILE.setNotificationBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("notificationForegroundColor".equals(key)) {
-                TILE.setNotificationForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("showNotifier".equals(key)) {
-                TILE.showNotifier(((BooleanProperty) properties.get(key)).get());
+            } else if ("notifyRegionBackgroundColor".equals(key)) {
+                TILE.setNotifyRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("notifyRegionForegroundColor".equals(key)) {
+                TILE.setNotifyRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("showNotifyRegion".equals(key)) {
+                TILE.showNotifyRegion(((BooleanProperty) properties.get(key)).get());
+            } else if ("infoRegionBackgroundColor".equals(key)) {
+                TILE.setInfoRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("infoRegionForegroundColor".equals(key)) {
+                TILE.setInfoRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("showInfoRegion".equals(key)) {
+                TILE.showInfoRegion(((BooleanProperty) properties.get(key)).get());
             } else if ("leftText".equals(key)) {
                 TILE.setLeftText(((StringProperty) properties.get(key)).get());
             } else if ("middleText".equals(key)) {
@@ -1506,6 +1545,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setMiddleGraphics(((ObjectProperty<Node>) properties.get(key)).get());
             } else if ("rightGraphics".equals(key)) {
                 TILE.setRightGraphics(((ObjectProperty<Node>) properties.get(key)).get());
+            } else if ("backgroundImage".equals(key)) {
+                TILE.setBackgroundImage(((ObjectProperty<Image>) properties.get(key)).get());
+            } else if ("backgroundImageOpacity".equals(key)) {
+                TILE.setBackgroundImageOpacity(((DoubleProperty) properties.get(key)).get());
+            } else if ("infoRegionEventHandler".equals(key)) {
+                TILE.setInfoRegionEventHandler(((ObjectProperty<EventHandler<MouseEvent>>) properties.get(key)).get());
             }
         }
         properties.clear();

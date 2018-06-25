@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 by Gerrit Grunwald
+ * Copyright (c) 2018 by Gerrit Grunwald
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
 
 
-/**
- * User: hansolo
- * Date: 08.11.17
- * Time: 04:37
- */
-public class NotifyRegion extends Region {
+public class InfoRegion extends Region {
     private static final double  PREFERRED_WIDTH  = 52;
     private static final double  PREFERRED_HEIGHT = 52;
     private static final double  MINIMUM_WIDTH    = 1;
@@ -51,9 +46,9 @@ public class NotifyRegion extends Region {
 
 
     // ******************** Constructors **************************************
-    public NotifyRegion() {
-        backgroundColor = Tile.YELLOW;
-        foregroundColor = Tile.BACKGROUND;
+    public InfoRegion() {
+        backgroundColor = Tile.DARK_BLUE;
+        foregroundColor = Tile.FOREGROUND;
         roundedCorner   = true;
         initGraphics();
         registerListeners();
@@ -76,6 +71,7 @@ public class NotifyRegion extends Region {
 
         icon = new Path();
         icon.setStroke(Color.TRANSPARENT);
+        icon.setMouseTransparent(true);
 
         getChildren().setAll(path, icon);
     }
@@ -128,29 +124,29 @@ public class NotifyRegion extends Region {
         if (width > 0 && height > 0) {
             path.getElements().clear();
             if (isRoundedCorner()) {
-                path.getElements().add(new MoveTo(0, 0));
-                path.getElements().add(new LineTo(size - size * 0.23809524, 0));
-                path.getElements().add(new QuadCurveTo(size, 0, size, size * 0.23809524));
-                path.getElements().add(new LineTo(size, size * 0.23809524));
-                path.getElements().add(new LineTo(size, size));
+                path.getElements().add(new MoveTo(size * 0.23809524, 0));
+                path.getElements().add(new LineTo(size, 0));
+                path.getElements().add(new LineTo(0, size));
+                path.getElements().add(new LineTo(0, size * 0.23809524));
+                path.getElements().add(new QuadCurveTo(0, 0, size * 0.23809524, 0));
                 path.getElements().add(new ClosePath());
             } else {
                 path.getElements().add(new MoveTo(0, 0));
                 path.getElements().add(new LineTo(size, 0));
-                path.getElements().add(new LineTo(size, size));
+                path.getElements().add(new LineTo(0, size));
                 path.getElements().add(new ClosePath());
             }
 
             icon.getElements().clear();
-            icon.getElements().add(new MoveTo(size * 0.802380952380952, size * 0.123809523809524));
-            icon.getElements().add(new LineTo(size * 0.871428571428571, size * 0.19047619047619));
-            icon.getElements().add(new LineTo(size * 0.70952380952381, size * 0.352380952380952));
-            icon.getElements().add(new LineTo(size * 0.642857142857143, size * 0.283333333333333));
+            icon.getElements().add(new MoveTo(size * 0.185714285714286, size * 0.119047619047619));
+            icon.getElements().add(new LineTo(size * 0.254761904761905, size * 0.185714285714286));
+            icon.getElements().add(new LineTo(size * 0.185714285714286, size * 0.254761904761905));
+            icon.getElements().add(new LineTo(size * 0.119047619047619, size * 0.185714285714286));
             icon.getElements().add(new ClosePath());
-            icon.getElements().add(new MoveTo(size * 0.588095238095238, size * 0.338095238095238));
-            icon.getElements().add(new LineTo(size * 0.657142857142857, size * 0.404761904761905));
-            icon.getElements().add(new LineTo(size * 0.588095238095238, size * 0.471428571428571));
-            icon.getElements().add(new LineTo(size * 0.521428571428571, size * 0.404761904761905));
+            icon.getElements().add(new MoveTo(size * 0.304761904761905, size * 0.238095238095238));
+            icon.getElements().add(new LineTo(size * 0.466666666666667, size * 0.4));
+            icon.getElements().add(new LineTo(size * 0.4, size * 0.466666666666667));
+            icon.getElements().add(new LineTo(size * 0.238095238095238, size * 0.304761904761905));
             icon.getElements().add(new ClosePath());
 
             redraw();
@@ -162,3 +158,4 @@ public class NotifyRegion extends Region {
         icon.setFill(getForegroundColor());
     }
 }
+

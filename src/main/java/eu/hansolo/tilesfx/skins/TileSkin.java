@@ -21,15 +21,17 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.CtxBounds;
+import eu.hansolo.tilesfx.tools.InfoRegion;
 import eu.hansolo.tilesfx.tools.NotifyRegion;
 import javafx.beans.InvalidationListener;
-import javafx.collections.ListChangeListener;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -79,14 +81,16 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              List<Section>            sections;
     protected              boolean                  sectionsVisible;
     protected              TextSize                 textSize;
-    protected              DropShadow               shadow;
-    protected              InvalidationListener     sizeListener;
-    protected              TileEventListener        tileEventListener;
-    protected              InvalidationListener     currentValueListener;
-    protected              InvalidationListener     timeListener;
-    protected              Tile                     tile;
-    private                NotifyRegion             notifyRegion;
-    private                ListChangeListener<Node> childrenListener;
+    protected DropShadow               shadow;
+    protected InvalidationListener     sizeListener;
+    protected TileEventListener        tileEventListener;
+    protected InvalidationListener     currentValueListener;
+    protected InvalidationListener     timeListener;
+    protected Tile                     tile;
+    private   ImageView                backgroundImageView;
+    private   NotifyRegion             notifyRegion;
+    private   InfoRegion               infoRegion;
+    private EventHandler<MouseEvent>   infoRegionHandler;
 
 
     // ******************** Constructors **************************************
@@ -106,10 +110,10 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         sectionsVisible      = TILE.getSectionsVisible();
         highlightSections    = tile.isHighlightSections();
         textSize             = tile.getTextSize();
+        infoRegionHandler    = tile.getInfoRegionHandler();
         sizeListener         = o -> handleEvents("RESIZE");
         tileEventListener    = e -> handleEvents(e.getEventType().name());
         currentValueListener = o -> handleCurrentValue(tile.getCurrentValue());
-        childrenListener     = c -> notifyRegion.toFront();
         contentBounds        = new CtxBounds();
 
         initGraphics();
@@ -131,10 +135,24 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
 
         shadow = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 3, 0, 0, 0);
 
+        backgroundImageView = new ImageView();
+        backgroundImageView.setPreserveRatio(true);
+        backgroundImageView.setMouseTransparent(true);
+        if (null == tile.getBackgroundImage()) {
+            enableNode(backgroundImageView, false);
+        } else {
+            backgroundImageView.setImage(tile.getBackgroundImage());
+            enableNode(backgroundImageView, true);
+        }
+
         notifyRegion = new NotifyRegion();
         enableNode(notifyRegion, false);
 
-        pane = new Pane(notifyRegion);
+        infoRegion = new InfoRegion();
+        infoRegion.setPickOnBounds(false);
+        enableNode(infoRegion, false);
+
+        pane = new Pane(backgroundImageView, notifyRegion, infoRegion);
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(tile.getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
 
@@ -146,7 +164,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         tile.heightProperty().addListener(sizeListener);
         tile.setOnTileEvent(tileEventListener);
         tile.currentValueProperty().addListener(currentValueListener);
-        pane.getChildren().addListener(childrenListener);
+        if (null != infoRegionHandler) { infoRegion.addEventHandler(MouseEvent.ANY, infoRegionHandler); }
     }
 
 
@@ -179,10 +197,32 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             handleCurrentValue(tile.getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = tile.getSections();
-        } else if ("SHOW_NOTIFIER".equals(EVENT_TYPE)) {
+        } else if ("SHOW_NOTIFY_REGION".equals(EVENT_TYPE)) {
             enableNode(notifyRegion, true);
-        } else if ("HIDE_NOTIFIER".equals(EVENT_TYPE)) {
+        } else if ("HIDE_NOTIFY_REGION".equals(EVENT_TYPE)) {
             enableNode(notifyRegion, false);
+        } else if ("SHOW_INFO_REGION".equals(EVENT_TYPE)) {
+            enableNode(infoRegion, true);
+        } else if ("HIDE_INFO_REGION".equals(EVENT_TYPE)) {
+            enableNode(infoRegion, false);
+        } else if ("BACKGROUND_IMAGE".equals(EVENT_TYPE)) {
+            if (null == tile.getBackgroundImage()) {
+                enableNode(backgroundImageView, false);
+            } else {
+                backgroundImageView.setImage(tile.getBackgroundImage());
+                backgroundImageView.setFitWidth(width);
+                backgroundImageView.setFitHeight(height);
+                enableNode(backgroundImageView, true);
+            }
+        } else if ("REGIONS_ON_TOP".equals(EVENT_TYPE)) {
+            // Set upper left and upper right notifiers to front
+            notifyRegion.toFront();
+            infoRegion.toFront();
+        } else if ("INFO_REGION_HANDLER".equals(EVENT_TYPE)) {
+            if (null != infoRegionHandler) { infoRegion.removeEventHandler(MouseEvent.ANY, infoRegionHandler); }
+            infoRegionHandler = tile.getInfoRegionHandler();
+            if (null == infoRegionHandler) { return; }
+            infoRegion.addEventHandler(MouseEvent.ANY, infoRegionHandler);
         }
     }
 
@@ -193,7 +233,6 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         tile.heightProperty().removeListener(sizeListener);
         tile.removeTileEventListener(tileEventListener);
         tile.currentValueProperty().removeListener(currentValueListener);
-        pane.getChildren().removeListener(childrenListener);
         tile = null;
     }
     
@@ -230,8 +269,15 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            notifyRegion.setPrefSize(size * 0.13, size * 0.13);
-            notifyRegion.relocate(width - size * 0.13, 0);
+            backgroundImageView.setFitWidth(width);
+            backgroundImageView.setFitHeight(height);
+            backgroundImageView.relocate((width - backgroundImageView.getLayoutBounds().getWidth()) * 0.5, (height - backgroundImageView.getLayoutBounds().getHeight()) * 0.5);
+
+            notifyRegion.setPrefSize(size * 0.105, size * 0.105);
+            notifyRegion.relocate(width - size * 0.105, 0);
+
+            infoRegion.setPrefSize(size * 0.105, size * 0.105);
+            infoRegion.relocate(0, 0);
 
             resizeStaticText();
             resizeDynamicText();
@@ -241,9 +287,16 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected void redraw() {
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, tile.getRoundedCorners() ? new CornerRadii(clamp(0, Double.MAX_VALUE, size * 0.025)) : CornerRadii.EMPTY, new BorderWidths(clamp(0, Double.MAX_VALUE, tile.getBorderWidth() / PREFERRED_WIDTH * size)))));
         pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), tile.getRoundedCorners() ? new CornerRadii(clamp(0, Double.MAX_VALUE, size * 0.025)) : CornerRadii.EMPTY, Insets.EMPTY)));
+
+        backgroundImageView.setOpacity(tile.getBackgroundImageOpacity());
+
         notifyRegion.setRoundedCorner(tile.getRoundedCorners());
-        notifyRegion.setBackgroundColor(tile.getNotificationBackgroundColor());
-        notifyRegion.setForegroundColor(tile.getNotificationForegroundColor());
+        notifyRegion.setBackgroundColor(tile.getNotifyRegionBackgroundColor());
+        notifyRegion.setForegroundColor(tile.getNotifyRegionForegroundColor());
+
+        infoRegion.setRoundedCorner(tile.getRoundedCorners());
+        infoRegion.setBackgroundColor(tile.getInfoRegionBackgroundColor());
+        //infoRegion.setForegroundColor(tile.getInfoRegionForegroundColor());
 
         locale          = tile.getLocale();
         formatString    = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();

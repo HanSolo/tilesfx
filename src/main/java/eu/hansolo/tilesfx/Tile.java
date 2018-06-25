@@ -31,7 +31,46 @@ import eu.hansolo.tilesfx.events.TimeEvent;
 import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.skins.*;
+import eu.hansolo.tilesfx.skins.BarChartItem;
+import eu.hansolo.tilesfx.skins.BarChartTileSkin;
+import eu.hansolo.tilesfx.skins.CalendarTileSkin;
+import eu.hansolo.tilesfx.skins.CharacterTileSkin;
+import eu.hansolo.tilesfx.skins.CircularProgressTileSkin;
+import eu.hansolo.tilesfx.skins.ClockTileSkin;
+import eu.hansolo.tilesfx.skins.CountryTileSkin;
+import eu.hansolo.tilesfx.skins.CustomTileSkin;
+import eu.hansolo.tilesfx.skins.DateTileSkin;
+import eu.hansolo.tilesfx.skins.DonutChartTileSkin;
+import eu.hansolo.tilesfx.skins.EphemerisTileSkin;
+import eu.hansolo.tilesfx.skins.FlipTileSkin;
+import eu.hansolo.tilesfx.skins.GaugeSparkLineTileSkin;
+import eu.hansolo.tilesfx.skins.GaugeTileSkin;
+import eu.hansolo.tilesfx.skins.HighLowTileSkin;
+import eu.hansolo.tilesfx.skins.LeaderBoardItem;
+import eu.hansolo.tilesfx.skins.LeaderBoardTileSkin;
+import eu.hansolo.tilesfx.skins.MapTileSkin;
+import eu.hansolo.tilesfx.skins.MatrixTileSkin;
+import eu.hansolo.tilesfx.skins.NumberTileSkin;
+import eu.hansolo.tilesfx.skins.PercentageTileSkin;
+import eu.hansolo.tilesfx.skins.PlusMinusTileSkin;
+import eu.hansolo.tilesfx.skins.RadarChartTileSkin;
+import eu.hansolo.tilesfx.skins.RadialChartTileSkin;
+import eu.hansolo.tilesfx.skins.RadialPercentageTileSkin;
+import eu.hansolo.tilesfx.skins.SliderTileSkin;
+import eu.hansolo.tilesfx.skins.SmoothAreaChartTileSkin;
+import eu.hansolo.tilesfx.skins.SmoothedChartTileSkin;
+import eu.hansolo.tilesfx.skins.SparkLineTileSkin;
+import eu.hansolo.tilesfx.skins.StatusTileSkin;
+import eu.hansolo.tilesfx.skins.StockTileSkin;
+import eu.hansolo.tilesfx.skins.SunburstChartTileSkin;
+import eu.hansolo.tilesfx.skins.SwitchSliderTileSkin;
+import eu.hansolo.tilesfx.skins.SwitchTileSkin;
+import eu.hansolo.tilesfx.skins.TextTileSkin;
+import eu.hansolo.tilesfx.skins.TileSkin;
+import eu.hansolo.tilesfx.skins.TimeTileSkin;
+import eu.hansolo.tilesfx.skins.TimerControlTileSkin;
+import eu.hansolo.tilesfx.skins.WeatherTileSkin;
+import eu.hansolo.tilesfx.skins.WorldMapTileSkin;
 import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
@@ -50,7 +89,22 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.IntegerPropertyBase;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.LongPropertyBase;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyLongProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.property.StringPropertyBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -65,6 +119,8 @@ import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
@@ -86,7 +142,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -177,47 +232,52 @@ public class Tile extends Control {
     }
     public enum ChartType { LINE, AREA }
 
-    public  static final Color       BACKGROUND            = Color.rgb(42, 42, 42);
-    public  static final Color       FOREGROUND            = Color.rgb(223, 223, 223);
-    public  static final Color       GRAY                  = TileColor.GRAY.color;
-    public  static final Color       RED                   = TileColor.RED.color;
-    public  static final Color       LIGHT_RED             = TileColor.LIGHT_RED.color;
-    public  static final Color       GREEN                 = TileColor.GREEN.color;
-    public  static final Color       LIGHT_GREEN           = TileColor.LIGHT_GREEN.color;
-    public  static final Color       BLUE                  = TileColor.BLUE.color;
-    public  static final Color       DARK_BLUE             = TileColor.DARK_BLUE.color;
-    public  static final Color       ORANGE                = TileColor.ORANGE.color;
-    public  static final Color       YELLOW_ORANGE         = TileColor.YELLOW_ORANGE.color;
-    public  static final Color       YELLOW                = TileColor.YELLOW.color;
-    public  static final Color       MAGENTA               = TileColor.MAGENTA.color;
-    public  static final Color       PINK                  = TileColor.PINK.color;
-    public  static final int         SHORT_INTERVAL        = 20;
-    public  static final int         LONG_INTERVAL         = 1000;
-    private static final int         MAX_NO_OF_DECIMALS    = 3;
+    public  static final Color       BACKGROUND                = Color.rgb(42, 42, 42);
+    public  static final Color       FOREGROUND                = Color.rgb(223, 223, 223);
+    public  static final Color       GRAY                      = TileColor.GRAY.color;
+    public  static final Color       RED                       = TileColor.RED.color;
+    public  static final Color       LIGHT_RED                 = TileColor.LIGHT_RED.color;
+    public  static final Color       GREEN                     = TileColor.GREEN.color;
+    public  static final Color       LIGHT_GREEN               = TileColor.LIGHT_GREEN.color;
+    public  static final Color       BLUE                      = TileColor.BLUE.color;
+    public  static final Color       DARK_BLUE                 = TileColor.DARK_BLUE.color;
+    public  static final Color       ORANGE                    = TileColor.ORANGE.color;
+    public  static final Color       YELLOW_ORANGE             = TileColor.YELLOW_ORANGE.color;
+    public  static final Color       YELLOW                    = TileColor.YELLOW.color;
+    public  static final Color       MAGENTA                   = TileColor.MAGENTA.color;
+    public  static final Color       PINK                      = TileColor.PINK.color;
+    public  static final int         SHORT_INTERVAL            = 20;
+    public  static final int         LONG_INTERVAL             = 1000;
+    private static final int         MAX_NO_OF_DECIMALS        = 3;
 
-    private        final TileEvent   SHOW_NOTIFIER_EVENT   = new TileEvent(EventType.SHOW_NOTIFIER);
-    private        final TileEvent   HIDE_NOTIFIER_EVENT   = new TileEvent(EventType.HIDE_NOTIFIER);
-    private        final TileEvent   EXCEEDED_EVENT        = new TileEvent(EventType.THRESHOLD_EXCEEDED);
-    private        final TileEvent   UNDERRUN_EVENT        = new TileEvent(EventType.THRESHOLD_UNDERRUN);
-    private        final TileEvent   MAX_VALUE_EXCEEDED    = new TileEvent(EventType.MAX_VALUE_EXCEEDED);
-    private        final TileEvent   MIN_VALUE_UNDERRUN    = new TileEvent(EventType.MIN_VALUE_UNDERRUN);
-    private        final TileEvent   VALUE_IN_RANGE        = new TileEvent(EventType.VALUE_IN_RANGE);
-    private        final TileEvent   RECALC_EVENT          = new TileEvent(EventType.RECALC);
-    private        final TileEvent   REDRAW_EVENT          = new TileEvent(EventType.REDRAW);
-    private        final TileEvent   RESIZE_EVENT          = new TileEvent(EventType.RESIZE);
-    private        final TileEvent   VISIBILITY_EVENT      = new TileEvent(EventType.VISIBILITY);
-    private        final TileEvent   SECTION_EVENT         = new TileEvent(EventType.SECTION);
-    private        final TileEvent   SERIES_EVENT          = new TileEvent(EventType.SERIES);
-    private        final TileEvent   DATA_EVENT            = new TileEvent(EventType.DATA);
-    private        final TileEvent   ALERT_EVENT           = new TileEvent(EventType.ALERT);
-    private        final TileEvent   VALUE_EVENT           = new TileEvent(EventType.VALUE);
-    private        final TileEvent   FINISHED_EVENT        = new TileEvent(EventType.FINISHED);
-    private        final TileEvent   GRAPHIC_EVENT         = new TileEvent(EventType.GRAPHIC);
-    private        final TileEvent   AVERAGING_EVENT       = new TileEvent(EventType.AVERAGING);
-    private        final TileEvent   LOCATION_EVENT        = new TileEvent(EventType.LOCATION);
-    private        final TileEvent   TRACK_EVENT           = new TileEvent(EventType.TRACK);
-    private        final TileEvent   MAP_PROVIDER_EVENT    = new TileEvent(EventType.MAP_PROVIDER);
-    private        final TileEvent   FLIP_START_EVENT      = new TileEvent(EventType.FLIP_START);
+    private        final TileEvent   SHOW_NOTIFY_REGION_EVENT  = new TileEvent(EventType.SHOW_NOTIFY_REGION);
+    private        final TileEvent   HIDE_NOTIFY_REGION_EVENT  = new TileEvent(EventType.HIDE_NOTIFY_REGION);
+    private        final TileEvent   SHOW_INFO_REGION_EVENT    = new TileEvent(EventType.SHOW_INFO_REGION);
+    private        final TileEvent   HIDE_INFO_REGION_EVENT    = new TileEvent(EventType.HIDE_INFO_REGION);
+    private        final TileEvent   EXCEEDED_EVENT            = new TileEvent(EventType.THRESHOLD_EXCEEDED);
+    private        final TileEvent   UNDERRUN_EVENT            = new TileEvent(EventType.THRESHOLD_UNDERRUN);
+    private        final TileEvent   MAX_VALUE_EXCEEDED        = new TileEvent(EventType.MAX_VALUE_EXCEEDED);
+    private        final TileEvent   MIN_VALUE_UNDERRUN        = new TileEvent(EventType.MIN_VALUE_UNDERRUN);
+    private        final TileEvent   VALUE_IN_RANGE            = new TileEvent(EventType.VALUE_IN_RANGE);
+    private        final TileEvent   RECALC_EVENT              = new TileEvent(EventType.RECALC);
+    private        final TileEvent   REDRAW_EVENT              = new TileEvent(EventType.REDRAW);
+    private        final TileEvent   RESIZE_EVENT              = new TileEvent(EventType.RESIZE);
+    private        final TileEvent   VISIBILITY_EVENT          = new TileEvent(EventType.VISIBILITY);
+    private        final TileEvent   SECTION_EVENT             = new TileEvent(EventType.SECTION);
+    private        final TileEvent   SERIES_EVENT              = new TileEvent(EventType.SERIES);
+    private        final TileEvent   DATA_EVENT                = new TileEvent(EventType.DATA);
+    private        final TileEvent   ALERT_EVENT               = new TileEvent(EventType.ALERT);
+    private        final TileEvent   VALUE_EVENT               = new TileEvent(EventType.VALUE);
+    private        final TileEvent   FINISHED_EVENT            = new TileEvent(EventType.FINISHED);
+    private        final TileEvent   GRAPHIC_EVENT             = new TileEvent(EventType.GRAPHIC);
+    private        final TileEvent   AVERAGING_EVENT           = new TileEvent(EventType.AVERAGING);
+    private        final TileEvent   LOCATION_EVENT            = new TileEvent(EventType.LOCATION);
+    private        final TileEvent   TRACK_EVENT               = new TileEvent(EventType.TRACK);
+    private        final TileEvent   MAP_PROVIDER_EVENT        = new TileEvent(EventType.MAP_PROVIDER);
+    private        final TileEvent   FLIP_START_EVENT          = new TileEvent(EventType.FLIP_START);
+    private        final TileEvent   BKG_IMAGE_EVENT           = new TileEvent(EventType.BACKGROUND_IMAGE);
+    private        final TileEvent   REGIONS_ON_TOP_EVENT      = new TileEvent(EventType.REGIONS_ON_TOP);
+    private        final TileEvent   INFO_REGION_HANDLER_EVENT = new TileEvent(EventType.INFO_REGION_HANDLER);
     
     // Tile events
     private              Queue<TileEvent>         tileEventQueue      = new LinkedBlockingQueue<>();
@@ -478,9 +538,12 @@ public class Tile extends Control {
     private              ChartType                                     _chartType;
     private              double                                        _tooltipTimeout;
     private              DoubleProperty                                tooltipTimeout;
-    private              Color                                         _notificationBackgroundColor;
-    private              Color                                         _notificationForegroundColor;
-
+    private              Color                                         _notifyRegionBackgroundColor;
+    private              Color                                         _notifyRegionForegroundColor;
+    private              Color                                         _infoRegionBackgroundColor;
+    private              Color                                         _infoRegionForegroundColor;
+    private              Image                                         _backgroundImage;
+    private              double                                        _backgroundImageOpacity;
     private              String                                        _leftText;
     private              StringProperty                                leftText;
     private              String                                        _middleText;
@@ -499,6 +562,7 @@ public class Tile extends Control {
     private              ObjectProperty<Node>                          middleGraphics;
     private              Node                                          _rightGraphics;
     private              ObjectProperty<Node>                          rightGraphics;
+    private              EventHandler<MouseEvent>                      infoRegionHandler;
 
     private volatile     ScheduledFuture<?>                            periodicTickTask;
     private static       ScheduledExecutorService                      periodicTickExecutorService;
@@ -689,8 +753,12 @@ public class Tile extends Control {
         _matrixSize                         = new int[]{ 30, 25 };
         _chartType                          = ChartType.LINE;
         _tooltipTimeout                     = 2000;
-        _notificationBackgroundColor        = Tile.YELLOW;
-        _notificationForegroundColor        = Tile.BACKGROUND;
+        _notifyRegionBackgroundColor        = Tile.YELLOW;
+        _notifyRegionForegroundColor        = Tile.BACKGROUND;
+        _infoRegionBackgroundColor          = Tile.DARK_BLUE;
+        _infoRegionForegroundColor          = Tile.FOREGROUND;
+        _backgroundImage                    = null;
+        _backgroundImageOpacity             = 0.2;
         _leftText                           = "";
         _middleText                         = "";
         _rightText                          = "";
@@ -832,12 +900,12 @@ public class Tile extends Control {
         if (null == minValue) {
             minValue = new DoublePropertyBase(_minValue) {
                 @Override protected void invalidated() {
-                    final double VALUE = get();
-                    if (VALUE > getMaxValue()) setMaxValue(VALUE);
-                    setRange(getMaxValue() - VALUE);
-                    if (Helper.equals(originalMinValue, -Double.MAX_VALUE)) originalMinValue = VALUE;
+                    double value = get();
+                    if (value > getMaxValue()) { setMaxValue(value); }
+                    setRange(getMaxValue() - value);
+                    if (Helper.equals(originalMinValue, -Double.MAX_VALUE)) originalMinValue = value;
                     if (isStartFromZero() && _minValue < 0) Tile.this.setValue(0);
-                    if (Helper.lessThan(originalThreshold, getThreshold())) { setThreshold(clamp(VALUE, getMaxValue(), originalThreshold)); }
+                    if (Helper.lessThan(originalThreshold, getThreshold())) { setThreshold(clamp(value, getMaxValue(), originalThreshold)); }
                     fireTileEvent(RECALC_EVENT);
                     if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
                 }
@@ -4623,15 +4691,40 @@ public class Tile extends Control {
         }
     }
 
-    public Color getNotificationBackgroundColor() { return _notificationBackgroundColor; }
-    public void setNotificationBackgroundColor(final Color COLOR) {
-        _notificationBackgroundColor = COLOR;
+    public Color getNotifyRegionBackgroundColor() { return _notifyRegionBackgroundColor; }
+    public void setNotifyRegionBackgroundColor(final Color COLOR) {
+        _notifyRegionBackgroundColor = COLOR;
         fireTileEvent(REDRAW_EVENT);
     }
 
-    public Color getNotificationForegroundColor() { return _notificationForegroundColor; }
-    public void setNotificationForegroundColor(final Color COLOR) {
-        _notificationForegroundColor = COLOR;
+    public Color getNotifyRegionForegroundColor() { return _notifyRegionForegroundColor; }
+    public void setNotifyRegionForegroundColor(final Color COLOR) {
+        _notifyRegionForegroundColor = COLOR;
+        fireTileEvent(REDRAW_EVENT);
+    }
+
+    public Color getInfoRegionBackgroundColor() { return _infoRegionBackgroundColor; }
+    public void setInfoRegionBackgroundColor(final Color COLOR) {
+        _infoRegionBackgroundColor = COLOR;
+        fireTileEvent(REDRAW_EVENT);
+    }
+
+    public Color getInfoRegionForegroundColor() { return _infoRegionForegroundColor; }
+    public void setInfoRegionForegroundColor(final Color COLOR) {
+        _infoRegionForegroundColor = COLOR;
+        fireTileEvent(REDRAW_EVENT);
+    }
+
+    public Image getBackgroundImage() { return _backgroundImage; }
+    public void setBackgroundImage(final Image IMAGE) {
+        _backgroundImage = IMAGE;
+        fireTileEvent(BKG_IMAGE_EVENT);
+    }
+
+    public double getBackgroundImageOpacity() { return _backgroundImageOpacity; }
+    public void setBackgroundImageOpacity(final double OPACITY) {
+        _backgroundImageOpacity = Helper.clamp(0, 1, OPACITY);
+        if (null == _backgroundImage) return;
         fireTileEvent(REDRAW_EVENT);
     }
 
@@ -4820,8 +4913,16 @@ public class Tile extends Control {
         }
         return rightGraphics;
     }
-    
-    public void showNotifier(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFIER_EVENT : HIDE_NOTIFIER_EVENT); }
+
+    public void showNotifyRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFY_REGION_EVENT : HIDE_NOTIFY_REGION_EVENT); }
+
+    public void showInfoRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_INFO_REGION_EVENT : HIDE_INFO_REGION_EVENT); }
+
+    public EventHandler<MouseEvent> getInfoRegionHandler() { return infoRegionHandler; }
+    public void setInfoRegionEventHandler(final EventHandler<MouseEvent> HANDLER) {
+        infoRegionHandler = HANDLER;
+        fireTileEvent(INFO_REGION_HANDLER_EVENT);
+    }
 
     private Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();
@@ -4916,7 +5017,7 @@ public class Tile extends Control {
         if (oldTime.getHour() != now.getHour()) fireTimeEvent(new TimeEvent(Tile.this, now, TimeEventType.HOUR));
     }); }
 
-    
+
     // ******************** Scheduled tasks ***********************************
     private synchronized void enableTickExecutorService() {
         if (null == periodicTickExecutorService) {
@@ -5007,6 +5108,7 @@ public class Tile extends Control {
                     for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }
                 }
             }
+            fireTileEvent(REGIONS_ON_TOP_EVENT);
         });
     }
 

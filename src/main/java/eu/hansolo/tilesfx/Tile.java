@@ -542,6 +542,7 @@ public class Tile extends Control {
     private              Color                                         _notifyRegionForegroundColor;
     private              Color                                         _infoRegionBackgroundColor;
     private              Color                                         _infoRegionForegroundColor;
+    private              String                                        _infoRegionTooltipText;
     private              Image                                         _backgroundImage;
     private              double                                        _backgroundImageOpacity;
     private              String                                        _leftText;
@@ -757,6 +758,7 @@ public class Tile extends Control {
         _notifyRegionForegroundColor        = Tile.BACKGROUND;
         _infoRegionBackgroundColor          = Tile.DARK_BLUE;
         _infoRegionForegroundColor          = Tile.FOREGROUND;
+        _infoRegionTooltipText              = "";
         _backgroundImage                    = null;
         _backgroundImageOpacity             = 0.2;
         _leftText                           = "";
@@ -4712,6 +4714,12 @@ public class Tile extends Control {
     public Color getInfoRegionForegroundColor() { return _infoRegionForegroundColor; }
     public void setInfoRegionForegroundColor(final Color COLOR) {
         _infoRegionForegroundColor = COLOR;
+        fireTileEvent(REDRAW_EVENT);
+    }
+
+    public String getInfoRegionTooltipText() { return _infoRegionTooltipText; }
+    public void setInfoRegionTooltipText(final String TEXT) {
+        _infoRegionTooltipText = TEXT;
         fireTileEvent(REDRAW_EVENT);
     }
 

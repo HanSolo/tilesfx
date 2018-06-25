@@ -58,6 +58,7 @@ public class TilesFXTest extends Application {
                               }
                           })
                           //.infoRegionBackgroundColor(Tile.LIGHT_RED)
+                          .infoRegionTooltipText("Info Region")
                           .build();
 
         tile.showNotifyRegion(true);

@@ -296,7 +296,8 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
 
         infoRegion.setRoundedCorner(tile.getRoundedCorners());
         infoRegion.setBackgroundColor(tile.getInfoRegionBackgroundColor());
-        //infoRegion.setForegroundColor(tile.getInfoRegionForegroundColor());
+        infoRegion.setForegroundColor(tile.getInfoRegionForegroundColor());
+        infoRegion.setTooltipText(tile.getInfoRegionTooltipText());
 
         locale          = tile.getLocale();
         formatString    = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();

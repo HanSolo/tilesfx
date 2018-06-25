@@ -868,6 +868,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B infoRegionTooltipText(final String TEXT) {
+        properties.put("infoRegionTooltipText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
     public final B showInfoRegion(final boolean SHOW) {
         properties.put("showInfoRegion", new SimpleBooleanProperty(SHOW));
         return (B)this;
@@ -1551,6 +1556,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setBackgroundImageOpacity(((DoubleProperty) properties.get(key)).get());
             } else if ("infoRegionEventHandler".equals(key)) {
                 TILE.setInfoRegionEventHandler(((ObjectProperty<EventHandler<MouseEvent>>) properties.get(key)).get());
+            } else if ("infoRegionTooltipText".equals(key)) {
+                TILE.setInfoRegionTooltipText(((StringProperty) properties.get(key)).get());
             }
         }
         properties.clear();

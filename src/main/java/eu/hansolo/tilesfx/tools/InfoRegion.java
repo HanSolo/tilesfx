@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.tools;
 import eu.hansolo.tilesfx.Tile;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ClosePath;
@@ -43,6 +44,7 @@ public class InfoRegion extends Region {
     private              Color   backgroundColor;
     private              Color   foregroundColor;
     private              boolean roundedCorner;
+    private              Tooltip tooltip;
 
 
     // ******************** Constructors **************************************
@@ -72,6 +74,8 @@ public class InfoRegion extends Region {
         icon = new Path();
         icon.setStroke(Color.TRANSPARENT);
         icon.setMouseTransparent(true);
+
+        tooltip = new Tooltip("");
 
         getChildren().setAll(path, icon);
     }
@@ -110,6 +114,16 @@ public class InfoRegion extends Region {
     public void setRoundedCorner(final boolean ROUNDED) {
         roundedCorner = ROUNDED;
         redraw();
+    }
+
+    public String getToolTipText() { return tooltip.getText(); }
+    public void setTooltipText(final String TEXT) {
+        if (null == TEXT || TEXT.isEmpty()) {
+            Tooltip.uninstall(path, tooltip);
+        } else {
+            tooltip.setText(TEXT);
+            Tooltip.install(path, tooltip);
+        }
     }
 
     @Override public ObservableList<Node> getChildren() { return super.getChildren(); }

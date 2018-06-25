@@ -827,7 +827,7 @@ public class Demo extends Application {
         mapTile.addPoiLocation(new Location(51.85, 7.75, "Test"));
         mapTile.removePoiLocation(new Location(51.85, 7.75, "Test"));
 
-        radialPercentageTile.showNotifier(true);
+        radialPercentageTile.showNotifyRegion(true);
     }
 
     @Override public void stop() {

@@ -19,8 +19,10 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
@@ -35,23 +37,34 @@ import java.util.Random;
  */
 public class TilesFXTest extends Application {
     private static final   Random RND = new Random();
+    private static int     noOfNodes  = 0;
     private Tile           tile;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
     @Override public void init() {
-        Image     img     = new Image(TilesFXTest.class.getResourceAsStream("JavaChampion.png"));
-        ImageView imgView = new ImageView(img);
+        tile = TileBuilder.create()
+                          .skinType(SkinType.GAUGE)
+                          .prefSize(400, 400)
+                          .backgroundImage(new Image(TilesFXTest.class.getResourceAsStream("JavaChampion.png")))
+                          //.backgroundImageOpacity(1)
+                          .infoRegionBackgroundColor(Tile.LIGHT_RED)
+                          .build();
 
+        tile.showNotifyRegion(true);
+        tile.showInfoRegion(true);
+
+        /*
         tile = TileBuilder.create()
                           .skinType(SkinType.CUSTOM)
                           .prefSize(750, 750)
                           .title("Image Tile")
                           .text("My Image")
                           .textVisible(true)
-                          .graphic(imgView)
+                          .graphic(new ImageView(new Image(TilesFXTest.class.getResourceAsStream("JavaChampion.png"))))
                           .build();
 
+        */
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
@@ -71,10 +84,28 @@ public class TilesFXTest extends Application {
         stage.setTitle("TilesFX Test");
         stage.setScene(scene);
         stage.show();
+
+        // Calculate number of nodes
+        calcNoOfNodes(pane);
+        System.out.println(noOfNodes + " Nodes in SceneGraph");
+
+        timer.start();
     }
 
     @Override public void stop() {
         System.exit(0);
+    }
+
+
+    // ******************** Misc **********************************************
+    private static void calcNoOfNodes(Node node) {
+        if (node instanceof Parent) {
+            if (((Parent) node).getChildrenUnmodifiable().size() != 0) {
+                ObservableList<Node> tempChildren = ((Parent) node).getChildrenUnmodifiable();
+                noOfNodes += tempChildren.size();
+                for (Node n : tempChildren) { calcNoOfNodes(n); }
+            }
+        }
     }
 
     public static void main(String[] args) {

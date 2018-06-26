@@ -933,6 +933,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B backgroundImageKeepAspect(final boolean KEEP_ASPECT) {
+        properties.put("backgroundImageKeepAspect", new SimpleBooleanProperty(KEEP_ASPECT));
+        return (B)this;
+    }
+
     public final B infoRegionEventHandler(final EventHandler<MouseEvent> HANDLER) {
         properties.put("infoRegionEventHandler", new SimpleObjectProperty(HANDLER));
         return (B)this;
@@ -1554,6 +1559,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setBackgroundImage(((ObjectProperty<Image>) properties.get(key)).get());
             } else if ("backgroundImageOpacity".equals(key)) {
                 TILE.setBackgroundImageOpacity(((DoubleProperty) properties.get(key)).get());
+            } else if ("backgroundImageKeepAspect".equals(key)) {
+                TILE.setBackgroundImageKeepAspect(((BooleanProperty) properties.get(key)).get());
             } else if ("infoRegionEventHandler".equals(key)) {
                 TILE.setInfoRegionEventHandler(((ObjectProperty<EventHandler<MouseEvent>>) properties.get(key)).get());
             } else if ("infoRegionTooltipText".equals(key)) {

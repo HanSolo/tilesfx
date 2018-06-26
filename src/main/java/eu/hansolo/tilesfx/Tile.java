@@ -545,6 +545,7 @@ public class Tile extends Control {
     private              String                                        _infoRegionTooltipText;
     private              Image                                         _backgroundImage;
     private              double                                        _backgroundImageOpacity;
+    private              boolean                                       _backgroundImageKeepAspect;
     private              String                                        _leftText;
     private              StringProperty                                leftText;
     private              String                                        _middleText;
@@ -761,6 +762,7 @@ public class Tile extends Control {
         _infoRegionTooltipText              = "";
         _backgroundImage                    = null;
         _backgroundImageOpacity             = 0.2;
+        _backgroundImageKeepAspect          = true;
         _leftText                           = "";
         _middleText                         = "";
         _rightText                          = "";
@@ -4733,6 +4735,12 @@ public class Tile extends Control {
     public void setBackgroundImageOpacity(final double OPACITY) {
         _backgroundImageOpacity = Helper.clamp(0, 1, OPACITY);
         if (null == _backgroundImage) return;
+        fireTileEvent(REDRAW_EVENT);
+    }
+
+    public boolean getBackgroundImageKeepAspect() { return _backgroundImageKeepAspect; }
+    public void setBackgroundImageKeepAspect(final boolean KEEP_ASPECT) {
+        _backgroundImageKeepAspect = KEEP_ASPECT;
         fireTileEvent(REDRAW_EVENT);
     }
 

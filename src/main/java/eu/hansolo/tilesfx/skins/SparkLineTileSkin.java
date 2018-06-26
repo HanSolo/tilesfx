@@ -263,7 +263,7 @@ public class SparkLineTileSkin extends TileSkin {
         double stepY = graphBounds.getHeight() / range;
 
         niceScaleY.setMinMax(low, high);
-        int    lineCountY       = 0;
+        int    lineCountY       = 1;
         int    tickLabelOffsetY = 1;
         double tickSpacingY     = niceScaleY.getTickSpacing();
         double tickStepY        = tickSpacingY * stepY;

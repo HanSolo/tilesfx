@@ -41,6 +41,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 import java.util.Locale;
@@ -269,9 +270,18 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            backgroundImageView.setFitWidth(width);
-            backgroundImageView.setFitHeight(height);
-            backgroundImageView.relocate((width - backgroundImageView.getLayoutBounds().getWidth()) * 0.5, (height - backgroundImageView.getLayoutBounds().getHeight()) * 0.5);
+            if (backgroundImageView.isVisible()) {
+                if (tile.getRoundedCorners()) {
+                    Rectangle imgClip = new Rectangle(width, height);
+                    imgClip.setArcWidth(clamp(0, Double.MAX_VALUE, size * 0.05));
+                    imgClip.setArcHeight(clamp(0, Double.MAX_VALUE, size * 0.05));
+                    backgroundImageView.setClip(imgClip);
+                    backgroundImageView.setFitWidth(width);
+                    backgroundImageView.setFitHeight(height);
+                    backgroundImageView.setPreserveRatio(tile.getBackgroundImageKeepAspect());
+                    backgroundImageView.relocate((width - backgroundImageView.getLayoutBounds().getWidth()) * 0.5, (height - backgroundImageView.getLayoutBounds().getHeight()) * 0.5);
+                }
+            }
 
             notifyRegion.setPrefSize(size * 0.105, size * 0.105);
             notifyRegion.relocate(width - size * 0.105, 0);

@@ -276,11 +276,11 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
                     imgClip.setArcWidth(clamp(0, Double.MAX_VALUE, size * 0.05));
                     imgClip.setArcHeight(clamp(0, Double.MAX_VALUE, size * 0.05));
                     backgroundImageView.setClip(imgClip);
-                    backgroundImageView.setFitWidth(width);
-                    backgroundImageView.setFitHeight(height);
-                    backgroundImageView.setPreserveRatio(tile.getBackgroundImageKeepAspect());
-                    backgroundImageView.relocate((width - backgroundImageView.getLayoutBounds().getWidth()) * 0.5, (height - backgroundImageView.getLayoutBounds().getHeight()) * 0.5);
                 }
+                backgroundImageView.setFitWidth(width);
+                backgroundImageView.setFitHeight(height);
+                backgroundImageView.setPreserveRatio(tile.getBackgroundImageKeepAspect());
+                backgroundImageView.relocate((width - backgroundImageView.getLayoutBounds().getWidth()) * 0.5, (height - backgroundImageView.getLayoutBounds().getHeight()) * 0.5);
             }
 
             notifyRegion.setPrefSize(size * 0.105, size * 0.105);

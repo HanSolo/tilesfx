@@ -51,6 +51,7 @@ public class TilesFXTest extends Application {
                           .backgroundImage(new Image(TilesFXTest.class.getResourceAsStream("JavaChampion.png")))
                           //.backgroundImageOpacity(1)
                           //.infoRegionBackgroundColor(Tile.LIGHT_RED)
+                          .backgroundImageKeepAspect(true)
                           .infoRegionEventHandler(e -> {
                               EventType type = e.getEventType();
                               if (type.equals(MouseEvent.MOUSE_PRESSED)) {

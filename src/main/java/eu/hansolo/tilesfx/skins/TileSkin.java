@@ -82,16 +82,16 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              List<Section>            sections;
     protected              boolean                  sectionsVisible;
     protected              TextSize                 textSize;
-    protected DropShadow               shadow;
-    protected InvalidationListener     sizeListener;
-    protected TileEventListener        tileEventListener;
-    protected InvalidationListener     currentValueListener;
-    protected InvalidationListener     timeListener;
-    protected Tile                     tile;
-    private   ImageView                backgroundImageView;
-    private   NotifyRegion             notifyRegion;
-    private   InfoRegion               infoRegion;
-    private EventHandler<MouseEvent>   infoRegionHandler;
+    protected              DropShadow               shadow;
+    protected              InvalidationListener     sizeListener;
+    protected              TileEventListener        tileEventListener;
+    protected              InvalidationListener     currentValueListener;
+    protected              InvalidationListener     timeListener;
+    protected              Tile                     tile;
+    private                ImageView                backgroundImageView;
+    private                NotifyRegion             notifyRegion;
+    private                InfoRegion               infoRegion;
+    private                EventHandler<MouseEvent> infoRegionHandler;
 
 
     // ******************** Constructors **************************************
@@ -273,8 +273,8 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             if (backgroundImageView.isVisible()) {
                 if (tile.getRoundedCorners()) {
                     Rectangle imgClip = new Rectangle(width, height);
-                    imgClip.setArcWidth(clamp(0, Double.MAX_VALUE, size * 0.05));
-                    imgClip.setArcHeight(clamp(0, Double.MAX_VALUE, size * 0.05));
+                    imgClip.setArcWidth(clamp(0, Double.MAX_VALUE, inset));
+                    imgClip.setArcHeight(clamp(0, Double.MAX_VALUE, inset));
                     backgroundImageView.setClip(imgClip);
                 }
                 backgroundImageView.setFitWidth(width);
@@ -296,16 +296,17 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     }
 
     protected void redraw() {
-        pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, tile.getRoundedCorners() ? new CornerRadii(clamp(0, Double.MAX_VALUE, size * 0.025)) : CornerRadii.EMPTY, new BorderWidths(clamp(0, Double.MAX_VALUE, tile.getBorderWidth() / PREFERRED_WIDTH * size)))));
-        pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), tile.getRoundedCorners() ? new CornerRadii(clamp(0, Double.MAX_VALUE, size * 0.025)) : CornerRadii.EMPTY, Insets.EMPTY)));
+        boolean hasRoundedCorners = tile.getRoundedCorners();
+        pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, hasRoundedCorners ? new CornerRadii(clamp(0, Double.MAX_VALUE, size * 0.025)) : CornerRadii.EMPTY, new BorderWidths(clamp(0, Double.MAX_VALUE, tile.getBorderWidth() / PREFERRED_WIDTH * size)))));
+        pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), hasRoundedCorners ? new CornerRadii(clamp(0, Double.MAX_VALUE, size * 0.025)) : CornerRadii.EMPTY, Insets.EMPTY)));
 
         backgroundImageView.setOpacity(tile.getBackgroundImageOpacity());
 
-        notifyRegion.setRoundedCorner(tile.getRoundedCorners());
+        notifyRegion.setRoundedCorner(hasRoundedCorners);
         notifyRegion.setBackgroundColor(tile.getNotifyRegionBackgroundColor());
         notifyRegion.setForegroundColor(tile.getNotifyRegionForegroundColor());
 
-        infoRegion.setRoundedCorner(tile.getRoundedCorners());
+        infoRegion.setRoundedCorner(hasRoundedCorners);
         infoRegion.setBackgroundColor(tile.getInfoRegionBackgroundColor());
         infoRegion.setForegroundColor(tile.getInfoRegionForegroundColor());
         infoRegion.setTooltipText(tile.getInfoRegionTooltipText());

@@ -283,10 +283,11 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
                 backgroundImageView.relocate((width - backgroundImageView.getLayoutBounds().getWidth()) * 0.5, (height - backgroundImageView.getLayoutBounds().getHeight()) * 0.5);
             }
 
-            notifyRegion.setPrefSize(size * 0.105, size * 0.105);
-            notifyRegion.relocate(width - size * 0.105, 0);
+            double regionSize = size * 0.105;
+            notifyRegion.setPrefSize(regionSize, regionSize);
+            notifyRegion.relocate(width - regionSize, 0);
 
-            infoRegion.setPrefSize(size * 0.105, size * 0.105);
+            infoRegion.setPrefSize(regionSize, regionSize);
             infoRegion.relocate(0, 0);
 
             resizeStaticText();

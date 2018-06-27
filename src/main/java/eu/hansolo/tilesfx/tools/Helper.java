@@ -30,6 +30,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
@@ -478,6 +479,32 @@ public class Helper {
         }
 
         return subdividedPoints;
+    }
+
+    public static final Point[] smoothSparkLine(final List<Double> DATA_LIST, final double MIN_VALUE, final double MAX_VALUE, final Rectangle GRAPH_BOUNDS, final int NO_OF_DATAPOINTS) {
+        int     size   = DATA_LIST.size();
+        Point[] points = new Point[size];
+
+        double low  = Statistics.getMin(DATA_LIST);
+        double high = Statistics.getMax(DATA_LIST);
+        if (Helper.equals(low, high)) {
+            low  = MIN_VALUE;
+            high = MAX_VALUE;
+        }
+        double range = high - low;
+
+        double minX  = GRAPH_BOUNDS.getX();
+        double maxX  = minX + GRAPH_BOUNDS.getWidth();
+        double minY  = GRAPH_BOUNDS.getY();
+        double maxY  = minY + GRAPH_BOUNDS.getHeight();
+        double stepX = GRAPH_BOUNDS.getWidth() / (NO_OF_DATAPOINTS - 1);
+        double stepY = GRAPH_BOUNDS.getHeight() / range;
+
+        for (int i = 0 ; i < size ; i++) {
+            points[i] = new Point(minX + i * stepX, maxY - Math.abs(low - DATA_LIST.get(i)) * stepY);
+        }
+
+        return Helper.subdividePoints(points, 16);
     }
 
     public static final Map<String, List<CountryPath>> getHiresCountryPaths() {

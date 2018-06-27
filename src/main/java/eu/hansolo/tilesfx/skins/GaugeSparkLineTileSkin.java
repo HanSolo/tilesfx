@@ -25,7 +25,9 @@ import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
 import eu.hansolo.tilesfx.tools.Point;
 import eu.hansolo.tilesfx.tools.Statistics;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.concurrent.Task;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;
@@ -296,7 +298,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         double stepY = graphBounds.getHeight() / range;
 
         niceScaleY.setMinMax(low, high);
-        int    lineCountY       = 0;
+        int    lineCountY       = 1;
         int    tickLabelOffsetY = 1;
         double tickSpacingY     = niceScaleY.getTickSpacing();
         double tickStepY        = tickSpacingY * stepY;
@@ -512,37 +514,27 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     }
 
     private void smooth(final List<Double> DATA_LIST) {
-        int     size   = DATA_LIST.size();
-        Point[] points = new Point[size];
-
-        low  = Statistics.getMin(DATA_LIST);
-        high = Statistics.getMax(DATA_LIST);
-        if (Helper.equals(low, high)) {
-            low  = minValue;
-            high = maxValue;
-        }
-        range = high - low;
-
-        double minX  = graphBounds.getX();
-        double maxX  = minX + graphBounds.getWidth();
-        double minY  = graphBounds.getY();
-        double maxY  = minY + graphBounds.getHeight();
-        double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
-        double stepY = graphBounds.getHeight() / range;
-
-        for (int i = 0 ; i < size ; i++) {
-            points[i] = new Point(minX + i * stepX, maxY - Math.abs(low - DATA_LIST.get(i)) * stepY);
-        }
-
-        Point[] smoothedPoints = Helper.subdividePoints(points, 16);
-        int length = smoothedPoints.length;
-        sparkLine.getElements().clear();
-        sparkLine.getElements().add(new MoveTo(smoothedPoints[0].getX(), smoothedPoints[0].getY()));
-        for (int i = 1 ; i < length - 1 ; i++) {
-            sparkLine.getElements().add(new LineTo(smoothedPoints[i].getX(), smoothedPoints[i].getY()));
-        }
-        dot.setCenterX(smoothedPoints[length - 1].getX());
-        dot.setCenterY(smoothedPoints[length - 1].getY());
+        Task<Point[]> smoothTask = new Task<Point[]>() {
+            @Override protected Point[] call() throws Exception {
+                return Helper.smoothSparkLine(DATA_LIST, minValue, maxValue, graphBounds, noOfDatapoints);
+            }
+        };
+        smoothTask.setOnSucceeded(t -> {
+            Point[] smoothedPoints = smoothTask.getValue();
+            int length = smoothedPoints.length;
+            Platform.runLater(() -> {
+                sparkLine.getElements().clear();
+                sparkLine.getElements().add(new MoveTo(smoothedPoints[0].getX(), smoothedPoints[0].getY()));
+                for (int i = 1 ; i < length - 1 ; i++) {
+                    sparkLine.getElements().add(new LineTo(smoothedPoints[i].getX(), smoothedPoints[i].getY()));
+                }
+                dot.setCenterX(smoothedPoints[length - 1].getX());
+                dot.setCenterY(smoothedPoints[length - 1].getY());
+            });
+        });
+        Thread smoothThread = new Thread(smoothTask);
+        smoothThread.setDaemon(true);
+        smoothThread.start();
     }
 
 

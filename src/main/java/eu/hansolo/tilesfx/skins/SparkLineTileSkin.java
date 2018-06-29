@@ -406,15 +406,13 @@ public class SparkLineTileSkin extends TileSkin {
         smoothTask.setOnSucceeded(t -> {
             Point[] smoothedPoints = smoothTask.getValue();
             int length = smoothedPoints.length;
-            Platform.runLater(() -> {
-                sparkLine.getElements().clear();
-                sparkLine.getElements().add(new MoveTo(smoothedPoints[0].getX(), smoothedPoints[0].getY()));
-                for (int i = 1 ; i < length - 1 ; i++) {
-                    sparkLine.getElements().add(new LineTo(smoothedPoints[i].getX(), smoothedPoints[i].getY()));
-                }
-                dot.setCenterX(smoothedPoints[length - 1].getX());
-                dot.setCenterY(smoothedPoints[length - 1].getY());
-            });
+            sparkLine.getElements().clear();
+            sparkLine.getElements().add(new MoveTo(smoothedPoints[0].getX(), smoothedPoints[0].getY()));
+            for (int i = 1 ; i < length - 1 ; i++) {
+                sparkLine.getElements().add(new LineTo(smoothedPoints[i].getX(), smoothedPoints[i].getY()));
+            }
+            dot.setCenterX(smoothedPoints[length - 1].getX());
+            dot.setCenterY(smoothedPoints[length - 1].getY());
         });
         Thread smoothThread = new Thread(smoothTask);
         smoothThread.setDaemon(true);

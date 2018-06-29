@@ -272,7 +272,7 @@ public class RadialPercentageTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        if (width > 0 && height > 0) {
+        if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 

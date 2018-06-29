@@ -115,7 +115,7 @@ public class SunburstChartTileSkin extends TileSkin {
         double chartHeight  = contentBounds.getHeight();
         double chartSize    = chartWidth < chartHeight ? chartWidth : chartHeight;
 
-        if (width > 0 && height > 0) {
+        if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 

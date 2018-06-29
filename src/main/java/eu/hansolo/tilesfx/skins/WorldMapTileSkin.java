@@ -285,7 +285,7 @@ public class WorldMapTileSkin extends TileSkin {
         double containerWidth  = contentBounds.getWidth();
         double containerHeight = contentBounds.getHeight();
 
-        if (width > 0 && height > 0) {
+        if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 

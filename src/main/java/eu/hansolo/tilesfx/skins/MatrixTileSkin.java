@@ -226,7 +226,7 @@ public class MatrixTileSkin extends TileSkin {
         double chartWidth  = contentBounds.getWidth();
         double chartHeight = contentBounds.getHeight();
 
-        if (width > 0 && height > 0) {
+        if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 

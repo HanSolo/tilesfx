@@ -4940,6 +4940,11 @@ public class Tile extends Control {
         fireTileEvent(INFO_REGION_HANDLER_EVENT);
     }
 
+    public boolean isShowing() {
+        if (null == showing) { return false; }
+        return showing.get();
+    }
+
     private Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();
         final Properties  PROPERTIES = new Properties();
@@ -5125,6 +5130,7 @@ public class Tile extends Control {
                 }
             }
             fireTileEvent(REGIONS_ON_TOP_EVENT);
+            fireTileEvent(RESIZE_EVENT);
         });
     }
 

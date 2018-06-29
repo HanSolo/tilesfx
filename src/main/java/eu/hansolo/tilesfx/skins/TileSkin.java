@@ -253,7 +253,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         inset       = size * 0.05;
         doubleInset = inset * 2;
 
-        if (width > 0 && height > 0) {
+        if (tile.isShowing() && width > 0 && height > 0) {
             //pane.setMaxSize(size, size);
             //pane.relocate((width - size) * 0.5, (height - size) * 0.5);
 

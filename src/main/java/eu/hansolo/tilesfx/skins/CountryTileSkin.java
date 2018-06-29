@@ -235,7 +235,7 @@ public class CountryTileSkin extends TileSkin {
         double countryHeight   = countryGroup.getLayoutBounds().getHeight();
         double countrySize     = countryWidth < countryHeight ? countryHeight : countryWidth; // max size
 
-        if (width > 0 && height > 0) {
+        if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 

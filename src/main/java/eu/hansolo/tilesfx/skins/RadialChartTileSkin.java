@@ -241,7 +241,7 @@ public class RadialChartTileSkin extends TileSkin {
         double canvasHeight = contentBounds.getHeight();
         double canvasSize   = canvasWidth < canvasHeight ? canvasWidth : canvasHeight;
 
-        if (width > 0 && height > 0) {
+        if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 

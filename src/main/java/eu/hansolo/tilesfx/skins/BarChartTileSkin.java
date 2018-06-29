@@ -212,6 +212,7 @@ public class BarChartTileSkin extends TileSkin {
 
     @Override protected void resize() {
         super.resize();
+
         barChartPane.setPrefSize(width, contentBounds.getHeight());
         barChartPane.relocate(0, contentBounds.getY());
         resizeItems();

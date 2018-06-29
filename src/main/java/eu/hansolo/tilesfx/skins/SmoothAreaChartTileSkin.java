@@ -28,9 +28,7 @@ import eu.hansolo.tilesfx.tools.Point;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
-import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -237,36 +235,15 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
     private void drawChart(final List<Point> POINTS) {
         if (POINTS.isEmpty()) return;
+        Point[] points = smoothing ? Helper.subdividePoints(POINTS.toArray(new Point[0]), 8) : POINTS.toArray(new Point[0]);
 
-        if (smoothing) {
-            Task<Point[]> smoothTask = new Task<Point[]>() {
-                @Override protected Point[] call() throws Exception {
-                    return Helper.subdividePoints(POINTS.toArray(new Point[0]), 16);
-                }
-            };
-            smoothTask.setOnSucceeded(t -> {
-                Point[] points = smoothTask.getValue();
-                Platform.runLater(() -> fillElements(points));
-            });
-            Thread smoothingThread = new Thread(smoothTask);
-            smoothingThread.setDaemon(true);
-            smoothingThread.start();
-        } else {
-            Point[] points = POINTS.toArray(new Point[0]);
-            fillElements(points);
-        }
-
-        if (dataPointsVisible) { drawDataPoints(POINTS, tile.isFillWithGradient() ? tile.getGradientStops().get(0).getColor() : tile.getBarColor()); }
-    }
-
-    private void fillElements(final Point[] POINTS) {
         fillPath.getElements().clear();
         fillPath.getElements().add(new MoveTo(0, height));
 
         strokePath.getElements().clear();
-        strokePath.getElements().add(new MoveTo(POINTS[0].getX(), POINTS[0].getY()));
+        strokePath.getElements().add(new MoveTo(points[0].getX(), points[0].getY()));
 
-        for (Point p : POINTS) {
+        for (Point p : points) {
             fillPath.getElements().add(new LineTo(p.getX(), p.getY()));
             strokePath.getElements().add(new LineTo(p.getX(), p.getY()));
         }
@@ -274,6 +251,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         fillPath.getElements().add(new LineTo(width, height));
         fillPath.getElements().add(new LineTo(0, height));
         fillPath.getElements().add(new ClosePath());
+
+        if (dataPointsVisible) { drawDataPoints(POINTS, tile.isFillWithGradient() ? tile.getGradientStops().get(0).getColor() : tile.getBarColor()); }
     }
 
     private void drawDataPoints(final List<Point> DATA, final Color COLOR) {

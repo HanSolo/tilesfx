@@ -91,6 +91,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     private              Text                 maxValueText;
     private              double               low;
     private              double               high;
+    private              double               lastLow;
+    private              double               lastHigh;
     private              double               stdDeviation;
     private              int                  noOfDatapoints;
     private              List<Double>         dataList;
@@ -146,6 +148,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         gradientLookup = new GradientLookup(tile.getGradientStops());
         low            = tile.getMaxValue();
         high           = tile.getMinValue();
+        lastLow        = low;
+        lastHigh       = high;
         stdDeviation   = 0;
         movingAverage  = tile.getMovingAverage();
         noOfDatapoints = tile.getAveragingPeriod();
@@ -295,39 +299,43 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        niceScaleY.setMinMax(low, high);
-        int    lineCountY       = 1;
-        int    tickLabelOffsetY = 1;
-        double tickSpacingY     = niceScaleY.getTickSpacing();
-        double tickStepY        = tickSpacingY * stepY;
-        double tickStartY       = maxY - (tickSpacingY - low) * stepY;
-        if (tickSpacingY < low) {
-            tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
-            tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
-        }
+        boolean loHiChanged = Double.compare(lastLow, low) != 0 || Double.compare(lastHigh, high) != 0;
 
-        horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
-        tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
-        horizontalLineOffset = 0;
-        for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
-            Line line  = horizontalTickLines.get(lineCountY);
-            Text label = tickLabelsY.get(lineCountY);
-            //label.setText(String.format(locale, "%.0f", (tickSpacingY * (lineCountY + tickLabelOffsetY))));
-            label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
-            label.setY(y + graphBounds.getHeight() * 0.03);
-            label.setFill(tickLineColor);
-            horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
+        if (loHiChanged) {
+            niceScaleY.setMinMax(low, high);
+            int    lineCountY       = 1;
+            int    tickLabelOffsetY = 1;
+            double tickSpacingY     = niceScaleY.getTickSpacing();
+            double tickStepY        = tickSpacingY * stepY;
+            double tickStartY       = maxY - (tickSpacingY - low) * stepY;
+            if (tickSpacingY < low) {
+                tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
+                tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+            }
 
-            line.setStartX(minX);
-            line.setStartY(y);
-            line.setEndY(y);
-            line.setStroke(tickLineColor);
-            lineCountY++;
-            lineCountY = clamp(0, 4, lineCountY);
+            horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
+            tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+            horizontalLineOffset = 0;
+            for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
+                Line line  = horizontalTickLines.get(lineCountY);
+                Text label = tickLabelsY.get(lineCountY);
+                //label.setText(String.format(locale, "%.0f", (tickSpacingY * (lineCountY + tickLabelOffsetY))));
+                label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+                label.setY(y + graphBounds.getHeight() * 0.03);
+                label.setFill(tickLineColor);
+                horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
+
+                line.setStartX(minX);
+                line.setStartY(y);
+                line.setEndY(y);
+                line.setStroke(tickLineColor);
+                lineCountY++;
+                lineCountY = clamp(0, 4, lineCountY);
+            }
+            if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
+            horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
+            tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02));
         }
-        if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
-        horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-        tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02));
 
         if (!dataList.isEmpty()) {
             if (tile.isSmoothing()) {
@@ -349,7 +357,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
                 dot.setCenterY(end.getY());
             }
 
-            if (tile.isStrokeWithGradient()) {
+            if (tile.isStrokeWithGradient() && loHiChanged) {
                 setupGradient();
                 dot.setFill(gradient);
                 sparkLine.setStroke(gradient);
@@ -375,6 +383,9 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
         }
         resizeDynamicText();
+
+        lastLow  = low;
+        lastHigh = high;
 
         setBar(VALUE);
         
@@ -652,6 +663,9 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
         graphBounds = new Rectangle((width - (size * 0.35)) * 0.5, (height - (size * 0.35)) * 0.5, size * 0.35, size * 0.35);
+
+        lastLow  = maxValue;
+        lastHigh = minValue;
 
         tickLabelFontSize  = graphBounds.getHeight() * 0.1;
         Font tickLabelFont = Fonts.latoRegular(tickLabelFontSize);

@@ -22,8 +22,11 @@ import javafx.scene.paint.Stop;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 
@@ -92,6 +95,31 @@ public class GradientLookup {
         stops.clear();
         for (Stop stop : STOPS) { stops.put(stop.getOffset(), stop); }
         init();
+    }
+
+    public Stop getStopAt(final double POSITION_OF_STOP) {
+        if (stops.isEmpty()) { throw new IllegalArgumentException("GradientStop stops should not be empty"); };
+
+        final double POSITION = Helper.clamp(0.0, 1.0, POSITION_OF_STOP);
+
+        Stop stop = null;
+        double distance = Math.abs(stops.get(Double.valueOf(0)).getOffset() - POSITION);
+        for(Entry<Double, Stop> entry : stops.entrySet()) {
+            double cdistance = Math.abs(entry.getKey() - POSITION);
+            if (cdistance < distance) {
+                stop = stops.get(entry.getKey());
+                distance = cdistance;
+            }
+        }
+        return stop;
+    }
+
+    public List<Stop> getStopsBetween(final double MIN_OFFSET, final double MAX_OFFSET) {
+        List<Stop> selectedStops = new ArrayList<>();
+        for (Entry<Double, Stop> entry : stops.entrySet()) {
+            if (entry.getValue().getOffset() >= MIN_OFFSET && entry.getValue().getOffset() <= MAX_OFFSET) { selectedStops.add(entry.getValue()); }
+        }
+        return selectedStops;
     }
 
     private Color interpolateColor(final Stop LOWER_BOUND, final Stop UPPER_BOUND, final double POSITION) {

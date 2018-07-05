@@ -487,7 +487,19 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         double hiFactor = (high - minValue) / tile.getRange();
         Stop   loStop   = new Stop(loFactor, gradientLookup.getColorAt(loFactor));
         Stop   hiStop   = new Stop(hiFactor, gradientLookup.getColorAt(hiFactor));
-        gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, loStop, hiStop);
+
+        List<Stop> stopsInBetween = gradientLookup.getStopsBetween(loFactor, hiFactor);
+
+        double     range  = hiFactor - loFactor;
+        double     factor = 1.0 / range;
+        List<Stop> stops  = new ArrayList<>();
+        stops.add(new Stop(0, loStop.getColor()));
+        for (Stop stop : stopsInBetween) {
+            stops.add(new Stop((stop.getOffset() - loFactor) * factor, stop.getColor()));
+        }
+        stops.add(new Stop(1, hiStop.getColor()));
+
+        gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, stops);
     }
 
     private String createTimeSpanText() {

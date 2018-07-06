@@ -738,9 +738,9 @@ public class Demo extends Application {
                                   .startFromZero(true)
                                   .threshold(80)
                                   .thresholdVisible(true)
-                                  .title("TITLE")
+                                  .title("BarGauge Tile")
                                   .unit("F")
-                                  .text("TEXT")
+                                  .text("Whatever text")
                                   .gradientStops(new Stop(0, Bright.BLUE),
                                                  new Stop(0.1, Bright.BLUE_GREEN),
                                                  new Stop(0.2, Bright.GREEN),

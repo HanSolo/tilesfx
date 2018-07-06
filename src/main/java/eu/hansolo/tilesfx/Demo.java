@@ -25,6 +25,8 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart.Mode;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
+import eu.hansolo.tilesfx.colors.Bright;
+import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.tools.Country;
@@ -140,6 +142,7 @@ public class Demo extends Application {
     private Tile            matrixTile;
     private Tile            radialPercentageTile;
     private Tile            statusTile;
+    private Tile            barGaugeTile;
 
 
     private long            lastTimerCall;
@@ -727,6 +730,31 @@ public class Demo extends Application {
                                 .text("Text")
                                 .build();
 
+        barGaugeTile = TileBuilder.create()
+                                  .skinType(SkinType.BAR_GAUGE)
+                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                  .minValue(0)
+                                  .maxValue(100)
+                                  .startFromZero(true)
+                                  .threshold(80)
+                                  .thresholdVisible(true)
+                                  .title("TITLE")
+                                  .unit("F")
+                                  .text("TEXT")
+                                  .gradientStops(new Stop(0, Bright.BLUE),
+                                                 new Stop(0.1, Bright.BLUE_GREEN),
+                                                 new Stop(0.2, Bright.GREEN),
+                                                 new Stop(0.3, Bright.GREEN_YELLOW),
+                                                 new Stop(0.4, Bright.YELLOW),
+                                                 new Stop(0.5, Bright.YELLOW_ORANGE),
+                                                 new Stop(0.6, Bright.ORANGE),
+                                                 new Stop(0.7, Bright.ORANGE_RED),
+                                                 new Stop(0.8, Bright.RED),
+                                                 new Stop(1.0, Dark.RED))
+                                  .strokeWithGradient(true)
+                                  .animated(true)
+                                  .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -782,6 +810,8 @@ public class Demo extends Application {
                     statusTile.setMiddleValue(statusTile.getMiddleValue() + RND.nextInt(3));
                     statusTile.setRightValue(statusTile.getRightValue() + RND.nextInt(3));
 
+                    barGaugeTile.setValue(RND.nextDouble() * 100);
+
                     lastTimerCall = now;
                 }
             }
@@ -798,7 +828,7 @@ public class Demo extends Application {
                                              gaugeSparkLineTile, radarChartTile1, radarChartTile2,
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
-                                             matrixTile, radialPercentageTile, statusTile);//, weatherTile);
+                                             matrixTile, radialPercentageTile, statusTile, barGaugeTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

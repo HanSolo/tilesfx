@@ -520,9 +520,9 @@ public class GaugeTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         unitText.setText(tile.getUnit());
-        minValueText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getMinValue()));
-        maxValueText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getMaxValue()));
-        thresholdText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getThreshold()));
+        minValueText.setText(String.format(locale, tickLabelFormatString, tile.getMinValue()));
+        maxValueText.setText(String.format(locale, tickLabelFormatString, tile.getMaxValue()));
+        thresholdText.setText(String.format(locale, tickLabelFormatString, tile.getThreshold()));
         resizeStaticText();
 
         barColor       = tile.getBarColor();

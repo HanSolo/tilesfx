@@ -33,6 +33,7 @@ import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.BarChartTileSkin;
+import eu.hansolo.tilesfx.skins.BarGaugeTileSkin;
 import eu.hansolo.tilesfx.skins.CalendarTileSkin;
 import eu.hansolo.tilesfx.skins.CharacterTileSkin;
 import eu.hansolo.tilesfx.skins.CircularProgressTileSkin;
@@ -168,14 +169,14 @@ public class Tile extends Control {
                            NUMBER("NumberTileSkin"), TEXT("TextTileSkin"),
                            WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
-                           MAP("MapTileSkin"), RADIAL_CHART("RadialChart"), DONUT_CHART("DonutChart"),
-                           CIRCULAR_PROGRESS("CircularProgress"), STOCK("Stock"),
-                           GAUGE_SPARK_LINE("GaugeSparkLine"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
-                           RADAR_CHART("RadarChart"), COUNTRY("Country"), EPHEMERIS("Ephemeris"),
-                           CHARACTER("Character"), FLIP("Flip"), SWITCH_SLIDER("SwitchSlider"),
-                           DATE("Date"), CALENDAR("Calendar"), SUNBURST("Sunburst"), MATRIX("Matrix"),
-                           RADIAL_PERCENTAGE("RadialPercentage"),
-                           STATUS("Status");
+                           MAP("MapTileSkin"), RADIAL_CHART("RadialChartTileSkin"), DONUT_CHART("DonutChartTileSkin"),
+                           CIRCULAR_PROGRESS("CircularProgressTileSkin"), STOCK("StockTileSkin"),
+                           GAUGE_SPARK_LINE("GaugeSparkLineTileSkin"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
+                           RADAR_CHART("RadarChartTileSkin"), COUNTRY("CountryTileSkin"), EPHEMERIS("EphemerisTileSkin"),
+                           CHARACTER("CharacterTileSkin"), FLIP("FlipTileSkin"), SWITCH_SLIDER("SwitchSliderTileSkin"),
+                           DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"), MATRIX("MatrixTileSkin"),
+                           RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
+                           STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5175,6 +5176,7 @@ public class Tile extends Control {
             case MATRIX           : return new MatrixTileSkin(Tile.this);
             case RADIAL_PERCENTAGE: return new RadialPercentageTileSkin(Tile.this);
             case STATUS           : return new StatusTileSkin(Tile.this);
+            case BAR_GAUGE        : return new BarGaugeTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -5302,6 +5304,12 @@ public class Tile extends Control {
             case STATUS:
                 setDescriptionAlignment(Pos.TOP_CENTER);
                 break;
+            case BAR_GAUGE:
+                setBarBackgroundColor(Tile.BACKGROUND.brighter());
+                setBarColor(Tile.BLUE);
+                setAngleRange(180);
+                setTickLabelDecimals(0);
+                break;
             default:
                 break;
         }
@@ -5347,6 +5355,7 @@ public class Tile extends Control {
             case MATRIX           : setSkin(new MatrixTileSkin(Tile.this)); break;
             case RADIAL_PERCENTAGE: setSkin(new RadialPercentageTileSkin(Tile.this)); break;
             case STATUS           : setSkin(new StatusTileSkin(Tile.this)); break;
+            case BAR_GAUGE        : setSkin(new BarGaugeTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

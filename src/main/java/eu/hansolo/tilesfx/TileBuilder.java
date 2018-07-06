@@ -1140,6 +1140,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case STATUS:
                     TILE.setDescriptionAlignment(Pos.TOP_CENTER);
                     break;
+                case BAR_GAUGE:
+                    TILE.setBarBackgroundColor(Tile.BACKGROUND.brighter());
+                    TILE.setBarColor(Tile.BLUE);
+                    TILE.setAngleRange(180);
+                    TILE.setTickLabelDecimals(0);
+                    break;
                 default:
                     break;
             }

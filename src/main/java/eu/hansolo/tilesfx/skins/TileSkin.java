@@ -78,6 +78,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              double                   angleStep;
     protected              boolean                  highlightSections;
     protected              String                   formatString;
+    protected              String                   tickLabelFormatString;
     protected              Locale                   locale;
     protected              List<Section>            sections;
     protected              boolean                  sectionsVisible;
@@ -97,25 +98,26 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     // ******************** Constructors **************************************
     public TileSkin(final Tile TILE) {
         super(TILE);
-        tile                 = TILE;
-        minValue             = TILE.getMinValue();
-        maxValue             = TILE.getMaxValue();
-        range                = TILE.getRange();
-        threshold            = TILE.getThreshold();
-        stepSize             = PREFERRED_WIDTH / range;
-        angleRange           = clamp(90.0, 180.0, tile.getAngleRange());
-        angleStep            = angleRange / range;
-        formatString         = new StringBuilder("%.").append(Integer.toString(TILE.getDecimals())).append("f").toString();
-        locale               = TILE.getLocale();
-        sections             = TILE.getSections();
-        sectionsVisible      = TILE.getSectionsVisible();
-        highlightSections    = tile.isHighlightSections();
-        textSize             = tile.getTextSize();
-        infoRegionHandler    = tile.getInfoRegionHandler();
-        sizeListener         = o -> handleEvents("RESIZE");
-        tileEventListener    = e -> handleEvents(e.getEventType().name());
-        currentValueListener = o -> handleCurrentValue(tile.getCurrentValue());
-        contentBounds        = new CtxBounds();
+        tile                  = TILE;
+        minValue              = TILE.getMinValue();
+        maxValue              = TILE.getMaxValue();
+        range                 = TILE.getRange();
+        threshold             = TILE.getThreshold();
+        stepSize              = PREFERRED_WIDTH / range;
+        angleRange            = clamp(90.0, 180.0, tile.getAngleRange());
+        angleStep             = angleRange / range;
+        formatString          = new StringBuilder("%.").append(Integer.toString(TILE.getDecimals())).append("f").toString();
+        tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(TILE.getTickLabelDecimals())).append("f").toString();;
+        locale                = TILE.getLocale();
+        sections              = TILE.getSections();
+        sectionsVisible       = TILE.getSectionsVisible();
+        highlightSections     = tile.isHighlightSections();
+        textSize              = tile.getTextSize();
+        infoRegionHandler     = tile.getInfoRegionHandler();
+        sizeListener          = o -> handleEvents("RESIZE");
+        tileEventListener     = e -> handleEvents(e.getEventType().name());
+        currentValueListener  = o -> handleCurrentValue(tile.getCurrentValue());
+        contentBounds         = new CtxBounds();
 
         initGraphics();
         registerListeners();
@@ -311,9 +313,10 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         infoRegion.setForegroundColor(tile.getInfoRegionForegroundColor());
         infoRegion.setTooltipText(tile.getInfoRegionTooltipText());
 
-        locale          = tile.getLocale();
-        formatString    = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();
-        sectionsVisible = tile.getSectionsVisible();
-        textSize        = tile.getTextSize();
+        locale                = tile.getLocale();
+        formatString          = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();
+        tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(tile.getTickLabelDecimals())).append("f").toString();
+        sectionsVisible       = tile.getSectionsVisible();
+        textSize              = tile.getTextSize();
     }
 }

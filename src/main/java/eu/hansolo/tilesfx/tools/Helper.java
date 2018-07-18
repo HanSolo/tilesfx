@@ -145,6 +145,20 @@ public class Helper {
         return VALUE;
     }
 
+    public static final double clampMin(final double MIN, final double VALUE) {
+        if (VALUE < MIN) return MIN;
+        return VALUE;
+    }
+    public static final double clampMax(final double MAX, final double VALUE) {
+        if (VALUE > MAX) return MAX;
+        return VALUE;
+    }
+
+    public static final double round(final double VALUE, final int PRECISION) {
+        final int SCALE = (int) Math.pow(10, PRECISION);
+        return (double) Math.round(VALUE * SCALE) / SCALE;
+    }
+
     public static final double nearest(final double SMALLER, final double VALUE, final double LARGER) {
         return (VALUE - SMALLER) < (LARGER - VALUE) ? SMALLER : LARGER;
     }

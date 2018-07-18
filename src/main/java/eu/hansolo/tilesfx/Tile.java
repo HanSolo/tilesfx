@@ -4941,10 +4941,7 @@ public class Tile extends Control {
         fireTileEvent(INFO_REGION_HANDLER_EVENT);
     }
 
-    public boolean isShowing() {
-        if (null == showing) { return false; }
-        return showing.get();
-    }
+    public boolean isShowing() { return null == showing ? false : showing.get(); }
 
     private Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();

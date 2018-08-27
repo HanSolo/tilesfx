@@ -19,22 +19,22 @@ package eu.hansolo.tilesfx.events;
 import eu.hansolo.tilesfx.tools.TreeNode;
 
 
-public class TreeNodeEvent {
+public class TreeNodeEvent<T> {
     public enum EventType { PARENT_CHANGED, CHILDREN_CHANGED, NODE_SELECTED }
 
-    private final TreeNode  SRC;
+    private final TreeNode<T>  SRC;
     private final EventType TYPE;
 
 
     // ******************** Constructors **************************************
-    public TreeNodeEvent(final TreeNode SRC, final EventType TYPE) {
+    public TreeNodeEvent(final TreeNode<T> SRC, final EventType TYPE) {
         this.SRC  = SRC;
         this.TYPE = TYPE;
     }
 
 
     // ******************** Methods *******************************************
-    public TreeNode getSource() { return SRC; }
+    public TreeNode<T> getSource() { return SRC; }
 
     public EventType getType() { return TYPE; }
 }

@@ -57,6 +57,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -87,55 +88,55 @@ public class SunburstChart extends Region {
 
         public double getMaxAngle() { return maxAngle; }
     }
-    private static final double                          PREFERRED_WIDTH   = 250;
-    private static final double                          PREFERRED_HEIGHT  = 250;
-    private static final double                          MINIMUM_WIDTH     = 50;
-    private static final double                          MINIMUM_HEIGHT    = 50;
-    private static final double                          MAXIMUM_WIDTH     = 2048;
-    private static final double                          MAXIMUM_HEIGHT    = 2048;
-    private static final Color                           BRIGHT_TEXT_COLOR = Color.WHITE;
-    private static final Color                           DARK_TEXT_COLOR   = Color.BLACK;
-    private              double                          size;
-    private              double                          width;
-    private              double                          height;
-    private              double                          centerX;
-    private              double                          centerY;
-    private              Pane                            segmentPane;
-    private              Canvas                          chartCanvas;
-    private              GraphicsContext                 chartCtx;
-    private              Pane                            pane;
-    private              Paint                           backgroundPaint;
-    private              Paint                           borderPaint;
-    private              double                          borderWidth;
-    private              List<Path>                      segments;
-    private              VisibleData                     _visibleData;
-    private              ObjectProperty<VisibleData>     visibleData;
-    private              TextOrientation                 _textOrientation;
-    private              ObjectProperty<TextOrientation> textOrientation;
-    private              Color                           _backgroundColor;
-    private              ObjectProperty<Color>           backgroundColor;
-    private              Color                           _textColor;
-    private              ObjectProperty<Color>           textColor;
-    private              boolean                         _useColorFromParent;
-    private              BooleanProperty                 useColorFromParent;
-    private              int                             _decimals;
-    private              IntegerProperty                 decimals;
-    private              boolean                         _interactive;
-    private              BooleanProperty                 interactive;
-    private              boolean                         _autoTextColor;
-    private              BooleanProperty                 autoTextColor;
-    private              Color                           _brightTextColor;
-    private              ObjectProperty<Color>           brightTextColor;
-    private              Color                           _darkTextColor;
-    private              ObjectProperty<Color>           darkTextColor;
-    private              boolean                         _useChartDataTextColor;
-    private              BooleanProperty                 useChartDataTextColor;
-    private              String                          formatString;
-    private              TreeNode                        tree;
-    private              TreeNode                        root;
-    private              int                             maxLevel;
-    private              Map<Integer, List<TreeNode>>    levelMap;
-    private              InvalidationListener            sizeListener;
+    private static final double                                  PREFERRED_WIDTH   = 250;
+    private static final double                                  PREFERRED_HEIGHT  = 250;
+    private static final double                                  MINIMUM_WIDTH     = 50;
+    private static final double                                  MINIMUM_HEIGHT    = 50;
+    private static final double                                  MAXIMUM_WIDTH     = 2048;
+    private static final double                                  MAXIMUM_HEIGHT    = 2048;
+    private static final Color                                   BRIGHT_TEXT_COLOR = Color.WHITE;
+    private static final Color                                   DARK_TEXT_COLOR   = Color.BLACK;
+    private              double                                  size;
+    private              double                                  width;
+    private              double                                  height;
+    private              double                                  centerX;
+    private              double                                  centerY;
+    private              Pane                                    segmentPane;
+    private              Canvas                                  chartCanvas;
+    private              GraphicsContext                         chartCtx;
+    private              Pane                                    pane;
+    private              Paint                                   backgroundPaint;
+    private              Paint                                   borderPaint;
+    private              double                                  borderWidth;
+    private              List<Path>                              segments;
+    private              VisibleData                             _visibleData;
+    private              ObjectProperty<VisibleData>             visibleData;
+    private              TextOrientation                         _textOrientation;
+    private              ObjectProperty<TextOrientation>         textOrientation;
+    private              Color                                   _backgroundColor;
+    private              ObjectProperty<Color>                   backgroundColor;
+    private              Color                                   _textColor;
+    private              ObjectProperty<Color>                   textColor;
+    private              boolean                                 _useColorFromParent;
+    private              BooleanProperty                         useColorFromParent;
+    private              int                                     _decimals;
+    private              IntegerProperty                         decimals;
+    private              boolean                                 _interactive;
+    private              BooleanProperty                         interactive;
+    private              boolean                                 _autoTextColor;
+    private              BooleanProperty                         autoTextColor;
+    private              Color                                   _brightTextColor;
+    private              ObjectProperty<Color>                   brightTextColor;
+    private              Color                                   _darkTextColor;
+    private              ObjectProperty<Color>                   darkTextColor;
+    private              boolean                                 _useChartDataTextColor;
+    private              BooleanProperty                         useChartDataTextColor;
+    private              String                                  formatString;
+    private              TreeNode<ChartData>                     tree;
+    private              TreeNode<ChartData>                     root;
+    private              int                                     maxLevel;
+    private              Map<Integer, List<TreeNode<ChartData>>> levelMap;
+    private              InvalidationListener                    sizeListener;
 
 
 
@@ -571,7 +572,7 @@ public class SunburstChart extends Region {
      * Defines the root element of the tree
      * @param TREE
      */
-    public void setTree(final TreeNode TREE) {
+    public void setTree(final TreeNode<ChartData> TREE) {
         if (null != tree) { tree.flattened().forEach(node -> node.removeAllTreeNodeEventListeners()); }
         tree = TREE;
         tree.flattened().forEach(node -> node.setOnTreeNodeEvent(e -> redraw()));
@@ -584,7 +585,7 @@ public class SunburstChart extends Region {
         Color brightColor = getBrightTextColor();
         Color darkColor   = getDarkTextColor();
         root.stream().forEach(node -> {
-            ChartData data = node.getData();
+            ChartData data = node.getItem();
             boolean darkFillColor = Helper.isDark(data.getFillColor());
             boolean darkTextColor = Helper.isDark(data.getTextColor());
             if (darkFillColor && darkTextColor) { data.setTextColor(brightColor); }
@@ -602,10 +603,10 @@ public class SunburstChart extends Region {
         root.stream().forEach(node -> levelMap.get(node.getDepth()).add(node));
 
         for (int level = 1 ; level < maxLevel ; level++) {
-            List<TreeNode> treeNodeList = levelMap.get(level);
+            List<TreeNode<ChartData>> treeNodeList = levelMap.get(level);
             treeNodeList.stream()
                         .filter(node -> node.getChildren().isEmpty())
-                        .forEach(node ->node.addNode(new TreeNode(new ChartData("", 0, Color.TRANSPARENT), node)));
+                        .forEach(node ->node.addNode(new TreeNode<ChartData>(new ChartData("", 0, Color.TRANSPARENT), node)));
         }
     }
 
@@ -636,7 +637,7 @@ public class SunburstChart extends Region {
         segments.clear();
 
         for (int level = 1 ; level <= maxLevel ; level++) {
-            List<TreeNode> nodesAtLevel = levelMap.get(level);
+            List<TreeNode<ChartData>> nodesAtLevel = levelMap.get(level);
             double         xy           = centerX - ringStepSize * level * 0.5;
             double         wh           = ringStepSize * level;
             double         outerRadius  = ringRadiusStep * level + barWidth * 0.5;
@@ -644,10 +645,10 @@ public class SunburstChart extends Region {
 
             double segmentStartAngle;
             double segmentEndAngle = 0;
-            for (TreeNode node : nodesAtLevel) {
-                ChartData segmentData  = node.getData();
-                double    segmentAngle = node.getParentAngle() * node.getPercentage();
-                Color     segmentColor = getUseColorFromParent() ? node.getMyRoot().getData().getFillColor() : segmentData.getFillColor();
+            for (TreeNode<ChartData> node : nodesAtLevel) {
+                ChartData segmentData  = node.getItem();
+                double    segmentAngle = getParentAngle(node) * getPercentage(node);
+                Color     segmentColor = getUseColorFromParent() ? node.getMyRoot().getItem().getFillColor() : segmentData.getFillColor();
 
                 segmentStartAngle = 90 + segmentEndAngle;
                 segmentEndAngle  -= segmentAngle;
@@ -714,7 +715,26 @@ public class SunburstChart extends Region {
         segmentPane.getChildren().setAll(segments);
     }
 
-    private Path createSegment(final double START_ANGLE, final double END_ANGLE, final double INNER_RADIUS, final double OUTER_RADIUS, final Color FILL, final Color STROKE, final TreeNode NODE) {
+    public double getParentAngle(final TreeNode<ChartData> NODE) {
+        List<TreeNode<ChartData>> parentList = new ArrayList<>();
+        TreeNode<ChartData> node = NODE;
+        while (!node.getParent().isRoot()) {
+            node = node.getParent();
+            parentList.add(node);
+        }
+        Collections.reverse(parentList);
+        double parentAngle = 360.0;
+        for (TreeNode<ChartData> n : parentList) { parentAngle = parentAngle * getPercentage(n); }
+        return parentAngle;
+    }
+
+    private double getPercentage(final TreeNode<ChartData> NODE) {
+        List<TreeNode<ChartData>> siblings   = NODE.getSiblings();
+        double         sum        = siblings.stream().map(node -> node.getItem()).mapToDouble(ChartData::getValue).sum();
+        return Double.compare(sum, 0) == 0 ? 1.0 : NODE.getItem().getValue() / sum;
+    }
+
+    private Path createSegment(final double START_ANGLE, final double END_ANGLE, final double INNER_RADIUS, final double OUTER_RADIUS, final Color FILL, final Color STROKE, final TreeNode<ChartData> NODE) {
         double  startAngleRad = Math.toRadians(START_ANGLE + 90);
         double  endAngleRad   = Math.toRadians(END_ANGLE + 90);
         boolean largeAngle    = Math.abs(END_ANGLE - START_ANGLE) > 180.0;
@@ -742,7 +762,7 @@ public class SunburstChart extends Region {
         path.setFill(FILL);
         path.setStroke(STROKE);
 
-        String tooltipText = new StringBuilder(NODE.getData().getName()).append("\n").append(String.format(Locale.US, formatString, NODE.getData().getValue())).toString();
+        String tooltipText = new StringBuilder(NODE.getItem().getName()).append("\n").append(String.format(Locale.US, formatString, NODE.getItem().getValue())).toString();
         Tooltip.install(path, new Tooltip(tooltipText));
 
         path.setOnMousePressed(new WeakEventHandler<>(e -> NODE.getTreeRoot().fireTreeNodeEvent(new TreeNodeEvent(NODE, EventType.NODE_SELECTED))));

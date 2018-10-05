@@ -151,6 +151,9 @@ public class Demo extends Application {
 
 
     @Override public void init() {
+        long start = System.currentTimeMillis();
+
+
         value = new SimpleDoubleProperty(0);
 
         // AreaChart Data
@@ -816,9 +819,13 @@ public class Demo extends Application {
                 }
             }
         };
+
+        System.out.println("Initialization: " + (System.currentTimeMillis() - start) + "ms");
     }
 
     @Override public void start(Stage stage) {
+        long start = System.currentTimeMillis();
+
         FlowGridPane pane = new FlowGridPane(8, 5,
                                              percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                              lineChartTile, timerControlTile, numberTile, textTile,
@@ -848,9 +855,11 @@ public class Demo extends Application {
         stage.setScene(scene);
         stage.show();
 
+        System.out.println("Rendering     : " + (System.currentTimeMillis() - start) + "ms");
+
         // Calculate number of nodes
         calcNoOfNodes(pane);
-        System.out.println(noOfNodes + " Nodes in SceneGraph");
+        System.out.println("Nodes in Scene: " + noOfNodes);
 
         timer.start();
 

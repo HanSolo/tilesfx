@@ -52,7 +52,248 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Predicate;
 
-import static eu.hansolo.tilesfx.tools.Country.*;
+import static eu.hansolo.tilesfx.tools.Country.AD;
+import static eu.hansolo.tilesfx.tools.Country.AE;
+import static eu.hansolo.tilesfx.tools.Country.AF;
+import static eu.hansolo.tilesfx.tools.Country.AG;
+import static eu.hansolo.tilesfx.tools.Country.AI;
+import static eu.hansolo.tilesfx.tools.Country.AL;
+import static eu.hansolo.tilesfx.tools.Country.AM;
+import static eu.hansolo.tilesfx.tools.Country.AO;
+import static eu.hansolo.tilesfx.tools.Country.AR;
+import static eu.hansolo.tilesfx.tools.Country.AS;
+import static eu.hansolo.tilesfx.tools.Country.AT;
+import static eu.hansolo.tilesfx.tools.Country.AU;
+import static eu.hansolo.tilesfx.tools.Country.AW;
+import static eu.hansolo.tilesfx.tools.Country.AX;
+import static eu.hansolo.tilesfx.tools.Country.AZ;
+import static eu.hansolo.tilesfx.tools.Country.BA;
+import static eu.hansolo.tilesfx.tools.Country.BB;
+import static eu.hansolo.tilesfx.tools.Country.BD;
+import static eu.hansolo.tilesfx.tools.Country.BE;
+import static eu.hansolo.tilesfx.tools.Country.BF;
+import static eu.hansolo.tilesfx.tools.Country.BG;
+import static eu.hansolo.tilesfx.tools.Country.BH;
+import static eu.hansolo.tilesfx.tools.Country.BI;
+import static eu.hansolo.tilesfx.tools.Country.BJ;
+import static eu.hansolo.tilesfx.tools.Country.BL;
+import static eu.hansolo.tilesfx.tools.Country.BM;
+import static eu.hansolo.tilesfx.tools.Country.BN;
+import static eu.hansolo.tilesfx.tools.Country.BO;
+import static eu.hansolo.tilesfx.tools.Country.BR;
+import static eu.hansolo.tilesfx.tools.Country.BS;
+import static eu.hansolo.tilesfx.tools.Country.BT;
+import static eu.hansolo.tilesfx.tools.Country.BV;
+import static eu.hansolo.tilesfx.tools.Country.BW;
+import static eu.hansolo.tilesfx.tools.Country.BY;
+import static eu.hansolo.tilesfx.tools.Country.BZ;
+import static eu.hansolo.tilesfx.tools.Country.CA;
+import static eu.hansolo.tilesfx.tools.Country.CC;
+import static eu.hansolo.tilesfx.tools.Country.CD;
+import static eu.hansolo.tilesfx.tools.Country.CF;
+import static eu.hansolo.tilesfx.tools.Country.CG;
+import static eu.hansolo.tilesfx.tools.Country.CH;
+import static eu.hansolo.tilesfx.tools.Country.CI;
+import static eu.hansolo.tilesfx.tools.Country.CK;
+import static eu.hansolo.tilesfx.tools.Country.CL;
+import static eu.hansolo.tilesfx.tools.Country.CM;
+import static eu.hansolo.tilesfx.tools.Country.CN;
+import static eu.hansolo.tilesfx.tools.Country.CO;
+import static eu.hansolo.tilesfx.tools.Country.CR;
+import static eu.hansolo.tilesfx.tools.Country.CU;
+import static eu.hansolo.tilesfx.tools.Country.CV;
+import static eu.hansolo.tilesfx.tools.Country.CX;
+import static eu.hansolo.tilesfx.tools.Country.CY;
+import static eu.hansolo.tilesfx.tools.Country.CZ;
+import static eu.hansolo.tilesfx.tools.Country.DE;
+import static eu.hansolo.tilesfx.tools.Country.DJ;
+import static eu.hansolo.tilesfx.tools.Country.DK;
+import static eu.hansolo.tilesfx.tools.Country.DM;
+import static eu.hansolo.tilesfx.tools.Country.DO;
+import static eu.hansolo.tilesfx.tools.Country.DZ;
+import static eu.hansolo.tilesfx.tools.Country.EC;
+import static eu.hansolo.tilesfx.tools.Country.EE;
+import static eu.hansolo.tilesfx.tools.Country.EG;
+import static eu.hansolo.tilesfx.tools.Country.EH;
+import static eu.hansolo.tilesfx.tools.Country.ER;
+import static eu.hansolo.tilesfx.tools.Country.ES;
+import static eu.hansolo.tilesfx.tools.Country.ET;
+import static eu.hansolo.tilesfx.tools.Country.FI;
+import static eu.hansolo.tilesfx.tools.Country.FJ;
+import static eu.hansolo.tilesfx.tools.Country.FK;
+import static eu.hansolo.tilesfx.tools.Country.FM;
+import static eu.hansolo.tilesfx.tools.Country.FO;
+import static eu.hansolo.tilesfx.tools.Country.FR;
+import static eu.hansolo.tilesfx.tools.Country.GA;
+import static eu.hansolo.tilesfx.tools.Country.GB;
+import static eu.hansolo.tilesfx.tools.Country.GD;
+import static eu.hansolo.tilesfx.tools.Country.GE;
+import static eu.hansolo.tilesfx.tools.Country.GF;
+import static eu.hansolo.tilesfx.tools.Country.GG;
+import static eu.hansolo.tilesfx.tools.Country.GH;
+import static eu.hansolo.tilesfx.tools.Country.GI;
+import static eu.hansolo.tilesfx.tools.Country.GL;
+import static eu.hansolo.tilesfx.tools.Country.GM;
+import static eu.hansolo.tilesfx.tools.Country.GP;
+import static eu.hansolo.tilesfx.tools.Country.GQ;
+import static eu.hansolo.tilesfx.tools.Country.GR;
+import static eu.hansolo.tilesfx.tools.Country.GS;
+import static eu.hansolo.tilesfx.tools.Country.GT;
+import static eu.hansolo.tilesfx.tools.Country.GU;
+import static eu.hansolo.tilesfx.tools.Country.GW;
+import static eu.hansolo.tilesfx.tools.Country.GY;
+import static eu.hansolo.tilesfx.tools.Country.HK;
+import static eu.hansolo.tilesfx.tools.Country.HM;
+import static eu.hansolo.tilesfx.tools.Country.HN;
+import static eu.hansolo.tilesfx.tools.Country.HR;
+import static eu.hansolo.tilesfx.tools.Country.HT;
+import static eu.hansolo.tilesfx.tools.Country.HU;
+import static eu.hansolo.tilesfx.tools.Country.ID;
+import static eu.hansolo.tilesfx.tools.Country.IE;
+import static eu.hansolo.tilesfx.tools.Country.IL;
+import static eu.hansolo.tilesfx.tools.Country.IM;
+import static eu.hansolo.tilesfx.tools.Country.IN;
+import static eu.hansolo.tilesfx.tools.Country.IO;
+import static eu.hansolo.tilesfx.tools.Country.IQ;
+import static eu.hansolo.tilesfx.tools.Country.IR;
+import static eu.hansolo.tilesfx.tools.Country.IS;
+import static eu.hansolo.tilesfx.tools.Country.IT;
+import static eu.hansolo.tilesfx.tools.Country.JE;
+import static eu.hansolo.tilesfx.tools.Country.JM;
+import static eu.hansolo.tilesfx.tools.Country.JO;
+import static eu.hansolo.tilesfx.tools.Country.JP;
+import static eu.hansolo.tilesfx.tools.Country.KE;
+import static eu.hansolo.tilesfx.tools.Country.KG;
+import static eu.hansolo.tilesfx.tools.Country.KH;
+import static eu.hansolo.tilesfx.tools.Country.KI;
+import static eu.hansolo.tilesfx.tools.Country.KM;
+import static eu.hansolo.tilesfx.tools.Country.KN;
+import static eu.hansolo.tilesfx.tools.Country.KP;
+import static eu.hansolo.tilesfx.tools.Country.KR;
+import static eu.hansolo.tilesfx.tools.Country.KW;
+import static eu.hansolo.tilesfx.tools.Country.KY;
+import static eu.hansolo.tilesfx.tools.Country.KZ;
+import static eu.hansolo.tilesfx.tools.Country.LA;
+import static eu.hansolo.tilesfx.tools.Country.LB;
+import static eu.hansolo.tilesfx.tools.Country.LC;
+import static eu.hansolo.tilesfx.tools.Country.LI;
+import static eu.hansolo.tilesfx.tools.Country.LK;
+import static eu.hansolo.tilesfx.tools.Country.LR;
+import static eu.hansolo.tilesfx.tools.Country.LS;
+import static eu.hansolo.tilesfx.tools.Country.LT;
+import static eu.hansolo.tilesfx.tools.Country.LU;
+import static eu.hansolo.tilesfx.tools.Country.LV;
+import static eu.hansolo.tilesfx.tools.Country.LY;
+import static eu.hansolo.tilesfx.tools.Country.MA;
+import static eu.hansolo.tilesfx.tools.Country.MC;
+import static eu.hansolo.tilesfx.tools.Country.MD;
+import static eu.hansolo.tilesfx.tools.Country.ME;
+import static eu.hansolo.tilesfx.tools.Country.MF;
+import static eu.hansolo.tilesfx.tools.Country.MG;
+import static eu.hansolo.tilesfx.tools.Country.MH;
+import static eu.hansolo.tilesfx.tools.Country.MK;
+import static eu.hansolo.tilesfx.tools.Country.ML;
+import static eu.hansolo.tilesfx.tools.Country.MM;
+import static eu.hansolo.tilesfx.tools.Country.MN;
+import static eu.hansolo.tilesfx.tools.Country.MO;
+import static eu.hansolo.tilesfx.tools.Country.MP;
+import static eu.hansolo.tilesfx.tools.Country.MQ;
+import static eu.hansolo.tilesfx.tools.Country.MR;
+import static eu.hansolo.tilesfx.tools.Country.MS;
+import static eu.hansolo.tilesfx.tools.Country.MT;
+import static eu.hansolo.tilesfx.tools.Country.MU;
+import static eu.hansolo.tilesfx.tools.Country.MV;
+import static eu.hansolo.tilesfx.tools.Country.MW;
+import static eu.hansolo.tilesfx.tools.Country.MX;
+import static eu.hansolo.tilesfx.tools.Country.MY;
+import static eu.hansolo.tilesfx.tools.Country.MZ;
+import static eu.hansolo.tilesfx.tools.Country.NA;
+import static eu.hansolo.tilesfx.tools.Country.NC;
+import static eu.hansolo.tilesfx.tools.Country.NE;
+import static eu.hansolo.tilesfx.tools.Country.NF;
+import static eu.hansolo.tilesfx.tools.Country.NG;
+import static eu.hansolo.tilesfx.tools.Country.NI;
+import static eu.hansolo.tilesfx.tools.Country.NL;
+import static eu.hansolo.tilesfx.tools.Country.NO;
+import static eu.hansolo.tilesfx.tools.Country.NP;
+import static eu.hansolo.tilesfx.tools.Country.NR;
+import static eu.hansolo.tilesfx.tools.Country.NU;
+import static eu.hansolo.tilesfx.tools.Country.NZ;
+import static eu.hansolo.tilesfx.tools.Country.OM;
+import static eu.hansolo.tilesfx.tools.Country.PA;
+import static eu.hansolo.tilesfx.tools.Country.PE;
+import static eu.hansolo.tilesfx.tools.Country.PF;
+import static eu.hansolo.tilesfx.tools.Country.PG;
+import static eu.hansolo.tilesfx.tools.Country.PH;
+import static eu.hansolo.tilesfx.tools.Country.PK;
+import static eu.hansolo.tilesfx.tools.Country.PL;
+import static eu.hansolo.tilesfx.tools.Country.PM;
+import static eu.hansolo.tilesfx.tools.Country.PN;
+import static eu.hansolo.tilesfx.tools.Country.PR;
+import static eu.hansolo.tilesfx.tools.Country.PS;
+import static eu.hansolo.tilesfx.tools.Country.PT;
+import static eu.hansolo.tilesfx.tools.Country.PW;
+import static eu.hansolo.tilesfx.tools.Country.PY;
+import static eu.hansolo.tilesfx.tools.Country.QA;
+import static eu.hansolo.tilesfx.tools.Country.RE;
+import static eu.hansolo.tilesfx.tools.Country.RO;
+import static eu.hansolo.tilesfx.tools.Country.RS;
+import static eu.hansolo.tilesfx.tools.Country.RU;
+import static eu.hansolo.tilesfx.tools.Country.RW;
+import static eu.hansolo.tilesfx.tools.Country.SA;
+import static eu.hansolo.tilesfx.tools.Country.SB;
+import static eu.hansolo.tilesfx.tools.Country.SC;
+import static eu.hansolo.tilesfx.tools.Country.SD;
+import static eu.hansolo.tilesfx.tools.Country.SE;
+import static eu.hansolo.tilesfx.tools.Country.SG;
+import static eu.hansolo.tilesfx.tools.Country.SH;
+import static eu.hansolo.tilesfx.tools.Country.SI;
+import static eu.hansolo.tilesfx.tools.Country.SJ;
+import static eu.hansolo.tilesfx.tools.Country.SK;
+import static eu.hansolo.tilesfx.tools.Country.SL;
+import static eu.hansolo.tilesfx.tools.Country.SM;
+import static eu.hansolo.tilesfx.tools.Country.SN;
+import static eu.hansolo.tilesfx.tools.Country.SO;
+import static eu.hansolo.tilesfx.tools.Country.SR;
+import static eu.hansolo.tilesfx.tools.Country.ST;
+import static eu.hansolo.tilesfx.tools.Country.SV;
+import static eu.hansolo.tilesfx.tools.Country.SY;
+import static eu.hansolo.tilesfx.tools.Country.SZ;
+import static eu.hansolo.tilesfx.tools.Country.TC;
+import static eu.hansolo.tilesfx.tools.Country.TD;
+import static eu.hansolo.tilesfx.tools.Country.TG;
+import static eu.hansolo.tilesfx.tools.Country.TH;
+import static eu.hansolo.tilesfx.tools.Country.TJ;
+import static eu.hansolo.tilesfx.tools.Country.TK;
+import static eu.hansolo.tilesfx.tools.Country.TL;
+import static eu.hansolo.tilesfx.tools.Country.TM;
+import static eu.hansolo.tilesfx.tools.Country.TN;
+import static eu.hansolo.tilesfx.tools.Country.TO;
+import static eu.hansolo.tilesfx.tools.Country.TR;
+import static eu.hansolo.tilesfx.tools.Country.TT;
+import static eu.hansolo.tilesfx.tools.Country.TV;
+import static eu.hansolo.tilesfx.tools.Country.TW;
+import static eu.hansolo.tilesfx.tools.Country.TZ;
+import static eu.hansolo.tilesfx.tools.Country.UA;
+import static eu.hansolo.tilesfx.tools.Country.UG;
+import static eu.hansolo.tilesfx.tools.Country.US;
+import static eu.hansolo.tilesfx.tools.Country.UY;
+import static eu.hansolo.tilesfx.tools.Country.UZ;
+import static eu.hansolo.tilesfx.tools.Country.VA;
+import static eu.hansolo.tilesfx.tools.Country.VC;
+import static eu.hansolo.tilesfx.tools.Country.VE;
+import static eu.hansolo.tilesfx.tools.Country.VG;
+import static eu.hansolo.tilesfx.tools.Country.VI;
+import static eu.hansolo.tilesfx.tools.Country.VN;
+import static eu.hansolo.tilesfx.tools.Country.VU;
+import static eu.hansolo.tilesfx.tools.Country.WF;
+import static eu.hansolo.tilesfx.tools.Country.WS;
+import static eu.hansolo.tilesfx.tools.Country.XK;
+import static eu.hansolo.tilesfx.tools.Country.YE;
+import static eu.hansolo.tilesfx.tools.Country.YT;
+import static eu.hansolo.tilesfx.tools.Country.ZA;
+import static eu.hansolo.tilesfx.tools.Country.ZM;
+import static eu.hansolo.tilesfx.tools.Country.ZW;
 
 
 /**
@@ -158,6 +399,11 @@ public class Helper {
         final int SCALE = (int) Math.pow(10, PRECISION);
         return (double) Math.round(VALUE * SCALE) / SCALE;
     }
+
+    public static final double roundTo(final double VALUE, final double TARGET) { return TARGET * (Math.round(VALUE / TARGET)); }
+
+    public static final double roundToHalf(final double VALUE) { return Math.round(VALUE * 2) / 2.0; }
+
 
     public static final double nearest(final double SMALLER, final double VALUE, final double LARGER) {
         return (VALUE - SMALLER) < (LARGER - VALUE) ? SMALLER : LARGER;
@@ -295,7 +541,7 @@ public class Helper {
         } else if (Locale.CHINA == LOCALE) {
             return DateTimeFormatter.ofPattern("YYYY.MM.dd");
         } else {
-            return DateTimeFormatter.ofPattern("dd.MM.YYYY");
+            return DateTimeFormatter.ofPattern("dd.MM.getY()YYY");
         }
     }
     public static final DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {
@@ -617,17 +863,17 @@ public class Helper {
         }
         return new Path(smoothedElements);
     }
-    private static final Pair<Point[], Point[]> calcCurveControlPoints(Point[] dataPoints) {
+    private static final Pair<Point[], Point[]> calcCurveControlPoints(final Point[] DATA_POINTS) {
         Point[] firstControlPoints;
         Point[] secondControlPoints;
-        int n = dataPoints.length - 1;
+        int n = DATA_POINTS.length - 1;
         if (n == 1) { // Special case: Bezier curve should be a straight line.
             firstControlPoints     = new Point[1];
             // 3P1 = 2P0 + P3
-            firstControlPoints[0]  = new Point((2 * dataPoints[0].getX() + dataPoints[1].getX()) / 3, (2 * dataPoints[0].getY() + dataPoints[1].getY()) / 3);
+            firstControlPoints[0]  = new Point((2 * DATA_POINTS[0].getX() + DATA_POINTS[1].getX()) / 3, (2 * DATA_POINTS[0].getY() + DATA_POINTS[1].getY()) / 3);
             secondControlPoints    = new Point[1];
             // P2 = 2P1 – P0
-            secondControlPoints[0] = new Point(2 * firstControlPoints[0].getX() - dataPoints[0].getX(), 2 * firstControlPoints[0].getY() - dataPoints[0].getY());
+            secondControlPoints[0] = new Point(2 * firstControlPoints[0].getX() - DATA_POINTS[0].getX(), 2 * firstControlPoints[0].getY() - DATA_POINTS[0].getY());
             return new Pair<>(firstControlPoints, secondControlPoints);
         }
 
@@ -637,19 +883,19 @@ public class Helper {
 
         // Set right hand side X values
         for (int i = 1; i < n - 1; ++i) {
-            rhs[i] = 4 * dataPoints[i].getX() + 2 * dataPoints[i + 1].getX();
+            rhs[i] = 4 * DATA_POINTS[i].getX() + 2 * DATA_POINTS[i + 1].getX();
         }
-        rhs[0]     = dataPoints[0].getX() + 2 * dataPoints[1].getX();
-        rhs[n - 1] = (8 * dataPoints[n - 1].getX() + dataPoints[n].getX()) / 2.0;
+        rhs[0]     = DATA_POINTS[0].getX() + 2 * DATA_POINTS[1].getX();
+        rhs[n - 1] = (8 * DATA_POINTS[n - 1].getX() + DATA_POINTS[n].getX()) / 2.0;
         // Get first control points X-values
         double[] x = getFirstControlPoints(rhs);
 
         // Set right hand side Y values
         for (int i = 1; i < n - 1; ++i) {
-            rhs[i] = 4 * dataPoints[i].getY() + 2 * dataPoints[i + 1].getY();
+            rhs[i] = 4 * DATA_POINTS[i].getY() + 2 * DATA_POINTS[i + 1].getY();
         }
-        rhs[0]     = dataPoints[0].getY() + 2 * dataPoints[1].getY();
-        rhs[n - 1] = (8 * dataPoints[n - 1].getY() + dataPoints[n].getY()) / 2.0;
+        rhs[0]     = DATA_POINTS[0].getY() + 2 * DATA_POINTS[1].getY();
+        rhs[n - 1] = (8 * DATA_POINTS[n - 1].getY() + DATA_POINTS[n].getY()) / 2.0;
         // Get first control points Y-values
         double[] y = getFirstControlPoints(rhs);
 
@@ -661,9 +907,9 @@ public class Helper {
             firstControlPoints[i] = new Point(x[i], y[i]);
             // Second control point
             if (i < n - 1) {
-                secondControlPoints[i] = new Point(2 * dataPoints[i + 1].getX() - x[i + 1], 2 * dataPoints[i + 1].getY() - y[i + 1]);
+                secondControlPoints[i] = new Point(2 * DATA_POINTS[i + 1].getX() - x[i + 1], 2 * DATA_POINTS[i + 1].getY() - y[i + 1]);
             } else {
-                secondControlPoints[i] = new Point((dataPoints[n].getX() + x[n - 1]) / 2, (dataPoints[n].getY() + y[n - 1]) / 2);
+                secondControlPoints[i] = new Point((DATA_POINTS[n].getX() + x[n - 1]) / 2, (DATA_POINTS[n].getY() + y[n - 1]) / 2);
             }
         }
         return new Pair<>(firstControlPoints, secondControlPoints);
@@ -687,7 +933,6 @@ public class Helper {
         return x;
     }
 
-
     public static final boolean isInRectangle(final double X, final double Y,
                                               final double MIN_X, final double MIN_Y,
                                               final double MAX_X, final double MAX_Y) {
@@ -710,13 +955,11 @@ public class Helper {
         double[]     pointsX             = new double[noOfPointsInPolygon];
         double[]     pointsY             = new double[noOfPointsInPolygon];
         int          pointCounter        = 0;
-        for (int i = 0 ; i < points.size() ; i++) {
-            if (i % 2 == 0) {
-                pointsX[i] = points.get(pointCounter);
-            } else {
-                pointsY[i] = points.get(pointCounter);
-                pointCounter++;
-            }
+        
+        for (int i = 0, size = points.size() ; i < size - 1 ; i += 2) {
+            pointsX[pointCounter] = points.get(i);
+            pointsY[pointCounter] = points.get(i + 1);
+            pointCounter++;
         }
         return isInPolygon(X, Y, noOfPointsInPolygon, pointsX, pointsY);
     }
@@ -747,6 +990,49 @@ public class Helper {
                 Double.compare(pointAngle, endAngle) <= 0);
     }
 
+public static final double distance(final Point P1, final Point P2) {
+        return distance(P1.getX(), P1.getY(), P2.getX(), P2.getY());
+    }
+    public static final double distance(final double P1_X, final double P1_Y, final double P2_X, final double P2_Y) {
+        return Math.sqrt((P2_X - P1_X) * (P2_X - P1_X) + (P2_Y - P1_Y) * (P2_Y - P1_Y));
+    }
+
+    public static double euclideanDistance(final Point P1, final Point P2) { return euclideanDistance(P1.getX(), P1.getY(), P2.getX(), P2.getY()); }
+    public static double euclideanDistance(final double X1, final double Y1, final double X2, final double Y2) {
+        double deltaX = (X2 - X1);
+        double deltaY = (Y2 - Y1);
+        return (deltaX * deltaX) + (deltaY * deltaY);
+    }
+
+    public static final Point pointOnLine(final double P1_X, final double P1_Y, final double P2_X, final double P2_Y, final double DISTAINCE_TOP_2) {
+        double distanceP1P2 = distance(P1_X, P1_Y, P2_X, P2_Y);
+        double t = DISTAINCE_TOP_2 / distanceP1P2;
+        return new Point((1 - t) * P1_X + t * P2_X, (1 - t) * P1_Y + t * P2_Y);
+    }
+
+    public static int checkLineCircleCollision(final Point P1, final Point P2, final double CENTER_X, final double CENTER_Y, final double RADIUS) {
+        return checkLineCircleCollision(P1.getX(), P1.getY(), P2.getX(), P2.getY(), CENTER_X, CENTER_Y, RADIUS);
+    }
+    public static int checkLineCircleCollision(final double P1_X, final double P1_Y, final double P2_X, final double P2_Y, final double CENTER_X, final double CENTER_Y, final double RADIUS) {
+        double A = (P1_Y - P2_Y);
+        double B = (P2_X - P1_X);
+        double C = (P1_X * P2_Y - P2_X * P1_Y);
+
+        return checkCollision(A, B, C, CENTER_X, CENTER_Y, RADIUS);
+    }
+    public static int checkCollision(final double a, final double b, final double c, final double centerX, final double centerY, final double radius) {
+        // Finding the distance of line from center.
+        double dist = (Math.abs(a * centerX + b * centerY + c)) / Math.sqrt(a * a + b * b);
+        dist = round(dist, 1);
+        if (radius > dist) {
+            return 1;  // intersect
+        } else if (radius < dist) {
+            return -1; // outside
+        } else {
+            return 0;  // touch
+        }
+    }
+
     public static final double getAngleFromXY(final double X, final double Y, final double CENTER_X, final double CENTER_Y) {
         return getAngleFromXY(X, Y, CENTER_X, CENTER_Y, 90.0);
     }
@@ -763,6 +1049,35 @@ public class Helper {
         double angle       = (theta + ANGLE_OFFSET) % 360;
         return angle;
     }
+    
+    public static final Point rotatePointAroundRotationCenter(final Point POINT, final Point ROTATION_CENTER, final double ANGLE) {
+        double[] xy = rotatePointAroundRotationCenter(POINT.getX(), POINT.getY(), ROTATION_CENTER.getX(), ROTATION_CENTER.getY(), ANGLE);
+        return new Point(xy[0], xy[1]);
+    }
+    public static final double[] rotatePointAroundRotationCenter(final double X, final double Y, final double RX, final double RY, final double ANGLE) {
+        final double rad = Math.toRadians(ANGLE);
+        final double sin = Math.sin(rad);
+        final double cos = Math.cos(rad);
+        final double nX  = RX + (X - RX) * cos - (Y - RY) * sin;
+        final double nY  = RY + (X - RX) * sin + (Y - RY) * cos;
+        return new double[] { nX, nY };
+    }
+
+    public static final Point getPointBetweenP1AndP2(final Point P1, final Point P2) {
+        double[] xy = getPointBetweenP1AndP2(P1.getX(), P1.getY(), P2.getX(), P2.getY());
+        return new Point(xy[0], xy[1]);
+    }
+    public static final double[] getPointBetweenP1AndP2(final double P1_X, final double P1_Y, final double P2_X, final double P2_Y) {
+        return new double[] { (P1_X + P2_X) * 0.5, (P1_Y + P2_Y) * 0.5 };
+    }
+
+    public static int getDegrees(final double DEC_DEG) { return (int) DEC_DEG; }
+    public static int getMinutes(final double DEC_DEG) { return (int) ((DEC_DEG - getDegrees(DEC_DEG)) * 60); }
+    public static double getSeconds(final double DEC_DEG) { return (((DEC_DEG - getDegrees(DEC_DEG)) * 60) - getMinutes(DEC_DEG)) * 60; }
+
+    public static double getDecimalDeg(final int DEGREES, final int MINUTES, final double SECONDS) {
+        return (((SECONDS / 60) + MINUTES) / 60) + DEGREES;
+    }
 
     public static final double[] latLonToXY(final double LATITUDE, final double LONGITUDE) {
         return latLonToXY(LATITUDE, LONGITUDE, MAP_OFFSET_X, MAP_OFFSET_Y);
@@ -773,5 +1088,100 @@ public class Helper {
         return new double[]{ x, y };
     }
 
-    public static final <T> Predicate<T> not(Predicate<T> predicate) { return predicate.negate(); }
+    public static final <T> Predicate<T> not(final Predicate<T> PREDICATE) { return PREDICATE.negate(); }
+    
+    public static final List<Point> createSmoothedConvexHull(final List<Point> POINTS, final int SUB_DIVISIONS) {
+        List<Point> hullPolygon = createConvexHull(POINTS);
+        return subdividePoints(hullPolygon, SUB_DIVISIONS);
+    }
+    public static final <T extends Point> List<T> createConvexHull(final List<T> POINTS) {
+        List<T> convexHull = new ArrayList<>();
+        if (POINTS.size() < 3) { return new ArrayList<T>(POINTS); }
+
+        int minDataPoint = -1;
+        int maxDataPoint = -1;
+        int minX         = Integer.MAX_VALUE;
+        int maxX         = Integer.MIN_VALUE;
+
+        for (int i = 0; i < POINTS.size(); i++) {
+            if (POINTS.get(i).getX() < minX) {
+                minX     = (int) POINTS.get(i).getX();
+                minDataPoint = i;
+            }
+            if (POINTS.get(i).getX() > maxX) {
+                maxX     = (int) POINTS.get(i).getX();
+                maxDataPoint = i;
+            }
+        }
+        T minPoint = POINTS.get(minDataPoint);
+        T maxPoint = POINTS.get(maxDataPoint);
+        convexHull.add(minPoint);
+        convexHull.add(maxPoint);
+        POINTS.remove(minPoint);
+        POINTS.remove(maxPoint);
+
+        List<T> leftSet  = new ArrayList<>();
+        List<T> rightSet = new ArrayList<>();
+
+        for (int i = 0; i < POINTS.size(); i++) {
+            T p = POINTS.get(i);
+            if (pointLocation(minPoint, maxPoint, p) == -1) { leftSet.add(p); } else if (pointLocation(minPoint, maxPoint, p) == 1) rightSet.add(p);
+        }
+        hullSet(minPoint, maxPoint, rightSet, convexHull);
+        hullSet(maxPoint, minPoint, leftSet, convexHull);
+
+        return convexHull;
+    }
+    private static final <T extends Point> double distance(final T P1, final T P2, final T P3) {
+        double deltaX = P2.getX() - P1.getX();
+        double deltaY = P2.getY() - P1.getY();
+        double num = deltaX * (P1.getY() - P3.getY()) - deltaY * (P1.getX() - P3.getX());
+        return Math.abs(num);
+    }
+    private static final <T extends Point> void hullSet(final T P1, final T P2, final List<T> POINTS, final List<T> HULL) {
+        int insertPosition = HULL.indexOf(P2);
+
+        if (POINTS.size() == 0) { return; }
+
+        if (POINTS.size() == 1) {
+            T point = POINTS.get(0);
+            POINTS.remove(point);
+            HULL.add(insertPosition, point);
+            return;
+        }
+
+        int dist              = Integer.MIN_VALUE;
+        int furthestDataPoint = -1;
+        for (int i = 0; i < POINTS.size(); i++) {
+            T point    = POINTS.get(i);
+            double distance = distance(P1, P2, point);
+            if (distance > dist) {
+                dist          = (int) distance;
+                furthestDataPoint = i;
+            }
+        }
+        T point = POINTS.get(furthestDataPoint);
+        POINTS.remove(furthestDataPoint);
+        HULL.add(insertPosition, point);
+
+        // Determine who's to the left of AP
+        ArrayList<T> leftSetAP = new ArrayList<>();
+        for (int i = 0; i < POINTS.size(); i++) {
+            T M = POINTS.get(i);
+            if (pointLocation(P1, point, M) == 1) { leftSetAP.add(M); }
+        }
+
+        // Determine who's to the left of PB
+        ArrayList<T> leftSetPB = new ArrayList<>();
+        for (int i = 0; i < POINTS.size(); i++) {
+            T M = POINTS.get(i);
+            if (pointLocation(point, P2, M) == 1) { leftSetPB.add(M); }
+        }
+        hullSet(P1, point, leftSetAP, HULL);
+        hullSet(point, P2, leftSetPB, HULL);
+    }
+    private static final <T extends Point> int pointLocation(final T P1, final T P2, final T P3) {
+        double cp1 = (P2.getX() - P1.getX()) * (P3.getY() - P1.getY()) - (P2.getY() - P1.getY()) * (P3.getX() - P1.getX());
+        return cp1 > 0 ? 1 : Double.compare(cp1, 0) == 0 ? 0 : -1;
+    }
 }

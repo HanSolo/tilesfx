@@ -5119,7 +5119,14 @@ public class Tile extends Control {
     public void removeOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
 
     private void setupBinding() {
-        showing = Bindings.selectBoolean(sceneProperty(), "window", "showing");
+        showing = Bindings.createBooleanBinding(() -> {
+            if (getScene() != null && getScene().getWindow() != null) {
+                return getScene().getWindow().isShowing();
+            } else {
+                return false;
+            }            
+        }, sceneProperty(), getScene().windowProperty(), getScene().getWindow().showingProperty());
+        
         showing.addListener((o, ov, nv) -> {
         if (nv) {
             while(tileEventQueue.peek() != null) {
@@ -5359,3 +5366,4 @@ public class Tile extends Control {
         presetTileParameters(SKIN_TYPE);
     }
 }
+

@@ -866,6 +866,7 @@ public class Demo extends Application {
         mapTile.addPoiLocation(new Location(51.85, 7.75, "Test"));
         mapTile.removePoiLocation(new Location(51.85, 7.75, "Test"));
 
+        radialPercentageTile.setNotifyRegionTooltipText("tooltip");
         radialPercentageTile.showNotifyRegion(true);
     }
 

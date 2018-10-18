@@ -541,6 +541,7 @@ public class Tile extends Control {
     private              DoubleProperty                                tooltipTimeout;
     private              Color                                         _notifyRegionBackgroundColor;
     private              Color                                         _notifyRegionForegroundColor;
+    private              String                                        _notifyRegionTooltipText;
     private              Color                                         _infoRegionBackgroundColor;
     private              Color                                         _infoRegionForegroundColor;
     private              String                                        _infoRegionTooltipText;
@@ -758,6 +759,7 @@ public class Tile extends Control {
         _tooltipTimeout                     = 2000;
         _notifyRegionBackgroundColor        = Tile.YELLOW;
         _notifyRegionForegroundColor        = Tile.BACKGROUND;
+        _notifyRegionTooltipText            = "";
         _infoRegionBackgroundColor          = Tile.DARK_BLUE;
         _infoRegionForegroundColor          = Tile.FOREGROUND;
         _infoRegionTooltipText              = "";
@@ -4707,6 +4709,12 @@ public class Tile extends Control {
         _notifyRegionForegroundColor = COLOR;
         fireTileEvent(REDRAW_EVENT);
     }
+    
+    public String getNotifyRegionTooltipText() { return _notifyRegionTooltipText; }
+    public void setNotifyRegionTooltipText(final String TEXT) {
+        _notifyRegionTooltipText = TEXT;
+        fireTileEvent(REDRAW_EVENT);
+    }    
 
     public Color getInfoRegionBackgroundColor() { return _infoRegionBackgroundColor; }
     public void setInfoRegionBackgroundColor(final Color COLOR) {

@@ -307,6 +307,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         notifyRegion.setRoundedCorner(hasRoundedCorners);
         notifyRegion.setBackgroundColor(tile.getNotifyRegionBackgroundColor());
         notifyRegion.setForegroundColor(tile.getNotifyRegionForegroundColor());
+        notifyRegion.setTooltipText(tile.getNotifyRegionTooltipText());
 
         infoRegion.setRoundedCorner(hasRoundedCorners);
         infoRegion.setBackgroundColor(tile.getInfoRegionBackgroundColor());

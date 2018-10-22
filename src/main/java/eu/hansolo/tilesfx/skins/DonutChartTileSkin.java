@@ -143,7 +143,7 @@ public class DonutChartTileSkin extends TileSkin {
         selectionTooltip.setHeight(48);
         Tooltip.install(chartCanvas, selectionTooltip);
 
-        getPane().getChildren().addAll(titleText, legendCanvas, chartCanvas, text);
+        getPane().getChildren().addAll(titleText, legendCanvas,text, chartCanvas);
     }
 
     @Override protected void registerListeners() {
@@ -186,20 +186,20 @@ public class DonutChartTileSkin extends TileSkin {
         double          canvasSize     = chartCanvas.getWidth();
         int             noOfItems      = dataList.size();
         double          center         = canvasSize * 0.5;
-        double          barWidth       = canvasSize * 0.1;
+        double          barWidth       = canvasSize * 0.09;
         double          sum            = dataList.stream().mapToDouble(ChartData::getValue).sum();
         double          stepSize       = 360.0 / sum;
         double          angle          = 0;
         double          startAngle     = 90;
-        double          xy             = canvasSize * 0.1;
-        double          wh             = canvasSize * 0.8;
+        double          xy             = canvasSize * 0.15;
+        double          wh             = canvasSize * 0.7;
         //Color           bkgColor       = tile.getBackgroundColor();
         Color           textColor      = tile.getTextColor();
 
         centerX        = xy + wh * 0.5;
         centerY        = xy + wh * 0.5;
-        innerRadius    = canvasSize * 0.275;
-        outerRadius    = canvasSize * 0.5;
+        innerRadius    = canvasSize * 0.225;
+        outerRadius    = canvasSize * 0.45;
 
         chartCtx.clearRect(0, 0, canvasSize, canvasSize);
         chartCtx.setLineCap(StrokeLineCap.BUTT);
@@ -209,7 +209,7 @@ public class DonutChartTileSkin extends TileSkin {
 
         // Sum
         if (tile.isValueVisible()) {
-            chartCtx.setFont(Fonts.latoRegular(canvasSize * 0.15));
+            chartCtx.setFont(Fonts.latoRegular(canvasSize * 0.12));
             chartCtx.fillText(String.format(Locale.US, "%.0f", sum), center, center, canvasSize * 0.4);
         }
 
@@ -321,7 +321,7 @@ public class DonutChartTileSkin extends TileSkin {
 
             legendCanvas.relocate(contentBounds.getX(), contentBounds.getY());
             legendCanvas.setVisible(width > (height * 1.2));
-            
+
             chartCanvas.setWidth(chartCanvasSize);
             chartCanvas.setHeight(chartCanvasSize);
 

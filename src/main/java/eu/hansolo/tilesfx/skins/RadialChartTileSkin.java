@@ -81,14 +81,18 @@ public class RadialChartTileSkin extends TileSkin {
         };
 
         clickHandler = e -> {
-            double          x          = e.getX();
-            double          y          = e.getY();
-            double          startAngle = 90;
-            List<ChartData> dataList   = tile.getChartData();
-            int             noOfItems  = dataList.size();
-            double          canvasSize = chartCanvas.getWidth();
-            double          barWidth   = canvasSize * 0.1;
-            double          max        = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+            System.out.println("clicked");
+            double          x           = e.getX();
+            double          y           = e.getY();
+            double          startAngle  = 90;
+            List<ChartData> dataList    = tile.getChartData();
+            int             noOfItems   = dataList.size();
+            double          canvasSize  = chartCanvas.getWidth();
+            double          radius      = canvasSize * 0.5;
+            double          innerSpacer = radius * 0.18;
+            double          barWidth    = (radius - innerSpacer) / tile.getChartData().size();
+            double          max         = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+
             for (int i = 0 ; i < noOfItems ; i++) {
                 ChartData data    = dataList.get(i);
                 double    value   = clamp(0, Double.MAX_VALUE, data.getValue());

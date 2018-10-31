@@ -7,3 +7,7 @@
 /src/main/java/eu/hansolo/tilesfx/Test.java
 /src/main/resources/eu/hansolo/tilesfx/track.gpx
 /out
+/local.properties
+/classes
+/src/main/java/eu/hansolo/tilesfx/skins/TestTileSkin.java
+/tilesfx.iml

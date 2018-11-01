@@ -132,7 +132,7 @@ public class SunburstChart extends Region {
     private              boolean                                 _useChartDataTextColor;
     private              BooleanProperty                         useChartDataTextColor;
     private              String                                  formatString;
-    private              TreeNode<ChartData>                     tree;
+    private              ObjectProperty<TreeNode<ChartData>>     tree;
     private              TreeNode<ChartData>                     root;
     private              int                                     maxLevel;
     private              Map<Integer, List<TreeNode<ChartData>>> levelMap;
@@ -145,25 +145,35 @@ public class SunburstChart extends Region {
         this(new TreeNode(new ChartData()));
     }
     public SunburstChart(final TreeNode TREE) {
-        backgroundPaint     = Color.TRANSPARENT;
-        borderPaint         = Color.TRANSPARENT;
-        borderWidth         = 0d;
-        segments            = new ArrayList<>(64);
-        _visibleData        = VisibleData.NAME;
-        _textOrientation    = TextOrientation.TANGENT;
-        _backgroundColor    = Color.WHITE;
-        _textColor          = Color.BLACK;
-        _useColorFromParent = false;
-        _decimals           = 0;
-        _interactive        = false;
+        backgroundPaint        = Color.TRANSPARENT;
+        borderPaint            = Color.TRANSPARENT;
+        borderWidth            = 0d;
+        segments               = new ArrayList<>(64);
+        _visibleData           = VisibleData.NAME;
+        _textOrientation       = TextOrientation.TANGENT;
+        _backgroundColor       = Color.WHITE;
+        _textColor             = Color.BLACK;
+        _useColorFromParent    = false;
+        _decimals              = 0;
+        _interactive           = false;
         _autoTextColor         = true;
         _brightTextColor       = BRIGHT_TEXT_COLOR;
         _darkTextColor         = DARK_TEXT_COLOR;
         _useChartDataTextColor = false;
-        formatString        = "%.0f";
-        tree                = TREE;
-        levelMap            = new HashMap<>(8);
-        sizeListener        = o -> resize();
+        formatString           = "%.0f";
+        tree                   = new ObjectPropertyBase<TreeNode<ChartData>>(TREE) {
+            @Override protected void invalidated() {
+                if (null != get()) { get().flattened().forEach(node -> node.removeAllTreeNodeEventListeners()); }
+                get().flattened().forEach(node -> node.setOnTreeNodeEvent(e -> redraw()));
+                prepareData();
+                if (isAutoTextColor()) { adjustTextColors(); }
+                drawChart();
+            }
+            @Override public Object getBean() { return SunburstChart.this; }
+            @Override public String getName() { return "tree"; }
+        };
+        levelMap               = new HashMap<>(8);
+        sizeListener           = o -> resize();
         initGraphics();
         registerListeners();
     }
@@ -199,7 +209,7 @@ public class SunburstChart extends Region {
     private void registerListeners() {
         widthProperty().addListener(sizeListener);
         heightProperty().addListener(sizeListener);
-        tree.setOnTreeNodeEvent(e -> redraw());
+        tree.get().setOnTreeNodeEvent(e -> redraw());
     }
 
 
@@ -220,7 +230,7 @@ public class SunburstChart extends Region {
     public void dispose() {
         widthProperty().removeListener(sizeListener);
         heightProperty().removeListener(sizeListener);
-        tree.removeAllTreeNodeEventListeners();
+        tree.get().removeAllTreeNodeEventListeners();
     }
 
     /**
@@ -568,18 +578,22 @@ public class SunburstChart extends Region {
         return useChartDataTextColor;
     }
 
+    public TreeNode<ChartData> getTreeNode() {
+        return tree.get();
+    }
     /**
      * Defines the root element of the tree
      * @param TREE
      */
     public void setTree(final TreeNode<ChartData> TREE) {
-        if (null != tree) { tree.flattened().forEach(node -> node.removeAllTreeNodeEventListeners()); }
-        tree = TREE;
-        tree.flattened().forEach(node -> node.setOnTreeNodeEvent(e -> redraw()));
+        if (null != tree) { getTreeNode().flattened().forEach(node -> node.removeAllTreeNodeEventListeners()); }
+        tree.set(TREE);
+        getTreeNode().flattened().forEach(node -> node.setOnTreeNodeEvent(e -> redraw()));
         prepareData();
         if (isAutoTextColor()) { adjustTextColors(); }
         drawChart();
     }
+    public ObjectProperty<TreeNode<ChartData>> treeNodeProperty() { return tree; }
 
     private void adjustTextColors() {
         Color brightColor = getBrightTextColor();
@@ -594,7 +608,7 @@ public class SunburstChart extends Region {
     }
 
     private void prepareData() {
-        root     = tree.getTreeRoot();
+        root     = getTreeNode().getTreeRoot();
         maxLevel = root.getMaxLevel();
 
         // Create map of all nodes per level

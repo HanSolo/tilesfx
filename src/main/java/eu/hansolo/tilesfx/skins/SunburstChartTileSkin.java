@@ -17,9 +17,13 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.SunburstChart;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TreeNodeEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.TreeNode;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -55,6 +59,19 @@ public class SunburstChartTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
+
+        TreeNode<ChartData> tree = tile.getSunburstChart().getTreeNode();
+        System.out.println("check 1");
+        if (null == tree) { return; }
+        System.out.println("check 2");
+        tree.setOnTreeNodeEvent(e -> {
+            System.out.println("TreeNodeEvent");
+            EventType type = e.getType();
+            if (EventType.NODE_SELECTED == type) {
+                TreeNode<ChartData> segment = e.getSource();
+                tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, segment.getItem()));
+            }
+        });
     }
 
 

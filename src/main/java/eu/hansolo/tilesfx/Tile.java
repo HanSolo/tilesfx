@@ -5127,8 +5127,8 @@ public class Tile extends Control {
             }            
         }, sceneProperty(), getScene().windowProperty(), getScene().getWindow().showingProperty());
         
-        showing.addListener((o, ov, nv) -> {
-        if (nv) {
+        showing.addListener(o -> {
+        if (showing.get()) {
             while(tileEventQueue.peek() != null) {
                 TileEvent event = tileEventQueue.poll();
                     for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }

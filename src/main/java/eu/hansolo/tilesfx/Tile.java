@@ -88,6 +88,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -575,7 +576,7 @@ public class Tile extends Control {
     public Tile() {
         this(SkinType.GAUGE);
     }
-    public Tile(final SkinType SKIN_TYPE) {
+    public Tile(@NamedArg("SKIN_TYPE") final SkinType SKIN_TYPE) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         skinType = SKIN_TYPE;
         getStyleClass().add("tile");

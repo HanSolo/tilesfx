@@ -209,7 +209,7 @@ public class DonutChartTileSkin extends TileSkin {
 
         // Sum
         if (tile.isValueVisible()) {
-            chartCtx.setFont(Fonts.latoRegular(canvasSize * 0.12));
+            chartCtx.setFont(Fonts.latoRegular(canvasSize * 0.15));
             chartCtx.fillText(String.format(Locale.US, "%.0f", sum), center, center, canvasSize * 0.4);
         }
 

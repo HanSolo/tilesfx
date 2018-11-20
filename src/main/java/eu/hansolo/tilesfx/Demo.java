@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.ChartType;
+import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
@@ -50,6 +51,7 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -66,6 +68,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
 
 
 /**
@@ -143,6 +146,7 @@ public class Demo extends Application {
     private Tile            radialPercentageTile;
     private Tile            statusTile;
     private Tile            barGaugeTile;
+    private Tile            imageTile;
 
 
     private long            lastTimerCall;
@@ -758,6 +762,16 @@ public class Demo extends Application {
                                   .animated(true)
                                   .build();
 
+        imageTile = TileBuilder.create()
+                               .skinType(SkinType.IMAGE)
+                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                               .title("Image Tile")
+                               .image(new Image(Demo.class.getResourceAsStream("HanSolo.png")))
+                               .imageMask(ImageMask.ROUND)
+                               .text("Whatever text")
+                               .textAlignment(TextAlignment.CENTER)
+                               .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -835,7 +849,7 @@ public class Demo extends Application {
                                              gaugeSparkLineTile, radarChartTile1, radarChartTile2,
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
-                                             matrixTile, radialPercentageTile, statusTile, barGaugeTile);//, weatherTile);
+                                             matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

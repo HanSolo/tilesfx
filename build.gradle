@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:3.3.0'
+        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.1.0'
     }
 }
 
@@ -15,8 +15,8 @@ plugins {
     id 'idea'
     id 'java'
     id 'maven-publish'
-    id 'net.nemerosa.versioning' version '2.6.1'
-    id 'com.jfrog.bintray' version '1.8.0'
+    id 'net.nemerosa.versioning' version '2.8.2'
+    id 'com.jfrog.bintray' version '1.8.4'
 }
 
 apply plugin: 'biz.aQute.bnd.builder'

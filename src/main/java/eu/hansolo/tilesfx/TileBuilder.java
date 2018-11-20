@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.ChartType;
+import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
@@ -669,6 +670,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B image(final Image IMAGE) {
+        properties.put("image", new SimpleObjectProperty(IMAGE));
+        return (B)this;
+    }
+
+    public final B imageMask(final ImageMask MASK) {
+        properties.put("imageMask", new SimpleObjectProperty(MASK));
+        return (B)this;
+    }
+
     public final B graphic(final Node GRAPHIC) {
         properties.put("graphic", new SimpleObjectProperty(GRAPHIC));
         return (B)this;
@@ -1015,6 +1026,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+
     public final Tile build() {
         final Tile TILE;
         if (properties.containsKey("skinType")) {
@@ -1145,6 +1157,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setBarColor(Tile.BLUE);
                     TILE.setAngleRange(180);
                     TILE.setTickLabelDecimals(0);
+                    break;
+                case IMAGE:
+                    TILE.setTextAlignment(TextAlignment.CENTER);
                     break;
                 default:
                     break;
@@ -1465,6 +1480,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
             } else if ("fillWithGradient".equals(key)) {
                 TILE.setFillWithGradient(((BooleanProperty) properties.get(key)).get());
+            } else if ("image".equals(key)) {
+                TILE.setImage(((ObjectProperty<Image>) properties.get(key)).get());
+            } else if ("imageMask".equals(key)) {
+                TILE.setImageMask(((ObjectProperty<ImageMask>) properties.get(key)).get());
             } else if ("graphic".equals(key)) {
                 TILE.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
             } else if ("roundedCorners".equals(key)) {

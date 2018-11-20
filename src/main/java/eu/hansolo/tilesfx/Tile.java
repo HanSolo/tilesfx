@@ -47,6 +47,7 @@ import eu.hansolo.tilesfx.skins.FlipTileSkin;
 import eu.hansolo.tilesfx.skins.GaugeSparkLineTileSkin;
 import eu.hansolo.tilesfx.skins.GaugeTileSkin;
 import eu.hansolo.tilesfx.skins.HighLowTileSkin;
+import eu.hansolo.tilesfx.skins.ImageTileSkin;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardTileSkin;
 import eu.hansolo.tilesfx.skins.MapTileSkin;
@@ -122,6 +123,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
@@ -177,7 +179,8 @@ public class Tile extends Control {
                            CHARACTER("CharacterTileSkin"), FLIP("FlipTileSkin"), SWITCH_SLIDER("SwitchSliderTileSkin"),
                            DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"), MATRIX("MatrixTileSkin"),
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
-                           STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin");
+                           STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
+                           IMAGE("ImageTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -233,6 +236,9 @@ public class Tile extends Control {
         }
     }
     public enum ChartType { LINE, AREA }
+    public enum ImageMask {
+        NONE, ROUND, RECTANGULAR
+    }
 
     public  static final Color       BACKGROUND                = Color.rgb(42, 42, 42);
     public  static final Color       FOREGROUND                = Color.rgb(223, 223, 223);
@@ -342,6 +348,9 @@ public class Tile extends Control {
     private              ObjectProperty<LocalTime>                     duration;
     private              ObservableList<BarChartItem>                  barChartItems;
     private              ObservableList<LeaderBoardItem>               leaderBoardItems;
+    private              ObjectProperty<Image>                         image;
+    private              ImageMask                                     _imageMask;
+    private              ObjectProperty<ImageMask>                     imageMask;
     private              ObjectProperty<Node>                          graphic;
     private              Location                                      _currentLocation;
     private              ObjectProperty<Location>                      currentLocation;
@@ -666,6 +675,7 @@ public class Tile extends Control {
         _averagingEnabled                   = false;
         _averagingPeriod                    = 10;
         _duration                           = LocalTime.of(1, 0);
+        _imageMask                          = ImageMask.NONE;
         _currentLocation                    = new Location(0, 0);
         _trackColor                         = TileColor.BLUE;
         _mapProvider                        = MapProvider.BW;
@@ -1626,6 +1636,40 @@ public class Tile extends Control {
         getGradientStops().clear();
         getGradientStops().addAll(STOPS);
         fireTileEvent(REDRAW_EVENT);
+    }
+
+    public Image getImage() { return null == image ? null : image.get(); }
+    public void setImage(final Image IMAGE) { imageProperty().set(IMAGE); }
+    public ObjectProperty<Image> imageProperty() {
+        if (null == image) {
+            image = new ObjectPropertyBase<Image>() {
+                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "image"; }
+            };
+        }
+        return image;
+    }
+
+    public ImageMask getImageMask() { return null == imageMask ? _imageMask : imageMask.get(); }
+    public void setImageMask(final ImageMask MASK) {
+        if (null == imageMask) {
+            _imageMask = MASK;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            imageMask.set(MASK);
+        }
+    }
+    public ObjectProperty<ImageMask> imageMaskProperty() {
+        if (null == imageMask) {
+            imageMask = new ObjectPropertyBase<ImageMask>(_imageMask) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "imageMask"; }
+            };
+            _imageMask = null;
+        }
+        return imageMask;
     }
 
     /**
@@ -5182,6 +5226,7 @@ public class Tile extends Control {
             case RADIAL_PERCENTAGE: return new RadialPercentageTileSkin(Tile.this);
             case STATUS           : return new StatusTileSkin(Tile.this);
             case BAR_GAUGE        : return new BarGaugeTileSkin(Tile.this);
+            case IMAGE            : return new ImageTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -5315,6 +5360,9 @@ public class Tile extends Control {
                 setAngleRange(180);
                 setTickLabelDecimals(0);
                 break;
+            case IMAGE:
+                setTextAlignment(TextAlignment.CENTER);
+                break;
             default:
                 break;
         }
@@ -5361,10 +5409,10 @@ public class Tile extends Control {
             case RADIAL_PERCENTAGE: setSkin(new RadialPercentageTileSkin(Tile.this)); break;
             case STATUS           : setSkin(new StatusTileSkin(Tile.this)); break;
             case BAR_GAUGE        : setSkin(new BarGaugeTileSkin(Tile.this)); break;
+            case IMAGE            : setSkin(new ImageTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);
         presetTileParameters(SKIN_TYPE);
     }
 }
-

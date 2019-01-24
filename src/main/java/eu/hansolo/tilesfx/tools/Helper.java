@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -434,6 +435,58 @@ public class Helper {
         niceMaxValue   = (Math.ceil(MAX_VALUE / majorTickSpace) * majorTickSpace);
         minorTickSpace = calcNiceNumber(majorTickSpace / (maxNoOfMinorTicks - 1), true);
         return new double[]{ niceMinValue, niceMaxValue, majorTickSpace, minorTickSpace };
+    }
+
+    /**
+     * Calculates nice minValue, maxValue and stepSize for given MIN and MAX values
+     * @param MIN
+     * @param MAX
+     * @return array of doubles with [niceMin, niceMax, niceRange, niceStep]
+     */
+    public static final double[] getNiceScale(final double MIN, final double MAX) {
+        return getNiceScale(MIN, MAX, 20);
+    }
+    /**
+     * Calculates nice minValue, maxValue and stepSize for given MIN and MAX values
+     * @param MIN
+     * @param MAX
+     * @param MAX_NO_OF_TICKS
+     * @return array of doubles with [niceMin, niceMax, niceRange, niceStep]
+     */
+    public static final double[] getNiceScale(final double MIN, final double MAX, final int MAX_NO_OF_TICKS) {
+        // Minimal increment to avoid round extreme values to be on the edge of the chart
+        double minimum = MIN;
+        double maximum = MAX;
+        double epsilon = (MAX - MIN) / 1e6;
+        maximum += epsilon;
+        minimum -= epsilon;
+        double range = maximum - minimum;
+
+        // Target number of values to be displayed on the Y axis (it may be less)
+        int stepCount = MAX_NO_OF_TICKS;
+        // First approximation
+        double roughStep = range / (stepCount - 1);
+
+        // Set best niceStep for the range
+        //double[] goodNormalizedSteps = { 1, 1.5, 2, 2.5, 5, 7.5, 10 }; // keep the 10 at the end
+        double[] goodNormalizedSteps = { 1, 2, 5, 10 };
+
+        // Normalize rough niceStep to find the normalized one that fits best
+        double stepPower          = Math.pow(10, -Math.floor(Math.log10(Math.abs(roughStep))));
+        double normalizedStep     = roughStep * stepPower;
+        double goodNormalizedStep = Arrays.stream(goodNormalizedSteps).filter(n -> Double.compare(n, normalizedStep) >= 0).findFirst().getAsDouble();
+        double niceStep           = goodNormalizedStep / stepPower;
+
+        // Determine the scale limits based on the chosen niceStep.
+        double niceMin = minimum < 0 ? Math.floor(minimum / niceStep) * niceStep : Math.ceil(minimum / niceStep) * niceStep;
+        double niceMax = maximum < 0 ? Math.floor(maximum / niceStep) * niceStep : Math.ceil(maximum / niceStep) * niceStep;
+
+        if (MIN % niceStep == 0) { niceMin = MIN; }
+        if (MAX % niceStep == 0) { niceMax = MAX; }
+
+        double niceRange = niceMax - niceMin;
+
+        return new double[] { niceMin, niceMax, niceRange, niceStep };
     }
 
     /**

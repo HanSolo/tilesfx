@@ -28,7 +28,7 @@ public class SunMoonCalculator {
     /**
      * The set of twilights to calculate (types of rise/set events).
      */
-    public static enum TWILIGHT {
+    public enum TWILIGHT {
         /**
          * Event ID for calculation of rising and setting times for astronomical
          * twilight. In this case, the calculated time will be the time when the

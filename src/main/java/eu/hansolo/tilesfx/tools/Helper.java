@@ -1237,4 +1237,11 @@ public static final double distance(final Point P1, final Point P2) {
         double cp1 = (P2.getX() - P1.getX()) * (P3.getY() - P1.getY()) - (P2.getY() - P1.getY()) * (P3.getX() - P1.getX());
         return cp1 > 0 ? 1 : Double.compare(cp1, 0) == 0 ? 0 : -1;
     }
+
+    public static final String padLeft(final String text, final String filler, final int n) {
+        return String.format("%" + n + "s", text).replace(" ", filler);
+    }
+    public static final String padRight(final String text, final String filler, final int n) {
+        return String.format("%-" + n + "s", text).replace(" ", filler);
+    }
 }

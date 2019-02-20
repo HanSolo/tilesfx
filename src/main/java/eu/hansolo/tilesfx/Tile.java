@@ -240,8 +240,8 @@ public class Tile extends Control {
         NONE, ROUND, RECTANGULAR
     }
 
-    public  static final Color       BACKGROUND                = Color.rgb(42, 42, 42);
-    public  static final Color       FOREGROUND                = Color.rgb(223, 223, 223);
+    public  static final Color       BACKGROUND                = Color.rgb(42, 42, 42); // #2a2a2a
+    public  static final Color       FOREGROUND                = Color.rgb(223, 223, 223); // #dfdfdf
     public  static final Color       GRAY                      = TileColor.GRAY.color;
     public  static final Color       RED                       = TileColor.RED.color;
     public  static final Color       LIGHT_RED                 = TileColor.LIGHT_RED.color;
@@ -585,9 +585,139 @@ public class Tile extends Control {
     public Tile() {
         this(SkinType.GAUGE);
     }
-    public Tile(@NamedArg("SKIN_TYPE") final SkinType SKIN_TYPE) {
+    public Tile(@NamedArg(value="skinType", defaultValue="SkinType.GAUGE") SkinType skinType) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        skinType = SKIN_TYPE;
+        this.skinType = skinType;
+        getStyleClass().add("tile");
+
+        init();
+        registerListeners();
+    }
+    public Tile(@NamedArg(value="skinType", defaultValue="SkinType.GAUGE") SkinType skinType,
+                @NamedArg(value="minValue", defaultValue="0") double minValue,
+                @NamedArg(value="maxValue", defaultValue="100") double maxValue,
+                @NamedArg(value="value", defaultValue="0") double value,
+                @NamedArg(value="threshold", defaultValue="100") double threshold,
+                @NamedArg(value="referenceValue", defaultValue="0") double referenceValue,
+                @NamedArg(value="autoReferenceValue", defaultValue="true") boolean autoReferenceValue,
+                @NamedArg(value="title", defaultValue="") String title,
+                @NamedArg(value="titleAlignment", defaultValue="TextAlignment.LEFT") TextAlignment titleAlignment,
+                @NamedArg(value="description", defaultValue="") String description,
+                @NamedArg(value="descriptionAlignment", defaultValue="Pos.TOP_RIGHT") Pos descriptionAlignment,
+                @NamedArg(value="unit", defaultValue="") String unit,
+                @NamedArg(value="flipText", defaultValue="") String flipText,
+                @NamedArg(value="active", defaultValue="false") boolean active,
+                @NamedArg(value="text", defaultValue="") String text,
+                @NamedArg(value="textAlignment", defaultValue="TextAlignment.LEFT") TextAlignment textAlignment,
+                @NamedArg(value="averagingEnabled", defaultValue="false") boolean averagingEnabled,
+                @NamedArg(value="averagingPeriod", defaultValue="10") int averagingPeriod,
+                @NamedArg(value="imageMask", defaultValue="ImageMask.NONE") ImageMask imageMask,
+                @NamedArg(value="trackColor", defaultValue="TileColor.BLUE") Color trackColor,
+                @NamedArg(value="mapProvider", defaultValue="MapProvider.BW") MapProvider mapProvider,
+                @NamedArg(value="flipTimeInMS", defaultValue="500") long flipTimeInMS,
+                @NamedArg(value="textSize", defaultValue="TextSize.NORMAL") TextSize textSize,
+                @NamedArg(value="roundedCorners", defaultValue="true") boolean roundedCorners,
+                @NamedArg(value="startFromZero", defaultValue="false") boolean startFromZero,
+                @NamedArg(value="returnToZero", defaultValue="false") boolean returnToZero,
+                @NamedArg(value="minMeasuredValue", defaultValue="100") double minMeasuredValue,
+                @NamedArg(value="maxMeasuredValue", defaultValue="0") double maxMeasuredValue,
+                @NamedArg(value="minMeasuredValueVisible", defaultValue="false") boolean minMeasuredValueVisible,
+                @NamedArg(value="maxMeasuredValueVisible", defaultValue="false") boolean maxMeasuredValueVisible,
+                @NamedArg(value="oldValueVisible", defaultValue="false") boolean oldValueVisible,
+                @NamedArg(value="valueVisible", defaultValue="true") boolean valueVisible,
+                @NamedArg(value="foregroundColor", defaultValue="#dfdfdf") Color foregroundColor,
+                @NamedArg(value="backgroundColor", defaultValue="#2a2a2a") Color backgroundColor,
+                @NamedArg(value="borderColor", defaultValue="#00000000") Color borderColor,
+                @NamedArg(value="borderWidth", defaultValue="1") double borderWidth,
+                @NamedArg(value="knobColor", defaultValue="#dfdfdf") Color knobColor,
+                @NamedArg(value="activeColor", defaultValue="#4274c6") Color activeColor,
+                @NamedArg(value="animated", defaultValue="false") boolean animated,
+                @NamedArg(value="animationDuration", defaultValue="800") long animationDuration,
+                @NamedArg(value="startAngle", defaultValue="0") double startAngle,
+                @NamedArg(value="angleRange", defaultValue="180") double angleRange,
+                @NamedArg(value="autoScale", defaultValue="true") boolean autoScale,
+                @NamedArg(value="shadowsEnabled", defaultValue="false") boolean shadowsEnabled,
+                @NamedArg(value="locale", defaultValue="Locale.US") Locale locale,
+                @NamedArg(value="numberFormat", defaultValue="NumberFormat.getInstance(Locale.US)") NumberFormat numberFormat,
+                @NamedArg(value="decimals", defaultValue="1") int decimals,
+                @NamedArg(value="tickLabelDecimals", defaultValue="1") int tickLabelDecimals,
+                @NamedArg(value="needleColor", defaultValue="#dfdfdf") Color needleColor,
+                @NamedArg(value="hourColor", defaultValue="#dfdfdf") Color hourColor,
+                @NamedArg(value="minuteColor", defaultValue="#dfdfdf") Color minuteColor,
+                @NamedArg(value="secondColor", defaultValue="#dfdfdf") Color secondColor,
+                @NamedArg(value="barColor", defaultValue="#4274c6") Color barColor,
+                @NamedArg(value="barBackgroundColor", defaultValue="#2a2a2a") Color barBackgroundColor,
+                @NamedArg(value="titleColor", defaultValue="#dfdfdf") Color titleColor,
+                @NamedArg(value="descriptionColor", defaultValue="#dfdfdf") Color descriptionColor,
+                @NamedArg(value="unitColor", defaultValue="#dfdfdf") Color unitColor,
+                @NamedArg(value="valueColor", defaultValue="#dfdfdf") Color valueColor,
+                @NamedArg(value="textColor", defaultValue="#dfdfdf") Color textColor,
+                @NamedArg(value="dateColor", defaultValue="#dfdfdf") Color dateColor,
+                @NamedArg(value="hourTickMarkColor", defaultValue="#dfdfdf") Color hourTickMarkColor,
+                @NamedArg(value="minuteTickMarkColor", defaultValue="#dfdfdf") Color minuteTickMarkColor,
+                @NamedArg(value="alarmColor", defaultValue="#dfdfdf") Color alarmColor,
+                @NamedArg(value="thresholdColor", defaultValue="#e5504c") Color thresholdColor,
+                @NamedArg(value="checkSectionsForValue", defaultValue="false") boolean checkSectionsForValue,
+                @NamedArg(value="checkThreshold", defaultValue="false") boolean checkThreshold,
+                @NamedArg(value="innerShadowEnabled", defaultValue="false") boolean innerShadowEnabled,
+                @NamedArg(value="thresholdVisible", defaultValue="false") boolean thresholdVisible,
+                @NamedArg(value="averageVisible", defaultValue="false") boolean averageVisible,
+                @NamedArg(value="sectionsVisible", defaultValue="false") boolean sectionsVisible,
+                @NamedArg(value="sectionsAlwaysVisible", defaultValue="false") boolean sectionsAlwaysVisible,
+                @NamedArg(value="sectionTextVisible", defaultValue="false") boolean sectionTextVisible,
+                @NamedArg(value="sectionIconsVisible", defaultValue="false") boolean sectionIconsVisible,
+                @NamedArg(value="highlightSections", defaultValue="false") boolean highlightSections,
+                @NamedArg(value="orientation", defaultValue="Orientation.HORIZONTAL") Orientation orientation,
+                @NamedArg(value="keepAspect", defaultValue="true") boolean keepAspect,
+                @NamedArg(value="customFontEnabled", defaultValue="false") boolean customFontEnabled,
+                @NamedArg(value="customFont", defaultValue="Fonts.latoRegular(12)") Font customFont,
+                @NamedArg(value="alert", defaultValue="false") boolean alert,
+                @NamedArg(value="alertMessage", defaultValue="") String alertMessage,
+                @NamedArg(value="smoothing", defaultValue="false") boolean smoothing,
+                @NamedArg(value="secondsVisible", defaultValue="false") boolean secondsVisible,
+                @NamedArg(value="discreteSeconds", defaultValue="true") boolean discreteSeconds,
+                @NamedArg(value="discreteMinutes", defaultValue="true") boolean discreteMinutes,
+                @NamedArg(value="discreteHours", defaultValue="false") boolean discreteHours,
+                @NamedArg(value="textVisible", defaultValue="true") boolean textVisible,
+                @NamedArg(value="dateVisible", defaultValue="false") boolean dateVisible,
+                @NamedArg(value="running", defaultValue="false") boolean running,
+                @NamedArg(value="hourTickMarksVisible", defaultValue="true") boolean hourTickMarksVisible,
+                @NamedArg(value="minuteTickMarksVisible", defaultValue="true") boolean minuteTickMarksVisible,
+                @NamedArg(value="alarmsEnabled", defaultValue="false") boolean alarmsEnabled,
+                @NamedArg(value="alarmsVisible", defaultValue="false") boolean alarmsVisible,
+                @NamedArg(value="strokeWithGradient", defaultValue="false") boolean strokeWithGradient,
+                @NamedArg(value="fillWithGradient", defaultValue="false") boolean fillWithGradient,
+                @NamedArg(value="radarChartMode", defaultValue="Mode.POLYGON") Mode radarChartMode,
+                @NamedArg(value="chartGridColor", defaultValue="#8B9092") Color chartGridColor,
+                @NamedArg(value="sortedData", defaultValue="true") boolean sortedData,
+                @NamedArg(value="dataPointsVisible", defaultValue="false") boolean dataPointsVisible,
+                @NamedArg(value="snapToTicks", defaultValue="false") boolean snapToTicks,
+                @NamedArg(value="minorTickCount", defaultValue="0") int minorTickCount,
+                @NamedArg(value="majorTickUnit", defaultValue="1") int majorTickUnit,
+                @NamedArg(value="chartType", defaultValue="ChartType.LINE") ChartType chartType,
+                @NamedArg(value="tooltipTimeout", defaultValue="2000") long tooltipTimeout,
+                @NamedArg(value="notifyRegionBackgroundColor", defaultValue="#E5E54C") Color notifyRegionBackgroundColor,
+                @NamedArg(value="notifyRegionForegroundColor", defaultValue="Tile.#2a2a2a") Color notifyRegionForegroundColor,
+                @NamedArg(value="infoRegionBackgroundColor", defaultValue="#375EFC") Color infoRegionBackgroundColor,
+                @NamedArg(value="infoRegionForegroundColor", defaultValue="#dfdfdf") Color infoRegionForegroundColor,
+                @NamedArg(value="infoRegionTooltipText", defaultValue="") String infoRegionTooltipText,
+                @NamedArg(value="backgroundImage", defaultValue="null") Image backgroundImage,
+                @NamedArg(value="backgroundImageOpacity", defaultValue="0.2") double backgroundImageOpacity,
+                @NamedArg(value="backgroundImageKeepAspect", defaultValue="true") boolean backgroundImageKeepAspect,
+                @NamedArg(value="leftText", defaultValue="") String leftText,
+                @NamedArg(value="middleText", defaultValue="") String middleText,
+                @NamedArg(value="rightText", defaultValue="") String rightText,
+                @NamedArg(value="leftValue", defaultValue="0") double leftValue,
+                @NamedArg(value="middleValue", defaultValue="0") double middleValue,
+                @NamedArg(value="rightValue", defaultValue="0") double rightValue,
+                @NamedArg(value="leftGraphics", defaultValue="null") Node leftGraphics,
+                @NamedArg(value="middleGraphics", defaultValue="null") Node middleGraphics,
+                @NamedArg(value="rightGraphics", defaultValue="null") Node rightGraphics,
+                @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
+                @NamedArg(value="increment", defaultValue="1") int increment
+                ) {
+        setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+        this.skinType = skinType;
         getStyleClass().add("tile");
 
         init();

@@ -11,16 +11,22 @@ buildscript {
 
 // TilesFX main build file
 plugins {
-    //id 'com.gradle.build-scan' version '1.11'
     id 'com.gradle.build-scan' version '2.1'
     id 'idea'
     id 'java'
     id 'maven-publish'
     id 'net.nemerosa.versioning' version '2.8.2'
     id 'com.jfrog.bintray' version '1.8.4'
+    //id 'org.openjfx.javafxplugin' version '0.0.7' //
 }
 
 apply plugin: 'biz.aQute.bnd.builder'
+
+//sourceCompatibility = '11'
+
+wrapper {
+    gradleVersion = '5.2'
+}
 
 buildScan {
     termsOfServiceUrl   = 'https://gradle.com/terms-of-service'
@@ -56,7 +62,7 @@ jar {
                 'Bundle-Description': description,
                 'Bundle-SymbolicName': 'eu.hansolo.tilesfx',
                 'Export-Package': 'eu.hansolo.tilesfx,eu.hansolo.tilesfx.chart,eu.hansolo.tilesfx.colors,eu.hansolo.tilesfx.events,eu.hansolo.tilesfx.fonts,eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools,eu.hansolo.tilesfx.weather',
-                'Automatic-Module-Name': 'tilesfx'
+                'Automatic-Module-Name': 'eu.hansolo.tilesfx'
         )
     }
 }

@@ -16,7 +16,6 @@
 
 package eu.hansolo.tilesfx.tools;
 
-import eu.hansolo.tilesfx.Tile;
 import javafx.beans.NamedArg;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.IntegerPropertyBase;

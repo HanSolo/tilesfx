@@ -18,8 +18,6 @@ package eu.hansolo.tilesfx.events;
 
 import eu.hansolo.tilesfx.Alarm;
 
-import java.util.EventObject;
-
 
 /**
  * Created by hansolo on 19.12.16.

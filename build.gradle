@@ -17,12 +17,12 @@ plugins {
     id 'maven-publish'
     id 'net.nemerosa.versioning' version '2.8.2'
     id 'com.jfrog.bintray' version '1.8.4'
-    //id 'org.openjfx.javafxplugin' version '0.0.7' //
+    id 'org.openjfx.javafxplugin' version '0.0.7'
 }
 
 apply plugin: 'biz.aQute.bnd.builder'
 
-//sourceCompatibility = '11'
+sourceCompatibility = '11'
 
 wrapper {
     gradleVersion = '5.2'
@@ -33,7 +33,7 @@ buildScan {
     termsOfServiceAgree = 'yes'
 }
 
-description = 'TilesFX is a JavaFX 8 library containing tiles for dashboards'
+description = 'TilesFX is a JavaFX library containing tiles for dashboards'
 
 Date buildTimeAndDate = new Date()
 ext {
@@ -43,6 +43,10 @@ ext {
 
 dependencies {
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
+}
+
+javafx {
+    modules = [ 'javafx.controls', 'javafx.web' ]
 }
 
 jar {

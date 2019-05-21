@@ -2535,7 +2535,7 @@ public class Tile extends Control {
      */
     public long getAnimationDuration() { return animationDuration; }
     /**
-     * Defines the duration ín milliseconds that will be used to animate
+     * Defines the duration in milliseconds that will be used to animate
      * the needle/bar of the gauge from the last value to the next value.
      * This will only be used if animated == true. This value will be
      * clamped in the range of 10ms - 10s.

@@ -362,7 +362,7 @@ public class Helper {
                                                       "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
                                                       "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
                                                       "W", "X", "Y", "Z", "-", "/", ":", ",", "", ";", "@",
-                                                      "#", "+", "?", "!", "%", "$", "=", "<", ">", "Ä", "Ö", "Ü", "ß"};
+                                                      "#", "+", "?", "!", "%", "$", "=", "<", ">", "U+00C4", "U+00D6", "U+00DC", "U+00DF"};
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;
@@ -835,10 +835,10 @@ public class Helper {
         if (null == loresCountryProperties) { loresCountryProperties = readProperties(LORES_COUNTRY_PROPERTIES); }
         Map<String, List<CountryPath>> loresCountryPaths = new ConcurrentHashMap<>();
         loresCountryProperties.forEach((key, value) -> {
-           String            name     = key.toString();
-           List<CountryPath> pathList = new ArrayList<>();
-           for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
-           loresCountryPaths.put(name, pathList);
+            String            name     = key.toString();
+            List<CountryPath> pathList = new ArrayList<>();
+            for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+            loresCountryPaths.put(name, pathList);
         });
         return loresCountryPaths;
     }
@@ -921,10 +921,8 @@ public class Helper {
         int n = DATA_POINTS.length - 1;
         if (n == 1) { // Special case: Bezier curve should be a straight line.
             firstControlPoints     = new Point[1];
-            // 3P1 = 2P0 + P3
             firstControlPoints[0]  = new Point((2 * DATA_POINTS[0].getX() + DATA_POINTS[1].getX()) / 3, (2 * DATA_POINTS[0].getY() + DATA_POINTS[1].getY()) / 3);
             secondControlPoints    = new Point[1];
-            // P2 = 2P1 – P0
             secondControlPoints[0] = new Point(2 * firstControlPoints[0].getX() - DATA_POINTS[0].getX(), 2 * firstControlPoints[0].getY() - DATA_POINTS[0].getY());
             return new Pair<>(firstControlPoints, secondControlPoints);
         }
@@ -1007,7 +1005,7 @@ public class Helper {
         double[]     pointsX             = new double[noOfPointsInPolygon];
         double[]     pointsY             = new double[noOfPointsInPolygon];
         int          pointCounter        = 0;
-        
+
         for (int i = 0, size = points.size() ; i < size - 1 ; i += 2) {
             pointsX[pointCounter] = points.get(i);
             pointsY[pointCounter] = points.get(i + 1);
@@ -1042,7 +1040,7 @@ public class Helper {
                 Double.compare(pointAngle, endAngle) <= 0);
     }
 
-public static final double distance(final Point P1, final Point P2) {
+    public static final double distance(final Point P1, final Point P2) {
         return distance(P1.getX(), P1.getY(), P2.getX(), P2.getY());
     }
     public static final double distance(final double P1_X, final double P1_Y, final double P2_X, final double P2_Y) {
@@ -1101,7 +1099,7 @@ public static final double distance(final Point P1, final Point P2) {
         double angle       = (theta + ANGLE_OFFSET) % 360;
         return angle;
     }
-    
+
     public static final Point rotatePointAroundRotationCenter(final Point POINT, final Point ROTATION_CENTER, final double ANGLE) {
         double[] xy = rotatePointAroundRotationCenter(POINT.getX(), POINT.getY(), ROTATION_CENTER.getX(), ROTATION_CENTER.getY(), ANGLE);
         return new Point(xy[0], xy[1]);
@@ -1141,7 +1139,7 @@ public static final double distance(final Point P1, final Point P2) {
     }
 
     public static final <T> Predicate<T> not(final Predicate<T> PREDICATE) { return PREDICATE.negate(); }
-    
+
     public static final List<Point> createSmoothedConvexHull(final List<Point> POINTS, final int SUB_DIVISIONS) {
         List<Point> hullPolygon = createConvexHull(POINTS);
         return subdividePoints(hullPolygon, SUB_DIVISIONS);

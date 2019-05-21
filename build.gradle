@@ -5,13 +5,13 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.1.0'
+        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.2.0'
     }
 }
 
 // TilesFX main build file
 plugins {
-    id 'com.gradle.build-scan' version '2.1'
+    id 'com.gradle.build-scan' version '2.3'
     id 'idea'
     id 'java'
     id 'maven-publish'
@@ -25,7 +25,7 @@ apply plugin: 'biz.aQute.bnd.builder'
 sourceCompatibility = '11'
 
 wrapper {
-    gradleVersion = '5.2'
+    gradleVersion = '5.4.1'
 }
 
 buildScan {

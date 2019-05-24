@@ -182,12 +182,12 @@ public class EphemerisTileSkin extends TileSkin {
         try { smc.setDate(LocalDate.now()); } catch (Exception e) {}
         smc.calcEphemeris(tile.getZoneId());
 
-        blueHourSunriseText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunriseCivil()), TIME_FORMATTER.format(smc.getSunriseBlueHour())));
+        blueHourSunriseText.setText(TIME_FORMATTER.format(smc.getSunriseCivil()) + " - " + TIME_FORMATTER.format(smc.getSunriseBlueHour()));
         sunriseText.setText(TIME_FORMATTER.format(smc.getSunrise()));
-        goldenHourSunriseText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunrise()), TIME_FORMATTER.format(smc.getSunriseGoldenHour())));
-        goldenHourSunsetText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunsetGoldenHour()), TIME_FORMATTER.format(smc.getSunset())));
+        goldenHourSunriseText.setText(TIME_FORMATTER.format(smc.getSunrise()) + " - " + TIME_FORMATTER.format(smc.getSunriseGoldenHour()));
+        goldenHourSunsetText.setText(TIME_FORMATTER.format(smc.getSunsetGoldenHour()) + " - " + TIME_FORMATTER.format(smc.getSunset()));
         sunsetText.setText(TIME_FORMATTER.format(smc.getSunset()));
-        blueHourSunsetText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunsetBlueHour()), TIME_FORMATTER.format(smc.getSunsetCivil())));
+        blueHourSunsetText.setText(TIME_FORMATTER.format(smc.getSunsetBlueHour()) + " - " + TIME_FORMATTER.format(smc.getSunsetCivil()));
     }
 
 
@@ -272,12 +272,12 @@ public class EphemerisTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
-        blueHourSunriseText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunriseCivil()), TIME_FORMATTER.format(smc.getSunriseBlueHour())));
+        blueHourSunriseText.setText(TIME_FORMATTER.format(smc.getSunriseCivil()) + " - " + TIME_FORMATTER.format(smc.getSunriseBlueHour()));
         sunriseText.setText(TIME_FORMATTER.format(smc.getSunrise()));
-        goldenHourSunriseText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunrise()), TIME_FORMATTER.format(smc.getSunriseGoldenHour())));
-        goldenHourSunsetText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunsetGoldenHour()), TIME_FORMATTER.format(smc.getSunset())));
+        goldenHourSunriseText.setText(TIME_FORMATTER.format(smc.getSunrise()) + " - " + TIME_FORMATTER.format(smc.getSunriseGoldenHour()));
+        goldenHourSunsetText.setText(TIME_FORMATTER.format(smc.getSunsetGoldenHour()) + "- " + TIME_FORMATTER.format(smc.getSunset()));
         sunsetText.setText(TIME_FORMATTER.format(smc.getSunset()));
-        blueHourSunsetText.setText(String.join(" - ", TIME_FORMATTER.format(smc.getSunsetBlueHour()), TIME_FORMATTER.format(smc.getSunsetCivil())));
+        blueHourSunsetText.setText(TIME_FORMATTER.format(smc.getSunsetBlueHour()) + " - " + TIME_FORMATTER.format(smc.getSunsetCivil()));
 
         resizeDynamicText();
         resizeStaticText();

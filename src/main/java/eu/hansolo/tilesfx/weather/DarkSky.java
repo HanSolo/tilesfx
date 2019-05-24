@@ -189,7 +189,7 @@ public class DarkSky {
     public DarkSky(final String API_KEY, final Unit UNIT, final Language LANGUAGE, final double LATITUDE, final double LONGITUDE) {
         if (null == API_KEY || API_KEY.isEmpty()) throw new IllegalArgumentException("Please provide a valid DarkSky API key");
         apiKey     = API_KEY;
-        darkSkyUrl = String.join("", "https://api.darksky.net/forecast/", apiKey, "/");
+        darkSkyUrl = "https://api.darksky.net/forecast/" + apiKey + "/";
         today      = new DataPoint();
         forecast   = new LinkedList<>();
         unit       = UNIT;
@@ -353,7 +353,7 @@ public class DarkSky {
             for (Exclude exclude : EXCLUDES) { PARAMETERS.append(exclude.value).append(","); }
             PARAMETERS.deleteCharAt(PARAMETERS.length() - 1);
         }
-        return String.join("", darkSkyUrl, PARAMETERS.toString());
+        return darkSkyUrl + PARAMETERS.toString();
     }
 
     public JSONObject toJsonObject() {

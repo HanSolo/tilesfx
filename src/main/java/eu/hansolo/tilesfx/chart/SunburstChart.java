@@ -717,7 +717,7 @@ public class SunburstChart extends Region {
                                 chartCtx.fillText(segmentData.getName(), 0, 0, maxTextWidth);
                                 break;
                             case NAME_VALUE:
-                                chartCtx.fillText(String.join("", segmentData.getName(), " (", String.format(Locale.US, formatString, value),")"), 0, 0, maxTextWidth);
+                                chartCtx.fillText(segmentData.getName() + " (" + String.format(Locale.US, formatString, value) + ")", 0, 0, maxTextWidth);
                                 break;
                         }
                         chartCtx.restore();

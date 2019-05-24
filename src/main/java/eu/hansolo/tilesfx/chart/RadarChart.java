@@ -470,7 +470,9 @@ public class RadarChart extends Region {
     public void setData(final List<ChartData> DATA) {
         if (DATA.size() < MIN_NO_OF_SECTORS) throw new IllegalArgumentException("Not enough sectors (min. " + MIN_NO_OF_SECTORS + "needed)");
         if (DATA.size() > MAX_NO_OF_SECTORS) throw new IllegalArgumentException("Too many sectors (max. " + MAX_NO_OF_SECTORS + " sectors allowed)");
-        DATA.forEach(d -> addData(d));
+        for (ChartData d : DATA) {
+            addData(d);
+        }
     }
     public void addData(final ChartData DATA) {
         if (data.size() > (getNoOfSectors() + 1)) throw new IllegalArgumentException("Too many sectors (max. " + getNoOfSectors() + " sectors allowed)");

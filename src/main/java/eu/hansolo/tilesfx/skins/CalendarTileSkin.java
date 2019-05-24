@@ -128,7 +128,9 @@ public class CalendarTileSkin extends TileSkin {
 
 
     @Override public void dispose() {
-        labels.forEach(label -> label.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler));
+        for (Label label : labels) {
+            label.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+        }
         super.dispose();
     }
 
@@ -182,7 +184,12 @@ public class CalendarTileSkin extends TileSkin {
                         text = Integer.toString(dayCounter);
 
                         LocalDate currentDay = time.toLocalDate().plusDays(dayCounter - 1);
-                        long appointments    = dataList.stream().filter(data -> data.getTimestampAsLocalDate().isEqual(currentDay)).count();
+                        long      appointments = 0L;
+                        for (ChartData data : dataList) {
+                            if (data.getTimestampAsLocalDate().isEqual(currentDay)) {
+                                appointments++;
+                            }
+                        }
 
                         if (x == 7) {
                             if (appointments > 0) { label.setBorder(appmntBorder); } else { label.setBorder(null); }
@@ -233,7 +240,13 @@ public class CalendarTileSkin extends TileSkin {
         List<ChartData>     dataList          = tile.getChartData();
         ZonedDateTime       time              = tile.getTime();
         LocalDate           selectedDate      = LocalDate.of(time.getYear(), time.getMonth(), selectedNo);
-        Optional<ChartData> selectedChartData = dataList.stream().filter(data -> data.getTimestampAsLocalDate().isEqual(selectedDate)).findAny();
+        Optional<ChartData> selectedChartData = Optional.empty();
+        for (ChartData data : dataList) {
+            if (data.getTimestampAsLocalDate().isEqual(selectedDate)) {
+                selectedChartData = Optional.of(data);
+                break;
+            }
+        }
 
         if (selectedChartData.isPresent()) { tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, selectedChartData.get())); }
     }

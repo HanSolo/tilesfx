@@ -213,9 +213,13 @@ public class GaugeTileSkin extends TileSkin {
     private void highlightSections(final double VALUE) {
         if (!sectionsVisible || sections.isEmpty()) return;
         if (highlightSections) {
-            sections.forEach(section -> sectionMap.get(section).setVisible(section.contains(VALUE)));
+            for (Section section : sections) {
+                sectionMap.get(section).setVisible(section.contains(VALUE));
+            }
         } else {
-            sections.forEach(section -> sectionMap.get(section).setOpacity(section.contains(VALUE) ? 1.0 : 0.25));
+            for (Section section : sections) {
+                sectionMap.get(section).setOpacity(section.contains(VALUE) ? 1.0 : 0.25);
+            }
         }
     }
 

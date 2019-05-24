@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -771,23 +772,27 @@ public class Helper {
         if (null == hiresCountryProperties) { hiresCountryProperties = readProperties(HIRES_COUNTRY_PROPERTIES); }
 
         Map<String, List<CountryPath>> hiresCountryPaths = new ConcurrentHashMap<>();
-        hiresCountryProperties.forEach((key, value) -> {
+        for (Entry<Object, Object> entry : hiresCountryProperties.entrySet()) {
+            Object            key      = entry.getKey();
+            Object            value    = entry.getValue();
             String            name     = key.toString();
             List<CountryPath> pathList = new ArrayList<>();
             for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
             hiresCountryPaths.put(name, pathList);
-        });
+        }
         return hiresCountryPaths;
     }
     public static final Map<String, List<CountryPath>> getLoresCountryPaths() {
         if (null == loresCountryProperties) { loresCountryProperties = readProperties(LORES_COUNTRY_PROPERTIES); }
         Map<String, List<CountryPath>> loresCountryPaths = new ConcurrentHashMap<>();
-        loresCountryProperties.forEach((key, value) -> {
-           String            name     = key.toString();
-           List<CountryPath> pathList = new ArrayList<>();
-           for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
-           loresCountryPaths.put(name, pathList);
-        });
+        for (Entry<Object, Object> entry : loresCountryProperties.entrySet()) {
+            Object            key      = entry.getKey();
+            Object            value    = entry.getValue();
+            String            name     = key.toString();
+            List<CountryPath> pathList = new ArrayList<>();
+            for (String path : value.toString().split(";")) { pathList.add(new CountryPath(name, path)); }
+            loresCountryPaths.put(name, pathList);
+        }
         return loresCountryPaths;
     }
     private static final Properties readProperties(final String FILE_NAME) {

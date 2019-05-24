@@ -26,16 +26,17 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 /**
@@ -64,11 +65,13 @@ public class BarChartTileSkin extends TileSkin {
         paneSizeListener = o -> resizeItems();
         handlerMap       = new HashMap<>();
 
-        List<BarChartItem> barChartItems = tile.getBarChartItems().stream()
-                                                         .sorted(Comparator.comparing(BarChartItem::getValue).reversed())
-                                                         .collect(Collectors.toList());
+        List<BarChartItem> barChartItems = new ArrayList<>();
+        for (BarChartItem barChartItem : tile.getBarChartItems()) {
+            barChartItems.add(barChartItem);
+        }
+        barChartItems.sort(Comparator.comparing(BarChartItem::getValue).reversed());
 
-        tile.getBarChartItems().forEach(item -> {
+        for (BarChartItem item : tile.getBarChartItems()) {
             item.addChartDataEventListener(updateHandler);
             EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, item.getChartData()));
             handlerMap.put(item, clickHandler);
@@ -77,7 +80,7 @@ public class BarChartTileSkin extends TileSkin {
             if (null == item.getFormatString() || item.getFormatString().isEmpty()) {
                 item.setFormatString(formatString);
             }
-        });
+        }
         barChartPane = new Pane();
         barChartPane.getChildren().addAll(barChartItems);
 
@@ -97,20 +100,20 @@ public class BarChartTileSkin extends TileSkin {
         tile.getBarChartItems().addListener(new WeakListChangeListener<>(change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(addedItem -> {
+                    for (BarChartItem addedItem : change.getAddedSubList()) {
                         barChartPane.getChildren().add(addedItem);
                         addedItem.addChartDataEventListener(updateHandler);
                         EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
                         handlerMap.put(addedItem, clickHandler);
                         addedItem.setOnMousePressed(clickHandler);
-                    });
+                    }
                     updateChart();
                 } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedItem -> {
+                    for (BarChartItem removedItem : change.getRemoved()) {
                         removedItem.removeChartDataEventListener(updateHandler);
                         removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
                         barChartPane.getChildren().remove(removedItem);
-                    });
+                    }
                     updateChart();
                 }
             }
@@ -136,10 +139,10 @@ public class BarChartTileSkin extends TileSkin {
     @Override public void dispose() {
         pane.widthProperty().removeListener(paneSizeListener);
         pane.heightProperty().removeListener(paneSizeListener);
-        tile.getBarChartItems().forEach(item -> {
+        for (BarChartItem item : tile.getBarChartItems()) {
             item.removeChartDataEventListener(updateHandler);
             item.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(item));
-        });
+        }
         handlerMap.clear();
         super.dispose();
     }
@@ -202,12 +205,12 @@ public class BarChartTileSkin extends TileSkin {
     }
 
     private void resizeItems() {
-        barChartPane.getChildren().forEach(node -> {
+        for (Node node : barChartPane.getChildren()) {
             BarChartItem item = (BarChartItem) node;
             item.setParentSize(width, height);
             item.setPrefSize(width, height * 0.12);
             item.setMaxSize(width, height * 0.12);
-        });
+        }
     }
 
     @Override protected void resize() {
@@ -224,10 +227,10 @@ public class BarChartTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
 
-        tile.getBarChartItems().forEach(item -> {
+        for (BarChartItem item : tile.getBarChartItems()) {
             item.setNameColor(tile.getTextColor());
             item.setValueColor(tile.getValueColor());
-        });
+        }
 
         resizeDynamicText();
         resizeStaticText();

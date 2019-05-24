@@ -23,8 +23,6 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.chart.RadarChart;
-import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
-import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
@@ -35,7 +33,6 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.Location;
-import eu.hansolo.tilesfx.tools.TreeNode;
 import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -777,51 +774,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B sunburstTree(final TreeNode TREE) {
-        properties.put("sunburstTree", new SimpleObjectProperty(TREE));
-        return (B)this;
-    }
-
-    public final B sunburstBackgroundColor(final Color COLOR) {
-        properties.put("sunburstBackgroundColor", new SimpleObjectProperty(COLOR));
-        return (B)this;
-    }
-
-    public final B sunburstTextColor(final Color COLOR) {
-        properties.put("sunburstTextColor", new SimpleObjectProperty(COLOR));
-        return (B)this;
-    }
-
-    public final B sunburstUseColorFromParent(final boolean USE) {
-        properties.put("sunburstUseColorFromParent", new SimpleBooleanProperty(USE));
-        return (B)this;
-    }
-
-    public final B sunburstTextOrientation(final TextOrientation ORIENTATION) {
-        properties.put("sunburstTextOrientation", new SimpleObjectProperty(ORIENTATION));
-        return (B)this;
-    }
-
-    public final B sunburstVisibleData(final VisibleData VISIBLE_DATA) {
-        properties.put("sunburstVisibleData", new SimpleObjectProperty(VISIBLE_DATA));
-        return (B)this;
-    }
-
-    public final B sunburstInteractive(final boolean INTERACTIVE) {
-        properties.put("sunburstInteractive", new SimpleBooleanProperty(INTERACTIVE));
-        return (B)this;
-    }
-
-    public final B sunburstAutoTextColor(final boolean AUTOMATIC) {
-        properties.put("sunburstAutoTextColor", new SimpleBooleanProperty(AUTOMATIC));
-        return (B)this;
-    }
-
-    public final B sunburstUseChartDataTextColor(final boolean USE) {
-        properties.put("sunburstUseChartDataTextColor", new SimpleBooleanProperty(USE));
-        return (B)this;
-    }
-
     public final B snapToTicks(final boolean SNAP) {
         properties.put("snapToTicks", new SimpleBooleanProperty(SNAP));
         return (B)this;
@@ -1130,8 +1082,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case CALENDAR:
                     TILE.setTitleAlignment(TextAlignment.CENTER);
                     TILE.setTextAlignment(TextAlignment.CENTER);
-                    break;
-                case SUNBURST:
                     break;
                 case MATRIX:
                     break;
@@ -1508,24 +1458,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setFlipText(((StringProperty) properties.get(key)).get());
             } else if ("dataPointsVisible".equals(key)) {
                 TILE.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sunburstTree".equals(key)) {
-                TILE.getSunburstChart().setTree(((ObjectProperty<TreeNode>) properties.get(key)).get());
-            } else if ("sunburstBackgroundColor".equals(key)) {
-                TILE.getSunburstChart().setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("sunburstTextColor".equals(key)) {
-                TILE.getSunburstChart().setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("sunburstUseColorFromParent".equals(key)) {
-                TILE.getSunburstChart().setUseColorFromParent(((BooleanProperty) properties.get(key)).get());
-            } else if ("sunburstTextOrientation".equals(key)) {
-                TILE.getSunburstChart().setTextOrientation(((ObjectProperty<TextOrientation>) properties.get(key)).get());
-            } else if("sunburstVisibleData".equals(key)) {
-                TILE.getSunburstChart().setVisibleData(((ObjectProperty<VisibleData>) properties.get(key)).get());
-            } else if ("sunburstInteractive".equals(key)) {
-                TILE.getSunburstChart().setInteractive(((BooleanProperty) properties.get(key)).get());
-            } else if ("sunburstAutoTextColor".equals(key)) {
-                TILE.getSunburstChart().setAutoTextColor(((BooleanProperty) properties.get(key)).get());
-            } else if ("sunburstUseChartDataTextColor".equals(key)) {
-                TILE.getSunburstChart().setUseChartDataTextColor(((BooleanProperty) properties.get(key)).get());
             } else if ("snapToTicks".equals(key)) {
                 TILE.setSnapToTicks(((BooleanProperty) properties.get(key)).get());
             } else if ("minorTickCount".equals(key)) {

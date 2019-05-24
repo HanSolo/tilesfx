@@ -27,7 +27,13 @@ public class Statistics {
 
 
     // ******************** Methods *******************************************
-    public static final double getMean(final List<Double> DATA) { return DATA.stream().mapToDouble(v -> v).sum() / DATA.size(); }
+    public static final double getMean(final List<Double> DATA) {
+        double sum = 0.0;
+        for (Double v : DATA) {
+            double v1 = v;
+            sum += v1;
+        }
+        return sum / DATA.size(); }
 
     public static final double getVariance(final List<Double> DATA) {
         double mean = getMean(DATA);
@@ -44,7 +50,27 @@ public class Statistics {
         return size % 2 == 0 ? (DATA.get((size / 2) - 1) + DATA.get(size / 2)) / 2.0 : DATA.get(size / 2);
     }
 
-    public static final double getMin(final List<Double> DATA) { return DATA.stream().mapToDouble(v -> v).min().orElse(0); }
+    public static final double getMin(final List<Double> DATA) {
+        boolean seen = false;
+        double  best = 0;
+        for (Double v : DATA) {
+            double v1 = v;
+            if (!seen || Double.compare(v1, best) < 0) {
+                seen = true;
+                best = v1;
+            }
+        }
+        return seen ? best : 0; }
 
-    public static final double getMax(final List<Double> DATA) { return DATA.stream().mapToDouble(v -> v).max().orElse(0); }
+    public static final double getMax(final List<Double> DATA) {
+        boolean seen = false;
+        double  best = 0;
+        for (Double v : DATA) {
+            double v1 = v;
+            if (!seen || Double.compare(v1, best) > 0) {
+                seen = true;
+                best = v1;
+            }
+        }
+        return seen ? best : 0; }
 }

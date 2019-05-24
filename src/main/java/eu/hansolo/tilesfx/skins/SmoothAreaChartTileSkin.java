@@ -104,9 +104,13 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         chartDataListener          = c -> {
             while (c.next()) {
                 if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(addedItem -> addedItem.addChartDataEventListener(chartEventListener));
+                    for (ChartData addedItem : c.getAddedSubList()) {
+                        addedItem.addChartDataEventListener(chartEventListener);
+                    }
                 } else if (c.wasRemoved()) {
-                    c.getRemoved().forEach(removedItem -> removedItem.removeChartDataEventListener(chartEventListener));
+                    for (ChartData removedItem : c.getRemoved()) {
+                        removedItem.removeChartDataEventListener(chartEventListener);
+                    }
                 }
             }
             handleData();
@@ -179,7 +183,9 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
+        for (ChartData chartData : tile.getChartData()) {
+            chartData.addChartDataEventListener(chartEventListener);
+        }
         tile.getChartData().addListener(chartDataListener);
         fillPath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         fadeInFadeOut.setOnFinished(endOfTransformationHandler);
@@ -187,7 +193,9 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
     @Override public void dispose() {
         tile.getChartData().removeListener(chartDataListener);
-        tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        for (ChartData chartData : tile.getChartData()) {
+            chartData.removeChartDataEventListener(chartEventListener);
+        }
         fillPath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         endOfTransformationHandler = null;
         fadeInFadeOut.setOnFinished(null);
@@ -215,14 +223,33 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         selector.setVisible(false);
         List<ChartData> data = tile.getChartData();
         if (null == data || data.isEmpty()) { return; }
-        Optional<ChartData> lastDataEntry = data.stream().reduce((first, second) -> second);
+        boolean   seen = false;
+        ChartData acc  = null;
+        for (ChartData datum : data) {
+            if (!seen) {
+                seen = true;
+                acc = datum;
+            } else {
+                acc = datum;
+            }
+        }
+        Optional<ChartData> lastDataEntry = seen ? Optional.of(acc) : Optional.empty();
         if (lastDataEntry.isPresent()) {
             valueText.setText(String.format(locale, formatString, lastDataEntry.get().getValue()));
             tile.setValue(lastDataEntry.get().getValue());
             resizeDynamicText();
         }
         dataSize  = data.size();
-        maxValue  = data.stream().max(Comparator.comparing(c -> c.getValue())).get().getValue();
+        boolean               seen1      = false;
+        ChartData             best       = null;
+        Comparator<ChartData> comparator = Comparator.comparing(c -> c.getValue());
+        for (ChartData datum : data) {
+            if (!seen1 || comparator.compare(datum, best) > 0) {
+                seen1 = true;
+                best = datum;
+            }
+        }
+        maxValue  = (seen1 ? Optional.of(best) : Optional.<ChartData>empty()).get().getValue();
         hStepSize = width / (dataSize - 1);
         vStepSize = (height * 0.5) / maxValue;
 
@@ -287,7 +314,16 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         if (Double.compare(EVENT_X, CHART_X) < 0 || Double.compare(EVENT_X, CHART_WIDTH) > 0) { return; }
 
-        double            upperBound   = tile.getChartData().stream().max(Comparator.comparing(ChartData::getValue)).get().getValue();
+        boolean               seen       = false;
+        ChartData             best       = null;
+        Comparator<ChartData> comparator = Comparator.comparing(ChartData::getValue);
+        for (ChartData chartData : tile.getChartData()) {
+            if (!seen || comparator.compare(chartData, best) > 0) {
+                seen = true;
+                best = chartData;
+            }
+        }
+        double            upperBound   = (seen ? Optional.of(best) : Optional.<ChartData>empty()).get().getValue();
         double            range        = upperBound - tile.getMinValue();
         double            factor       = range / (height * 0.5);
         List<PathElement> elements     = strokePath.getElements();

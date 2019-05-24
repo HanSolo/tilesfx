@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.SmoothedChart;
+import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.events.SmoothedChartEvent;
 import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
@@ -28,10 +29,12 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class SmoothedChartTileSkin extends TileSkin {
@@ -78,24 +81,17 @@ public class SmoothedChartTileSkin extends TileSkin {
         getPane().getChildren().addAll(titleText, chart);
 
         // Add series not before chart is part of scene
-        chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
+        List<Series<String, Number>> list = new ArrayList<>();
+        for (TilesFXSeries<String, Number> tilesFxSeries : tile.getTilesFXSeries()) {
+            Series<String, Number> tilesFxSeriesSeries = tilesFxSeries.getSeries();
+            list.add(tilesFxSeriesSeries);
+        }
+        chart.getData().setAll(list);
 
         // Adjust colors according to series settings
-        tile.getTilesFXSeries()
-            .stream()
-            .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
-
-        /*
-        Scene scene = chart.getScene();
-        if (scene != null) {
-            Window stage = scene.getWindow();
-            if (stage != null) {
-                if (stage.isShowing()) {
-                    chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
-                }
-            }
+        for (TilesFXSeries<String, Number> series : tile.getTilesFXSeries()) {
+            chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill());
         }
-        */
     }
 
     @Override protected void registerListeners() {
@@ -115,10 +111,15 @@ public class SmoothedChartTileSkin extends TileSkin {
                 default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
             }
             if (chart.getData().isEmpty()) {
-                chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
-                tile.getTilesFXSeries()
-                    .stream()
-                    .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
+                List<Series<String, Number>> list = new ArrayList<>();
+                for (TilesFXSeries<String, Number> tilesFxSeries : tile.getTilesFXSeries()) {
+                    Series<String, Number> tilesFxSeriesSeries = tilesFxSeries.getSeries();
+                    list.add(tilesFxSeriesSeries);
+                }
+                chart.getData().setAll(list);
+                for (TilesFXSeries<String, Number> series : tile.getTilesFXSeries()) {
+                    chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill());
+                }
             }
         }
     }

@@ -91,16 +91,28 @@ public class RadialPercentageTileSkin extends TileSkin {
         formatString         = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();
         locale               = tile.getLocale();
         dataList             = tile.getChartData();
-        sum                  = dataList.stream().mapToDouble(ChartData::getValue).sum();
+        double result = 0.0;
+        for (ChartData data : dataList) {
+            double value = data.getValue();
+            result += value;
+        }
+        sum                  = result;
         angleStep            = ANGLE_RANGE / sum;
         referenceValue       = tile.getReferenceValue() < maxValue ? maxValue : tile.getReferenceValue();
 
         chartEventListener = e -> setProportionBar();
-        tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
+        for (ChartData data : tile.getChartData()) {
+            data.addChartDataEventListener(chartEventListener);
+        }
 
         chartDataListener = c -> {
             dataList = tile.getChartData();
-            sum      = dataList.stream().mapToDouble(ChartData::getValue).sum();
+            double sum1 = 0.0;
+            for (ChartData chartData : dataList) {
+                double value = chartData.getValue();
+                sum1 += value;
+            }
+            sum      = sum1;
             setProportionBar();
         };
         currentValueListener = o -> setBar(tile.getCurrentValue());
@@ -182,7 +194,12 @@ public class RadialPercentageTileSkin extends TileSkin {
         if ("RECALC".equals(EVENT_TYPE)) {
             referenceValue = tile.getReferenceValue() < maxValue ? maxValue : tile.getReferenceValue();
             angleStep      = ANGLE_RANGE / range;
-            sum            = dataList.stream().mapToDouble(ChartData::getValue).sum();
+            double result = 0.0;
+            for (ChartData chartData : dataList) {
+                double value = chartData.getValue();
+                result += value;
+            }
+            sum            = result;
             sections       = tile.getSections();
             redraw();
             setBar(tile.getCurrentValue());
@@ -206,14 +223,21 @@ public class RadialPercentageTileSkin extends TileSkin {
     }
 
     private void setProportionBar() {
-        sum = dataList.stream().mapToDouble(ChartData::getValue).sum();
+        double result = 0.0;
+        for (ChartData chartData : dataList) {
+            double value = chartData.getValue();
+            result += value;
+        }
+        sum = result;
         proportionBar.setLength(-sum * ANGLE_RANGE / referenceValue);
     }
 
     @Override public void dispose() {
         tile.currentValueProperty().removeListener(currentValueListener);
         tile.getChartData().removeListener(chartDataListener);
-        tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        for (ChartData chartData : tile.getChartData()) {
+            chartData.removeChartDataEventListener(chartEventListener);
+        }
         super.dispose();
     }
 

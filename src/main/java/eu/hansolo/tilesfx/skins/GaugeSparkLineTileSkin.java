@@ -313,8 +313,12 @@ public class GaugeSparkLineTileSkin extends TileSkin {
                 tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
             }
 
-            horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
-            tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+            for (Line horizontalTickLine : horizontalTickLines) {
+                horizontalTickLine.setStroke(Color.TRANSPARENT);
+            }
+            for (Text label1 : tickLabelsY) {
+                label1.setFill(Color.TRANSPARENT);
+            }
             horizontalLineOffset = 0;
             for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
                 Line line  = horizontalTickLines.get(lineCountY);
@@ -333,8 +337,12 @@ public class GaugeSparkLineTileSkin extends TileSkin {
                 lineCountY = clamp(0, 4, lineCountY);
             }
             if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
-            horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-            tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02));
+            for (Line line : horizontalTickLines) {
+                line.setEndX(maxX - horizontalLineOffset);
+            }
+            for (Text label : tickLabelsY) {
+                label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02);
+            }
         }
 
         if (!dataList.isEmpty()) {
@@ -681,11 +689,13 @@ public class GaugeSparkLineTileSkin extends TileSkin {
 
         tickLabelFontSize  = graphBounds.getHeight() * 0.1;
         Font tickLabelFont = Fonts.latoRegular(tickLabelFontSize);
-        tickLabelsY.forEach(label -> {
+        for (Text label : tickLabelsY) {
             enableNode(label, tickLabelFontSize >= 6);
             label.setFont(tickLabelFont);
-        });
-        horizontalTickLines.forEach(line -> line.setStrokeWidth(0.5));
+        }
+        for (Line line : horizontalTickLines) {
+            line.setStrokeWidth(0.5);
+        }
 
         stdDeviationArea.setX(graphBounds.getX());
         stdDeviationArea.setWidth(graphBounds.getWidth());

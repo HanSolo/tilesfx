@@ -20,9 +20,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 
 /**
@@ -58,17 +58,33 @@ public class MovingAverage {
         addData(new TimeData(VALUE));
     }
     public void addListOfData(final List<TimeData> LIST_OF_DATA) {
-        LIST_OF_DATA.forEach(data -> addData(data));
+        for (TimeData data : LIST_OF_DATA) {
+            addData(data);
+        }
     }
 
     public Queue<TimeData> getWindow() {
-        return window.stream()
-                     .map(item -> new TimeData(item.getValue(), item.getTimestamp()))
-                     .collect(Collectors.toCollection(LinkedList::new));
+        LinkedList<TimeData> result = new LinkedList<>();
+        for (TimeData item : window) {
+            TimeData timeData = new TimeData(item.getValue(), item.getTimestamp());
+            result.add(timeData);
+        }
+        return result;
     }
 
     public TimeData getFirstEntry() { return window.peek(); }
-    public TimeData getLastEntry() { return window.stream().reduce((first, second) -> second).orElse(null); }
+    public TimeData getLastEntry() {
+        boolean  seen = false;
+        TimeData acc  = null;
+        for (TimeData timeData : window) {
+            if (!seen) {
+                seen = true;
+                acc = timeData;
+            } else {
+                acc = timeData;
+            }
+        }
+        return seen ? acc : null; }
 
     public Instant getTimeSpan() {
         TimeData firstEntry = getFirstEntry();
@@ -84,11 +100,17 @@ public class MovingAverage {
 
     public double getTimeBasedAverageOf(final Duration DURATION) {
         assert !DURATION.isNegative() : "Time period must be positive";
-        Instant now     = Instant.now();
-        return window.stream()
-                     .filter(v -> v.getTimestamp().isAfter(now.minus(DURATION)))
-                     .mapToDouble(TimeData::getValue)
-                     .average()
+        Instant now    = Instant.now();
+        double  result = 0;
+        long    count  = 0;
+        for (TimeData v : window) {
+            if (v.getTimestamp().isAfter(now.minus(DURATION))) {
+                double value = v.getValue();
+                result += value;
+                count++;
+            }
+        }
+        return (count > 0 ? OptionalDouble.of(result / count) : OptionalDouble.empty())
                      .getAsDouble();
     }
 

@@ -39,6 +39,7 @@ import javafx.scene.text.TextAlignment;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
@@ -67,14 +68,20 @@ public class RadialChartTileSkin extends TileSkin {
         super.initGraphics();
 
         chartEventListener = e -> drawChart();
-        tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
+        for (ChartData chartData1 : tile.getChartData()) {
+            chartData1.addChartDataEventListener(chartEventListener);
+        }
 
         chartDataListener  = c -> {
             while (c.next()) {
                 if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(addedItem -> addedItem.addChartDataEventListener(chartEventListener));
+                    for (ChartData addedItem : c.getAddedSubList()) {
+                        addedItem.addChartDataEventListener(chartEventListener);
+                    }
                 } else if (c.wasRemoved()) {
-                    c.getRemoved().forEach(removedItem -> removedItem.removeChartDataEventListener(chartEventListener));
+                    for (ChartData removedItem : c.getRemoved()) {
+                        removedItem.removeChartDataEventListener(chartEventListener);
+                    }
                 }
             }
             drawChart();
@@ -91,7 +98,19 @@ public class RadialChartTileSkin extends TileSkin {
             double          radius      = canvasSize * 0.5;
             double          innerSpacer = radius * 0.18;
             double          barWidth    = (radius - innerSpacer) / tile.getChartData().size();
-            double          max         = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+            double          max;
+            if (noOfItems == 0) {max = 0;} else {
+                boolean               seen       = false;
+                ChartData             best       = null;
+                Comparator<ChartData> comparator = Comparator.comparingDouble(ChartData::getValue);
+                for (ChartData chartData : dataList) {
+                    if (!seen || comparator.compare(chartData, best) > 0) {
+                        seen = true;
+                        best = chartData;
+                    }
+                }
+                max = (seen ? Optional.of(best) : Optional.<ChartData>empty()).get().getValue();
+            }
 
             for (int i = 0 ; i < noOfItems ; i++) {
                 ChartData data    = dataList.get(i);
@@ -142,7 +161,9 @@ public class RadialChartTileSkin extends TileSkin {
 
     @Override public void dispose() {
         tile.getChartData().removeListener(chartDataListener);
-        tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        for (ChartData chartData : tile.getChartData()) {
+            chartData.removeChartDataEventListener(chartEventListener);
+        }
         chartCanvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         super.dispose();
     }
@@ -152,10 +173,21 @@ public class RadialChartTileSkin extends TileSkin {
         double          radius         = canvasSize * 0.5;
         double          innerSpacer    = radius * 0.18;
         double          barWidth       = (radius - innerSpacer) / tile.getChartData().size();
-        //List<RadialChartData> sortedDataList = tile.getChartData().stream().sorted(Comparator.comparingDouble(RadialChartData::getValue)).collect(Collectors.toList());
         List<ChartData> dataList       = tile.getChartData();
         int             noOfItems      = dataList.size();
-        double          max            = noOfItems == 0 ? 0 : dataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+        double          max;
+        if (noOfItems == 0) {max = 0;} else {
+            boolean               seen       = false;
+            ChartData             best       = null;
+            Comparator<ChartData> comparator = Comparator.comparingDouble(ChartData::getValue);
+            for (ChartData chartData : dataList) {
+                if (!seen || comparator.compare(chartData, best) > 0) {
+                    seen = true;
+                    best = chartData;
+                }
+            }
+            max = (seen ? Optional.of(best) : Optional.<ChartData>empty()).get().getValue();
+        }
 
         double          nameX          = radius * 0.975;
         double          nameWidth      = radius * 0.95;

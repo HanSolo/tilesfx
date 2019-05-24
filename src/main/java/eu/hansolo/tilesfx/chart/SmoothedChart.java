@@ -71,7 +71,6 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 
 public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
@@ -149,7 +148,7 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         seriesListener             = change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(addedItem -> {
+                    for (Series<X, Y> addedItem : change.getAddedSubList()) {
                         final Series<X, Y> series     = addedItem;
                         final Path         strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
                         final Path         fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
@@ -157,17 +156,19 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
                         strokePath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
                         strokePaths.add(strokePath);
 
-                        series.getData().forEach(data -> data.YValueProperty().addListener(o -> layoutPlotChildren()));
-                    });
+                        for (Data<X, Y> data : series.getData()) {
+                            data.YValueProperty().addListener(o -> layoutPlotChildren());
+                        }
+                    }
                 } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedItem -> {
+                    for (Series<X, Y> removedItem : change.getRemoved()) {
                         final Series<X, Y> series     = removedItem;
                         final Path         strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
                         final Path         fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
                         fillPath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
                         strokePath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
                         strokePaths.remove(strokePath);
-                    });
+                    }
                 }
             }
         };
@@ -301,7 +302,9 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public void setSymbolsVisible(final boolean VISIBLE) {
         if (null == symbolsVisible) {
             _symbolsVisible = VISIBLE;
-            getData().forEach(series -> setSymbolsVisible(series, _symbolsVisible));
+            for (Series<X, Y> series : getData()) {
+                setSymbolsVisible(series, _symbolsVisible);
+            }
         } else {
             symbolsVisible.set(VISIBLE);
         }
@@ -309,7 +312,11 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public BooleanProperty symbolsVisibleProperty() {
         if (null == symbolsVisible) {
             symbolsVisible = new BooleanPropertyBase(_symbolsVisible) {
-                @Override protected void invalidated() { getData().forEach(series -> setSymbolsVisible(series, _symbolsVisible)); }
+                @Override protected void invalidated() {
+                    for (Series<X, Y> series : getData()) {
+                        setSymbolsVisible(series, _symbolsVisible);
+                    }
+                }
                 @Override public Object getBean() { return SmoothedChart.this; }
                 @Override public String getName() { return "symbolsVisible"; }
             };
@@ -645,7 +652,12 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public Path getFillPath(final Series<X, Y> SERIES) { return getPaths(SERIES) [0]; }
     public Path getStrokePath(final Series<X, Y> SERIES) { return getPaths(SERIES)[1]; }
     public List<StackPane> getSymbols(final Series<X, Y> SERIES) {
-        return SERIES.getData().stream().map(node -> (StackPane) node.getNode()).collect(Collectors.toList());
+        List<StackPane> list = new ArrayList<>();
+        for (Data<X, Y> node : SERIES.getData()) {
+            StackPane nodeNode = (StackPane) node.getNode();
+            list.add(nodeNode);
+        }
+        return list;
     }
 
     /**
@@ -682,13 +694,13 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         super.layoutPlotChildren();
 
         double height = getLayoutBounds().getHeight();
-        getData().forEach(series -> {
+        for (Series<X, Y> series : getData()) {
             final Path[] paths = getPaths(series);
-            if (null == paths) { return; }
+            if (null == paths) { continue; }
             if (isSmoothed()) { smooth(paths[1].getElements(), paths[0].getElements(), height); }
             paths[0].setVisible(ChartType.AREA == getChartType());
             paths[0].setManaged(ChartType.AREA == getChartType());
-        });
+        }
     }
 
     /**

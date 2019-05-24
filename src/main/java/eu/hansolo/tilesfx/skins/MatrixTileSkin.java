@@ -77,17 +77,23 @@ public class MatrixTileSkin extends TileSkin {
         }
 
         chartEventListener = e -> updateMatrixWithChartData();
-        tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
+        for (ChartData chartData : tile.getChartData()) {
+            chartData.addChartDataEventListener(chartEventListener);
+        }
 
         chartDataListener = c -> {
             while (c.next()) {
                 if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(addedItem -> addedItem.addChartDataEventListener(chartEventListener));
+                    for (ChartData addedItem : c.getAddedSubList()) {
+                        addedItem.addChartDataEventListener(chartEventListener);
+                    }
                     if (!tile.getChartData().isEmpty() && tile.getChartData().size() > 2) {
                         matrix.setColsAndRows(tile.getChartData().size(), matrix.getRows());
                     }
                 } else if (c.wasRemoved()) {
-                    c.getRemoved().forEach(removedItem -> removedItem.removeChartDataEventListener(chartEventListener));
+                    for (ChartData removedItem : c.getRemoved()) {
+                        removedItem.removeChartDataEventListener(chartEventListener);
+                    }
                     if (!tile.getChartData().isEmpty() && tile.getChartData().size() > 2) {
                         matrix.setColsAndRows(tile.getChartData().size(), matrix.getRows());
                     }
@@ -166,7 +172,9 @@ public class MatrixTileSkin extends TileSkin {
         matrix.removeEventHandler(MouseEvent.MOUSE_EXITED, mouseHandler);
         matrix.dispose();
         tile.getChartData().removeListener(chartDataListener);
-        tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        for (ChartData chartData : tile.getChartData()) {
+            chartData.removeChartDataEventListener(chartEventListener);
+        }
         super.dispose();
     }
 

@@ -19,7 +19,6 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChart;
 import eu.hansolo.tilesfx.chart.RadarChart.Mode;
-import eu.hansolo.tilesfx.chart.SunburstChart;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
@@ -64,7 +63,6 @@ import eu.hansolo.tilesfx.skins.SmoothedChartTileSkin;
 import eu.hansolo.tilesfx.skins.SparkLineTileSkin;
 import eu.hansolo.tilesfx.skins.StatusTileSkin;
 import eu.hansolo.tilesfx.skins.StockTileSkin;
-import eu.hansolo.tilesfx.skins.SunburstChartTileSkin;
 import eu.hansolo.tilesfx.skins.SwitchSliderTileSkin;
 import eu.hansolo.tilesfx.skins.SwitchTileSkin;
 import eu.hansolo.tilesfx.skins.TextTileSkin;
@@ -143,7 +141,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -153,7 +150,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 import static eu.hansolo.tilesfx.tools.MovingAverage.MAX_PERIOD;
@@ -177,7 +173,7 @@ public class Tile extends Control {
                            GAUGE_SPARK_LINE("GaugeSparkLineTileSkin"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
                            RADAR_CHART("RadarChartTileSkin"), COUNTRY("CountryTileSkin"), EPHEMERIS("EphemerisTileSkin"),
                            CHARACTER("CharacterTileSkin"), FLIP("FlipTileSkin"), SWITCH_SLIDER("SwitchSliderTileSkin"),
-                           DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"), MATRIX("MatrixTileSkin"),
+                           DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), MATRIX("MatrixTileSkin"),
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
                            IMAGE("ImageTileSkin");
@@ -363,7 +359,6 @@ public class Tile extends Control {
     private              ObjectProperty<MapProvider>                   mapProvider;
     private              List<String>                                  characterList;
     private              long                                          flipTimeInMS;
-    private              SunburstChart                                 sunburstChart;
 
     // UI related
     private              SkinType                                      skinType;
@@ -1105,10 +1100,6 @@ public class Tile extends Control {
         return autoReferenceValue;
     }
 
-    public SunburstChart getSunburstChart() {
-        if (null == sunburstChart) { sunburstChart = new SunburstChart(); }
-        return sunburstChart;
-    }
 
     /**
      * Returns the title of the gauge. This title will usually
@@ -1533,10 +1524,17 @@ public class Tile extends Control {
     }
 
     public ObservableList<Series<String, Number>> getSeries() {
-        return getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toCollection(FXCollections::observableArrayList));
+        ObservableList<Series<String, Number>> objects = FXCollections.observableArrayList();
+        for (TilesFXSeries<String, Number> tilesFxSeries : getTilesFXSeries()) {
+            Series<String, Number> tilesFxSeriesSeries = tilesFxSeries.getSeries();
+            objects.add(tilesFxSeriesSeries);
+        }
+        return objects;
     }
     public void setSeries(final List<Series<String, Number>> SERIES) {
-        SERIES.forEach(series -> addTilesFXSeries(new TilesFXSeries<String, Number>(series)));
+        for (Series<String, Number> stringNumberSeries : SERIES) {
+            addTilesFXSeries(new TilesFXSeries<>(stringNumberSeries));
+        }
     }
     public void setSeries(final Series<String, Number>... SERIES) {
         setSeries(Arrays.asList(SERIES));
@@ -1545,7 +1543,13 @@ public class Tile extends Control {
         addTilesFXSeries(new TilesFXSeries<String, Number>(SERIES));
     }
     public void removeSeries(final Series<String, Number> SERIES) {
-        TilesFXSeries<String, Number> seriesToRemove = series.stream().filter(tilesFxSeries -> tilesFxSeries.getSeries().equals(SERIES)).findFirst().orElse(null);
+        TilesFXSeries<String, Number> seriesToRemove = null;
+        for (TilesFXSeries<String, Number> tilesFxSeries : series) {
+            if (tilesFxSeries.getSeries().equals(SERIES)) {
+                seriesToRemove = tilesFxSeries;
+                break;
+            }
+        }
         if (null == seriesToRemove) return;
         series.removeAll(seriesToRemove);
     }
@@ -1807,10 +1811,14 @@ public class Tile extends Control {
     }
     public void setCharacters(final String... CHARACTERS) {
         getCharacterList().clear();
-        Arrays.stream(CHARACTERS)
-              .filter(Objects::nonNull)
-              .filter(character -> !character.isEmpty())
-              .forEach(character -> getCharacterList().add(character) /*characterList.add(character.substring(0, 1)) */);
+        /*characterList.add(character.substring(0, 1)) */
+        for (String character : CHARACTERS) {
+            if (character != null) {
+                if (!character.isEmpty()) {
+                    getCharacterList().add(character);
+                }
+            }
+        }
     }
 
     public long getFlipTimeInMS() { return flipTimeInMS; }
@@ -1833,10 +1841,10 @@ public class Tile extends Control {
     public void removeChartData(final ChartData DATA) { getChartData().remove(DATA); }
     public void clearChartData() { getChartData().clear(); }
     private void updateChartData() {
-        getChartData().forEach(chartData -> {
+        for (ChartData chartData : getChartData()) {
             chartData.setAnimated(isAnimated());
             chartData.setAnimationDuration(getAnimationDuration());
-        });
+        }
     }
 
     /**
@@ -5221,7 +5229,6 @@ public class Tile extends Control {
             case SWITCH_SLIDER    : return new SwitchSliderTileSkin(Tile.this);
             case DATE             : return new DateTileSkin(Tile.this);
             case CALENDAR         : return new CalendarTileSkin(Tile.this);
-            case SUNBURST         : return new SunburstChartTileSkin(Tile.this);
             case MATRIX           : return new MatrixTileSkin(Tile.this);
             case RADIAL_PERCENTAGE: return new RadialPercentageTileSkin(Tile.this);
             case STATUS           : return new StatusTileSkin(Tile.this);
@@ -5343,8 +5350,6 @@ public class Tile extends Control {
                 setTitleAlignment(TextAlignment.CENTER);
                 setTextAlignment(TextAlignment.CENTER);
                 break;
-            case SUNBURST:
-                break;
             case MATRIX:
                 break;
             case RADIAL_PERCENTAGE:
@@ -5404,7 +5409,6 @@ public class Tile extends Control {
             case SWITCH_SLIDER    : setSkin(new SwitchSliderTileSkin(Tile.this)); break;
             case DATE             : setSkin(new DateTileSkin(Tile.this)); break;
             case CALENDAR         : setSkin(new CalendarTileSkin(Tile.this)); break;
-            case SUNBURST         : setSkin(new SunburstChartTileSkin(Tile.this)); break;
             case MATRIX           : setSkin(new MatrixTileSkin(Tile.this)); break;
             case RADIAL_PERCENTAGE: setSkin(new RadialPercentageTileSkin(Tile.this)); break;
             case STATUS           : setSkin(new StatusTileSkin(Tile.this)); break;

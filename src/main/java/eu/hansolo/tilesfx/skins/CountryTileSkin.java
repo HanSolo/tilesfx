@@ -88,26 +88,13 @@ public class CountryTileSkin extends TileSkin {
         countryMinY = Helper.MAP_HEIGHT;
         countryMaxX = 0;
         countryMaxY = 0;
-        countryPaths.forEach(path -> {
+        for (CountryPath path : countryPaths) {
             path.setFill(tile.getBarColor());
             countryMinX = Math.min(countryMinX, path.getBoundsInParent().getMinX());
             countryMinY = Math.min(countryMinY, path.getBoundsInParent().getMinY());
             countryMaxX = Math.max(countryMaxX, path.getBoundsInParent().getMaxX());
             countryMaxY = Math.max(countryMaxY, path.getBoundsInParent().getMaxY());
-        });
-
-        /*
-        tile.getPoiList()
-            .forEach(poi -> {
-                String tooltipText = new StringBuilder(poi.getName()).append("\n")
-                                                                     .append(poi.getInfo())
-                                                                     .toString();
-                Circle circle = new Circle(3, poi.getColor());
-                circle.setOnMousePressed(e -> poi.fireLocationEvent(new LocationEvent(poi)));
-                Tooltip.install(circle, new Tooltip(tooltipText));
-                poiLocations.put(poi, circle);
-            });
-        */
+        }
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -163,7 +150,9 @@ public class CountryTileSkin extends TileSkin {
             country = tile.getCountry();
             if (null == country) { country = Country.DE; }
             countryPaths = Helper.getHiresCountryPaths().get(country.name());
-            countryPaths.forEach(path -> path.setFill(tile.getBarColor()));
+            for (CountryPath path : countryPaths) {
+                path.setFill(tile.getBarColor());
+            }
             countryGroup.getChildren().setAll(countryPaths);
             text.setText(country.getDisplayName());
 
@@ -249,17 +238,6 @@ public class CountryTileSkin extends TileSkin {
                 countryGroup.setScaleY(scaleFactor);
             }
 
-            /*
-            poiLocations.forEach((location, circle) -> {
-                double[] xy = Helper.latLonToXY(location.getLatitude(), location.getLongitude());
-                double   x  = (xy[0] - countryMinX) * countryGroup.getScaleX() + countryGroup.getBoundsInParent().getMinX();
-                double   y  = (xy[1] - countryMinY) * countryGroup.getScaleY() + countryGroup.getBoundsInParent().getMinY();
-                circle.setCenterX(x);
-                circle.setCenterY(y);
-                circle.setRadius(size * 0.01);
-            });
-            */
-
             resizeStaticText();
         }
     }
@@ -278,6 +256,8 @@ public class CountryTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         valueText.setFill(tile.getValueColor());
         unitText.setFill(tile.getUnitColor());
-        countryPaths.forEach(path -> path.setFill(Helper.getColorWithOpacity(tile.getBarColor(), 0.5)));
+        for (CountryPath path : countryPaths) {
+            path.setFill(Helper.getColorWithOpacity(tile.getBarColor(), 0.5));
+        }
     }
 }

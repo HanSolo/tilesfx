@@ -27,16 +27,17 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 /**
@@ -75,9 +76,11 @@ public class LeaderBoardTileSkin extends TileSkin {
         paneSizeListener = o -> resizeItems();
         handlerMap       = new HashMap<>();
 
-        List<LeaderBoardItem> leaderBoardItems = tile.getLeaderBoardItems().stream()
-                                                               .sorted(Comparator.comparing(LeaderBoardItem::getValue).reversed())
-                                                               .collect(Collectors.toList());
+        List<LeaderBoardItem> leaderBoardItems = new ArrayList<>();
+        for (LeaderBoardItem leaderBoardItem : tile.getLeaderBoardItems()) {
+            leaderBoardItems.add(leaderBoardItem);
+        }
+        leaderBoardItems.sort(Comparator.comparing(LeaderBoardItem::getValue).reversed());
 
         registerItemListeners();
 
@@ -115,31 +118,31 @@ public class LeaderBoardTileSkin extends TileSkin {
     }
 
     private void registerItemListeners() {
-        tile.getLeaderBoardItems().forEach(item -> {
+        for (LeaderBoardItem item : tile.getLeaderBoardItems()) {
             item.setFormatString(formatString);
             item.addChartDataEventListener(updateHandler);
             EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, item.getChartData()));
             handlerMap.put(item, clickHandler);
             item.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
-        });
+        }
 
         tile.getLeaderBoardItems().addListener(new WeakListChangeListener<>((ListChangeListener<LeaderBoardItem>) change -> {
             while (change.next()) {
                 if (change.wasPermutated()) {
                 } else if (change.wasUpdated()) {
                 } else if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(addedItem -> {
+                    for (LeaderBoardItem addedItem : change.getAddedSubList()) {
                         addedItem.setFormatString(formatString);
                         addedItem.addChartDataEventListener(updateHandler);
                         EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
                         handlerMap.put(addedItem, clickHandler);
                         addedItem.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
-                    });
+                    }
                 } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedItem -> {
+                    for (LeaderBoardItem removedItem : change.getRemoved()) {
                         removedItem.removeChartDataEventListener(updateHandler);
                         removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
-                    });
+                    }
                 }
             }
         }));
@@ -148,17 +151,19 @@ public class LeaderBoardTileSkin extends TileSkin {
     private void sortItems() {
         List<LeaderBoardItem> items = tile.getLeaderBoardItems();
         items.sort(Comparator.comparing(LeaderBoardItem::getValue).reversed());
-        items.forEach(i -> i.setIndex(items.indexOf(i)));
+        for (LeaderBoardItem i : items) {
+            i.setIndex(items.indexOf(i));
+        }
         updateChart();
     }
 
     @Override public void dispose() {
         pane.widthProperty().removeListener(paneSizeListener);
         pane.heightProperty().removeListener(paneSizeListener);
-        tile.getLeaderBoardItems().forEach(item -> {
+        for (LeaderBoardItem item : tile.getLeaderBoardItems()) {
             item.removeChartDataEventListener(updateHandler);
             item.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(item));
-        });
+        }
         handlerMap.clear();
         super.dispose();
     }
@@ -216,14 +221,14 @@ public class LeaderBoardTileSkin extends TileSkin {
     }
 
     private void resizeItems() {
-        leaderBoardPane.getChildren().forEach(node -> {
+        //item.setParentSize(pane.getWidth(), pane.getHeight());
+        //item.setPrefSize(pane.getWidth(), pane.getHeight());
+        for (Node node : leaderBoardPane.getChildren()) {
             LeaderBoardItem item = (LeaderBoardItem) node;
-            //item.setParentSize(pane.getWidth(), pane.getHeight());
-            //item.setPrefSize(pane.getWidth(), pane.getHeight());
             item.setParentSize(width, height);
             item.setPrefSize(width, height * 0.12);
             item.setMaxSize(width, height * 0.12);
-        });
+        }
     }
     @Override protected void resize() {
         super.resize();
@@ -239,10 +244,10 @@ public class LeaderBoardTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
 
-        tile.getLeaderBoardItems().forEach(item -> {
+        for (LeaderBoardItem item : tile.getLeaderBoardItems()) {
             item.setNameColor(tile.getTextColor());
             item.setValueColor(tile.getValueColor());
-        });
+        }
 
         resizeDynamicText();
         resizeStaticText();

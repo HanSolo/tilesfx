@@ -60,14 +60,20 @@ public class RadarChartTileSkin extends TileSkin {
         radarChart.setGradientStops(tile.getGradientStops());
 
         chartEventListener = e -> radarChart.redraw();
-        tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
+        for (ChartData chartData : tile.getChartData()) {
+            chartData.addChartDataEventListener(chartEventListener);
+        }
 
         chartDataListener  = c -> {
             while (c.next()) {
                 if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(addedItem -> addedItem.addChartDataEventListener(chartEventListener));
+                    for (ChartData addedItem : c.getAddedSubList()) {
+                        addedItem.addChartDataEventListener(chartEventListener);
+                    }
                 } else if (c.wasRemoved()) {
-                    c.getRemoved().forEach(removedItem -> removedItem.removeChartDataEventListener(chartEventListener));
+                    for (ChartData removedItem : c.getRemoved()) {
+                        removedItem.removeChartDataEventListener(chartEventListener);
+                    }
                 }
             }
             radarChart.redraw();
@@ -110,7 +116,9 @@ public class RadarChartTileSkin extends TileSkin {
     @Override public void dispose() {
         radarChart.dispose();
         tile.getChartData().removeListener(chartDataListener);
-        tile.getChartData().forEach(chartData -> chartData.removeChartDataEventListener(chartEventListener));
+        for (ChartData chartData : tile.getChartData()) {
+            chartData.removeChartDataEventListener(chartEventListener);
+        }
         super.dispose();
     }
 

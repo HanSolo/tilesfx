@@ -29,6 +29,7 @@ import javafx.scene.paint.Color;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 
 /**
@@ -89,7 +90,9 @@ public class LocationBuilder<B extends LocationBuilder<B>> {
 
     public final Location build() {
         Location location = new Location();
-        properties.forEach((key, property) -> {
+        for (Entry<String, Property> entry : properties.entrySet()) {
+            String   key      = entry.getKey();
+            Property property = entry.getValue();
             if ("name".equals(key)) {
                 location.setName(((StringProperty) properties.get(key)).get());
             } else if ("timestamp".equals(key)) {
@@ -108,7 +111,7 @@ public class LocationBuilder<B extends LocationBuilder<B>> {
                 location.setZoomLevel(((IntegerProperty) properties.get(key)).get());
             }
 
-        });
+        }
         return location;
     }
 }

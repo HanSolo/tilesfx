@@ -76,9 +76,13 @@ public class MapTileSkin extends TileSkin {
                         updatePoi(tile.getPoiList().get(i));
                     }
                 } else if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(poi -> addPoi(poi));
+                    for (Location poi : c.getAddedSubList()) {
+                        addPoi(poi);
+                    }
                 } else if (c.wasRemoved()) {
-                    c.getRemoved().forEach(poi -> removePoi(poi));
+                    for (Location poi : c.getRemoved()) {
+                        removePoi(poi);
+                    }
                 }
             }
         };
@@ -102,7 +106,9 @@ public class MapTileSkin extends TileSkin {
                 if (MapProvider.BW != tile.getMapProvider()) { changeMapProvider(tile.getMapProvider()); }
                 updateLocation();
                 updateLocationColor();
-                tile.getPoiList().forEach(poi -> addPoi(poi));
+                for (Location poi : tile.getPoiList()) {
+                    addPoi(poi);
+                }
                 addTrack(tile.getTrack());
                 updateTrackColor();
             }

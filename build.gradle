@@ -5,25 +5,31 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:3.3.0'
+        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.2.0'
     }
 }
 
 // TilesFX main build file
 plugins {
-    id 'com.gradle.build-scan' version '1.11'
+    id 'com.gradle.build-scan' version '2.3'
     id 'idea'
     id 'java'
     id 'maven-publish'
-    id 'net.nemerosa.versioning' version '2.6.1'
-    id 'com.jfrog.bintray' version '1.8.0'
+    id 'net.nemerosa.versioning' version '2.8.2'
+    id 'com.jfrog.bintray' version '1.8.4'
 }
 
 apply plugin: 'biz.aQute.bnd.builder'
 
+sourceCompatibility = '1.8'
+
+wrapper {
+    gradleVersion = '5.4.1'
+}
+
 buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
+    termsOfServiceUrl   = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
 }
 
 description = 'TilesFX is a JavaFX 8 library containing tiles for dashboards'
@@ -54,7 +60,8 @@ jar {
                 'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
                 'Bundle-Description': description,
                 'Bundle-SymbolicName': 'eu.hansolo.tilesfx',
-                'Export-Package': 'eu.hansolo.tilesfx,eu.hansolo.tilesfx.chart,eu.hansolo.tilesfx.colors,eu.hansolo.tilesfx.events,eu.hansolo.tilesfx.fonts,eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools,eu.hansolo.tilesfx.weather'
+                'Export-Package': 'eu.hansolo.tilesfx,eu.hansolo.tilesfx.chart,eu.hansolo.tilesfx.colors,eu.hansolo.tilesfx.events,eu.hansolo.tilesfx.fonts,eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools,eu.hansolo.tilesfx.weather',
+                'Automatic-Module-Name': 'eu.hansolo.tilesfx'
         )
     }
 }

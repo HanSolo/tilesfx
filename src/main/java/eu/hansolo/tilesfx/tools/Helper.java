@@ -362,7 +362,7 @@ public class Helper {
                                                       "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
                                                       "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
                                                       "W", "X", "Y", "Z", "-", "/", ":", ",", "", ";", "@",
-                                                      "#", "+", "?", "!", "%", "$", "=", "<", ">", "U+00C4", "U+00D6", "U+00DC", "U+00DF"};
+                                                      "#", "+", "?", "!", "%", "$", "=", "<", ">", "\u00C4", "\u00D6", "\u00DC", "\u00DF"};
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;

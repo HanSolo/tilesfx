@@ -145,8 +145,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B description(final String SUBTITLE) {
-        properties.put("description", new SimpleStringProperty(SUBTITLE));
+    public final B description(final String DESCRIPTION) {
+        properties.put("description", new SimpleStringProperty(DESCRIPTION));
         return (B)this;
     }
 
@@ -275,18 +275,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B needleBorderColor(final Color COLOR) {
-        properties.put("needleBorderColor", new SimpleObjectProperty<>(COLOR));
-        return (B)this;
-    }
-
     public final B barColor(final Color COLOR) {
         properties.put("barColor", new SimpleObjectProperty<>(COLOR));
-        return (B)this;
-    }
-
-    public final B barBorderColor(final Color COLOR) {
-        properties.put("barBorderColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 

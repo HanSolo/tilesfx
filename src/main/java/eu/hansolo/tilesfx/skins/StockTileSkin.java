@@ -275,7 +275,14 @@ public class StockTileSkin extends TileSkin {
             referenceLine.setEndY(maxY - Math.abs(low - referenceValue) * stepY);
 
             changeText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE - referenceValue)));
-            changePercentageText.setText(new StringBuilder().append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE / referenceValue * 100.0) - 100.0)).append("\u0025").toString());
+            StringBuilder changePercentageTextBuilder = new StringBuilder();
+            if (Double.compare(tile.getReferenceValue(), 0.0) == 0) {
+                changePercentageTextBuilder.append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", 0.0));
+            } else {
+                changePercentageTextBuilder.append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE / tile.getReferenceValue() * 100.0) - 100.0));
+            }
+            changePercentageTextBuilder.append("\u0025");
+            changePercentageText.setText(changePercentageTextBuilder.toString());
 
             RotateTransition rotateTransition = new RotateTransition(Duration.millis(200), triangle);
             rotateTransition.setFromAngle(triangle.getRotate());

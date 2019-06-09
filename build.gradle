@@ -78,7 +78,7 @@ repositories {
 
 // start the demo from gradle
 task Demo(type: JavaExec) {
-    main = "eu.hansolo.tilesfx.Demo"
+    main = "eu.hansolo.tilesfx.DemoLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 

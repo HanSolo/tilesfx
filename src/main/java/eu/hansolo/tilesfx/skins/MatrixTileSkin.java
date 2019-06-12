@@ -21,6 +21,7 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.PixelMatrix;
 import eu.hansolo.tilesfx.chart.PixelMatrix.PixelShape;
 import eu.hansolo.tilesfx.chart.PixelMatrixBuilder;
+import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.events.PixelMatrixEventListener;
 import eu.hansolo.tilesfx.events.TileEvent;
@@ -243,12 +244,12 @@ public class MatrixTileSkin extends TileSkin {
         text.setText(tile.getText());
 
         resizeStaticText();
-        matrix.drawMatrix();
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
 
         matrix.setPixelOnColor(tile.getBarColor());
         matrix.setPixelOffColor(Helper.isDark(tile.getBackgroundColor()) ? tile.getBackgroundColor().brighter() : tile.getBackgroundColor().darker());
+        updateMatrixWithChartData();
     }
 }

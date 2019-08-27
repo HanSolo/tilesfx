@@ -69,6 +69,7 @@ import eu.hansolo.tilesfx.skins.SwitchSliderTileSkin;
 import eu.hansolo.tilesfx.skins.SwitchTileSkin;
 import eu.hansolo.tilesfx.skins.TextTileSkin;
 import eu.hansolo.tilesfx.skins.TileSkin;
+import eu.hansolo.tilesfx.skins.TimelineTileSkin;
 import eu.hansolo.tilesfx.skins.TimeTileSkin;
 import eu.hansolo.tilesfx.skins.TimerControlTileSkin;
 import eu.hansolo.tilesfx.skins.WeatherTileSkin;
@@ -180,7 +181,7 @@ public class Tile extends Control {
                            DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"), MATRIX("MatrixTileSkin"),
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
-                           IMAGE("ImageTileSkin");
+                           IMAGE("ImageTileSkin"), TIMELINE("TimelineTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5357,6 +5358,7 @@ public class Tile extends Control {
             case STATUS           : return new StatusTileSkin(Tile.this);
             case BAR_GAUGE        : return new BarGaugeTileSkin(Tile.this);
             case IMAGE            : return new ImageTileSkin(Tile.this);
+            case TIMELINE         : return new TimelineTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -5492,6 +5494,14 @@ public class Tile extends Control {
                 break;
             case IMAGE:
                 setTextAlignment(TextAlignment.CENTER);
+                break;
+            case TIMELINE:
+                setTextVisible(false);
+                setAnimated(false);
+                setAveragingEnabled(true);
+                setAveragingPeriod(10);
+                setDecimals(0);
+                setTickLabelDecimals(0);
                 break;
             default:
                 break;

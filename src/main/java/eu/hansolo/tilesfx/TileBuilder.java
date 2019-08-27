@@ -1151,6 +1151,14 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case IMAGE:
                     TILE.setTextAlignment(TextAlignment.CENTER);
                     break;
+                case TIMELINE:
+                    TILE.setTextVisible(false);
+                    TILE.setAnimated(false);
+                    TILE.setAveragingEnabled(true);
+                    TILE.setAveragingPeriod(10);
+                    TILE.setDecimals(0);
+                    TILE.setTickLabelDecimals(0);
+                    break;
                 default:
                     break;
             }

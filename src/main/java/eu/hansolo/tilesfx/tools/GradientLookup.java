@@ -123,15 +123,20 @@ public class GradientLookup {
     private Color interpolateColor(final Stop LOWER_BOUND, final Stop UPPER_BOUND, final double POSITION) {
         final double POS  = (POSITION - LOWER_BOUND.getOffset()) / (UPPER_BOUND.getOffset() - LOWER_BOUND.getOffset());
 
-        final double DELTA_RED     = (UPPER_BOUND.getColor().getRed()     - LOWER_BOUND.getColor().getRed())     * POS;
-        final double DELTA_GREEN   = (UPPER_BOUND.getColor().getGreen()   - LOWER_BOUND.getColor().getGreen())   * POS;
-        final double DELTA_BLUE    = (UPPER_BOUND.getColor().getBlue()    - LOWER_BOUND.getColor().getBlue())    * POS;
-        final double DELTA_OPACITY = (UPPER_BOUND.getColor().getOpacity() - LOWER_BOUND.getColor().getOpacity()) * POS;
+        final double LB_RED     = LOWER_BOUND.getColor().getRed();
+        final double LB_GREEN   = LOWER_BOUND.getColor().getGreen();
+        final double LB_BLUE    = LOWER_BOUND.getColor().getBlue();
+        final double LB_OPACITY = LOWER_BOUND.getColor().getOpacity();
 
-        double red     = Helper.clamp(0.0, 1.0, (LOWER_BOUND.getColor().getRed()     + DELTA_RED));
-        double green   = Helper.clamp(0.0, 1.0, (LOWER_BOUND.getColor().getGreen()   + DELTA_GREEN));
-        double blue    = Helper.clamp(0.0, 1.0, (LOWER_BOUND.getColor().getBlue()    + DELTA_BLUE));
-        double opacity = Helper.clamp(0.0, 1.0, (LOWER_BOUND.getColor().getOpacity() + DELTA_OPACITY));
+        final double DELTA_RED     = (UPPER_BOUND.getColor().getRed()     - LB_RED)     * POS;
+        final double DELTA_GREEN   = (UPPER_BOUND.getColor().getGreen()   - LB_GREEN)   * POS;
+        final double DELTA_BLUE    = (UPPER_BOUND.getColor().getBlue()    - LB_BLUE)    * POS;
+        final double DELTA_OPACITY = (UPPER_BOUND.getColor().getOpacity() - LB_OPACITY) * POS;
+
+        double red     = Helper.clamp(0.0, 1.0, (LB_RED     + DELTA_RED));
+        double green   = Helper.clamp(0.0, 1.0, (LB_GREEN   + DELTA_GREEN));
+        double blue    = Helper.clamp(0.0, 1.0, (LB_BLUE    + DELTA_BLUE));
+        double opacity = Helper.clamp(0.0, 1.0, (LB_OPACITY + DELTA_OPACITY));
 
         return Color.color(red, green, blue, opacity);
     }

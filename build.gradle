@@ -85,6 +85,12 @@ task Demo(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+// Only used for internal test
+task Test(type: JavaExec) {
+    main = "eu.hansolo.tilesfx.TestLauncher"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 // create one jar for the javadoc
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'

@@ -335,7 +335,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             }
             if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
             horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-            tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02));
+            tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.05));
         }
 
         if (!dataList.isEmpty()) {

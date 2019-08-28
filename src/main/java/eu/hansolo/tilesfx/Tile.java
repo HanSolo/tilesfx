@@ -502,6 +502,10 @@ public class Tile extends Control {
     private              ObjectProperty<Color>                         minuteTickMarkColor;
     private              Color                                         _alarmColor;
     private              ObjectProperty<Color>                         alarmColor;
+    private              Color                                         _tickLabelColor;
+    private              ObjectProperty<Color>                         tickLabelColor;
+    private              Color                                         _tickMarkColor;
+    private              ObjectProperty<Color>                         tickMarkColor;
     private              boolean                                       _hourTickMarksVisible;
     private              BooleanProperty                               hourTickMarksVisible;
     private              boolean                                       _minuteTickMarksVisible;
@@ -657,6 +661,8 @@ public class Tile extends Control {
                 @NamedArg(value="hourTickMarkColor", defaultValue="#dfdfdf") Color hourTickMarkColor,
                 @NamedArg(value="minuteTickMarkColor", defaultValue="#dfdfdf") Color minuteTickMarkColor,
                 @NamedArg(value="alarmColor", defaultValue="#dfdfdf") Color alarmColor,
+                @NamedArg(value="tickLabelColor", defaultValue="#dfdfdf") Color tickLabelColor,
+                @NamedArg(value="tickMarkColor", defaultValue="#dfdfdf") Color tickMarkColor,
                 @NamedArg(value="thresholdColor", defaultValue="#e5504c") Color thresholdColor,
                 @NamedArg(value="checkSectionsForValue", defaultValue="false") boolean checkSectionsForValue,
                 @NamedArg(value="checkThreshold", defaultValue="false") boolean checkThreshold,
@@ -854,6 +860,8 @@ public class Tile extends Control {
         _hourTickMarkColor                  = FOREGROUND;
         _minuteTickMarkColor                = FOREGROUND;
         _alarmColor                         = FOREGROUND;
+        _tickLabelColor                     = FOREGROUND;
+        _tickMarkColor                      = FOREGROUND;
         _thresholdColor                     = RED;
         _checkSectionsForValue              = false;
         _checkThreshold                     = false;
@@ -4168,6 +4176,56 @@ public class Tile extends Control {
         return alarmColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize tick labels (e.g. in the SparkLineTileSkin)
+     * @return the color that will be used to colorize tick labels (e.g. in the SparkLineTileSkin)
+     */
+    public Color getTickLabelColor() { return null == tickLabelColor ? _tickLabelColor : tickLabelColor.get(); }
+    public void setTickLabelColor(final Color COLOR) {
+        if (null == tickLabelColor) {
+            _tickLabelColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            tickLabelColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> tickLabelColorProperty() {
+        if (null == tickLabelColor) {
+            tickLabelColor = new ObjectPropertyBase<Color>(_tickLabelColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "tickLabelColor"; }
+            };
+            _tickLabelColor = null;
+        }
+        return tickLabelColor;
+    }
+
+    /**
+     * Returns the color that will be used to colorize tick marks in some skins
+     * @return the color that will be used to colorize tick marks in some skins
+     */
+    public Color getTickMarkColor() { return null == tickMarkColor ? _tickMarkColor : tickMarkColor.get(); }
+    public void setTickMarkColor(final Color COLOR) {
+        if (null == tickMarkColor) {
+            _tickMarkColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            tickMarkColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> tickMarkColorProperty() {
+        if (null == tickMarkColor) {
+            tickMarkColor = new ObjectPropertyBase<Color>(_tickMarkColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "tickMarkColor"; }
+            };
+            _tickMarkColor = null;
+        }
+        return tickMarkColor;
+    }
+    
     /**
      * Returns true if the hour tickmarks will be drawn.
      * @return true if the hour tickmarks will be drawn

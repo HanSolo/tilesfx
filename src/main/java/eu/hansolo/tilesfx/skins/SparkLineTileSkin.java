@@ -98,6 +98,7 @@ public class SparkLineTileSkin extends TileSkin {
     private double               tickLabelFontSize;
     private List<Text>           tickLabelsY;
     private Color                tickLineColor;
+    private Color                tickLabelColor;
 
 
     // ******************** Constructors **************************************
@@ -118,9 +119,10 @@ public class SparkLineTileSkin extends TileSkin {
 
         niceScaleY = new NiceScale(tile.getMinValue(), tile.getMaxValue());
         niceScaleY.setMaxTicks(5);
-        tickLineColor = Color.color(tile.getChartGridColor().getRed(), tile.getChartGridColor().getGreen(), tile.getChartGridColor().getBlue(), 0.5);
+        tickLineColor       = Color.color(tile.getChartGridColor().getRed(), tile.getChartGridColor().getGreen(), tile.getChartGridColor().getBlue(), 0.5);
+        tickLabelColor      = tile.getTickLabelColor();
         horizontalTickLines = new ArrayList<>(5);
-        tickLabelsY = new ArrayList<>(5);
+        tickLabelsY         = new ArrayList<>(5);
         for (int i = 0 ; i < 5 ; i++) {
             Line hLine = new Line(0, 0, 0, 0);
             hLine.getStrokeDashArray().addAll(1.0, 2.0);
@@ -291,7 +293,7 @@ public class SparkLineTileSkin extends TileSkin {
                 //label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
                 label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
                 label.setY(y + graphBounds.getHeight() * 0.03);
-                label.setFill(tickLineColor);
+                label.setFill(tickLabelColor);
                 horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
 
                 line.setStartX(minX);
@@ -303,7 +305,10 @@ public class SparkLineTileSkin extends TileSkin {
             }
             if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
             horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-            tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth()));
+            tickLabelsY.forEach(label -> {
+                label.setX(maxX - label.getLayoutBounds().getWidth());
+                label.toFront();
+            });
 
             highText.setText(String.format(locale, formatString, high));
             lowText.setText(String.format(locale, formatString, low));

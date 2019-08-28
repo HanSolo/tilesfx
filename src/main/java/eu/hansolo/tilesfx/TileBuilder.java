@@ -590,6 +590,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B tickLabelColor(final Color COLOR) {
+        properties.put("tickLabelColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B tickMarkColor(final Color COLOR) {
+        properties.put("tickMarkColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B hourTickMarksVisible(final boolean VISIBLE) {
         properties.put("hourTickMarksVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -1446,6 +1456,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("alarmColor".equals(key)) {
                 TILE.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("tickLabelColor".equals(key)) {
+                TILE.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("tickMarkColor".equals(key)) {
+                TILE.setTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("hourTickMarksVisible".equals(key)) {
                 TILE.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("minuteTickMarksVisible".equals(key)) {

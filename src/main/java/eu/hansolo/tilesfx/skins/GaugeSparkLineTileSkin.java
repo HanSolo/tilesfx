@@ -284,6 +284,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
+        addData(clamp(minValue, maxValue, VALUE));
         low  = Statistics.getMin(dataList);
         high = Statistics.getMax(dataList);
         if (Helper.equals(low, high)) {

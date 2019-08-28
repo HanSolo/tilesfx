@@ -234,7 +234,6 @@ public class SparkLineTileSkin extends TileSkin {
             if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, tile.getValue());
-            addData(value);
             handleCurrentValue(value);
         } else if ("AVERAGING".equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
@@ -251,6 +250,8 @@ public class SparkLineTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
+        addData(VALUE);
+
         low  = Statistics.getMin(dataList);
         high = Statistics.getMax(dataList);
 

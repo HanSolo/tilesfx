@@ -425,6 +425,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public B lowerThresholdColor(final Color COLOR) {
+        properties.put("lowerThresholdColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B checkSectionsForValue(final boolean CHECK) {
         properties.put("checkSectionsForValue", new SimpleBooleanProperty(CHECK));
         return (B)this;
@@ -1416,6 +1421,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("thresholdColor".equals(key)) {
                 TILE.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("lowerThresholdColor".equals(key)) {
+                TILE.setLowerThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("orientation".equals(key)) {
                 TILE.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
             } else if ("checkSectionsForValue".equals(key)) {

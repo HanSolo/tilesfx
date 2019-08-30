@@ -441,6 +441,8 @@ public class Tile extends Control {
     private              ObjectProperty<Color>                         valueColor;
     private              Color                                         _thresholdColor;
     private              ObjectProperty<Color>                         thresholdColor;
+    private              Color                                         _lowerThresholdColor;
+    private              ObjectProperty<Color>                         lowerThresholdColor;
     private              boolean                                       _checkSectionsForValue;
     private              BooleanProperty                               checkSectionsForValue;
     private              boolean                                       _checkThreshold;
@@ -670,6 +672,7 @@ public class Tile extends Control {
                 @NamedArg(value="tickLabelColor", defaultValue="#dfdfdf") Color tickLabelColor,
                 @NamedArg(value="tickMarkColor", defaultValue="#dfdfdf") Color tickMarkColor,
                 @NamedArg(value="thresholdColor", defaultValue="#e5504c") Color thresholdColor,
+                @NamedArg(value="lowerThresholdColor", defaultValue="#e5504c") Color _lowerThresholdColor,
                 @NamedArg(value="checkSectionsForValue", defaultValue="false") boolean checkSectionsForValue,
                 @NamedArg(value="checkThreshold", defaultValue="false") boolean checkThreshold,
                 @NamedArg(value="innerShadowEnabled", defaultValue="false") boolean innerShadowEnabled,
@@ -871,6 +874,7 @@ public class Tile extends Control {
         _tickLabelColor                     = FOREGROUND;
         _tickMarkColor                      = FOREGROUND;
         _thresholdColor                     = RED;
+        _lowerThresholdColor                = RED;
         _checkSectionsForValue              = false;
         _checkThreshold                     = false;
         _innerShadowEnabled                 = false;
@@ -3213,6 +3217,27 @@ public class Tile extends Control {
             _thresholdColor = null;
         }
         return thresholdColor;
+    }
+
+    public Color getLowerThresholdColor() { return null == lowerThresholdColor ? _lowerThresholdColor : lowerThresholdColor.get(); }
+    public void setLowerThresholdColor(final Color COLOR) {
+        if (null == lowerThresholdColor) {
+            _lowerThresholdColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            lowerThresholdColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> lowerThresholdColorProperty() {
+        if (null == lowerThresholdColor) {
+            lowerThresholdColor = new ObjectPropertyBase<Color>(_lowerThresholdColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "lowerThresholdColor"; }
+            };
+            _lowerThresholdColor = null;
+        }
+        return lowerThresholdColor;
     }
 
     /**

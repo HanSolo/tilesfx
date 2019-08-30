@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx.skins;
 
+import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.fonts.Fonts;
@@ -31,6 +32,7 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -56,9 +58,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -67,45 +71,49 @@ import static eu.hansolo.tilesfx.tools.Helper.enableNode;
 
 
 public class TimelineTileSkin extends TileSkin {
-    private static final int                  SEC_MONTH     = 2_592_000;
-    private static final int                  SEC_DAY       = 86_400;
-    private static final int                  SEC_HOUR      = 3_600;
-    private static final int                  SEC_MINUTE    = 60;
-    private              DateTimeFormatter    timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-    private              Text                 titleText;
-    private              Text                 valueText;
-    private              Text                 unitText;
-    private              TextFlow             valueUnitFlow;
-    private              Text                 averageText;
-    private              Text                 highText;
-    private              Text                 lowText;
-    private              Text                 text;
-    private              Text                 timeSpanText;
-    private              Rectangle            graphBounds;
-    private              List<PathElement>    pathElements;
-    private              Path                 sparkLine;
-    private              Circle               dot;
-    private              Rectangle            stdDeviationArea;
-    private              Line                 averageLine;
-    private              LinearGradient       gradient;
-    private              GradientLookup       gradientLookup;
-    private              double               low;
-    private              double               high;
-    private              double               lastLow;
-    private              double               lastHigh;
-    private              double               stdDeviation;
-    private              int                  noOfDatapoints;
-    private              List<ChartData>      dataList;
-    private              Duration             timePeriod;
-    private              MovingAverage        movingAverage;
-    private              InvalidationListener periodListener;
-    private              NiceScale            niceScaleY;
-    private              List<Line>           horizontalTickLines;
-    private              double               horizontalLineOffset;
-    private              double               tickLabelFontSize;
-    private              List<Text>           tickLabelsY;
-    private              Color                tickLineColor;
-    private              Color                tickLabelColor;
+    private static final int                     SEC_MONTH     = 2_592_000;
+    private static final int                     SEC_DAY       = 86_400;
+    private static final int                     SEC_HOUR      = 3_600;
+    private static final int                     SEC_MINUTE    = 60;
+    private              DateTimeFormatter       timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private              Text                    titleText;
+    private              Text                    valueText;
+    private              Text                    unitText;
+    private              TextFlow                valueUnitFlow;
+    private              Text                    averageText;
+    private              Text                    minText;
+    private              Text                    maxText;
+    private              Text                    highText;
+    private              Text                    lowText;
+    private              Text                    text;
+    private              Text                    timeSpanText;
+    private              Rectangle               graphBounds;
+    private              List<PathElement>       pathElements;
+    private              Path                    sparkLine;
+    private              Circle                  dot;
+    private              Rectangle               stdDeviationArea;
+    private              Line                    thresholdLine;
+    private              Line                    lowerThresholdLine;
+    private              Line                    averageLine;
+    private              Group                   sectionGroup;
+    private              Map<Section, Rectangle> sections;
+    private              LinearGradient          gradient;
+    private              GradientLookup          gradientLookup;
+    private              double                  low;
+    private              double                  high;
+    private              double                  stdDeviation;
+    private              int                     noOfDatapoints;
+    private              List<ChartData>         dataList;
+    private              Duration                timePeriod;
+    private              MovingAverage           movingAverage;
+    private              InvalidationListener    periodListener;
+    private              NiceScale               niceScaleY;
+    private              List<Line>              horizontalTickLines;
+    private              double                  horizontalLineOffset;
+    private              double                  tickLabelFontSize;
+    private              List<Text>              tickLabelsY;
+    private              Color                   tickLineColor;
+    private              Color                   tickLabelColor;
 
 
     // ******************** Constructors **************************************
@@ -142,9 +150,7 @@ public class TimelineTileSkin extends TileSkin {
 
         gradientLookup = new GradientLookup(tile.getGradientStops());
         low            = tile.getMaxValue();
-        lastLow        = low;
         high           = tile.getMinValue();
-        lastHigh       = high;
         stdDeviation   = 0;
         movingAverage  = tile.getMovingAverage();
         dataList       = new LinkedList<>();
@@ -178,6 +184,14 @@ public class TimelineTileSkin extends TileSkin {
         averageText.setFill(Tile.FOREGROUND);
         Helper.enableNode(averageText, tile.isAverageVisible());
 
+        minText = new Text();
+        minText.setTextOrigin(VPos.TOP);
+        minText.setFill(tile.getValueColor());
+
+        maxText = new Text();
+        maxText.setTextOrigin(VPos.BOTTOM);
+        maxText.setFill(tile.getValueColor());
+
         highText = new Text();
         highText.setTextOrigin(VPos.BOTTOM);
         highText.setFill(tile.getValueColor());
@@ -198,10 +212,26 @@ public class TimelineTileSkin extends TileSkin {
         stdDeviationArea = new Rectangle();
         Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
 
+        thresholdLine = new Line();
+        thresholdLine.setStroke(tile.getThresholdColor());
+        thresholdLine.getStrokeDashArray().addAll(PREFERRED_WIDTH * 0.005, PREFERRED_WIDTH * 0.005);
+        Helper.enableNode(thresholdLine, tile.isThresholdVisible());
+
+        lowerThresholdLine = new Line();
+        lowerThresholdLine.setStroke(tile.getLowerThresholdColor());
+        lowerThresholdLine.getStrokeDashArray().addAll(PREFERRED_WIDTH * 0.005, PREFERRED_WIDTH * 0.005);
+        Helper.enableNode(lowerThresholdLine, tile.isThresholdVisible());
+
         averageLine = new Line();
         averageLine.setStroke(Tile.FOREGROUND);
         averageLine.getStrokeDashArray().addAll(PREFERRED_WIDTH * 0.005, PREFERRED_WIDTH * 0.005);
         Helper.enableNode(averageLine, tile.isAverageVisible());
+
+        sections = new HashMap<>();
+        tile.getSections().forEach(section -> sections.put(section, new Rectangle()));
+        sectionGroup = new Group();
+        sectionGroup.getChildren().addAll(sections.values());
+        Helper.enableNode(sectionGroup, tile.getSectionsVisible());
 
         pathElements = new ArrayList<>(noOfDatapoints);
         pathElements.add(0, new MoveTo());
@@ -218,7 +248,7 @@ public class TimelineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(tile.getBarColor());
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, sparkLine, dot, averageText, minText, maxText, highText, lowText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
     }
@@ -234,6 +264,17 @@ public class TimelineTileSkin extends TileSkin {
                     c.getRemoved().forEach(chartData -> dataList.remove(chartData));
                 }
             }
+        });
+        tile.getSections().addListener((ListChangeListener<Section>) c -> {
+            while(c.next()) {
+                if (c.wasAdded()) {
+                    c.getAddedSubList().forEach(section -> sections.put(section, new Rectangle()));
+                } else if (c.wasRemoved()) {
+                    c.getRemoved().forEach(section -> sections.remove(section));
+                }
+            }
+            sectionGroup.getChildren().setAll(sections.values());
+            resize();
         });
     }
 
@@ -251,6 +292,9 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(averageLine, tile.isAverageVisible());
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
+            Helper.enableNode(thresholdLine, tile.isThresholdVisible());
+            Helper.enableNode(lowerThresholdLine, tile.isThresholdVisible());
+            Helper.enableNode(sectionGroup, tile.getSectionsVisible());
             redraw();
         } else if ("VALUE".equals(EVENT_TYPE)) {
             if(tile.isAnimated()) { tile.setAnimated(false); }
@@ -278,20 +322,16 @@ public class TimelineTileSkin extends TileSkin {
         }
     }
 
-    private void handleCurrentValue(final ChartData DATA) {
-        handleCurrentValue(DATA.getValue());
-    }
     @Override protected void handleCurrentValue(final double VALUE) {
         if (dataList.size() < 4) { return; }
 
-        low  = Statistics.getChartDataMin(dataList);
-        high = Statistics.getChartDataMax(dataList);
+        List<Double> clampedDataList = dataList.stream().map(chartData -> Helper.clamp(minValue, maxValue, chartData.getValue())).collect(Collectors.toList());
+        low  = Math.min(low, VALUE);
+        high = Math.max(high, VALUE);
 
-        if (Helper.equals(low, high)) {
-            low = minValue;
-            high = maxValue;
-        }
-        range = high - low;
+        low = 0 == low ? tile.getLowerThreshold() : low;
+
+        range = (maxValue - minValue);
 
         double minX  = graphBounds.getX();
         double maxX  = minX + graphBounds.getWidth();
@@ -300,80 +340,108 @@ public class TimelineTileSkin extends TileSkin {
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        boolean loHiChanged = Double.compare(lastLow, low) != 0 || Double.compare(lastHigh, high) != 0;
-
-        if (loHiChanged) {
-            niceScaleY.setMinMax(low, high);
-            int    lineCountY       = 1;
-            int    tickLabelOffsetY = 1;
-            double tickSpacingY     = niceScaleY.getTickSpacing();
-            double tickStepY        = tickSpacingY * stepY;
-            double tickStartY       = maxY - tickStepY;
-            if (tickSpacingY < low) {
-                tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
-                tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
-            }
-
-            horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
-            tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
-            horizontalLineOffset = 0;
-            for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
-                Line line  = horizontalTickLines.get(lineCountY);
-                Text label = tickLabelsY.get(lineCountY);
-                //label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
-                label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
-                label.setY(y + graphBounds.getHeight() * 0.03);
-                label.setFill(tickLineColor);
-                horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
-
-                line.setStartX(minX);
-                line.setStartY(y);
-                line.setEndY(y);
-                line.setStroke(tickLineColor);
-                lineCountY++;
-                lineCountY = clamp(0, 4, lineCountY);
-            }
-            if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
-            horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-            tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth()));
-
-            highText.setText(String.format(locale, formatString, high));
-            lowText.setText(String.format(locale, formatString, low));
+        niceScaleY.setMinMax(minValue, maxValue);
+        int    lineCountY       = 1;
+        int    tickLabelOffsetY = 1;
+        double tickSpacingY     = niceScaleY.getTickSpacing();
+        double tickStepY        = tickSpacingY * stepY;
+        double tickStartY       = maxY - tickStepY;
+        if (tickSpacingY < minValue) {
+            tickLabelOffsetY = (int) (minValue / tickSpacingY) + 1;
+            tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - minValue) * stepY;
         }
+
+        horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
+        tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+        horizontalLineOffset = 0;
+        for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
+            Line line  = horizontalTickLines.get(lineCountY);
+            Text label = tickLabelsY.get(lineCountY);
+            //label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
+            label.setText(String.format(locale, "%.0f", minValue + lineCountY * tickSpacingY));
+            label.setY(y + graphBounds.getHeight() * 0.03);
+            label.setFill(tickLabelColor);
+            horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
+
+            line.setStartX(minX);
+            line.setStartY(y);
+            line.setEndY(y);
+            line.setStroke(tickLineColor);
+            lineCountY++;
+            lineCountY = clamp(0, 4, lineCountY);
+        }
+        if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
+        horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
+        tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth()));
+
+        minText.setText(String.format(locale, formatString, minValue));
+        maxText.setText(String.format(locale, formatString, maxValue));
+
+        lowText.setText(String.format(locale, formatString, low));
+        highText.setText(String.format(locale, formatString, high));
+
+        minText.setX((maxX - minText.getLayoutBounds().getWidth()));
+        maxText.setX((maxX - maxText.getLayoutBounds().getWidth()));
 
         if (!dataList.isEmpty()) {
             if (tile.isSmoothing()) {
-                smooth(dataList.stream().map(ChartData::getValue).collect(Collectors.toList()));
+                smooth(clampedDataList);
             } else {
                 MoveTo begin = (MoveTo) pathElements.get(0);
                 begin.setX(minX);
-                begin.setY(maxY - Math.abs(low - dataList.get(0).getValue()) * stepY);
-                for (int i = 1; i < (noOfDatapoints - 1); i++) {
+                begin.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, dataList.get(0).getValue())) * stepY);
+                for (int i = 1 ; i < (noOfDatapoints - 1) ; i++) {
                     LineTo lineTo = (LineTo) pathElements.get(i);
                     lineTo.setX(minX + i * stepX);
-                    lineTo.setY(maxY - Math.abs(low - dataList.get(i).getValue()) * stepY);
+                    lineTo.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, dataList.get(i).getValue())) * stepY);
                 }
                 LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
                 end.setX(maxX);
-                end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1).getValue()) * stepY);
+                end.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, dataList.get(noOfDatapoints - 1).getValue())) * stepY);
 
                 dot.setCenterX(maxX);
                 dot.setCenterY(end.getY());
             }
 
-            if (tile.isStrokeWithGradient() && loHiChanged) {
+            if (tile.isStrokeWithGradient()) {
                 setupGradient();
                 dot.setFill(gradient);
                 sparkLine.setStroke(gradient);
             }
 
+            sections.entrySet().forEach(entry -> {
+                Section   section   = entry.getKey();
+                Rectangle rectangle = entry.getValue();
+                rectangle.setX(minX);
+                rectangle.setY(clamp(minY, maxY, maxY - Math.abs(minValue - section.getStop()) * stepY));
+                rectangle.setWidth(graphBounds.getWidth());
+                rectangle.setHeight(Math.abs(section.getStop() - section.getStart()) * stepY);
+                rectangle.setFill(section.getColor());
+            });
+
             double average  = tile.getAverage();
-            double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
+            double averageY = clamp(minY, maxY, maxY - Math.abs(minValue - average) * stepY);
 
             averageLine.setStartX(minX);
             averageLine.setStartY(averageY);
             averageLine.setEndX(maxX);
             averageLine.setEndY(averageY);
+
+            double threshold  = tile.getThreshold();
+            double thresholdY = clamp(minY, maxY, maxY - Math.abs(minValue - threshold) * stepY);
+
+            thresholdLine.setStartX(minX);
+            thresholdLine.setStartY(thresholdY);
+            thresholdLine.setEndX(maxX);
+            thresholdLine.setEndY(thresholdY);
+
+            double lowerThreshold  = tile.getLowerThreshold();
+            double lowerThresholdY = clamp(minY, maxY, maxY - Math.abs(minValue - lowerThreshold) * stepY);
+
+            lowerThresholdLine.setStartX(minX);
+            lowerThresholdLine.setStartY(lowerThresholdY);
+            lowerThresholdLine.setEndX(maxX);
+            lowerThresholdLine.setEndY(lowerThresholdY);
 
             stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
             stdDeviationArea.setHeight(stdDeviation * stepY);
@@ -386,9 +454,6 @@ public class TimelineTileSkin extends TileSkin {
             text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
         }
         resizeDynamicText();
-
-        lastLow  = low;
-        lastHigh = high;
     }
 
     private void addData(final ChartData DATA) {
@@ -404,10 +469,12 @@ public class TimelineTileSkin extends TileSkin {
         Collections.sort(dataList, Comparator.comparing(ChartData::getTimestamp));
         noOfDatapoints = dataList.size();
 
+        /*
         if (noOfDatapoints > 4) {
             Model model = DoubleExponentialSmoothingForLinearSeries.fit(dataList.stream().mapToDouble(ChartData::getValue).toArray(), 0.8, 0.2);
             System.out.println("Forecast: " + Arrays.toString(model.forecast(1)));
         }
+        */
 
         stdDeviation = Statistics.getChartDataStdDev(dataList);
         pathElements.clear();
@@ -508,13 +575,21 @@ public class TimelineTileSkin extends TileSkin {
             averageText.setY(averageLine.getStartY() - (size * 0.0075));
         }
 
-        highText.setFont(Fonts.latoRegular(fontSize));
-        if (highText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(highText, maxWidth, fontSize); }
-        highText.setY(graphBounds.getY() - size * 0.0125);
+        minText.setFont(Fonts.latoRegular(fontSize));
+        if (minText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(minText, maxWidth, fontSize); }
+        minText.setY(height - size * 0.1);
+
+        maxText.setFont(Fonts.latoRegular(fontSize));
+        if (maxText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxText, maxWidth, fontSize); }
+        maxText.setY(graphBounds.getY() - size * 0.0125);
 
         lowText.setFont(Fonts.latoRegular(fontSize));
         if (lowText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(lowText, maxWidth, fontSize); }
         lowText.setY(height - size * 0.1);
+
+        highText.setFont(Fonts.latoRegular(fontSize));
+        if (highText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(highText, maxWidth, fontSize); }
+        highText.setY(graphBounds.getY() - size * 0.0125);
 
         maxWidth = width - size * 0.25;
         fontSize = size * 0.06;
@@ -550,17 +625,14 @@ public class TimelineTileSkin extends TileSkin {
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
-        averageText.setX(size * 0.05);
-        highText.setX(size * 0.05);
         lowText.setX(size * 0.05);
+        highText.setX(size * 0.05);
+        averageText.setX(size * 0.05);
     }
 
     @Override protected void resize() {
         super.resize();
-        graphBounds        = new Rectangle(contentBounds.getX(), titleText.isVisible() ? size * 0.5 : size * 0.4, contentBounds.getWidth(), titleText.isVisible() ? height - size * 0.61 : height - size * 0.51);
-
-        lastLow  = maxValue;
-        lastHigh = minValue;
+        graphBounds = new Rectangle(contentBounds.getX(), titleText.isVisible() ? size * 0.5 : size * 0.4, contentBounds.getWidth(), titleText.isVisible() ? height - size * 0.61 : height - size * 0.51);
 
         tickLabelFontSize  = graphBounds.getHeight() * 0.1;
         Font tickLabelFont = Fonts.latoRegular(tickLabelFontSize);
@@ -573,6 +645,8 @@ public class TimelineTileSkin extends TileSkin {
         stdDeviationArea.setX(graphBounds.getX());
         stdDeviationArea.setWidth(graphBounds.getWidth());
 
+        thresholdLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
+        lowerThresholdLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
         handleCurrentValue(tile.getValue());
@@ -614,8 +688,10 @@ public class TimelineTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
-        highText.setFill(tile.getValueColor());
+        minText.setFill(tile.getValueColor());
+        maxText.setFill(tile.getValueColor());
         lowText.setFill(tile.getValueColor());
+        highText.setFill(tile.getValueColor());
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
         if (tile.isStrokeWithGradient()) {

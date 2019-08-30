@@ -309,6 +309,8 @@ public class Tile extends Control {
     private              DoubleProperty                                range;
     private              double                                        _threshold;
     private              DoubleProperty                                threshold;
+    private              double                                        _lowerThreshold;
+    private              DoubleProperty                                lowerThreshold;
     private              double                                        _referenceValue;
     private              DoubleProperty                                referenceValue;
     private              boolean                                       _autoReferenceValue;
@@ -605,6 +607,7 @@ public class Tile extends Control {
                 @NamedArg(value="maxValue", defaultValue="100") double maxValue,
                 @NamedArg(value="value", defaultValue="0") double value,
                 @NamedArg(value="threshold", defaultValue="100") double threshold,
+                @NamedArg(value="lowerThreshold", defaultValue="0") double lowerThreshold,
                 @NamedArg(value="referenceValue", defaultValue="0") double referenceValue,
                 @NamedArg(value="autoReferenceValue", defaultValue="true") boolean autoReferenceValue,
                 @NamedArg(value="title", defaultValue="") String title,
@@ -795,6 +798,7 @@ public class Tile extends Control {
         formerValue                         = new SimpleDoubleProperty(Tile.this, "formerValue", value.get());
         _range                              = _maxValue - _minValue;
         _threshold                          = _maxValue;
+        _lowerThreshold                     = _minValue;
         _referenceValue                     = _minValue;
         _autoReferenceValue                 = true;
 
@@ -1190,6 +1194,29 @@ public class Tile extends Control {
             };
         }
         return threshold;
+    }
+
+    public double getLowerThreshold() { return null == lowerThreshold ? _lowerThreshold : lowerThreshold.get(); }
+    public void setLowerThreshold(final double THRESHOLD) {
+        if (null == lowerThreshold) {
+            _lowerThreshold = clamp(getMinValue(), getMaxValue(), THRESHOLD);
+            fireTileEvent(RESIZE_EVENT);
+        } else {
+            lowerThreshold.set(THRESHOLD);
+        }
+    }
+    public DoubleProperty lowerThresholdProperty() {
+        if (null == lowerThreshold) {
+            lowerThreshold = new DoublePropertyBase(_lowerThreshold) {
+                @Override protected void invalidated() {
+                    set(clamp(getMinValue(), getMaxValue(), get()));
+                    fireTileEvent(RESIZE_EVENT);
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "lowerThreshold"; }
+            };
+        }
+        return lowerThreshold;
     }
 
     /**

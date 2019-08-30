@@ -19,6 +19,8 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries;
+import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries.Model;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
@@ -51,6 +53,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -400,6 +403,11 @@ public class TimelineTileSkin extends TileSkin {
         dataList.removeIf(isNotInTimePeriod);
         Collections.sort(dataList, Comparator.comparing(ChartData::getTimestamp));
         noOfDatapoints = dataList.size();
+
+        if (noOfDatapoints > 4) {
+            Model model = DoubleExponentialSmoothingForLinearSeries.fit(dataList.stream().mapToDouble(ChartData::getValue).toArray(), 0.8, 0.2);
+            System.out.println("Forecast: " + Arrays.toString(model.forecast(1)));
+        }
 
         stdDeviation = Statistics.getChartDataStdDev(dataList);
         pathElements.clear();

@@ -115,6 +115,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B lowerThreshold(final double VALUE) {
+        properties.put("lowerThreshold", new SimpleDoubleProperty(VALUE));
+        return (B)this;
+    }
+
     public final B referenceValue(final double VALUE) {
         properties.put("referenceValue", new SimpleDoubleProperty(VALUE));
         return (B)this;
@@ -1423,6 +1428,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setKeepAspect(((BooleanProperty) properties.get(key)).get());
             } else if ("threshold".equals(key)) {
                 TILE.setThreshold(((DoubleProperty) properties.get(key)).get());
+            } else if ("lowerThreshold".equals(key)) {
+                TILE.setLowerThreshold(((DoubleProperty) properties.get(key)).get());
             } else if ("referenceValue".equals(key)) {
                 TILE.setReferenceValue(((DoubleProperty) properties.get(key)).get());
             } else if ("autoReferenceValue".equals(key)) {

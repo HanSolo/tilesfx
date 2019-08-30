@@ -180,6 +180,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B timePeriod(final java.time.Duration PERIOD) {
+        properties.put("timePeriod", new SimpleObjectProperty(PERIOD));
+        return (B)this;
+    }
+
     public final B foregroundBaseColor(final Color COLOR) {
         properties.put("foregroundBaseColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -1334,6 +1339,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
             } else if("averagingPeriod".equals(key)) {
                 TILE.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
+            } else if ("timerPeriod".equals(key)) {
+                TILE.setTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {

@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -25,6 +26,7 @@ import eu.hansolo.tilesfx.tools.NiceScale;
 import eu.hansolo.tilesfx.tools.Point;
 import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.geometry.VPos;
 import javafx.scene.paint.Color;
@@ -45,21 +47,25 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static eu.hansolo.tilesfx.tools.Helper.checkCollision;
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 import static eu.hansolo.tilesfx.tools.Helper.enableNode;
 
 
 public class TimelineTileSkin extends TileSkin {
     private static final int                  SEC_MONTH     = 2_592_000;
-    private static final int                  SEC_7_DAYS    = 604_800;
-    private static final int                  SEC_3_DAYS    = 259_200;
     private static final int                  SEC_DAY       = 86_400;
     private static final int                  SEC_HOUR      = 3_600;
     private static final int                  SEC_MINUTE    = 60;
@@ -86,10 +92,11 @@ public class TimelineTileSkin extends TileSkin {
     private              double               lastLow;
     private              double               lastHigh;
     private              double               stdDeviation;
-    private              int                  noOfDatapoints;
-    private              List<Double>         dataList;
+    private              long                  noOfDatapoints;
+    private              List<ChartData>      dataList;
+    private              Duration             timePeriod;
     private              MovingAverage        movingAverage;
-    private              InvalidationListener averagingListener;
+    private              InvalidationListener periodListener;
     private              NiceScale            niceScaleY;
     private              List<Line>           horizontalTickLines;
     private              double               horizontalLineOffset;
@@ -108,7 +115,7 @@ public class TimelineTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        averagingListener = o -> handleEvents("AVERAGING");
+        periodListener = o -> handleEvents("PERIOD");
 
         timeFormatter = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
 
@@ -136,8 +143,12 @@ public class TimelineTileSkin extends TileSkin {
         lastHigh       = high;
         stdDeviation   = 0;
         movingAverage  = tile.getMovingAverage();
-        noOfDatapoints = tile.getAveragingPeriod();
         dataList       = new LinkedList<>();
+        timePeriod     = tile.getTimePeriod();
+
+        Predicate<ChartData> isNotInTimePeriod  = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
+        dataList.removeIf(isNotInTimePeriod);
+        noOfDatapoints = dataList.size();
 
         // To get smooth lines in the chart we need at least 4 values
         if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
@@ -188,7 +199,7 @@ public class TimelineTileSkin extends TileSkin {
         averageLine.getStrokeDashArray().addAll(PREFERRED_WIDTH * 0.005, PREFERRED_WIDTH * 0.005);
         Helper.enableNode(averageLine, tile.isAverageVisible());
 
-        pathElements = new ArrayList<>(noOfDatapoints);
+        pathElements = new ArrayList<PathElement>((int) noOfDatapoints);
         pathElements.add(0, new MoveTo());
         for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
 
@@ -210,7 +221,16 @@ public class TimelineTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.averagingPeriodProperty().addListener(averagingListener);
+        tile.timePeriodProperty().addListener(periodListener);
+        tile.getChartData().addListener((ListChangeListener<ChartData>) c -> {
+            while(c.next()) {
+                if (c.wasAdded()) {
+                    c.getAddedSubList().forEach(chartData -> addData(chartData));
+                } else if (c.wasRemoved()) {
+                    c.getRemoved().forEach(chartData -> removeData(chartData));
+                }
+            }
+        });
     }
 
 
@@ -232,14 +252,19 @@ public class TimelineTileSkin extends TileSkin {
             if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, tile.getValue());
-            addData(value);
+            addData(new ChartData(value));
             handleCurrentValue(value);
-        } else if ("AVERAGING".equals(EVENT_TYPE)) {
-            noOfDatapoints = tile.getAveragingPeriod();
+        } else if ("PERIOD".equals(EVENT_TYPE)) {
+            timePeriod = tile.getTimePeriod();
+            timeSpanText.setText(createTimeSpanText());
+
+            Predicate<ChartData> isNotInTimePeriod  = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
+            dataList.removeIf(isNotInTimePeriod);
+            noOfDatapoints = dataList.size();
 
             // To get smooth lines in the chart we need at least 4 values
             if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
-            for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
+            for (int i = 0; i < noOfDatapoints; i++) { dataList.add(new ChartData(minValue, Instant.now().minusSeconds(i * 10))); }
             pathElements.clear();
             pathElements.add(0, new MoveTo());
             for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
@@ -249,8 +274,8 @@ public class TimelineTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        low  = Statistics.getMin(dataList);
-        high = Statistics.getMax(dataList);
+        low  = Statistics.getChartDataMin(dataList);
+        high = Statistics.getChartDataMax(dataList);
 
         if (Helper.equals(low, high)) {
             low = minValue;
@@ -308,19 +333,19 @@ public class TimelineTileSkin extends TileSkin {
 
         if (!dataList.isEmpty()) {
             if (tile.isSmoothing()) {
-                smooth(dataList);
+                smooth(dataList.stream().map(ChartData::getValue).collect(Collectors.toList()));
             } else {
                 MoveTo begin = (MoveTo) pathElements.get(0);
                 begin.setX(minX);
-                begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+                begin.setY(maxY - Math.abs(low - dataList.get(0).getValue()) * stepY);
                 for (int i = 1; i < (noOfDatapoints - 1); i++) {
                     LineTo lineTo = (LineTo) pathElements.get(i);
                     lineTo.setX(minX + i * stepX);
-                    lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+                    lineTo.setY(maxY - Math.abs(low - dataList.get(i).getValue()) * stepY);
                 }
-                LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
+                LineTo end = (LineTo) pathElements.get((int)noOfDatapoints - 1);
                 end.setX(maxX);
-                end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
+                end.setY(maxY - Math.abs(low - dataList.get((int)noOfDatapoints - 1).getValue()) * stepY);
 
                 dot.setCenterX(maxX);
                 dot.setCenterY(end.getY());
@@ -347,8 +372,7 @@ public class TimelineTileSkin extends TileSkin {
         }
         valueText.setText(String.format(locale, formatString, VALUE));
 
-        if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
-            timeSpanText.setText(createTimeSpanText());
+        if (!tile.isTextVisible()) {
             text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
         }
         resizeDynamicText();
@@ -357,15 +381,23 @@ public class TimelineTileSkin extends TileSkin {
         lastHigh = high;
     }
 
-    private void addData(final double VALUE) {
-        if (dataList.isEmpty()) { for (int i = 0 ; i < noOfDatapoints ;i ++) { dataList.add(VALUE); } }
-        if (dataList.size() <= noOfDatapoints) {
+    private void addData(final ChartData DATA) {
+        if (dataList.isEmpty()) { for (int i = 0 ; i < noOfDatapoints ; i++) { dataList.add(DATA); } }
+        if (dataList.size() <= noOfDatapoints || dataList.size() == Integer.MAX_VALUE - 1) {
             Collections.rotate(dataList, -1);
-            dataList.set((noOfDatapoints - 1), VALUE);
+            dataList.set(((int)noOfDatapoints - 1), DATA);
         } else {
-            dataList.add(VALUE);
+            dataList.add(DATA);
         }
-        stdDeviation = Statistics.getStdDev(dataList);
+        Predicate<ChartData> isNotInTimePeriod  = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
+        dataList.removeIf(isNotInTimePeriod);
+        noOfDatapoints = dataList.size();
+        stdDeviation = Statistics.getChartDataStdDev(dataList);
+    }
+    private void removeData(final ChartData DATA) {
+        if (dataList.contains(DATA)) {
+            dataList.remove(DATA);
+        }
     }
 
     private void setupGradient() {
@@ -389,7 +421,7 @@ public class TimelineTileSkin extends TileSkin {
     }
 
     private String createTimeSpanText() {
-        long          timeSpan        = movingAverage.getTimeSpan().getEpochSecond();
+        long          timeSpan        = timePeriod.getSeconds();
         StringBuilder timeSpanBuilder = new StringBuilder(movingAverage.isFilling() ? "\u22a2 " : "\u2190 ");
         if (timeSpan > SEC_MONTH) { // 1 Month (30 days)
             int    months = (int)(timeSpan / SEC_MONTH);
@@ -415,14 +447,14 @@ public class TimelineTileSkin extends TileSkin {
     }
 
     @Override public void dispose() {
-        tile.averagingPeriodProperty().removeListener(averagingListener);
+        tile.timePeriodProperty().removeListener(periodListener);
         super.dispose();
     }
 
     private void smooth(final List<Double> DATA_LIST) {
         Task<Point[]> smoothTask = new Task<Point[]>() {
             @Override protected Point[] call() {
-                return Helper.smoothSparkLine(DATA_LIST, minValue, maxValue, graphBounds, noOfDatapoints);
+                return Helper.smoothSparkLine(DATA_LIST, minValue, maxValue, graphBounds, (int)noOfDatapoints);
             }
         };
         smoothTask.setOnSucceeded(t -> {

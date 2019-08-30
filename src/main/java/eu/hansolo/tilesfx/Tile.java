@@ -336,6 +336,8 @@ public class Tile extends Control {
     private              BooleanProperty                               averagingEnabled;
     private              int                                           _averagingPeriod;
     private              IntegerProperty                               averagingPeriod;
+    private              java.time.Duration                            _timePeriod;
+    private              ObjectProperty<java.time.Duration>            timePeriod;
     private              MovingAverage                                 movingAverage;
     private              ObservableList<Section>                       sections;
     private              ObservableList<TilesFXSeries<String, Number>> series;
@@ -616,6 +618,7 @@ public class Tile extends Control {
                 @NamedArg(value="textAlignment", defaultValue="TextAlignment.LEFT") TextAlignment textAlignment,
                 @NamedArg(value="averagingEnabled", defaultValue="false") boolean averagingEnabled,
                 @NamedArg(value="averagingPeriod", defaultValue="10") int averagingPeriod,
+                @NamedArg(value="timePeriod", defaultValue="java.time.Duration.ofMinutes(60)") java.time.Duration timePeriod,
                 @NamedArg(value="imageMask", defaultValue="ImageMask.NONE") ImageMask imageMask,
                 @NamedArg(value="trackColor", defaultValue="TileColor.BLUE") Color trackColor,
                 @NamedArg(value="mapProvider", defaultValue="MapProvider.BW") MapProvider mapProvider,
@@ -811,6 +814,7 @@ public class Tile extends Control {
         _textAlignment                      = TextAlignment.LEFT;
         _averagingEnabled                   = false;
         _averagingPeriod                    = 10;
+        _timePeriod                         = java.time.Duration.ofMinutes(60);
         _duration                           = LocalTime.of(1, 0);
         _imageMask                          = ImageMask.NONE;
         _currentLocation                    = new Location(0, 0);
@@ -1574,6 +1578,34 @@ public class Tile extends Control {
      * @return the moving average over the given duration
      */
     public double getTimeBasedAverageOf(final java.time.Duration DURATION) { return movingAverage.getTimeBasedAverageOf(DURATION); }
+
+    /**
+     * Returns the duration that should be used for the data shown in the TimelineTileSkin
+     * @return the duration that should be used for the data shown in the TimelineTileSkin
+     */
+    public java.time.Duration getTimePeriod() { return null == timePeriod ? _timePeriod : timePeriod.get(); }
+    /**
+     * Defines the duration that should be used for the data shown in the TimelineTileSkin
+     * @param PERIOD
+     */
+    public void setTimePeriod(final java.time.Duration PERIOD) {
+        if (null == timePeriod) {
+            _timePeriod = PERIOD;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            timePeriod.set(PERIOD);
+        }
+    }
+    public ObjectProperty<java.time.Duration> timePeriodProperty() {
+        if (null == timePeriod) {
+            timePeriod = new ObjectPropertyBase<>(_timePeriod) {
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "timePeriod"; }
+            };
+            _timePeriod = null;
+        }
+        return timePeriod;
+    }
 
     /**
      * Returns a duration that will be used in the TimeTileSkin

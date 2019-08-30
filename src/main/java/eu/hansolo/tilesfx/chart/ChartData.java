@@ -183,7 +183,7 @@ public class ChartData implements Comparable<ChartData> {
         fireChartDataEvent(UPDATE_EVENT);
     }
 
-    public ZonedDateTime getTimestampAdDateTime() { return getTimestampAsDateTime(ZoneId.systemDefault()); }
+    public ZonedDateTime getTimestampAsDateTime() { return getTimestampAsDateTime(ZoneId.systemDefault()); }
     public ZonedDateTime getTimestampAsDateTime(final ZoneId ZONE_ID) { return ZonedDateTime.ofInstant(timestamp, ZONE_ID); }
 
     public LocalDate getTimestampAsLocalDate() { return getTimestampAsLocalDate(ZoneId.systemDefault()); }
@@ -194,6 +194,13 @@ public class ChartData implements Comparable<ChartData> {
 
     public long getAnimationDuration() { return animationDuration; }
     public void setAnimationDuration(final long DURATION) { animationDuration = clamp(10, 10000, DURATION); }
+
+    public boolean isWithinTimePeriod(final java.time.Duration PERIOD) {
+        return isWithinTimePeriod(Instant.now(), PERIOD);
+    }
+    public boolean isWithinTimePeriod(final Instant PERIOD_START, final java.time.Duration PERIOD) {
+        return timestamp.isBefore(PERIOD_START) && timestamp.isAfter(PERIOD_START.minus(PERIOD));
+    }
 
     @Override public String toString() {
         return new StringBuilder().append("{\n")

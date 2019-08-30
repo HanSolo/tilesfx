@@ -264,6 +264,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             redraw();
         } else if ("VALUE".equals(EVENT_TYPE)) {
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
+        } else if ("FINISHED".equals(EVENT_TYPE)) {
             addData(clamp(minValue, maxValue, tile.getValue()));
         } else if ("AVERAGING".equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
@@ -286,7 +287,6 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        addData(clamp(minValue, maxValue, VALUE));
         low  = Statistics.getMin(dataList);
         high = Statistics.getMax(dataList);
         if (Helper.equals(low, high)) {
@@ -302,46 +302,42 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        boolean loHiChanged = Double.compare(lastLow, low) != 0 || Double.compare(lastHigh, high) != 0;
-
-        if (loHiChanged) {
-            niceScaleY.setMinMax(low, high);
-            int    lineCountY       = 1;
-            int    tickLabelOffsetY = 1;
-            double tickSpacingY     = niceScaleY.getTickSpacing();
-            double tickStepY        = tickSpacingY * stepY;
-            double tickStartY       = maxY - (tickSpacingY - low) * stepY;
-            if (tickSpacingY < low) {
-                tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
-                tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
-            }
-
-            horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
-            tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
-            horizontalLineOffset = 0;
-            for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
-                Line line  = horizontalTickLines.get(lineCountY);
-                Text label = tickLabelsY.get(lineCountY);
-                //label.setText(String.format(locale, "%.0f", (tickSpacingY * (lineCountY + tickLabelOffsetY))));
-                label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
-                label.setY(y + graphBounds.getHeight() * 0.03);
-                label.setFill(tickLabelColor);
-                horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
-
-                line.setStartX(minX);
-                line.setStartY(y);
-                line.setEndY(y);
-                line.setStroke(tickLineColor);
-                lineCountY++;
-                lineCountY = clamp(0, 4, lineCountY);
-            }
-            if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
-            horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-            tickLabelsY.forEach(label -> {
-                label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02);
-                label.toFront();
-            });
+        niceScaleY.setMinMax(low, high);
+        int    lineCountY       = 1;
+        int    tickLabelOffsetY = 1;
+        double tickSpacingY     = niceScaleY.getTickSpacing();
+        double tickStepY        = tickSpacingY * stepY;
+        double tickStartY       = maxY - tickStepY;
+        if (tickSpacingY < low) {
+            tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
+            tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
         }
+
+        horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
+        tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+        horizontalLineOffset = 0;
+        for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
+            Line line  = horizontalTickLines.get(lineCountY);
+            Text label = tickLabelsY.get(lineCountY);
+            //label.setText(String.format(locale, "%.0f", (tickSpacingY * (lineCountY + tickLabelOffsetY))));
+            label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+            label.setY(y + graphBounds.getHeight() * 0.03);
+            label.setFill(tickLabelColor);
+            horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
+
+            line.setStartX(minX);
+            line.setStartY(y);
+            line.setEndY(y);
+            line.setStroke(tickLineColor);
+            lineCountY++;
+            lineCountY = clamp(0, 4, lineCountY);
+        }
+        if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
+        horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
+        tickLabelsY.forEach(label -> {
+            label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02);
+            label.toFront();
+        });
 
         if (!dataList.isEmpty()) {
             if (tile.isSmoothing()) {
@@ -363,7 +359,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
                 dot.setCenterY(end.getY());
             }
 
-            if (tile.isStrokeWithGradient() && loHiChanged) {
+            if (tile.isStrokeWithGradient()) {
                 setupGradient();
                 dot.setFill(gradient);
                 sparkLine.setStroke(gradient);
@@ -373,8 +369,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
 
             averageLine.setStartX(minX);
-            averageLine.setEndX(maxX);
             averageLine.setStartY(averageY);
+            averageLine.setEndX(maxX);
             averageLine.setEndY(averageY);
 
             stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));

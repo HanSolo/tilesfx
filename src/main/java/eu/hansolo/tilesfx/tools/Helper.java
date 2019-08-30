@@ -37,6 +37,8 @@ import javafx.util.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -363,6 +365,15 @@ public class Helper {
                                                       "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
                                                       "W", "X", "Y", "Z", "-", "/", ":", ",", "", ";", "@",
                                                       "#", "+", "?", "!", "%", "$", "=", "<", ">", "\u00C4", "\u00D6", "\u00DC", "\u00DF"};
+
+    public static final java.time.Duration   TIME_PERIOD_24_HOURS  = Duration.ofHours(24);
+    public static final java.time.Duration   TIME_PERIOD_3_DAYS    = Duration.ofDays(3);
+    public static final java.time.Duration   TIME_PERIOD_5_DAYS    = Duration.ofDays(5);
+    public static final java.time.Duration   TIME_PERIOD_7_DAYS    = Duration.ofDays(7);
+    public static final java.time.Duration   TIME_PERIOD_1_MONTH   = Duration.ofSeconds(Period.ofMonths(1).getDays() * 86_400);
+    public static final java.time.Duration   TIME_PERIOD_3_MONTH   = Duration.ofSeconds(Period.ofMonths(3).getDays() * 86_400);
+    public static final java.time.Duration   TIME_PERIOD_6_MONTH   = Duration.ofSeconds(Period.ofMonths(6).getDays() * 86_400);
+    public static final java.time.Duration   TIME_PERIOD_12_MONTH  = Duration.ofSeconds(Period.ofYears(1).getDays() * 86_400);
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;

@@ -1339,7 +1339,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
             } else if("averagingPeriod".equals(key)) {
                 TILE.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
-            } else if ("timerPeriod".equals(key)) {
+            } else if ("timePeriod".equals(key)) {
                 TILE.setTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());

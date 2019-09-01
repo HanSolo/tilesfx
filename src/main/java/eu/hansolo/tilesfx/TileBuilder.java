@@ -190,6 +190,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B maxTimePeriod(final java.time.Duration MAX_PERIOD) {
+        properties.put("maxTimePeriod", new SimpleObjectProperty<>(MAX_PERIOD));
+        return (B)this;
+    }
+
     public final B foregroundBaseColor(final Color COLOR) {
         properties.put("foregroundBaseColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -949,6 +954,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B trendVisible(final boolean VISIBLE) {
+        properties.put("trendVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B backgroundImage(final Image IMAGE) {
         properties.put("backgroundImage", new SimpleObjectProperty(IMAGE));
         return (B)this;
@@ -1351,6 +1361,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
             } else if ("timePeriod".equals(key)) {
                 TILE.setTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
+            } else if ("maxTimePeriod".equals(key)) {
+                TILE.setMaxTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {
@@ -1613,6 +1625,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setMiddleGraphics(((ObjectProperty<Node>) properties.get(key)).get());
             } else if ("rightGraphics".equals(key)) {
                 TILE.setRightGraphics(((ObjectProperty<Node>) properties.get(key)).get());
+            } else if ("trendVisible".equals(key)) {
+                TILE.setTrendVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("backgroundImage".equals(key)) {
                 TILE.setBackgroundImage(((ObjectProperty<Image>) properties.get(key)).get());
             } else if ("backgroundImageOpacity".equals(key)) {

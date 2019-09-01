@@ -340,6 +340,8 @@ public class Tile extends Control {
     private              IntegerProperty                               averagingPeriod;
     private              java.time.Duration                            _timePeriod;
     private              ObjectProperty<java.time.Duration>            timePeriod;
+    private              java.time.Duration                            _maxTimePeriod;
+    private              ObjectProperty<java.time.Duration>            maxTimePeriod;
     private              MovingAverage                                 movingAverage;
     private              ObservableList<Section>                       sections;
     private              ObservableList<TilesFXSeries<String, Number>> series;
@@ -586,6 +588,8 @@ public class Tile extends Control {
     private              ObjectProperty<Node>                          middleGraphics;
     private              Node                                          _rightGraphics;
     private              ObjectProperty<Node>                          rightGraphics;
+    private              boolean                                       _trendVisible;
+    private              BooleanProperty                               trendVisible;
     private              EventHandler<MouseEvent>                      infoRegionHandler;
 
     private volatile     ScheduledFuture<?>                            periodicTickTask;
@@ -624,6 +628,7 @@ public class Tile extends Control {
                 @NamedArg(value="averagingEnabled", defaultValue="false") boolean averagingEnabled,
                 @NamedArg(value="averagingPeriod", defaultValue="10") int averagingPeriod,
                 @NamedArg(value="timePeriod", defaultValue="java.time.Duration.ofMinutes(60)") java.time.Duration timePeriod,
+                @NamedArg(value="maxTimePeriod", defaultValue="java.time.Duration.ofMinutes(60)") java.time.Duration maxTimePeriod,
                 @NamedArg(value="imageMask", defaultValue="ImageMask.NONE") ImageMask imageMask,
                 @NamedArg(value="trackColor", defaultValue="TileColor.BLUE") Color trackColor,
                 @NamedArg(value="mapProvider", defaultValue="MapProvider.BW") MapProvider mapProvider,
@@ -729,6 +734,7 @@ public class Tile extends Control {
                 @NamedArg(value="leftGraphics", defaultValue="null") Node leftGraphics,
                 @NamedArg(value="middleGraphics", defaultValue="null") Node middleGraphics,
                 @NamedArg(value="rightGraphics", defaultValue="null") Node rightGraphics,
+                @NamedArg(value="trendVisible", defaultValue="true") boolean trendVisible,
                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
                 @NamedArg(value="increment", defaultValue="1") int increment
                 ) {
@@ -822,6 +828,7 @@ public class Tile extends Control {
         _averagingEnabled                   = false;
         _averagingPeriod                    = 10;
         _timePeriod                         = java.time.Duration.ofMinutes(60);
+        _maxTimePeriod                      = java.time.Duration.ofMinutes(60);
         _duration                           = LocalTime.of(1, 0);
         _imageMask                          = ImageMask.NONE;
         _currentLocation                    = new Location(0, 0);
@@ -1636,6 +1643,43 @@ public class Tile extends Control {
             _timePeriod = null;
         }
         return timePeriod;
+    }
+
+    /**
+     * Returns the duration that will be used to store datapoints in the skin
+     * Values that are not within that duration won't be stored.
+     * @return the duration that will be used to store datapoints in the skin
+     */
+    public java.time.Duration getMaxTimePeriod() { return null == maxTimePeriod ? _maxTimePeriod : maxTimePeriod.get(); }
+    /**
+     * Defines the duration that will be used to store datapoints in the skin
+     * @param MAX_PERIOD
+     */
+    public void setMaxTimePeriod(final java.time.Duration MAX_PERIOD) {
+        if (null == maxTimePeriod) {
+            _maxTimePeriod = MAX_PERIOD;
+            if (getTimePeriod().getSeconds() > _maxTimePeriod.getSeconds()) {
+                setTimePeriod(MAX_PERIOD);
+            }
+        } else {
+            maxTimePeriod.set(MAX_PERIOD);
+        }
+    }
+    public ObjectProperty<java.time.Duration> maxTimePeriodProperty() {
+        if (null == maxTimePeriod) {
+            maxTimePeriod = new ObjectPropertyBase<java.time.Duration>(_maxTimePeriod) {
+                @Override protected void invalidated() {
+                    if (getTimePeriod().getSeconds() < get().getSeconds()) {
+                        setTimePeriod(get());
+                    }
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "maxTimePeriod"; }
+            };
+            _maxTimePeriod = null;
+        }
+
+        return maxTimePeriod;
     }
 
     /**
@@ -5247,6 +5291,34 @@ public class Tile extends Control {
             _rightGraphics = null;
         }
         return rightGraphics;
+    }
+
+    /**
+     * Returns true if the trend indicator in the TimelineTileSkin is visible
+     * @return true if the trend indicator in the TimelineTileSkin is visible
+     */
+    public boolean isTrendVisible() { return null == trendVisible ? _trendVisible : trendVisible.get(); }
+    /**
+     * Defines the visibility of the trend indicator in the TimelineTileSkin
+     * @param VISIBLE
+     */
+    public void setTrendVisible(final boolean VISIBLE) {
+        if (null == trendVisible) {
+            _trendVisible = VISIBLE;
+            fireTileEvent(VISIBILITY_EVENT);
+        } else {
+            trendVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty trendVisibleProperty() {
+        if (null == trendVisible) {
+            trendVisible = new BooleanPropertyBase(_trendVisible) {
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "trendVisible"; }
+            };
+        }
+        return trendVisible;
     }
 
     public void showNotifyRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFY_REGION_EVENT : HIDE_NOTIFY_REGION_EVENT); }

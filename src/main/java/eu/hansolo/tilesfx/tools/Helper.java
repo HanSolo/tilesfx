@@ -41,9 +41,11 @@ import java.time.Duration;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -53,6 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 
 import static eu.hansolo.tilesfx.tools.Country.AD;
 import static eu.hansolo.tilesfx.tools.Country.AE;
@@ -1251,5 +1254,19 @@ public class Helper {
     }
     public static final String padRight(final String text, final String filler, final int n) {
         return String.format("%-" + n + "s", text).replace(" ", filler);
+    }
+
+    // Get last n elements from stream
+    public static <T> Collector<T, ?, List<T>> lastN(int n) {
+        return Collector.<T, Deque<T>, List<T>>of(ArrayDeque::new, (acc, t) -> {
+            if(acc.size() == n)
+                acc.pollFirst();
+            acc.add(t);
+        }, (acc1, acc2) -> {
+            while(acc2.size() < n && !acc1.isEmpty()) {
+                acc2.addFirst(acc1.pollLast());
+            }
+            return acc2;
+        }, ArrayList::new);
     }
 }

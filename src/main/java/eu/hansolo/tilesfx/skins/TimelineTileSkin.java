@@ -38,7 +38,6 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -56,7 +55,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -79,7 +77,10 @@ public class TimelineTileSkin extends TileSkin {
     private              DateTimeFormatter       timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
     private              Text                    titleText;
     private              Text                    valueText;
+    private              Text                    upperUnitText;
+    private              Line                    fractionLine;
     private              Text                    unitText;
+    private              TextFlow                unitFlow;
     private              TextFlow                valueUnitFlow;
     private              Text                    averageText;
     private              Text                    minText;
@@ -115,12 +116,7 @@ public class TimelineTileSkin extends TileSkin {
     private              List<Text>              tickLabelsY;
     private              Color                   tickLineColor;
     private              Color                   tickLabelColor;
-    private              Path                    trendIndicator;
-    private              MoveTo                  trendMT;
-    private              LineTo                  trendLT0;
-    private              LineTo                  trendLT1;
-    private              LineTo                  trendLT2;
-    private              ClosePath               trendCP;
+    private              Text                    trendText;
 
 
     // ******************** Constructors **************************************
@@ -162,13 +158,7 @@ public class TimelineTileSkin extends TileSkin {
         movingAverage  = tile.getMovingAverage();
         dataList       = new LinkedList<>();
         timePeriod     = tile.getTimePeriod();
-
-        Predicate<ChartData> isNotInTimePeriod  = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
-        dataList.removeIf(isNotInTimePeriod);
-        noOfDatapoints = dataList.size();
-
-        // To get smooth lines in the chart we need at least 4 values
-        //if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
+        noOfDatapoints = (int) timePeriod.getSeconds();
 
         graphBounds = new Rectangle(PREFERRED_WIDTH * 0.05, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.45);
 
@@ -180,11 +170,20 @@ public class TimelineTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
         unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
+        unitFlow = new TextFlow(upperUnitText, unitText);
+        unitFlow.setTextAlignment(TextAlignment.RIGHT);
+
+        valueUnitFlow = new TextFlow(valueText, unitFlow);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
         averageText = new Text(String.format(locale, formatString, tile.getAverage()));
@@ -240,17 +239,13 @@ public class TimelineTileSkin extends TileSkin {
         sectionGroup.getChildren().addAll(sections.values());
         Helper.enableNode(sectionGroup, tile.getSectionsVisible());
 
-        trendMT  = new MoveTo();
-        trendLT0 = new LineTo();
-        trendLT1 = new LineTo();
-        trendLT2 = new LineTo();
-        trendCP  = new ClosePath();
-        trendIndicator = new Path(trendMT, trendLT0, trendLT1, trendLT2, trendCP);
-        trendIndicator.setStroke(Color.TRANSPARENT);
-
         pathElements = new ArrayList<>(noOfDatapoints);
         pathElements.add(0, new MoveTo());
         for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
+
+        trendText = new Text("");
+        trendText.setTextOrigin(VPos.TOP);
+        trendText.setFill(tile.getTextColor());
 
         sparkLine = new Path();
         sparkLine.getElements().addAll(pathElements);
@@ -263,7 +258,7 @@ public class TimelineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(tile.getBarColor());
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, trendIndicator, averageLine, sparkLine, dot, averageText, minText, maxText, highText, lowText, timeSpanText, text);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, sparkLine, dot, averageText, minText, maxText, highText, lowText, trendText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
     }
@@ -310,7 +305,7 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(thresholdLine, tile.isThresholdVisible());
             Helper.enableNode(lowerThresholdLine, tile.isThresholdVisible());
             Helper.enableNode(sectionGroup, tile.getSectionsVisible());
-            Helper.enableNode(trendIndicator, tile.isTrendVisible());
+            Helper.enableNode(trendText, tile.isTrendVisible());
             redraw();
         } else if ("VALUE".equals(EVENT_TYPE)) {
             if(tile.isAnimated()) { tile.setAnimated(false); }
@@ -322,10 +317,7 @@ public class TimelineTileSkin extends TileSkin {
             timePeriod = tile.getTimePeriod();
             timeSpanText.setText(createTimeSpanText());
 
-            Predicate<ChartData> isNotInTimePeriod  = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
-            dataList.removeIf(isNotInTimePeriod);
-            Collections.sort(dataList, Comparator.comparing(ChartData::getTimestamp));
-            noOfDatapoints = dataList.size();
+            noOfDatapoints = (int) timePeriod.getSeconds();
 
             // To get smooth lines in the chart we need at least 4 values
             //if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
@@ -343,9 +335,8 @@ public class TimelineTileSkin extends TileSkin {
 
         List<Double> clampedDataList = dataList.stream().map(chartData -> Helper.clamp(minValue, maxValue, chartData.getValue())).collect(Collectors.toList());
 
-        Predicate<ChartData> isInTimePeriod = chartData -> chartData.isWithinTimePeriod(Instant.now(), timePeriod);
-        low  = dataList.stream().filter(isInTimePeriod).map(ChartData::getValue).min(Comparator.comparingDouble(Double::doubleValue)).orElse(tile.getLowerThreshold());
-        high = dataList.stream().filter(isInTimePeriod).map(ChartData::getValue).max(Comparator.comparingDouble(Double::doubleValue)).orElse(tile.getThreshold());
+        low  = clampedDataList.stream().min(Comparator.comparingDouble(Double::doubleValue)).orElse(tile.getLowerThreshold());
+        high = clampedDataList.stream().max(Comparator.comparingDouble(Double::doubleValue)).orElse(tile.getThreshold());
 
         range = (maxValue - minValue);
 
@@ -399,21 +390,21 @@ public class TimelineTileSkin extends TileSkin {
         minText.setX((maxX - minText.getLayoutBounds().getWidth()));
         maxText.setX((maxX - maxText.getLayoutBounds().getWidth()));
 
-        if (!dataList.isEmpty()) {
+        if (!clampedDataList.isEmpty()) {
             if (tile.isSmoothing()) {
                 smooth(clampedDataList);
             } else {
                 MoveTo begin = (MoveTo) pathElements.get(0);
                 begin.setX(minX);
-                begin.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, dataList.get(0).getValue())) * stepY);
+                begin.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, clampedDataList.get(0).doubleValue())) * stepY);
                 for (int i = 1 ; i < (noOfDatapoints - 1) ; i++) {
                     LineTo lineTo = (LineTo) pathElements.get(i);
                     lineTo.setX(minX + i * stepX);
-                    lineTo.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, dataList.get(i).getValue())) * stepY);
+                    lineTo.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, clampedDataList.get(i).doubleValue())) * stepY);
                 }
                 LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
                 end.setX(maxX);
-                end.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, dataList.get(noOfDatapoints - 1).getValue())) * stepY);
+                end.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, clampedDataList.get(noOfDatapoints - 1).doubleValue())) * stepY);
 
                 dot.setCenterX(maxX);
                 dot.setCenterY(end.getY());
@@ -473,7 +464,7 @@ public class TimelineTileSkin extends TileSkin {
     }
 
     private void addData(final ChartData DATA) {
-        if (dataList.size() == Integer.MAX_VALUE - 1) {
+        if (dataList.size() >= tile.getMaxTimePeriod().getSeconds()) {
             Collections.rotate(dataList, -1);
             if (!dataList.isEmpty()) { dataList.set((noOfDatapoints - 1), DATA); }
         } else {
@@ -484,21 +475,37 @@ public class TimelineTileSkin extends TileSkin {
         List<ChartData> clampedDataList = new ArrayList<>(dataList);
         clampedDataList.removeIf(isNotInTimePeriod);
         Collections.sort(clampedDataList, Comparator.comparing(ChartData::getTimestamp));
-        noOfDatapoints = clampedDataList.size();
 
-        if (noOfDatapoints > 4) {
-            List<Double> last3Values = clampedDataList.stream().map(ChartData::getValue).collect(Helper.lastN(3));
-            Model        model       = DoubleExponentialSmoothingForLinearSeries.fit(last3Values.stream().mapToDouble(Double::doubleValue).toArray(), 0.8, 0.2);
-            double       angle       = Helper.getAngleFromXY(0, clampedDataList.get(clampedDataList.size() - 1).getValue(), 100, model.forecast(1)[0]);
-            trendIndicator.setRotate(180 - 270 - angle);
+        if (clampedDataList.size() == Integer.MAX_VALUE - 1 || clampedDataList.size() >= noOfDatapoints) {
+            Collections.rotate(clampedDataList, -1);
+            if (!clampedDataList.isEmpty()) { clampedDataList.set((noOfDatapoints - 1), DATA); }
+        }
+
+        int n = Helper.clamp(2, clampedDataList.size(), tile.getNumberOfValuesForTrendCalculation());
+        if (clampedDataList.size() > n) {
+            List<Double> lastNValues = clampedDataList.stream().map(ChartData::getValue).collect(Helper.lastN(n));
+            Model        model       = DoubleExponentialSmoothingForLinearSeries.fit(lastNValues.stream().mapToDouble(Double::doubleValue).toArray(), 0.8, 0.2);
+            trendText.setText(String.format(tile.getLocale(), "%.0f", model.forecast(1)[0]));
+            //double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
+            //System.out.println("TrendAngle: " + (360 - Helper.getAngleFromXY(0, DATA.getValue(), stepX, model.forecast(1)[0])));
             //System.out.println("Last 4 values: " + last3Values + " -> Trend: " + model.forecast(1)[0]);
         }
 
-        stdDeviation = Statistics.getChartDataStdDev(dataList);
+        stdDeviation = Statistics.getChartDataStdDev(clampedDataList);
         pathElements.clear();
         pathElements.add(new MoveTo());
         for (int i = 0 ; i < noOfDatapoints - 1 ; i++) { pathElements.add(new LineTo()); }
         sparkLine.getElements().setAll(pathElements);
+        if (DATA.getValue() <= tile.getLowerThreshold()) {
+            tile.showNotifyRegion(true);
+            tile.setTooltipText("Blood sugar too low");
+        } else if (DATA.getValue() >= tile.getThreshold()) {
+            tile.showNotifyRegion(true);
+            tile.setTooltipText("Blood sugar too high");
+        } else {
+            tile.showNotifyRegion(false);
+            tile.setTooltipText("");
+        }
         handleCurrentValue(DATA.getValue());
     }
 
@@ -609,6 +616,10 @@ public class TimelineTileSkin extends TileSkin {
         if (highText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(highText, maxWidth, fontSize); }
         highText.setY(graphBounds.getY() - size * 0.0125);
 
+        trendText.setFont(Fonts.latoRegular(fontSize));
+        if (trendText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(trendText, maxWidth, fontSize); }
+        trendText.setY(height - size * 0.1);
+
         maxWidth = width - size * 0.25;
         fontSize = size * 0.06;
         text.setFont(Fonts.latoRegular(fontSize));
@@ -639,13 +650,19 @@ public class TimelineTileSkin extends TileSkin {
         }
 
         maxWidth = width - size * 0.275;
-        fontSize = size * 0.12;
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        maxWidth = width - size * 0.275;
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
         lowText.setX(size * 0.05);
         highText.setX(size * 0.05);
         averageText.setX(size * 0.05);
+        trendText.setX(size * 0.25);
     }
 
     @Override protected void resize() {
@@ -667,20 +684,11 @@ public class TimelineTileSkin extends TileSkin {
         lowerThresholdLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
-        trendMT.setX(graphBounds.getWidth() * 0.327 + graphBounds.getX());
-        trendMT.setY(graphBounds.getHeight() * 0.055 + graphBounds.getY() * 0.825);
-        trendLT0.setX(graphBounds.getWidth() * 0.397 + graphBounds.getX());
-        trendLT0.setY(graphBounds.getHeight() * 0.098 + graphBounds.getY() * 0.825);
-        trendLT1.setX(graphBounds.getWidth() * 0.327 + graphBounds.getX());
-        trendLT1.setY(graphBounds.getHeight() * 0.141 + graphBounds.getY() * 0.825);
-        trendLT2.setX(graphBounds.getWidth() * 0.327 + graphBounds.getX());
-        trendLT2.setY(graphBounds.getHeight() * 0.055 + graphBounds.getY() * 0.825);
-
         handleCurrentValue(tile.getValue());
-        if (tile.getAveragingPeriod() < 250) {
+        if (noOfDatapoints < 60) {
             sparkLine.setStrokeWidth(size * 0.01);
             dot.setRadius(size * 0.014);
-        } else if (tile.getAveragingPeriod() < 500) {
+        } else if (noOfDatapoints < 3600) {
             sparkLine.setStrokeWidth(size * 0.0075);
             dot.setRadius(size * 0.0105);
         } else {
@@ -695,13 +703,33 @@ public class TimelineTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(height * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(height * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(valueText.getLayoutBounds().getMinY() - upperUnitText.getLayoutBounds().getHeight());
     }
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        unitText.setText(tile.getUnit());
+
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0] + "\n");
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText("");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
+
         if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
 
         if (tile.isTextVisible()) {
@@ -715,13 +743,15 @@ public class TimelineTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        unitText.setFill(tile.getUnitColor());
         minText.setFill(tile.getValueColor());
         maxText.setFill(tile.getValueColor());
         lowText.setFill(tile.getValueColor());
         highText.setFill(tile.getValueColor());
+        trendText.setFill(tile.getTextColor());
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
-        trendIndicator.setFill(tile.getValueColor());
         if (tile.isStrokeWithGradient()) {
             setupGradient();
             sparkLine.setStroke(gradient);

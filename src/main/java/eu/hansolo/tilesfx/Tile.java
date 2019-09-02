@@ -241,23 +241,24 @@ public class Tile extends Control {
         NONE, ROUND, RECTANGULAR
     }
 
-    public  static final Color       BACKGROUND                = Color.rgb(42, 42, 42); // #2a2a2a
-    public  static final Color       FOREGROUND                = Color.rgb(223, 223, 223); // #dfdfdf
-    public  static final Color       GRAY                      = TileColor.GRAY.color;
-    public  static final Color       RED                       = TileColor.RED.color;
-    public  static final Color       LIGHT_RED                 = TileColor.LIGHT_RED.color;
-    public  static final Color       GREEN                     = TileColor.GREEN.color;
-    public  static final Color       LIGHT_GREEN               = TileColor.LIGHT_GREEN.color;
-    public  static final Color       BLUE                      = TileColor.BLUE.color;
-    public  static final Color       DARK_BLUE                 = TileColor.DARK_BLUE.color;
-    public  static final Color       ORANGE                    = TileColor.ORANGE.color;
-    public  static final Color       YELLOW_ORANGE             = TileColor.YELLOW_ORANGE.color;
-    public  static final Color       YELLOW                    = TileColor.YELLOW.color;
-    public  static final Color       MAGENTA                   = TileColor.MAGENTA.color;
-    public  static final Color       PINK                      = TileColor.PINK.color;
-    public  static final int         SHORT_INTERVAL            = 20;
-    public  static final int         LONG_INTERVAL             = 1000;
-    private static final int         MAX_NO_OF_DECIMALS        = 3;
+    public  static final Color              BACKGROUND                = Color.rgb(42, 42, 42); // #2a2a2a
+    public  static final Color              FOREGROUND                = Color.rgb(223, 223, 223); // #dfdfdf
+    public  static final Color              GRAY                      = TileColor.GRAY.color;
+    public  static final Color              RED                       = TileColor.RED.color;
+    public  static final Color              LIGHT_RED                 = TileColor.LIGHT_RED.color;
+    public  static final Color              GREEN                     = TileColor.GREEN.color;
+    public  static final Color              LIGHT_GREEN               = TileColor.LIGHT_GREEN.color;
+    public  static final Color              BLUE                      = TileColor.BLUE.color;
+    public  static final Color              DARK_BLUE                 = TileColor.DARK_BLUE.color;
+    public  static final Color              ORANGE                    = TileColor.ORANGE.color;
+    public  static final Color              YELLOW_ORANGE             = TileColor.YELLOW_ORANGE.color;
+    public  static final Color              YELLOW                    = TileColor.YELLOW.color;
+    public  static final Color              MAGENTA                   = TileColor.MAGENTA.color;
+    public  static final Color              PINK                      = TileColor.PINK.color;
+    public  static final int                SHORT_INTERVAL            = 20;
+    public  static final int                LONG_INTERVAL             = 1000;
+    public  static final java.time.Duration DEFAULT_TIME_PERIOD       = java.time.Duration.ofMinutes(1);
+    private static final int                MAX_NO_OF_DECIMALS        = 3;
 
     private        final TileEvent   SHOW_NOTIFY_REGION_EVENT  = new TileEvent(EventType.SHOW_NOTIFY_REGION);
     private        final TileEvent   HIDE_NOTIFY_REGION_EVENT  = new TileEvent(EventType.HIDE_NOTIFY_REGION);
@@ -590,6 +591,8 @@ public class Tile extends Control {
     private              ObjectProperty<Node>                          rightGraphics;
     private              boolean                                       _trendVisible;
     private              BooleanProperty                               trendVisible;
+    private              int                                           _numberOfValuesForTrendCalculation;
+    private              IntegerProperty                               numberOfValuesForTrendCalculation;
     private              EventHandler<MouseEvent>                      infoRegionHandler;
 
     private volatile     ScheduledFuture<?>                            periodicTickTask;
@@ -627,8 +630,8 @@ public class Tile extends Control {
                 @NamedArg(value="textAlignment", defaultValue="TextAlignment.LEFT") TextAlignment textAlignment,
                 @NamedArg(value="averagingEnabled", defaultValue="false") boolean averagingEnabled,
                 @NamedArg(value="averagingPeriod", defaultValue="10") int averagingPeriod,
-                @NamedArg(value="timePeriod", defaultValue="java.time.Duration.ofMinutes(60)") java.time.Duration timePeriod,
-                @NamedArg(value="maxTimePeriod", defaultValue="java.time.Duration.ofMinutes(60)") java.time.Duration maxTimePeriod,
+                @NamedArg(value="timePeriod", defaultValue="java.time.Duration.ofMinutes(1)") java.time.Duration timePeriod,
+                @NamedArg(value="maxTimePeriod", defaultValue="java.time.Duration.ofMinutes(1)") java.time.Duration maxTimePeriod,
                 @NamedArg(value="imageMask", defaultValue="ImageMask.NONE") ImageMask imageMask,
                 @NamedArg(value="trackColor", defaultValue="TileColor.BLUE") Color trackColor,
                 @NamedArg(value="mapProvider", defaultValue="MapProvider.BW") MapProvider mapProvider,
@@ -685,6 +688,7 @@ public class Tile extends Control {
                 @NamedArg(value="averageVisible", defaultValue="false") boolean averageVisible,
                 @NamedArg(value="sectionsVisible", defaultValue="false") boolean sectionsVisible,
                 @NamedArg(value="sectionsAlwaysVisible", defaultValue="false") boolean sectionsAlwaysVisible,
+                @NamedArg(value="secions", defaultValue="null") List<Section> sections,
                 @NamedArg(value="sectionTextVisible", defaultValue="false") boolean sectionTextVisible,
                 @NamedArg(value="sectionIconsVisible", defaultValue="false") boolean sectionIconsVisible,
                 @NamedArg(value="highlightSections", defaultValue="false") boolean highlightSections,
@@ -735,6 +739,7 @@ public class Tile extends Control {
                 @NamedArg(value="middleGraphics", defaultValue="null") Node middleGraphics,
                 @NamedArg(value="rightGraphics", defaultValue="null") Node rightGraphics,
                 @NamedArg(value="trendVisible", defaultValue="true") boolean trendVisible,
+                @NamedArg(value="numberOfValuesForTrendCalculation", defaultValue="3") int numberOfValuesForTrendCalculation,
                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
                 @NamedArg(value="increment", defaultValue="1") int increment
                 ) {
@@ -827,8 +832,8 @@ public class Tile extends Control {
         _textAlignment                      = TextAlignment.LEFT;
         _averagingEnabled                   = false;
         _averagingPeriod                    = 10;
-        _timePeriod                         = java.time.Duration.ofMinutes(60);
-        _maxTimePeriod                      = java.time.Duration.ofMinutes(60);
+        _timePeriod                         = DEFAULT_TIME_PERIOD;
+        _maxTimePeriod                      = DEFAULT_TIME_PERIOD;
         _duration                           = LocalTime.of(1, 0);
         _imageMask                          = ImageMask.NONE;
         _currentLocation                    = new Location(0, 0);
@@ -942,6 +947,8 @@ public class Tile extends Control {
         _leftGraphics                       = null;
         _middleGraphics                     = null;
         _rightGraphics                      = null;
+        _trendVisible                       = false;
+        _numberOfValuesForTrendCalculation  = 3;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -5319,6 +5326,24 @@ public class Tile extends Control {
             };
         }
         return trendVisible;
+    }
+
+    public int getNumberOfValuesForTrendCalculation() { return null == numberOfValuesForTrendCalculation ? _numberOfValuesForTrendCalculation : numberOfValuesForTrendCalculation.get(); }
+    public void setNumberOfValuesForTrendCalculation(final int NUMBER) {
+        if (null == numberOfValuesForTrendCalculation) {
+            _numberOfValuesForTrendCalculation = NUMBER;
+        } else {
+            numberOfValuesForTrendCalculation.set(NUMBER);
+        }
+    }
+    public IntegerProperty numberOfValuesForTrendCalculationProperty() {
+        if (null == numberOfValuesForTrendCalculation) {
+            numberOfValuesForTrendCalculation = new IntegerPropertyBase(_numberOfValuesForTrendCalculation) {
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "numberOfValuesForTrendCalculation"; }
+            };
+        }
+        return numberOfValuesForTrendCalculation;
     }
 
     public void showNotifyRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFY_REGION_EVENT : HIDE_NOTIFY_REGION_EVENT); }

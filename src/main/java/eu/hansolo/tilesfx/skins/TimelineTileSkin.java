@@ -31,12 +31,21 @@ import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
@@ -99,6 +108,8 @@ public class TimelineTileSkin extends TileSkin {
     private              Line                    averageLine;
     private              Group                   sectionGroup;
     private              Map<Section, Rectangle> sections;
+    private              Map<Section, Label>     percentageInSections;
+    private              Group                   percentageInSectionGroup;
     private              LinearGradient          gradient;
     private              GradientLookup          gradientLookup;
     private              double                  low;
@@ -239,9 +250,20 @@ public class TimelineTileSkin extends TileSkin {
         sectionGroup.getChildren().addAll(sections.values());
         Helper.enableNode(sectionGroup, tile.getSectionsVisible());
 
+        percentageInSections = new HashMap<>();
+        tile.getSections().forEach(section -> {
+            Label sectionLabel = new Label();
+            sectionLabel.setAlignment(Pos.CENTER_RIGHT);
+            sectionLabel.setTextFill(tile.getTextColor());
+            percentageInSections.put(section, sectionLabel);
+        });
+        percentageInSectionGroup = new Group();
+        percentageInSectionGroup.getChildren().setAll(percentageInSections.values());
+        Helper.enableNode(percentageInSectionGroup, tile.getSectionsVisible());
+
         pathElements = new ArrayList<>(noOfDatapoints);
         pathElements.add(0, new MoveTo());
-        for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
+        for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo());}
 
         trendText = new Text("");
         trendText.setTextOrigin(VPos.TOP);
@@ -258,7 +280,7 @@ public class TimelineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(tile.getBarColor());
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, sparkLine, dot, averageText, minText, maxText, highText, lowText, trendText, timeSpanText, text);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, sparkLine, dot, percentageInSectionGroup, averageText, minText, maxText, highText, lowText, trendText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
     }
@@ -305,6 +327,7 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(thresholdLine, tile.isThresholdVisible());
             Helper.enableNode(lowerThresholdLine, tile.isThresholdVisible());
             Helper.enableNode(sectionGroup, tile.getSectionsVisible());
+            Helper.enableNode(percentageInSectionGroup, tile.getSectionsVisible());
             Helper.enableNode(trendText, tile.isTrendVisible());
             redraw();
         } else if ("VALUE".equals(EVENT_TYPE)) {
@@ -313,6 +336,15 @@ public class TimelineTileSkin extends TileSkin {
             double value = clamp(minValue, maxValue, tile.getValue());
             addData(new ChartData(value));
             handleCurrentValue(value);
+        } else if ("SECTION".equals(EVENT_TYPE)) {
+            percentageInSections.clear();
+            tile.getSections().forEach(section -> {
+                Label sectionLabel = new Label();
+                sectionLabel.setAlignment(Pos.CENTER_RIGHT);
+                sectionLabel.setTextFill(tile.getTextColor());
+                percentageInSections.put(section, sectionLabel);
+            });
+            percentageInSectionGroup.getChildren().setAll(percentageInSections.values());
         } else if ("PERIOD".equals(EVENT_TYPE)) {
             timePeriod = tile.getTimePeriod();
             timeSpanText.setText(createTimeSpanText());
@@ -326,6 +358,7 @@ public class TimelineTileSkin extends TileSkin {
             pathElements.add(0, new MoveTo());
             for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
             sparkLine.getElements().setAll(pathElements);
+
             redraw();
         }
     }
@@ -506,27 +539,14 @@ public class TimelineTileSkin extends TileSkin {
             tile.showNotifyRegion(false);
             tile.setTooltipText("");
         }
+
+        analyse(clampedDataList);
+
         handleCurrentValue(DATA.getValue());
     }
 
     private void setupGradient() {
-        double loFactor = (low - minValue) / tile.getRange();
-        double hiFactor = (high - minValue) / tile.getRange();
-        Stop   loStop   = new Stop(loFactor, gradientLookup.getColorAt(loFactor));
-        Stop   hiStop   = new Stop(hiFactor, gradientLookup.getColorAt(hiFactor));
-
-        List<Stop> stopsInBetween = gradientLookup.getStopsBetween(loFactor, hiFactor);
-
-        double     range  = hiFactor - loFactor;
-        double     factor = 1.0 / range;
-        List<Stop> stops  = new ArrayList<>();
-        stops.add(new Stop(0, loStop.getColor()));
-        for (Stop stop : stopsInBetween) {
-            stops.add(new Stop((stop.getOffset() - loFactor) * factor, stop.getColor()));
-        }
-        stops.add(new Stop(1, hiStop.getColor()));
-
-        gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, stops);
+        gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, tile.getGradientStops());
     }
 
     private String createTimeSpanText() {
@@ -582,6 +602,14 @@ public class TimelineTileSkin extends TileSkin {
         smoothThread.start();
     }
 
+    private void analyse(final List<ChartData> clampedDataList) {
+        double noOfPointsInTimePeriod = clampedDataList.size();
+        percentageInSections.entrySet().forEach(entry -> {
+            double noOfPointsInSection = clampedDataList.stream().filter(chartData -> entry.getKey().contains(chartData.getValue())).mapToDouble(ChartData::getValue).count();
+            entry.getValue().setText(String.format(tile.getLocale(), "%.0f%%", ((noOfPointsInSection / noOfPointsInTimePeriod * 100))));
+        });
+    }
+
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
@@ -631,6 +659,12 @@ public class TimelineTileSkin extends TileSkin {
         timeSpanText.setFont(Fonts.latoRegular(fontSize));
         if (timeSpanText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(timeSpanText, maxWidth, fontSize); }
         timeSpanText.relocate((width - timeSpanText.getLayoutBounds().getWidth()) * 0.5, height - size * 0.1);
+
+        percentageInSections.entrySet().forEach(entry -> {
+            entry.getValue().setFont(Fonts.latoRegular(size * 0.02));
+            entry.getValue().setPrefWidth(size * 0.065);
+            entry.getValue().relocate(size * 0.05, sections.get(entry.getKey()).getLayoutBounds().getCenterY() - entry.getValue().getLayoutBounds().getCenterY());
+        });
     }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;

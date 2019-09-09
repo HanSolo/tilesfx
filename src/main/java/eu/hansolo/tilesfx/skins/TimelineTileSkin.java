@@ -22,17 +22,20 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries;
 import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries.Model;
-import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
 import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -49,6 +52,7 @@ import javafx.scene.text.TextFlow;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -68,58 +72,60 @@ import static eu.hansolo.tilesfx.tools.Helper.enableNode;
 
 
 public class TimelineTileSkin extends TileSkin {
-    private static final int                     SEC_MONTH     = 2_592_000;
-    private static final int                     SEC_DAY       = 86_400;
-    private static final int                     SEC_HOUR      = 3_600;
-    private static final int                     SEC_MINUTE    = 60;
-    private              DateTimeFormatter       timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-    private              Text                    titleText;
-    private              Text                    valueText;
-    private              Text                    upperUnitText;
-    private              Line                    fractionLine;
-    private              Text                    unitText;
-    private              TextFlow                unitFlow;
-    private              TextFlow                valueUnitFlow;
-    private              Text                    averageText;
-    private              Text                    minText;
-    private              Text                    maxText;
-    private              Text                    highText;
-    private              Text                    lowText;
-    private              Text                    text;
-    private              Text                    timeSpanText;
-    private              Rectangle               graphBounds;
-    private              Map<ChartData, Circle>  dots;
-    private              Path                    path;
-    private              Group                   dotGroup;
-    private              Rectangle               stdDeviationArea;
-    private              Line                    thresholdLine;
-    private              Line                    lowerThresholdLine;
-    private              Line                    averageLine;
-    private              Group                   sectionGroup;
-    private              Map<Section, Rectangle> sections;
-    private              Map<Section, Label>     percentageInSections;
-    private              Group                   percentageInSectionGroup;
-    private              LinearGradient          gradient;
-    private              GradientLookup          gradientLookup;
-    private              double                  low;
-    private              double                  high;
-    private              double                  stdDeviation;
-    private              int                     noOfDatapoints;
-    private              int                     maxNoOfDatapoints;
-    private              List<ChartData>         dataList;
-    private              List<ChartData>         reducedDataList;
-    private              Duration                timePeriod;
-    private              MovingAverage           movingAverage;
-    private              InvalidationListener    periodListener;
-    private              NiceScale               niceScaleY;
-    private              List<Line>              horizontalTickLines;
-    private              double                  horizontalLineOffset;
-    private              double                  tickLabelFontSize;
-    private              List<Text>              tickLabelsY;
-    private              Color                   tickLineColor;
-    private              Color                   tickLabelColor;
-    private              Text                    trendText;
-    private              double                  dotRadius;
+    private static final int                      SEC_MONTH     = 2_592_000;
+    private static final int                      SEC_DAY       = 86_400;
+    private static final int                      SEC_HOUR      = 3_600;
+    private static final int                      SEC_MINUTE    = 60;
+    private              DateTimeFormatter        DTF           = DateTimeFormatter.ofPattern("dd.YY HH:mm");
+    private              DateTimeFormatter        timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private              Text                     titleText;
+    private              Text                     valueText;
+    private              Text                     upperUnitText;
+    private              Line                     fractionLine;
+    private              Text                     unitText;
+    private              TextFlow                 unitFlow;
+    private              TextFlow                 valueUnitFlow;
+    private              Text                     averageText;
+    private              Text                     minText;
+    private              Text                     maxText;
+    private              Text                     highText;
+    private              Text                     lowText;
+    private              Text                     text;
+    private              Text                     timeSpanText;
+    private              Rectangle                graphBounds;
+    private              Map<ChartData, Circle>   dots;
+    private              Path                     path;
+    private              Group                    dotGroup;
+    private              Rectangle                stdDeviationArea;
+    private              Line                     thresholdLine;
+    private              Line                     lowerThresholdLine;
+    private              Line                     averageLine;
+    private              Group                    sectionGroup;
+    private              Map<Section, Rectangle>  sections;
+    private              Map<Section, Label>      percentageInSections;
+    private              Group                    percentageInSectionGroup;
+    private              LinearGradient           gradient;
+    private              double                   low;
+    private              double                   high;
+    private              double                   stdDeviation;
+    private              int                      noOfDatapoints;
+    private              int                      maxNoOfDatapoints;
+    private              List<ChartData>          dataList;
+    private              List<ChartData>          reducedDataList;
+    private              Duration                 timePeriod;
+    private              MovingAverage            movingAverage;
+    private              InvalidationListener     periodListener;
+    private              NiceScale                niceScaleY;
+    private              List<Line>               horizontalTickLines;
+    private              double                   horizontalLineOffset;
+    private              double                   tickLabelFontSize;
+    private              List<Text>               tickLabelsY;
+    private              Color                    tickLineColor;
+    private              Color                    tickLabelColor;
+    private              Text                     trendText;
+    private              double                   dotRadius;
+    private              EventHandler<MouseEvent> mouseListener;
+    private              Tooltip                  dotTooltip;
 
 
     // ******************** Constructors **************************************
@@ -132,7 +138,14 @@ public class TimelineTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
+        dotTooltip = new Tooltip("");
+        dotTooltip.setAutoHide(true);
+        dotTooltip.setHideDelay(javafx.util.Duration.seconds(0));
+        dotTooltip.setShowDuration(javafx.util.Duration.seconds(5));
+
         periodListener = o -> handleEvents("PERIOD");
+
+        mouseListener  = e -> handleMouseEvents(e);
 
         timeFormatter = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
 
@@ -148,13 +161,14 @@ public class TimelineTileSkin extends TileSkin {
             Line hLine = new Line(0, 0, 0, 0);
             hLine.getStrokeDashArray().addAll(1.0, 2.0);
             hLine.setStroke(Color.TRANSPARENT);
+            hLine.setMouseTransparent(true);
             horizontalTickLines.add(hLine);
             Text tickLabelY = new Text("");
             tickLabelY.setFill(Color.TRANSPARENT);
+            tickLabelY.setMouseTransparent(true);
             tickLabelsY.add(tickLabelY);
         }
 
-        gradientLookup    = new GradientLookup(tile.getGradientStops());
         low               = tile.getMaxValue();
         high              = tile.getMinValue();
         stdDeviation      = 0;
@@ -165,7 +179,6 @@ public class TimelineTileSkin extends TileSkin {
         dotRadius         = 3;
         noOfDatapoints    = calcNumberOfDatapointsForPeriod(timePeriod);
         maxNoOfDatapoints = calcNumberOfDatapointsForPeriod(tile.getMaxTimePeriod());
-
 
         graphBounds = new Rectangle(PREFERRED_WIDTH * 0.05, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.45);
 
@@ -241,7 +254,11 @@ public class TimelineTileSkin extends TileSkin {
         Helper.enableNode(averageLine, tile.isAverageVisible());
 
         sections = new HashMap<>();
-        tile.getSections().forEach(section -> sections.put(section, new Rectangle()));
+        tile.getSections().forEach(section -> {
+            Rectangle sectionRect = new Rectangle();
+            sectionRect.setMouseTransparent(true);
+            sections.put(section, sectionRect);
+        });
         sectionGroup = new Group();
         sectionGroup.getChildren().addAll(sections.values());
         Helper.enableNode(sectionGroup, tile.getSectionsVisible());
@@ -262,6 +279,7 @@ public class TimelineTileSkin extends TileSkin {
         trendText.setFill(tile.getTextColor());
 
         path = new Path();
+        path.setMouseTransparent(true);
 
         dots = new LinkedHashMap<>(noOfDatapoints);
         dotGroup = new Group();
@@ -288,7 +306,11 @@ public class TimelineTileSkin extends TileSkin {
         tile.getSections().addListener((ListChangeListener<Section>) c -> {
             while(c.next()) {
                 if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(section -> sections.put(section, new Rectangle()));
+                    c.getAddedSubList().forEach(section -> {
+                        Rectangle sectionRect = new Rectangle();
+                        sectionRect.setMouseTransparent(true);
+                        sections.put(section, sectionRect);
+                    });
                 } else if (c.wasRemoved()) {
                     c.getRemoved().forEach(section -> sections.remove(section));
                 }
@@ -340,10 +362,37 @@ public class TimelineTileSkin extends TileSkin {
             timeSpanText.setText(createTimeSpanText());
 
             // Add initial values
+            dots.values().forEach(dot -> {
+                dot.removeEventHandler(MouseEvent.MOUSE_ENTERED, mouseListener);
+                dot.removeEventHandler(MouseEvent.MOUSE_EXITED, mouseListener);
+            });
             dots.clear();
+            reducedDataList.forEach(data -> {
+                Circle dot = new Circle(dotRadius);
+                dot.addEventHandler(MouseEvent.MOUSE_ENTERED, mouseListener);
+                dot.addEventHandler(MouseEvent.MOUSE_EXITED, mouseListener);
+                dots.put(data, dot);
+            });
             dotGroup.getChildren().setAll(dots.values());
 
             redraw();
+        }
+    }
+
+    private void handleMouseEvents(final MouseEvent e) {
+        EventType type = e.getEventType();
+        Circle    dot  = (Circle) e.getSource();
+        ChartData data = dots.entrySet().stream().filter(entry -> entry.getValue().equals(dot)).map(entry -> entry.getKey()).findAny().orElse(null);
+        if (MouseEvent.MOUSE_ENTERED.equals(type)) {
+            if (null != data) {
+                dotTooltip.setX(e.getScreenX());
+                dotTooltip.setY(e.getScreenY());
+                LocalDateTime localDateTime = LocalDateTime.ofInstant(data.getTimestamp(), tile.getZoneId());
+                dotTooltip.setText(String.join("\n", DTF.format(localDateTime), String.format(tile.getLocale(), String.join(" ", formatString, tile.getUnit()), data.getValue())));
+                dotTooltip.show(tile.getScene().getWindow());
+            }
+        } else if (MouseEvent.MOUSE_EXITED.equals(type)) {
+            dotTooltip.hide();
         }
     }
 
@@ -373,7 +422,7 @@ public class TimelineTileSkin extends TileSkin {
         double maxX  = minX + graphBounds.getWidth();
         double minY  = graphBounds.getY();
         double maxY  = minY + graphBounds.getHeight();
-        double stepX = graphBounds.getWidth() / (timePeriod.getSeconds() / resolutionStep);
+        double stepX = graphBounds.getWidth() / timePeriod.getSeconds();
         double stepY = graphBounds.getHeight() / range;
 
         niceScaleY.setMinMax(minValue, maxValue);
@@ -393,7 +442,6 @@ public class TimelineTileSkin extends TileSkin {
         for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
             Line line  = horizontalTickLines.get(lineCountY);
             Text label = tickLabelsY.get(lineCountY);
-            //label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
             label.setText(String.format(locale, "%.0f", minValue + lineCountY * tickSpacingY));
             label.setY(y + graphBounds.getHeight() * 0.03);
             label.setFill(tickLabelColor);
@@ -419,7 +467,7 @@ public class TimelineTileSkin extends TileSkin {
         minText.setX((maxX - minText.getLayoutBounds().getWidth()));
         maxText.setX((maxX - maxText.getLayoutBounds().getWidth()));
 
-
+        // Draw dots and line
         if (!reducedDataList.isEmpty()) {
             if (tile.isStrokeWithGradient()) { setupGradient(); }
 
@@ -514,8 +562,17 @@ public class TimelineTileSkin extends TileSkin {
         }
         Collections.sort(reducedDataList, Comparator.comparing(ChartData::getTimestamp).reversed());
 
+        dots.values().forEach(dot -> {
+            dot.removeEventHandler(MouseEvent.MOUSE_ENTERED, mouseListener);
+            dot.removeEventHandler(MouseEvent.MOUSE_EXITED, mouseListener);
+        });
         dots.clear();
-        reducedDataList.forEach(data -> dots.put(data, new Circle(dotRadius)));
+        reducedDataList.forEach(data -> {
+            Circle dot = new Circle(dotRadius);
+            dot.addEventHandler(MouseEvent.MOUSE_ENTERED, mouseListener);
+            dot.addEventHandler(MouseEvent.MOUSE_EXITED, mouseListener);
+            dots.put(data, dot);
+        });
         dotGroup.getChildren().setAll(dots.values());
         dotGroup.getChildren().add(path);
 
@@ -535,7 +592,7 @@ public class TimelineTileSkin extends TileSkin {
             tile.setTooltipText("Value below lower threshold");
         } else if (DATA.getValue() >= tile.getThreshold()) {
             tile.showNotifyRegion(true);
-            tile.setTooltipText("VAlue above upper threshold");
+            tile.setTooltipText("Value above upper threshold");
         } else {
             tile.showNotifyRegion(false);
             tile.setTooltipText("");
@@ -710,11 +767,14 @@ public class TimelineTileSkin extends TileSkin {
         handleCurrentValue(tile.getValue());
 
         if (noOfDatapoints < 60) {
-            dotRadius = size * 0.005;
+            //dotRadius = size * 0.005;
+            dotRadius = size * 0.01;
         } else if (noOfDatapoints < 3600) {
-            dotRadius = size * 0.00375;
+            //dotRadius = size * 0.00375;
+            dotRadius = size * 0.0075;
         } else {
-            dotRadius = size * 0.0025;
+            //dotRadius = size * 0.0025;
+            dotRadius = size * 0.005;
         }
         dots.values().forEach(dot -> dot.setRadius(dotRadius));
 

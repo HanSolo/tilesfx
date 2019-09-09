@@ -173,11 +173,11 @@ public class Location {
         fireLocationEvent(new LocationEvent(Location.this));
     }
     public void set(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final Instant TIMESTAMP, final String INFO) {
-        latitude    = LATITUDE;
-        longitude   = LONGITUDE;
-        altitude    = ALTITUDE;
-        timestamp   = TIMESTAMP;
-        info        = INFO;
+        latitude  = LATITUDE;
+        longitude = LONGITUDE;
+        altitude  = ALTITUDE;
+        timestamp = TIMESTAMP;
+        info      = INFO;
         fireLocationEvent(new LocationEvent(Location.this));
     }
     public void set(final Location LOCATION) {
@@ -263,7 +263,7 @@ public class Location {
     public void removeLocationEventListener(final LocationEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
 
     public void fireLocationEvent(final LocationEvent EVENT) {
-        for (LocationEventListener listener : listenerList) { listener.onLocationEvent(EVENT); }
+        listenerList.forEach(listener -> listener.onLocationEvent(EVENT));
     }
 
 
@@ -282,13 +282,13 @@ public class Location {
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("nam", name);
-        jsonObject.put("tst", new Long(timestamp.getEpochSecond()));
-        jsonObject.put("lat", new Double(latitude));
-        jsonObject.put("lon", new Double(longitude));
-        jsonObject.put("alt", new Double(altitude));
-        jsonObject.put("inf", new String(info));
-        jsonObject.put("col", new String(color.toString().replace("0x", "#")));
-        jsonObject.put("zml", new Integer(zoomLevel));
+        jsonObject.put("tst", timestamp.getEpochSecond());
+        jsonObject.put("lat", latitude);
+        jsonObject.put("lon", longitude);
+        jsonObject.put("alt", altitude);
+        jsonObject.put("inf", info);
+        jsonObject.put("col", color.toString().replace("0x", "#"));
+        jsonObject.put("zml", zoomLevel);
         return jsonObject;
     }
 

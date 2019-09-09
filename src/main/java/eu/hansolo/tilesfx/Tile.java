@@ -241,24 +241,25 @@ public class Tile extends Control {
         NONE, ROUND, RECTANGULAR
     }
 
-    public  static final Color              BACKGROUND                = Color.rgb(42, 42, 42); // #2a2a2a
-    public  static final Color              FOREGROUND                = Color.rgb(223, 223, 223); // #dfdfdf
-    public  static final Color              GRAY                      = TileColor.GRAY.color;
-    public  static final Color              RED                       = TileColor.RED.color;
-    public  static final Color              LIGHT_RED                 = TileColor.LIGHT_RED.color;
-    public  static final Color              GREEN                     = TileColor.GREEN.color;
-    public  static final Color              LIGHT_GREEN               = TileColor.LIGHT_GREEN.color;
-    public  static final Color              BLUE                      = TileColor.BLUE.color;
-    public  static final Color              DARK_BLUE                 = TileColor.DARK_BLUE.color;
-    public  static final Color              ORANGE                    = TileColor.ORANGE.color;
-    public  static final Color              YELLOW_ORANGE             = TileColor.YELLOW_ORANGE.color;
-    public  static final Color              YELLOW                    = TileColor.YELLOW.color;
-    public  static final Color              MAGENTA                   = TileColor.MAGENTA.color;
-    public  static final Color              PINK                      = TileColor.PINK.color;
-    public  static final int                SHORT_INTERVAL            = 20;
-    public  static final int                LONG_INTERVAL             = 1000;
-    public  static final java.time.Duration DEFAULT_TIME_PERIOD       = java.time.Duration.ofMinutes(1);
-    private static final int                MAX_NO_OF_DECIMALS        = 3;
+    public  static final Color              BACKGROUND                     = Color.rgb(42, 42, 42); // #2a2a2a
+    public  static final Color              FOREGROUND                     = Color.rgb(223, 223, 223); // #dfdfdf
+    public  static final Color              GRAY                           = TileColor.GRAY.color;
+    public  static final Color              RED                            = TileColor.RED.color;
+    public  static final Color              LIGHT_RED                      = TileColor.LIGHT_RED.color;
+    public  static final Color              GREEN                          = TileColor.GREEN.color;
+    public  static final Color              LIGHT_GREEN                    = TileColor.LIGHT_GREEN.color;
+    public  static final Color              BLUE                           = TileColor.BLUE.color;
+    public  static final Color              DARK_BLUE                      = TileColor.DARK_BLUE.color;
+    public  static final Color              ORANGE                         = TileColor.ORANGE.color;
+    public  static final Color              YELLOW_ORANGE                  = TileColor.YELLOW_ORANGE.color;
+    public  static final Color              YELLOW                         = TileColor.YELLOW.color;
+    public  static final Color              MAGENTA                        = TileColor.MAGENTA.color;
+    public  static final Color              PINK                           = TileColor.PINK.color;
+    public  static final int                SHORT_INTERVAL                 = 20;
+    public  static final int                LONG_INTERVAL                  = 1000;
+    public  static final java.time.Duration DEFAULT_TIME_PERIOD            = java.time.Duration.ofMinutes(1);
+    public  static final TimeUnit           DEFAULT_TIME_PERIOD_RESOLUTION = TimeUnit.SECONDS;
+    private static final int                MAX_NO_OF_DECIMALS             = 3;
 
     private        final TileEvent   SHOW_NOTIFY_REGION_EVENT  = new TileEvent(EventType.SHOW_NOTIFY_REGION);
     private        final TileEvent   HIDE_NOTIFY_REGION_EVENT  = new TileEvent(EventType.HIDE_NOTIFY_REGION);
@@ -281,6 +282,7 @@ public class Tile extends Control {
     private        final TileEvent   FINISHED_EVENT            = new TileEvent(EventType.FINISHED);
     private        final TileEvent   GRAPHIC_EVENT             = new TileEvent(EventType.GRAPHIC);
     private        final TileEvent   AVERAGING_EVENT           = new TileEvent(EventType.AVERAGING);
+    private        final TileEvent   TIME_PERIOD_EVENT         = new TileEvent(EventType.TIME_PERIOD);
     private        final TileEvent   LOCATION_EVENT            = new TileEvent(EventType.LOCATION);
     private        final TileEvent   TRACK_EVENT               = new TileEvent(EventType.TRACK);
     private        final TileEvent   MAP_PROVIDER_EVENT        = new TileEvent(EventType.MAP_PROVIDER);
@@ -343,6 +345,8 @@ public class Tile extends Control {
     private              ObjectProperty<java.time.Duration>            timePeriod;
     private              java.time.Duration                            _maxTimePeriod;
     private              ObjectProperty<java.time.Duration>            maxTimePeriod;
+    private              TimeUnit                                      _timePeriodResolution;
+    private              ObjectProperty<TimeUnit>                      timePeriodResolution;
     private              MovingAverage                                 movingAverage;
     private              ObservableList<Section>                       sections;
     private              ObservableList<TilesFXSeries<String, Number>> series;
@@ -834,6 +838,7 @@ public class Tile extends Control {
         _averagingPeriod                    = 10;
         _timePeriod                         = DEFAULT_TIME_PERIOD;
         _maxTimePeriod                      = DEFAULT_TIME_PERIOD;
+        _timePeriodResolution               = DEFAULT_TIME_PERIOD_RESOLUTION;
         _duration                           = LocalTime.of(1, 0);
         _imageMask                          = ImageMask.NONE;
         _currentLocation                    = new Location(0, 0);
@@ -1636,7 +1641,7 @@ public class Tile extends Control {
     public void setTimePeriod(final java.time.Duration PERIOD) {
         if (null == timePeriod) {
             _timePeriod = PERIOD;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvent(TIME_PERIOD_EVENT);
         } else {
             timePeriod.set(PERIOD);
         }
@@ -1644,6 +1649,7 @@ public class Tile extends Control {
     public ObjectProperty<java.time.Duration> timePeriodProperty() {
         if (null == timePeriod) {
             timePeriod = new ObjectPropertyBase<>(_timePeriod) {
+                @Override protected void invalidated() { fireTileEvent(TIME_PERIOD_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "timePeriod"; }
             };
@@ -1667,6 +1673,7 @@ public class Tile extends Control {
             _maxTimePeriod = MAX_PERIOD;
             if (getTimePeriod().getSeconds() > _maxTimePeriod.getSeconds()) {
                 setTimePeriod(MAX_PERIOD);
+                fireTileEvent(TIME_PERIOD_EVENT);
             }
         } else {
             maxTimePeriod.set(MAX_PERIOD);
@@ -1679,6 +1686,7 @@ public class Tile extends Control {
                     if (getTimePeriod().getSeconds() < get().getSeconds()) {
                         setTimePeriod(get());
                     }
+                    fireTileEvent(TIME_PERIOD_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "maxTimePeriod"; }
@@ -1687,6 +1695,27 @@ public class Tile extends Control {
         }
 
         return maxTimePeriod;
+    }
+
+    public TimeUnit getTimePeriodResolution() { return null == timePeriodResolution ? _timePeriodResolution : timePeriodResolution.get(); }
+    public void setTimePeriodResolution(final TimeUnit RESOLUTION) {
+        if (null == timePeriodResolution) {
+            _timePeriodResolution = RESOLUTION;
+            fireTileEvent(TIME_PERIOD_EVENT);
+        } else {
+            timePeriodResolution.set(RESOLUTION);
+        }
+    }
+    public ObjectProperty<TimeUnit> timePeriodResolutionProperty() {
+        if (null == timePeriodResolution) {
+            timePeriodResolution = new ObjectPropertyBase<TimeUnit>(_timePeriodResolution) {
+                @Override protected void invalidated() { fireTileEvent(TIME_PERIOD_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "timePeriodResolution"; }
+            };
+            _timePeriodResolution = null;
+        }
+        return timePeriodResolution;
     }
 
     /**

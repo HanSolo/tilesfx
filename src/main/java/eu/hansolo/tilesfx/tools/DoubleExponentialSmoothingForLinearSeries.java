@@ -23,12 +23,11 @@ public class DoubleExponentialSmoothingForLinearSeries {
 
     /**
      * Performs double exponential smoothing for given time series.
-     * <p/>
      * This method is suitable for fitting series with linear trend.
      *
      * @param data  An array containing the recorded data of the time series
-     * @param alpha Smoothing factor for data (0 < alpha < 1)
-     * @param beta  Smoothing factor for trend (0 < beta < 1)
+     * @param alpha Smoothing factor for data (0 &lt; alpha &lt; 1)
+     * @param beta  Smoothing factor for trend (0 &lt; beta &lt; 1)
      *
      * @return Instance of model that can be used to forecast future values
      */

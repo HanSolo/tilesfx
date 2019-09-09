@@ -1641,6 +1641,9 @@ public class Tile extends Control {
     public void setTimePeriod(final java.time.Duration PERIOD) {
         if (null == timePeriod) {
             _timePeriod = PERIOD;
+            if (PERIOD.getSeconds() > getMaxTimePeriod().getSeconds()) {
+                setMaxTimePeriod(PERIOD);
+            }
             fireTileEvent(TIME_PERIOD_EVENT);
         } else {
             timePeriod.set(PERIOD);
@@ -1649,7 +1652,12 @@ public class Tile extends Control {
     public ObjectProperty<java.time.Duration> timePeriodProperty() {
         if (null == timePeriod) {
             timePeriod = new ObjectPropertyBase<>(_timePeriod) {
-                @Override protected void invalidated() { fireTileEvent(TIME_PERIOD_EVENT); }
+                @Override protected void invalidated() {
+                    if (get().getSeconds() > getMaxTimePeriod().getSeconds()) {
+                        setMaxTimePeriod(get());
+                    }
+                    fireTileEvent(TIME_PERIOD_EVENT);
+                }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "timePeriod"; }
             };
@@ -1681,7 +1689,7 @@ public class Tile extends Control {
     }
     public ObjectProperty<java.time.Duration> maxTimePeriodProperty() {
         if (null == maxTimePeriod) {
-            maxTimePeriod = new ObjectPropertyBase<java.time.Duration>(_maxTimePeriod) {
+            maxTimePeriod = new ObjectPropertyBase<>(_maxTimePeriod) {
                 @Override protected void invalidated() {
                     if (getTimePeriod().getSeconds() < get().getSeconds()) {
                         setTimePeriod(get());

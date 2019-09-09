@@ -72,6 +72,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -192,6 +193,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B maxTimePeriod(final java.time.Duration MAX_PERIOD) {
         properties.put("maxTimePeriod", new SimpleObjectProperty<>(MAX_PERIOD));
+        return (B)this;
+    }
+
+    public final B timePeriodResolution(final TimeUnit RESOLUTION) {
+        properties.put("timePeriodResolution", new SimpleObjectProperty(RESOLUTION));
         return (B)this;
     }
 
@@ -1368,6 +1374,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
             } else if ("maxTimePeriod".equals(key)) {
                 TILE.setMaxTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
+            } else if ("timePeriodResolution".equals(key)) {
+                TILE.setTimePeriodResolution(((ObjectProperty<TimeUnit>) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {

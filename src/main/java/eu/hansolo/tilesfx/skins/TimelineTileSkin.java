@@ -26,23 +26,13 @@ import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
-import eu.hansolo.tilesfx.tools.Point;
 import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
-import javafx.concurrent.Task;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -51,10 +41,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -63,16 +50,18 @@ import javafx.scene.text.TextFlow;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 import static eu.hansolo.tilesfx.tools.Helper.enableNode;
@@ -99,9 +88,9 @@ public class TimelineTileSkin extends TileSkin {
     private              Text                    text;
     private              Text                    timeSpanText;
     private              Rectangle               graphBounds;
-    private              List<PathElement>       pathElements;
-    private              Path                    sparkLine;
-    private              Circle                  dot;
+    private              Map<ChartData, Circle>  dots;
+    private              Path                    path;
+    private              Group                   dotGroup;
     private              Rectangle               stdDeviationArea;
     private              Line                    thresholdLine;
     private              Line                    lowerThresholdLine;
@@ -116,7 +105,9 @@ public class TimelineTileSkin extends TileSkin {
     private              double                  high;
     private              double                  stdDeviation;
     private              int                     noOfDatapoints;
+    private              int                     maxNoOfDatapoints;
     private              List<ChartData>         dataList;
+    private              List<ChartData>         reducedDataList;
     private              Duration                timePeriod;
     private              MovingAverage           movingAverage;
     private              InvalidationListener    periodListener;
@@ -128,6 +119,7 @@ public class TimelineTileSkin extends TileSkin {
     private              Color                   tickLineColor;
     private              Color                   tickLabelColor;
     private              Text                    trendText;
+    private              double                  dotRadius;
 
 
     // ******************** Constructors **************************************
@@ -162,14 +154,18 @@ public class TimelineTileSkin extends TileSkin {
             tickLabelsY.add(tickLabelY);
         }
 
-        gradientLookup = new GradientLookup(tile.getGradientStops());
-        low            = tile.getMaxValue();
-        high           = tile.getMinValue();
-        stdDeviation   = 0;
-        movingAverage  = tile.getMovingAverage();
-        dataList       = new LinkedList<>();
-        timePeriod     = tile.getTimePeriod();
-        noOfDatapoints = (int) timePeriod.getSeconds();
+        gradientLookup    = new GradientLookup(tile.getGradientStops());
+        low               = tile.getMaxValue();
+        high              = tile.getMinValue();
+        stdDeviation      = 0;
+        movingAverage     = tile.getMovingAverage();
+        dataList          = new ArrayList<>();
+        reducedDataList   = new ArrayList<>();
+        timePeriod        = tile.getTimePeriod();
+        dotRadius         = 3;
+        noOfDatapoints    = calcNumberOfDatapointsForPeriod(timePeriod);
+        maxNoOfDatapoints = calcNumberOfDatapointsForPeriod(tile.getMaxTimePeriod());
+
 
         graphBounds = new Rectangle(PREFERRED_WIDTH * 0.05, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.45);
 
@@ -261,26 +257,18 @@ public class TimelineTileSkin extends TileSkin {
         percentageInSectionGroup.getChildren().setAll(percentageInSections.values());
         Helper.enableNode(percentageInSectionGroup, tile.getSectionsVisible());
 
-        pathElements = new ArrayList<>(noOfDatapoints);
-        pathElements.add(0, new MoveTo());
-        for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo());}
-
         trendText = new Text("");
         trendText.setTextOrigin(VPos.TOP);
         trendText.setFill(tile.getTextColor());
 
-        sparkLine = new Path();
-        sparkLine.getElements().addAll(pathElements);
-        sparkLine.setFill(null);
-        sparkLine.setStroke(tile.getBarColor());
-        sparkLine.setStrokeWidth(PREFERRED_WIDTH * 0.0075);
-        sparkLine.setStrokeLineCap(StrokeLineCap.ROUND);
-        sparkLine.setStrokeLineJoin(StrokeLineJoin.ROUND);
+        path = new Path();
 
-        dot = new Circle();
-        dot.setFill(tile.getBarColor());
+        dots = new LinkedHashMap<>(noOfDatapoints);
+        dotGroup = new Group();
+        dotGroup.getChildren().setAll(dots.values());
+        dotGroup.getChildren().add(path);
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, sparkLine, dot, percentageInSectionGroup, averageText, minText, maxText, highText, lowText, trendText, timeSpanText, text);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, dotGroup, percentageInSectionGroup, averageText, minText, maxText, highText, lowText, trendText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
     }
@@ -334,7 +322,7 @@ public class TimelineTileSkin extends TileSkin {
             if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, tile.getValue());
-            addData(new ChartData(value));
+            addData(new ChartData("", value, Instant.now()));
             handleCurrentValue(value);
         } else if ("SECTION".equals(EVENT_TYPE)) {
             percentageInSections.clear();
@@ -345,39 +333,47 @@ public class TimelineTileSkin extends TileSkin {
                 percentageInSections.put(section, sectionLabel);
             });
             percentageInSectionGroup.getChildren().setAll(percentageInSections.values());
-        } else if ("PERIOD".equals(EVENT_TYPE)) {
-            timePeriod = tile.getTimePeriod();
+        } else if ("TIME_PERIOD".equals(EVENT_TYPE)) {
+            timePeriod        = tile.getTimePeriod();
+            noOfDatapoints    = calcNumberOfDatapointsForPeriod(timePeriod);
+            maxNoOfDatapoints = calcNumberOfDatapointsForPeriod(tile.getMaxTimePeriod());
             timeSpanText.setText(createTimeSpanText());
 
-            noOfDatapoints = (int) timePeriod.getSeconds();
-
-            // To get smooth lines in the chart we need at least 4 values
-            //if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
-            for (int i = 0; i < noOfDatapoints; i++) { dataList.add(new ChartData(minValue, Instant.now().minusSeconds(i * 10))); }
-            pathElements.clear();
-            pathElements.add(0, new MoveTo());
-            for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
-            sparkLine.getElements().setAll(pathElements);
+            // Add initial values
+            dots.clear();
+            dotGroup.getChildren().setAll(dots.values());
 
             redraw();
         }
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        if (dataList.size() < 4) { return; }
+        if (reducedDataList.size() < 4) { return; }
 
-        List<Double> clampedDataList = dataList.stream().map(chartData -> Helper.clamp(minValue, maxValue, chartData.getValue())).collect(Collectors.toList());
-
-        low  = clampedDataList.stream().min(Comparator.comparingDouble(Double::doubleValue)).orElse(tile.getLowerThreshold());
-        high = clampedDataList.stream().max(Comparator.comparingDouble(Double::doubleValue)).orElse(tile.getThreshold());
+        low  = reducedDataList.stream().min(Comparator.comparingDouble(ChartData::getValue)).map(data -> data.getValue()).orElse(tile.getLowerThreshold());
+        high = reducedDataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).map(data -> data.getValue()).orElse(tile.getThreshold());
 
         range = (maxValue - minValue);
+
+        Instant now = Instant.now();
+        long maxTime = now.getEpochSecond();
+        long minTime = now.minus(timePeriod.toSeconds(), ChronoUnit.SECONDS).getEpochSecond();
+
+        TimeUnit resolution = tile.getTimePeriodResolution();
+        long resolutionStep;
+        switch(resolution) {
+            case DAYS   : resolutionStep = 86_400; break;
+            case HOURS  : resolutionStep = 3_600;  break;
+            case MINUTES: resolutionStep = 60;     break;
+            case SECONDS:
+            default     : resolutionStep = 1;      break;
+        }
 
         double minX  = graphBounds.getX();
         double maxX  = minX + graphBounds.getWidth();
         double minY  = graphBounds.getY();
         double maxY  = minY + graphBounds.getHeight();
-        double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
+        double stepX = graphBounds.getWidth() / (timePeriod.getSeconds() / resolutionStep);
         double stepY = graphBounds.getHeight() / range;
 
         niceScaleY.setMinMax(minValue, maxValue);
@@ -423,35 +419,38 @@ public class TimelineTileSkin extends TileSkin {
         minText.setX((maxX - minText.getLayoutBounds().getWidth()));
         maxText.setX((maxX - maxText.getLayoutBounds().getWidth()));
 
-        if (!clampedDataList.isEmpty()) {
-            if (tile.isSmoothing()) {
-                smooth(clampedDataList);
-            } else {
-                MoveTo begin = (MoveTo) pathElements.get(0);
-                begin.setX(minX);
-                begin.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, clampedDataList.get(0).doubleValue())) * stepY);
-                for (int i = 1 ; i < (noOfDatapoints - 1) ; i++) {
-                    LineTo lineTo = (LineTo) pathElements.get(i);
-                    lineTo.setX(minX + i * stepX);
-                    lineTo.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, clampedDataList.get(i).doubleValue())) * stepY);
+
+        if (!reducedDataList.isEmpty()) {
+            if (tile.isStrokeWithGradient()) { setupGradient(); }
+
+            Iterator entries = dots.entrySet().iterator();
+            Map.Entry<ChartData, Circle> entry = (Map.Entry) entries.next();
+            ChartData data = entry.getKey();
+            Circle    dot  = entry.getValue();
+            path.getElements().clear();
+            path.getElements().add(new MoveTo(maxX - (maxTime - data.getTimestamp().getEpochSecond()) * stepX, maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, data.getValue())) * stepY));
+            for (long timeSlot = maxTime ; timeSlot >= minTime ; timeSlot -= resolutionStep) {
+                if (data.getTimestamp().getEpochSecond() > timeSlot - resolutionStep) {
+                    dot.setCenterX(maxX - (maxTime - data.getTimestamp().getEpochSecond()) * stepX);
+                    dot.setCenterY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, data.getValue())) * stepY);
+                    dot.setFill(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
+                    path.getElements().add(new LineTo(dot.getCenterX(), dot.getCenterY()));
+                    if (entries.hasNext()) {
+                        entry = (Map.Entry) entries.next();
+                        data = entry.getKey();
+                        dot  = entry.getValue();
+                    }
                 }
-                LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
-                end.setX(maxX);
-                end.setY(maxY - Math.abs(minValue - Helper.clamp(minValue, maxValue, clampedDataList.get(noOfDatapoints - 1).doubleValue())) * stepY);
-
-                dot.setCenterX(maxX);
-                dot.setCenterY(end.getY());
+            }
+            path.setStroke(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
+            path.setStrokeWidth(2);
+            if (tile.isSmoothing()) {
+                Helper.smoothPath(path, false);
             }
 
-            if (tile.isStrokeWithGradient()) {
-                setupGradient();
-                dot.setFill(gradient);
-                sparkLine.setStroke(gradient);
-            }
-
-            sections.entrySet().forEach(entry -> {
-                Section   section   = entry.getKey();
-                Rectangle rectangle = entry.getValue();
+            sections.entrySet().forEach(e -> {
+                Section   section   = e.getKey();
+                Rectangle rectangle = e.getValue();
                 rectangle.setX(minX);
                 rectangle.setY(clamp(minY, maxY, maxY - Math.abs(minValue - section.getStop()) * stepY));
                 rectangle.setWidth(graphBounds.getWidth());
@@ -497,7 +496,7 @@ public class TimelineTileSkin extends TileSkin {
     }
 
     private void addData(final ChartData DATA) {
-        if (dataList.size() >= tile.getMaxTimePeriod().getSeconds()) {
+        if (dataList.size() >= maxNoOfDatapoints) {
             Collections.rotate(dataList, -1);
             if (!dataList.isEmpty()) { dataList.set((noOfDatapoints - 1), DATA); }
         } else {
@@ -505,18 +504,24 @@ public class TimelineTileSkin extends TileSkin {
         }
 
         Predicate<ChartData> isNotInTimePeriod = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
-        List<ChartData> clampedDataList = new ArrayList<>(dataList);
-        clampedDataList.removeIf(isNotInTimePeriod);
-        Collections.sort(clampedDataList, Comparator.comparing(ChartData::getTimestamp));
+        reducedDataList.clear();
+        reducedDataList.addAll(dataList);
+        reducedDataList.removeIf(isNotInTimePeriod);
 
-        if (clampedDataList.size() == Integer.MAX_VALUE - 1 || clampedDataList.size() >= noOfDatapoints) {
-            Collections.rotate(clampedDataList, -1);
-            if (!clampedDataList.isEmpty()) { clampedDataList.set((noOfDatapoints - 1), DATA); }
+        if (reducedDataList.size() == Integer.MAX_VALUE - 1 || reducedDataList.size() >= noOfDatapoints) {
+            Collections.rotate(reducedDataList, -1);
+            if (!reducedDataList.isEmpty()) { reducedDataList.set((noOfDatapoints - 1), DATA); }
         }
+        Collections.sort(reducedDataList, Comparator.comparing(ChartData::getTimestamp).reversed());
 
-        int n = Helper.clamp(2, clampedDataList.size(), tile.getNumberOfValuesForTrendCalculation());
-        if (clampedDataList.size() > n) {
-            List<Double> lastNValues = clampedDataList.stream().map(ChartData::getValue).collect(Helper.lastN(n));
+        dots.clear();
+        reducedDataList.forEach(data -> dots.put(data, new Circle(dotRadius)));
+        dotGroup.getChildren().setAll(dots.values());
+        dotGroup.getChildren().add(path);
+
+        int n = Helper.clamp(2, reducedDataList.size(), tile.getNumberOfValuesForTrendCalculation());
+        if (reducedDataList.size() > n) {
+            List<Double> lastNValues = reducedDataList.stream().map(ChartData::getValue).collect(Helper.lastN(n));
             Model        model       = DoubleExponentialSmoothingForLinearSeries.fit(lastNValues.stream().mapToDouble(Double::doubleValue).toArray(), 0.8, 0.2);
             trendText.setText(String.format(tile.getLocale(), "%.0f", model.forecast(1)[0]));
             //double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
@@ -524,29 +529,35 @@ public class TimelineTileSkin extends TileSkin {
             //System.out.println("Last 4 values: " + last3Values + " -> Trend: " + model.forecast(1)[0]);
         }
 
-        stdDeviation = Statistics.getChartDataStdDev(clampedDataList);
-        pathElements.clear();
-        pathElements.add(new MoveTo());
-        for (int i = 0 ; i < noOfDatapoints - 1 ; i++) { pathElements.add(new LineTo()); }
-        sparkLine.getElements().setAll(pathElements);
+        stdDeviation = Statistics.getChartDataStdDev(reducedDataList);
         if (DATA.getValue() <= tile.getLowerThreshold()) {
             tile.showNotifyRegion(true);
-            tile.setTooltipText("Blood sugar too low");
+            tile.setTooltipText("Value below lower threshold");
         } else if (DATA.getValue() >= tile.getThreshold()) {
             tile.showNotifyRegion(true);
-            tile.setTooltipText("Blood sugar too high");
+            tile.setTooltipText("VAlue above upper threshold");
         } else {
             tile.showNotifyRegion(false);
             tile.setTooltipText("");
         }
 
-        analyse(clampedDataList);
+        analyse(reducedDataList);
 
         handleCurrentValue(DATA.getValue());
     }
 
     private void setupGradient() {
         gradient = new LinearGradient(0, graphBounds.getY() + graphBounds.getHeight(), 0, graphBounds.getY(), false, CycleMethod.NO_CYCLE, tile.getGradientStops());
+    }
+
+    private int calcNumberOfDatapointsForPeriod(final Duration TIME_PERIOD) {
+        switch(tile.getTimePeriodResolution()) {
+            case DAYS   : return (int) TIME_PERIOD.getSeconds() / 86_400;
+            case HOURS  : return (int) TIME_PERIOD.getSeconds() / 3_600;
+            case MINUTES: return (int) TIME_PERIOD.getSeconds() / 60;
+            case SECONDS:
+            default     : return (int) TIME_PERIOD.getSeconds();
+        }
     }
 
     private String createTimeSpanText() {
@@ -578,28 +589,6 @@ public class TimelineTileSkin extends TileSkin {
     @Override public void dispose() {
         tile.timePeriodProperty().removeListener(periodListener);
         super.dispose();
-    }
-
-    private void smooth(final List<Double> DATA_LIST) {
-        Task<Point[]> smoothTask = new Task<Point[]>() {
-            @Override protected Point[] call() {
-                return Helper.smoothSparkLine(DATA_LIST, minValue, maxValue, graphBounds, noOfDatapoints);
-            }
-        };
-        smoothTask.setOnSucceeded(t -> {
-            Point[] smoothedPoints = smoothTask.getValue();
-            int lengthMinusOne = smoothedPoints.length - 1;
-            sparkLine.getElements().clear();
-            sparkLine.getElements().add(new MoveTo(smoothedPoints[0].getX(), smoothedPoints[0].getY()));
-            for (int i = 1 ; i < lengthMinusOne ; i++) {
-                sparkLine.getElements().add(new LineTo(smoothedPoints[i].getX(), smoothedPoints[i].getY()));
-            }
-            dot.setCenterX(smoothedPoints[lengthMinusOne].getX());
-            dot.setCenterY(smoothedPoints[lengthMinusOne].getY());
-        });
-        Thread smoothThread = new Thread(smoothTask);
-        smoothThread.setDaemon(true);
-        smoothThread.start();
     }
 
     private void analyse(final List<ChartData> clampedDataList) {
@@ -719,16 +708,15 @@ public class TimelineTileSkin extends TileSkin {
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
         handleCurrentValue(tile.getValue());
+
         if (noOfDatapoints < 60) {
-            sparkLine.setStrokeWidth(size * 0.01);
-            dot.setRadius(size * 0.014);
+            dotRadius = size * 0.005;
         } else if (noOfDatapoints < 3600) {
-            sparkLine.setStrokeWidth(size * 0.0075);
-            dot.setRadius(size * 0.0105);
+            dotRadius = size * 0.00375;
         } else {
-            sparkLine.setStrokeWidth(size * 0.005);
-            dot.setRadius(size * 0.007);
+            dotRadius = size * 0.0025;
         }
+        dots.values().forEach(dot -> dot.setRadius(dotRadius));
 
         if (tile.isStrokeWithGradient()) { setupGradient(); }
 
@@ -786,13 +774,6 @@ public class TimelineTileSkin extends TileSkin {
         trendText.setFill(tile.getTextColor());
         text.setFill(tile.getTextColor());
         timeSpanText.setFill(tile.getTextColor());
-        if (tile.isStrokeWithGradient()) {
-            setupGradient();
-            sparkLine.setStroke(gradient);
-        } else {
-            sparkLine.setStroke(tile.getBarColor());
-        }
         stdDeviationArea.setFill(Helper.getColorWithOpacity(Tile.FOREGROUND, 0.1));
-        dot.setFill(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
     }
 }

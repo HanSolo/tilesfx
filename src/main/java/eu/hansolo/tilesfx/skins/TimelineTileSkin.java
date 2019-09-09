@@ -45,6 +45,8 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -280,6 +282,8 @@ public class TimelineTileSkin extends TileSkin {
 
         path = new Path();
         path.setMouseTransparent(true);
+        path.setStrokeLineJoin(StrokeLineJoin.ROUND);
+        path.setStrokeLineCap(StrokeLineCap.ROUND);
 
         dots = new LinkedHashMap<>(noOfDatapoints);
         dotGroup = new Group();
@@ -491,7 +495,6 @@ public class TimelineTileSkin extends TileSkin {
                 }
             }
             path.setStroke(tile.isStrokeWithGradient() ? gradient : tile.getBarColor());
-            path.setStrokeWidth(2);
             if (tile.isSmoothing()) {
                 Helper.smoothPath(path, false);
             }
@@ -767,16 +770,15 @@ public class TimelineTileSkin extends TileSkin {
         handleCurrentValue(tile.getValue());
 
         if (noOfDatapoints < 60) {
-            //dotRadius = size * 0.005;
             dotRadius = size * 0.01;
         } else if (noOfDatapoints < 3600) {
-            //dotRadius = size * 0.00375;
             dotRadius = size * 0.0075;
         } else {
-            //dotRadius = size * 0.0025;
             dotRadius = size * 0.005;
         }
         dots.values().forEach(dot -> dot.setRadius(dotRadius));
+
+        path.setStrokeWidth(size * 0.01);
 
         if (tile.isStrokeWithGradient()) { setupGradient(); }
 

@@ -889,6 +889,48 @@ public class Helper {
     }
 
     // Smooth given path defined by it's list of path elements
+    public static final void smoothPath(final Path PATH, final boolean FILLED) {
+        List<PathElement> pathElements = PATH.getElements();
+        if (pathElements.isEmpty()) { return; }
+        final Point[] dataPoints = new Point[pathElements.size()];
+        for (int i = 0; i < pathElements.size(); i++) {
+            final PathElement element = pathElements.get(i);
+            if (element instanceof MoveTo) {
+                MoveTo move   = (MoveTo) element;
+                dataPoints[i] = new Point(move.getX(), move.getY());
+            } else if (element instanceof LineTo) {
+                LineTo line   = (LineTo) element;
+                dataPoints[i] = new Point(line.getX(), line.getY());
+            }
+        }
+        double                 zeroY               = ((MoveTo) pathElements.get(0)).getY();
+        List<PathElement>      smoothedElements    = new ArrayList<>();
+        Pair<Point[], Point[]> result              = calcCurveControlPoints(dataPoints);
+        Point[]                firstControlPoints  = result.getKey();
+        Point[]                secondControlPoints = result.getValue();
+        // Start path dependent on filled or not
+        if (FILLED) {
+            smoothedElements.add(new MoveTo(dataPoints[0].getX(), zeroY));
+            smoothedElements.add(new LineTo(dataPoints[0].getX(), dataPoints[0].getY()));
+        } else {
+            smoothedElements.add(new MoveTo(dataPoints[0].getX(), dataPoints[0].getY()));
+        }
+        // Add curves
+        for (int i = 2; i < dataPoints.length; i++) {
+            final int ci = i - 1;
+            smoothedElements.add(new CubicCurveTo(
+                firstControlPoints[ci].getX(), firstControlPoints[ci].getY(),
+                secondControlPoints[ci].getX(), secondControlPoints[ci].getY(),
+                dataPoints[i].getX(), dataPoints[i].getY()));
+        }
+        // Close the path if filled
+        if (FILLED) {
+            smoothedElements.add(new LineTo(dataPoints[dataPoints.length - 1].getX(), zeroY));
+            smoothedElements.add(new ClosePath());
+        }
+        PATH.getElements().setAll(smoothedElements);
+    }
+
     public static final Path smoothPath(final ObservableList<PathElement> ELEMENTS, final boolean FILLED) {
         if (ELEMENTS.isEmpty()) { return new Path(); }
         final Point[] dataPoints = new Point[ELEMENTS.size()];

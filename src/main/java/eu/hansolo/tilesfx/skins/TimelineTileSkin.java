@@ -68,6 +68,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 import static eu.hansolo.tilesfx.tools.Helper.enableNode;
@@ -581,12 +582,24 @@ public class TimelineTileSkin extends TileSkin {
 
         int n = Helper.clamp(2, reducedDataList.size(), tile.getNumberOfValuesForTrendCalculation());
         if (reducedDataList.size() > n) {
-            List<Double> lastNValues = reducedDataList.stream().map(ChartData::getValue).collect(Helper.lastN(n));
-            Model        model       = DoubleExponentialSmoothingForLinearSeries.fit(lastNValues.stream().mapToDouble(Double::doubleValue).toArray(), 0.8, 0.2);
-            trendText.setText(String.format(tile.getLocale(), "%.0f", model.forecast(1)[0]));
-            //double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
-            //System.out.println("TrendAngle: " + (360 - Helper.getAngleFromXY(0, DATA.getValue(), stepX, model.forecast(1)[0])));
-            //System.out.println("Last 4 values: " + last3Values + " -> Trend: " + model.forecast(1)[0]);
+            List<Double> firstNValues = reducedDataList.stream().map(ChartData::getValue).limit(n).collect(Collectors.toList());
+            Model        model       = DoubleExponentialSmoothingForLinearSeries.fit(firstNValues.stream().mapToDouble(Double::doubleValue).toArray(), 0.8, 0.2);
+            String forecast   = String.format(tile.getLocale(), "%.0f", model.forecast(1)[0]);
+            double stepX      = graphBounds.getWidth() / (noOfDatapoints - 1);
+            double trendAngle = (Helper.getAngleFromXY(0, DATA.getValue(), stepX, model.forecast(1)[0]) - 90);
+            if (90 <= trendAngle && trendAngle < 112.5) {
+                trendText.setText("\u2191");
+            } else if (112.5 <= trendAngle && trendAngle < 147.5) {
+                trendText.setText("\u2197");
+            } else if (147.5 <= trendAngle && trendAngle < 202.5) {
+                trendText.setText("\u2192");
+            } else if (202.5 <= trendAngle && trendAngle < 247.5) {
+                trendText.setText("\u2198");
+            } else if (247.5 <= trendAngle && trendAngle < 270) {
+                trendText.setText("\u2193");
+            } else {
+                trendText.setText("");
+            }
         }
 
         stdDeviation = Statistics.getChartDataStdDev(reducedDataList);

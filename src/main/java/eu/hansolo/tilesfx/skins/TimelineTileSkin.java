@@ -789,9 +789,9 @@ public class TimelineTileSkin extends TileSkin {
         valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
 
         fractionLine.setStartX(width - 0.17 * size);
-        fractionLine.setStartY(height * 0.3);
+        fractionLine.setStartY(size * 0.3);
         fractionLine.setEndX(width - 0.05 * size);
-        fractionLine.setEndY(height * 0.3);
+        fractionLine.setEndY(size * 0.3);
         fractionLine.setStroke(tile.getUnitColor());
         fractionLine.setStrokeWidth(size * 0.005);
 

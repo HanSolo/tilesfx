@@ -26,6 +26,7 @@ import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
 import eu.hansolo.tilesfx.tools.Statistics;
+import eu.hansolo.tilesfx.tools.TimeData;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -89,6 +90,7 @@ public class TimelineTileSkin extends TileSkin {
     private              TextFlow                 unitFlow;
     private              TextFlow                 valueUnitFlow;
     private              Text                     averageText;
+    private              Text                     averageText2;
     private              Text                     minText;
     private              Text                     maxText;
     private              Text                     highText;
@@ -185,6 +187,8 @@ public class TimelineTileSkin extends TileSkin {
 
         graphBounds = new Rectangle(PREFERRED_WIDTH * 0.05, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.45);
 
+        tile.setAveragingPeriod(noOfDatapoints);
+
         titleText = new Text(tile.getTitle());
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
@@ -209,9 +213,13 @@ public class TimelineTileSkin extends TileSkin {
         valueUnitFlow = new TextFlow(valueText, unitFlow);
         valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
-        averageText = new Text(String.format(locale, formatString, tile.getAverage()));
+        averageText = new Text(String.format(locale, "\u2300 " + formatString, tile.getAverage()));
         averageText.setFill(Tile.FOREGROUND);
         Helper.enableNode(averageText, tile.isAverageVisible());
+
+        averageText2 = new Text(String.format(locale, "\u2300 " + formatString, tile.getAverage()));
+        averageText2.setFill(Tile.FOREGROUND);
+        Helper.enableNode(averageText2, tile.isAverageVisible());
 
         minText = new Text();
         minText.setTextOrigin(VPos.TOP);
@@ -291,7 +299,7 @@ public class TimelineTileSkin extends TileSkin {
         dotGroup.getChildren().setAll(dots.values());
         dotGroup.getChildren().add(path);
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, dotGroup, percentageInSectionGroup, averageText, minText, maxText, highText, lowText, trendText, timeSpanText, text);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, dotGroup, percentageInSectionGroup, averageText, averageText2, minText, maxText, highText, lowText, trendText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
     }
@@ -338,6 +346,7 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(timeSpanText, !tile.isTextVisible());
             Helper.enableNode(averageLine, tile.isAverageVisible());
             Helper.enableNode(averageText, tile.isAverageVisible());
+            Helper.enableNode(averageText2, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             Helper.enableNode(thresholdLine, tile.isThresholdVisible());
             Helper.enableNode(lowerThresholdLine, tile.isThresholdVisible());
@@ -347,7 +356,6 @@ public class TimelineTileSkin extends TileSkin {
             redraw();
         } else if ("VALUE".equals(EVENT_TYPE)) {
             if(tile.isAnimated()) { tile.setAnimated(false); }
-            if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, tile.getValue());
             addData(new ChartData("", value, Instant.now()));
             handleCurrentValue(value);
@@ -365,6 +373,7 @@ public class TimelineTileSkin extends TileSkin {
             noOfDatapoints    = calcNumberOfDatapointsForPeriod(timePeriod);
             maxNoOfDatapoints = calcNumberOfDatapointsForPeriod(tile.getMaxTimePeriod());
             timeSpanText.setText(createTimeSpanText());
+            tile.setAveragingPeriod(noOfDatapoints);
 
             // Add initial values
             dots.values().forEach(dot -> {
@@ -537,13 +546,16 @@ public class TimelineTileSkin extends TileSkin {
             stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
             stdDeviationArea.setHeight(stdDeviation * stepY);
 
-            averageText.setText(String.format(locale, formatString, average));
+            averageText.setText(String.format(locale, "\u2300 " + formatString, average));
+            averageText2.setText(String.format(locale, "\u2300 " + formatString, average));
         }
         valueText.setText(String.format(locale, formatString, VALUE));
 
-        if (!tile.isTextVisible()) {
+        if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
+            timeSpanText.setText(createTimeSpanText());
             text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
         }
+
         resizeDynamicText();
     }
 
@@ -553,6 +565,7 @@ public class TimelineTileSkin extends TileSkin {
             if (!dataList.isEmpty()) { dataList.set((noOfDatapoints - 1), DATA); }
         } else {
             dataList.add(DATA);
+            if (tile.isAveragingEnabled()) { movingAverage.addData(new TimeData(DATA.getValue(), DATA.getTimestamp())); }
         }
 
         Predicate<ChartData> isNotInTimePeriod = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
@@ -624,13 +637,7 @@ public class TimelineTileSkin extends TileSkin {
     }
 
     private int calcNumberOfDatapointsForPeriod(final Duration TIME_PERIOD) {
-        switch(tile.getTimePeriodResolution()) {
-            case DAYS   : return (int) TIME_PERIOD.getSeconds() / 86_400;
-            case HOURS  : return (int) TIME_PERIOD.getSeconds() / 3_600;
-            case MINUTES: return (int) TIME_PERIOD.getSeconds() / 60;
-            case SECONDS:
-            default     : return (int) TIME_PERIOD.getSeconds();
-        }
+        return Helper.calcNumberOfDatapointsForPeriod(TIME_PERIOD, tile.getTimePeriodResolution());
     }
 
     private String createTimeSpanText() {
@@ -681,7 +688,7 @@ public class TimelineTileSkin extends TileSkin {
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
         maxWidth = width - size * 0.7;
-        fontSize = size * 0.06;
+        fontSize = size * 0.03;
         averageText.setFont(Fonts.latoRegular(fontSize));
         if (averageText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(averageText, maxWidth, fontSize); }
         if (averageLine.getStartY() < graphBounds.getY() + graphBounds.getHeight() * 0.5) {
@@ -690,6 +697,7 @@ public class TimelineTileSkin extends TileSkin {
             averageText.setY(averageLine.getStartY() - (size * 0.0075));
         }
 
+        fontSize = size * 0.06;
         minText.setFont(Fonts.latoRegular(fontSize));
         if (minText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(minText, maxWidth, fontSize); }
         minText.setY(height - size * 0.1);
@@ -708,7 +716,11 @@ public class TimelineTileSkin extends TileSkin {
 
         trendText.setFont(Fonts.latoRegular(fontSize));
         if (trendText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(trendText, maxWidth, fontSize); }
-        trendText.setY(height - size * 0.1);
+        trendText.relocate((width - trendText.getLayoutBounds().getWidth()) * 0.25, height - size * 0.1);
+
+        averageText2.setFont(Fonts.latoRegular(fontSize));
+        if (averageText2.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(averageText2, maxWidth, fontSize); }
+        averageText2.relocate((width - averageText2.getLayoutBounds().getWidth()) * 0.75, height - size * 0.1);
 
         maxWidth = width - size * 0.25;
         fontSize = size * 0.06;
@@ -757,8 +769,7 @@ public class TimelineTileSkin extends TileSkin {
 
         lowText.setX(size * 0.05);
         highText.setX(size * 0.05);
-        averageText.setX(size * 0.05);
-        trendText.setX(size * 0.25);
+        averageText.setX(size * 0.15);
     }
 
     @Override protected void resize() {
@@ -848,6 +859,8 @@ public class TimelineTileSkin extends TileSkin {
         highText.setFill(tile.getValueColor());
         trendText.setFill(tile.getTextColor());
         text.setFill(tile.getTextColor());
+        averageText.setFill(tile.getForegroundColor());
+        averageText2.setFill(tile.getForegroundColor());
         timeSpanText.setFill(tile.getTextColor());
         stdDeviationArea.setFill(Helper.getColorWithOpacity(Tile.FOREGROUND, 0.1));
     }

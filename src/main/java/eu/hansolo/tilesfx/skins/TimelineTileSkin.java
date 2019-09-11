@@ -337,7 +337,7 @@ public class TimelineTileSkin extends TileSkin {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
-
+        if(tile.isAnimated()) { tile.setAnimated(false); }
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
@@ -355,7 +355,6 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(trendText, tile.isTrendVisible());
             redraw();
         } else if ("VALUE".equals(EVENT_TYPE)) {
-            if(tile.isAnimated()) { tile.setAnimated(false); }
             double value = clamp(minValue, maxValue, tile.getValue());
             addData(new ChartData("", value, Instant.now()));
             handleCurrentValue(value);

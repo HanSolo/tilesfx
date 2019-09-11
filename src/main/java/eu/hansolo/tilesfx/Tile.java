@@ -124,7 +124,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
@@ -5775,7 +5774,7 @@ public class Tile extends Control {
                 setTextVisible(false);
                 setAnimated(false);
                 setAveragingEnabled(true);
-                setAveragingPeriod(10);
+                setAveragingPeriod(Helper.calcNumberOfDatapointsForPeriod(getTimePeriod(), getTimePeriodResolution()));
                 setDecimals(0);
                 setTickLabelDecimals(0);
                 break;

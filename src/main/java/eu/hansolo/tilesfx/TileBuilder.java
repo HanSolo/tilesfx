@@ -34,6 +34,7 @@ import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryGroup;
+import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.TreeNode;
 import eu.hansolo.tilesfx.weather.DarkSky;
@@ -1201,7 +1202,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setTextVisible(false);
                     TILE.setAnimated(false);
                     TILE.setAveragingEnabled(true);
-                    TILE.setAveragingPeriod(10);
+                    TILE.setAveragingPeriod(Helper.calcNumberOfDatapointsForPeriod(TILE.getTimePeriod(), TILE.getTimePeriodResolution()));
                     TILE.setDecimals(0);
                     TILE.setTickLabelDecimals(0);
                     break;

@@ -54,6 +54,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 
@@ -1310,5 +1311,15 @@ public class Helper {
             }
             return acc2;
         }, ArrayList::new);
+    }
+
+    public static int calcNumberOfDatapointsForPeriod(final Duration TIME_PERIOD, final TimeUnit RESOLUTION) {
+        switch(RESOLUTION) {
+            case DAYS   : return (int) TIME_PERIOD.getSeconds() / 86_400;
+            case HOURS  : return (int) TIME_PERIOD.getSeconds() / 3_600;
+            case MINUTES: return (int) TIME_PERIOD.getSeconds() / 60;
+            case SECONDS:
+            default     : return (int) TIME_PERIOD.getSeconds();
+        }
     }
 }

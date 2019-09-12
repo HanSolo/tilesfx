@@ -790,7 +790,7 @@ public class TimelineTileSkin extends TileSkin {
         lowerThresholdLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
-        handleCurrentValue(tile.getValue());
+        handleCurrentValue(Double.parseDouble(valueText.getText()));
 
         if (noOfDatapoints < 60) {
             dotRadius = size * 0.01;

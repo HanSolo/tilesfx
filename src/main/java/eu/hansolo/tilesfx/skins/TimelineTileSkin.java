@@ -299,7 +299,7 @@ public class TimelineTileSkin extends TileSkin {
         dotGroup.getChildren().setAll(dots.values());
         dotGroup.getChildren().add(path);
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, averageLine, dotGroup, percentageInSectionGroup, averageText, averageText2, minText, maxText, highText, lowText, trendText, timeSpanText, text);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, dotGroup, percentageInSectionGroup, averageLine, averageText, averageText2, minText, maxText, highText, lowText, trendText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
     }

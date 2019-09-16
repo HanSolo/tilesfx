@@ -91,6 +91,11 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
         return (B)this;
     }
 
+    public final B formatString(final String FORMAT_STRING) {
+        properties.put("formatString", new SimpleStringProperty(FORMAT_STRING));
+        return (B)this;
+    }
+
     public final B onChartDataEvent(final ChartDataEventListener HANDLER) {
         properties.put("onChartDataEvent", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
@@ -116,6 +121,8 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
                 DATA.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("animated".equals(key)) {
                 DATA.setAnimated(((BooleanProperty) properties.get(key)).get());
+            } else if("formatString".equals(key)) {
+                DATA.setFormatString(((StringProperty) properties.get(key)).get());
             } else if ("onChartDataEvent".equals(key)) {
                 DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
             }

@@ -59,6 +59,7 @@ public class ChartData implements Comparable<ChartData> {
     private       List<ChartDataEventListener> listenerList = new CopyOnWriteArrayList<>();
     private       DoubleProperty               currentValue;
     private       Timeline                     timeline;
+    private       String                       formatString;
 
 
     // ******************** Constructors **************************************
@@ -118,6 +119,7 @@ public class ChartData implements Comparable<ChartData> {
         timeline          = new Timeline();
         animated          = ANIMATED;
         animationDuration = ANIMATION_DURATION;
+        formatString      = "";
 
         timeline.setOnFinished(e -> fireChartDataEvent(FINISHED_EVENT));
     }
@@ -201,6 +203,9 @@ public class ChartData implements Comparable<ChartData> {
     public boolean isWithinTimePeriod(final Instant PERIOD_START, final java.time.Duration PERIOD) {
         return timestamp.isBefore(PERIOD_START) && timestamp.isAfter(PERIOD_START.minus(PERIOD));
     }
+
+    public String getFormatString() { return formatString; }
+    public void setFormatString(final String FORMAT_STRING) { formatString = FORMAT_STRING; }
 
     @Override public String toString() {
         return new StringBuilder().append("{\n")

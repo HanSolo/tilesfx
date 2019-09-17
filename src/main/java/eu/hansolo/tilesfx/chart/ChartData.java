@@ -60,6 +60,8 @@ public class ChartData implements Comparable<ChartData> {
     private       DoubleProperty               currentValue;
     private       Timeline                     timeline;
     private       String                       formatString;
+    private       double                       minValue;
+    private       double                       maxValue;
 
 
     // ******************** Constructors **************************************
@@ -120,6 +122,8 @@ public class ChartData implements Comparable<ChartData> {
         animated          = ANIMATED;
         animationDuration = ANIMATION_DURATION;
         formatString      = "";
+        minValue          = 0;
+        maxValue          = 100;
 
         timeline.setOnFinished(e -> fireChartDataEvent(FINISHED_EVENT));
     }
@@ -206,6 +210,12 @@ public class ChartData implements Comparable<ChartData> {
 
     public String getFormatString() { return formatString; }
     public void setFormatString(final String FORMAT_STRING) { formatString = FORMAT_STRING; }
+
+    public double getMaxValue() { return maxValue; }
+    public void setMaxValue(final double MAX_VALUE) { maxValue = MAX_VALUE; }
+
+    public double getMinValue() { return minValue; }
+    public void setMinValue(final double MIN_VALUE) { minValue = MIN_VALUE; }
 
     @Override public String toString() {
         return new StringBuilder().append("{\n")

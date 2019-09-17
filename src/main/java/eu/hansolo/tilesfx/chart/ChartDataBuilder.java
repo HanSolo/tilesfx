@@ -96,6 +96,16 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
         return (B)this;
     }
 
+    public final B minValue(final double MIN_VALUE) {
+        properties.put("minValue", new SimpleDoubleProperty(MIN_VALUE));
+        return (B)this;
+    }
+
+    public final B maxValue(final double MAX_VALUE) {
+        properties.put("maxValue", new SimpleDoubleProperty(MAX_VALUE));
+        return (B)this;
+    }
+
     public final B onChartDataEvent(final ChartDataEventListener HANDLER) {
         properties.put("onChartDataEvent", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
@@ -123,6 +133,10 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
                 DATA.setAnimated(((BooleanProperty) properties.get(key)).get());
             } else if("formatString".equals(key)) {
                 DATA.setFormatString(((StringProperty) properties.get(key)).get());
+            } else if("minValue".equals(key)) {
+                DATA.setMinValue(((DoubleProperty) properties.get(key)).get());
+            } else if("maxValue".equals(key)) {
+                DATA.setMaxValue(((DoubleProperty) properties.get(key)).get());
             } else if ("onChartDataEvent".equals(key)) {
                 DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
             }

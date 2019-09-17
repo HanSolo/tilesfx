@@ -159,7 +159,10 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     @Override public ObservableList<Node> getChildren() { return super.getChildren(); }
 
     public String getName() { return chartData.getName(); }
-    public void setName(final String NAME) { chartData.setName(NAME); }
+    public void setName(final String NAME) { 
+        chartData.setName(NAME); 
+        nameText.setText(NAME);
+    }
 
     public double getValue() { return chartData.getValue(); }
     public void setValue(final double VALUE) { chartData.setValue(VALUE); }

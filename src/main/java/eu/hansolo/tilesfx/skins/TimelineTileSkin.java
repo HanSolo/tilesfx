@@ -75,6 +75,11 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 import static eu.hansolo.tilesfx.tools.Helper.enableNode;
 
 
+/**
+ * User: hansolo
+ * Date: 13.09.19
+ * Time: 03:12
+ */
 public class TimelineTileSkin extends TileSkin {
     private static final int                      SEC_MONTH     = 2_592_000;
     private static final int                      SEC_DAY       = 86_400;

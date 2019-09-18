@@ -5738,8 +5738,8 @@ public class Tile extends Control {
                 setTickLabelDecimals(0);
                 break;
             case CLUSTER_MONITOR:
-                setTitle("IP Address");
-                setText("Last ping 0s");
+                setTitle("");
+                setTextVisible(false);
                 setUnit("\u0025");
                 setAnimated(false);
                 setDecimals(1);

@@ -20,7 +20,6 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.skins.TileSkin;
 import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.InvalidationListener;
@@ -41,6 +40,11 @@ import java.util.Locale;
 import java.util.Map;
 
 
+/**
+ * User: hansolo
+ * Date: 18.09.19
+ * Time: 03:12
+ */
 public class ClusterMonitorTileSkin extends TileSkin {
     private Text                      titleText;
     private Text                      text;
@@ -67,7 +71,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             }
         };
         paneSizeListener = e -> updateChart();
-        dataItemMap = new HashMap<>();
+        dataItemMap      = new HashMap<>();
 
         chartPane = new VBox();
 
@@ -173,7 +177,8 @@ public class ClusterMonitorTileSkin extends TileSkin {
         chartPane.relocate(contentBounds.getX(), contentBounds.getY());
         chartPane.setSpacing(contentBounds.getHeight() * 0.25);
 
-        double itemHeight = contentBounds.getHeight() * 0.725 / (dataItemMap.size());
+        //double itemHeight = contentBounds.getHeight() * 0.725 / (dataItemMap.size());
+        double itemHeight = contentBounds.getHeight() / (dataItemMap.size());
 
         dataItemMap.values().forEach(item -> {
             item.setPrefSize(contentBounds.getWidth(), itemHeight);
@@ -181,9 +186,9 @@ public class ClusterMonitorTileSkin extends TileSkin {
         });
 
         if (titleText.getText().isEmpty()) {
-            chartPane.setSpacing((contentBounds.getHeight() - (2 * itemHeight)));
+            chartPane.setSpacing((contentBounds.getHeight() - (3 * itemHeight)));
         } else {
-            chartPane.setSpacing((contentBounds.getHeight() - (2 * itemHeight)) / 1.5);
+            chartPane.setSpacing((contentBounds.getHeight() - (3 * itemHeight)) / 1.5);
         }
 
         updateChart();
@@ -215,7 +220,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
 
     // ******************** Internal Classes **********************************
     private class ChartItem extends Region {
-        private static final double                 PREF_WIDTH  = 330;
+        private static final double                 PREF_WIDTH  = 100;
         private static final double                 PREF_HEIGHT = 95;
         private              ChartData              chartData;
         private              CtxBounds              contentBounds;
@@ -300,7 +305,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             title.setPrefSize(textWidth, textHeight);
             value.setPrefSize(textWidth, textHeight);
 
-            Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * 0.50526316));
+            Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * 0.35));
             title.setFont(font);
             value.setFont(font);
 
@@ -312,7 +317,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
 
             bar.setX(0);
             bar.setY(title.getLayoutY() + title.getFont().getSize() + height * 0.12);
-            bar.setHeight(height * 0.52631579);
+            bar.setHeight(height * 0.35);
             bar.setWidth(chartData.getValue() * step);
 
             scale.setX(0);

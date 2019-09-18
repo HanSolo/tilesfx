@@ -1207,8 +1207,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setTickLabelDecimals(0);
                     break;
                 case CLUSTER_MONITOR:
-                    TILE.setTitle("IP Address");
-                    TILE.setText("Last ping 0s");
+                    TILE.setTitle("");
+                    TILE.setTextVisible(false);
                     TILE.setUnit("\u0025");
                     TILE.setAnimated(false);
                     TILE.setDecimals(1);

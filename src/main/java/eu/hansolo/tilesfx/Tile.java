@@ -85,6 +85,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
@@ -321,6 +322,7 @@ public class Tile extends Control {
     private              ImageMask                                     _imageMask;
     private              ObjectProperty<ImageMask>                     imageMask;
     private              ObjectProperty<Node>                          graphic;
+    private              ObjectProperty<SVGPath>                       svgPath;
     private              Location                                      _currentLocation;
     private              ObjectProperty<Location>                      currentLocation;
     private              ObservableList<Location>                      poiList;
@@ -1933,7 +1935,7 @@ public class Tile extends Control {
     public void setGraphic(final Node GRAPHIC) { graphicProperty().set(GRAPHIC); }
     public ObjectProperty<Node> graphicProperty() {
         if (null == graphic) {
-            graphic = new ObjectPropertyBase<Node>() {
+            graphic = new ObjectPropertyBase<>() {
                 @Override protected void invalidated() {
                 	fireTileEvent(GRAPHIC_EVENT);
                 	fireTileEvent(RESIZE_EVENT);
@@ -1943,6 +1945,21 @@ public class Tile extends Control {
             };
         }
         return graphic;
+    }
+
+    public SVGPath getSVGPath() { return null == svgPath ? null : svgPath.get(); }
+    public void setSVGPath(final SVGPath SVG_PATH) { svgPathProperty().set(SVG_PATH); }
+    public ObjectProperty<SVGPath> svgPathProperty() {
+        if (null == svgPath) {
+            svgPath = new ObjectPropertyBase<>() {
+                @Override protected void invalidated() {
+                    fireTileEvent(RESIZE_EVENT);
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "svgPath"; }
+            };
+        }
+        return svgPath;
     }
 
     public Location getCurrentLocation() { return null == currentLocation ? _currentLocation : currentLocation.get(); }

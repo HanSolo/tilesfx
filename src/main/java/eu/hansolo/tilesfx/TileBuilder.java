@@ -64,6 +64,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
@@ -687,6 +688,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B onTileEvent(final TileEventListener LISTENER) {
+        properties.put("onTileEvent", new SimpleObjectProperty(LISTENER));
+        return (B)this;
+    }
+
     public final B increment(final double INCREMENT) {
         properties.put("increment", new SimpleDoubleProperty(INCREMENT));
         return (B)this;
@@ -709,6 +715,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B graphic(final Node GRAPHIC) {
         properties.put("graphic", new SimpleObjectProperty(GRAPHIC));
+        return (B)this;
+    }
+
+    public final B svgPath(final SVGPath SVG_PATH) {
+        properties.put("svgPath", new SimpleObjectProperty(SVG_PATH));
         return (B)this;
     }
 
@@ -1529,6 +1540,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
             } else if ("onTimeEvent".equals(key)) {
                 TILE.setOnTimeEvent(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
+            } else if ("onTileEvent".equals(key)) {
+                TILE.setOnTileEvent(((ObjectProperty<TileEventListener>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
                 TILE.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("alarmsVisible".equals(key)) {
@@ -1553,6 +1566,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setImageMask(((ObjectProperty<ImageMask>) properties.get(key)).get());
             } else if ("graphic".equals(key)) {
                 TILE.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
+            } else if ("svgPath".equals(key)) {
+                TILE.setSVGPath(((ObjectProperty<SVGPath>) properties.get(key)).get());
             } else if ("roundedCorners".equals(key)) {
                 TILE.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
             } else if ("textSize".equals(key)) {

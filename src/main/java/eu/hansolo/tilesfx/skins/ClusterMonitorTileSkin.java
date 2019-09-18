@@ -19,17 +19,26 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.InvalidationListener;
 import javafx.collections.WeakListChangeListener;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -46,13 +55,16 @@ import java.util.Map;
  * Time: 03:12
  */
 public class ClusterMonitorTileSkin extends TileSkin {
-    private static final double       MIN_HEIGHT = 100;
-    private Text                      titleText;
-    private Text                      text;
-    private VBox                      chartPane;
-    private ChartDataEventListener    updateHandler;
-    private InvalidationListener      paneSizeListener;
-    private Map<ChartData, ChartItem> dataItemMap;
+    private static final double                    MIN_HEIGHT        = 100;
+    private        final TileEvent                 SVG_PRESSED_EVENT = new TileEvent(EventType.SVG_PATH_PRESSED);
+    private              Text                      titleText;
+    private              Text                      text;
+    private              VBox                      chartPane;
+    private              ChartDataEventListener    updateHandler;
+    private              InvalidationListener      paneSizeListener;
+    private              Map<ChartData, ChartItem> dataItemMap;
+    private              Region                    graphicRegion;
+    private              EventHandler<MouseEvent>  svgPathPressedHandler;
 
 
     // ******************** Constructors **************************************
@@ -91,7 +103,15 @@ public class ClusterMonitorTileSkin extends TileSkin {
         text.setFill(tile.getUnitColor());
         Helper.enableNode(text, tile.isTextVisible());
 
-        getPane().getChildren().addAll(titleText, text, chartPane);
+        SVGPath svgPath = tile.getSVGPath();
+        if (null != svgPath) {
+            svgPathPressedHandler = e -> tile.fireTileEvent(SVG_PRESSED_EVENT);
+            graphicRegion = new Region();
+            graphicRegion.setShape(svgPath);
+            getPane().getChildren().addAll(titleText, text, chartPane, graphicRegion);
+        } else {
+            getPane().getChildren().addAll(titleText, text, chartPane);
+        }
     }
 
     @Override protected void registerListeners() {
@@ -114,6 +134,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             dataItemMap.entrySet().forEach(entry -> chartPane.getChildren().add(entry.getValue()));
             updateChart();
         }));
+        if (null != tile.getSVGPath()) { graphicRegion.addEventHandler(MouseEvent.MOUSE_PRESSED, svgPathPressedHandler); }
 
         pane.widthProperty().addListener(paneSizeListener);
         pane.heightProperty().addListener(paneSizeListener);
@@ -127,6 +148,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
+            if (null != graphicRegion) { Helper.enableNode(graphicRegion, tile.isTextVisible()); }
         } else if ("DATA".equals(EVENT_TYPE)) {
             updateChart();
         }
@@ -136,6 +158,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
         pane.widthProperty().removeListener(paneSizeListener);
         pane.heightProperty().removeListener(paneSizeListener);
         tile.getBarChartItems().forEach(item -> item.removeChartDataEventListener(updateHandler));
+        if (null != tile.getSVGPath()) { graphicRegion.removeEventHandler(MouseEvent.MOUSE_PRESSED, svgPathPressedHandler); }
         dataItemMap.clear();
         super.dispose();
     }
@@ -193,6 +216,19 @@ public class ClusterMonitorTileSkin extends TileSkin {
             chartPane.setSpacing((contentBounds.getHeight() - (noOfChartData * itemHeight)) / 1.5);
         }
 
+        if (null != graphicRegion) {
+            double prefGraphicSize = 0.05 * size;
+            graphicRegion.setMinSize(prefGraphicSize, prefGraphicSize);
+            graphicRegion.setMaxSize(prefGraphicSize, prefGraphicSize);
+            graphicRegion.setPrefSize(prefGraphicSize, prefGraphicSize);
+            switch(tile.getTextAlignment()) {
+                default    :
+                case LEFT  :
+                case CENTER: graphicRegion.relocate(width - (size * 0.05) - prefGraphicSize, height - size * 0.05 - prefGraphicSize); break;
+                case RIGHT : graphicRegion.relocate(size * 0.05, height - size * 0.05 - prefGraphicSize); break;
+            }
+        }
+
         updateChart();
     }
 
@@ -206,6 +242,10 @@ public class ClusterMonitorTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
+
+        if (null != graphicRegion) {
+            graphicRegion.setBackground(new Background(new BackgroundFill(tile.getSVGPath().getFill(), CornerRadii.EMPTY, Insets.EMPTY)));
+        }
     }
 
     private void updateChart() {

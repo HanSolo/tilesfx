@@ -46,6 +46,7 @@ import java.util.Map;
  * Time: 03:12
  */
 public class ClusterMonitorTileSkin extends TileSkin {
+    private static final double       MIN_HEIGHT = 100;
     private Text                      titleText;
     private Text                      text;
     private VBox                      chartPane;
@@ -177,18 +178,19 @@ public class ClusterMonitorTileSkin extends TileSkin {
         chartPane.relocate(contentBounds.getX(), contentBounds.getY());
         chartPane.setSpacing(contentBounds.getHeight() * 0.25);
 
-        //double itemHeight = contentBounds.getHeight() * 0.725 / (dataItemMap.size());
         double itemHeight = contentBounds.getHeight() / (dataItemMap.size());
 
         dataItemMap.values().forEach(item -> {
+            item.setCompressed(height < MIN_HEIGHT);
             item.setPrefSize(contentBounds.getWidth(), itemHeight);
             item.setLayoutX(contentBounds.getX());
         });
 
+        int noOfChartData = tile.getChartData().size();
         if (titleText.getText().isEmpty()) {
-            chartPane.setSpacing((contentBounds.getHeight() - (3 * itemHeight)));
+            chartPane.setSpacing((contentBounds.getHeight() - (noOfChartData * itemHeight)));
         } else {
-            chartPane.setSpacing((contentBounds.getHeight() - (3 * itemHeight)) / 1.5);
+            chartPane.setSpacing((contentBounds.getHeight() - (noOfChartData * itemHeight)) / 1.5);
         }
 
         updateChart();
@@ -230,6 +232,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
         private              Rectangle              bar;
         private              String                 formatString;
         private              double                 step;
+        private              boolean                compressed;
         private              ChartDataEventListener chartDataListener;
 
 
@@ -245,6 +248,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             bar               = new Rectangle(0, 0);
             formatString      = FORMAT_STRING;
             step              = PREF_WIDTH / (CHART_DATA.getMaxValue() - CHART_DATA.getMinValue());
+            compressed        = false;
             chartDataListener = e -> {
                 switch(e.getType()) {
                     case UPDATE  : update(); break;
@@ -260,16 +264,16 @@ public class ClusterMonitorTileSkin extends TileSkin {
             setPrefSize(contentBounds.getWidth(), contentBounds.getHeight() * 0.2375);
             Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * 0.50526316));
             title.setFont(font);
-            title.setTextFill(Color.rgb(238, 238, 238));
+            title.setTextFill(chartData.getTextColor());
             title.setAlignment(Pos.CENTER_LEFT);
 
             value.setFont(font);
-            value.setTextFill(Color.rgb(238, 238, 238));
+            value.setTextFill(chartData.getTextColor());
             value.setAlignment(Pos.CENTER_RIGHT);
             scale.setFill(Color.rgb(90, 90, 90));
             bar.setFill(chartData.getFillColor());
 
-            getChildren().addAll(title, value, scale, bar);
+            getChildren().addAll(scale, bar, title, value);
         }
 
         private void registerListeners() {
@@ -284,6 +288,13 @@ public class ClusterMonitorTileSkin extends TileSkin {
             update();
         }
 
+        public boolean isCompressed() { return compressed; }
+        public void setCompressed(final boolean COMPRESSED) {
+            compressed = COMPRESSED;
+            Helper.enableNode(scale, !compressed);
+            resize();
+        }
+
         public void update() {
             value.setText(String.format(Locale.US, formatString, chartData.getValue()));
             bar.setWidth(chartData.getValue() * step);
@@ -291,6 +302,13 @@ public class ClusterMonitorTileSkin extends TileSkin {
                 bar.setFill(chartData.getGradientLookup().getColorAt(chartData.getValue() / (chartData.getMaxValue() - chartData.getMinValue())));
             } else {
                 bar.setFill(chartData.getFillColor());
+            }
+            if (compressed) {
+                title.setTextFill(bar.getWidth() > width * 0.2 ? tile.getBackgroundColor() : chartData.getTextColor());
+                value.setTextFill(bar.getWidth() > width * 0.8 ? tile.getBackgroundColor() : chartData.getTextColor());
+            } else {
+                title.setTextFill(chartData.getTextColor());
+                value.setTextFill(chartData.getTextColor());
             }
         }
 
@@ -310,19 +328,26 @@ public class ClusterMonitorTileSkin extends TileSkin {
             title.setPrefSize(textWidth, textHeight);
             value.setPrefSize(textWidth, textHeight);
 
-            Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * 0.35));
+            Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * (compressed ? 0.5 : 0.35)));
             title.setFont(font);
             value.setFont(font);
 
             title.setLayoutX(0);
-            title.setLayoutY(0);
 
             value.setLayoutX(width * 0.5);
-            value.setLayoutY(0);
 
             bar.setX(0);
-            bar.setY(title.getLayoutY() + title.getFont().getSize() + height * 0.12);
-            bar.setHeight(height * 0.35);
+            if (compressed) {
+                bar.setY(height * 0.05);
+                bar.setHeight(height * 0.9);
+                value.setLayoutY((height - font.getSize()) * 0.5);
+                title.setLayoutY((height - font.getSize()) * 0.5);
+            } else {
+                bar.setY(title.getLayoutY() + font.getSize() + height * 0.12);
+                bar.setHeight(height * 0.35);
+                value.setLayoutY(0);
+                title.setLayoutY(0);
+            }
             bar.setWidth(chartData.getValue() * step);
 
             scale.setX(0);

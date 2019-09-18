@@ -1211,7 +1211,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setTextVisible(false);
                     TILE.setUnit("\u0025");
                     TILE.setAnimated(false);
-                    TILE.setDecimals(1);
+                    TILE.setDecimals(0);
                     TILE.setBarColor(Tile.BLUE);
                     break;
                 default:

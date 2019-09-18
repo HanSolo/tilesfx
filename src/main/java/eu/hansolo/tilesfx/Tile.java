@@ -5742,7 +5742,7 @@ public class Tile extends Control {
                 setTextVisible(false);
                 setUnit("\u0025");
                 setAnimated(false);
-                setDecimals(1);
+                setDecimals(0);
                 setBarColor(BLUE);
                 break;
             default:

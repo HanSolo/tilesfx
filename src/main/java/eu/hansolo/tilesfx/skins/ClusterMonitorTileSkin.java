@@ -66,8 +66,8 @@ public class ClusterMonitorTileSkin extends TileSkin {
 
         updateHandler    = e -> {
             switch(e.getType()) {
-                case UPDATE  : break;
-                case FINISHED: updateChart();
+                case UPDATE  : updateChart(); break;
+                case FINISHED: updateChart(); break;
             }
         };
         paneSizeListener = e -> updateChart();
@@ -247,8 +247,8 @@ public class ClusterMonitorTileSkin extends TileSkin {
             step              = PREF_WIDTH / (CHART_DATA.getMaxValue() - CHART_DATA.getMinValue());
             chartDataListener = e -> {
                 switch(e.getType()) {
-                    case UPDATE  : bar.setFill(chartData.getFillColor()); break;
-                    case FINISHED: update();
+                    case UPDATE  : update(); break;
+                    case FINISHED: update(); break;
                 }
             };
             initGraphics();
@@ -287,6 +287,11 @@ public class ClusterMonitorTileSkin extends TileSkin {
         public void update() {
             value.setText(String.format(Locale.US, formatString, chartData.getValue()));
             bar.setWidth(chartData.getValue() * step);
+            if (tile.isFillWithGradient() && null != chartData.getGradientLookup()) {
+                bar.setFill(chartData.getGradientLookup().getColorAt(chartData.getValue() / (chartData.getMaxValue() - chartData.getMinValue())));
+            } else {
+                bar.setFill(chartData.getFillColor());
+            }
         }
 
         public void dispose() {

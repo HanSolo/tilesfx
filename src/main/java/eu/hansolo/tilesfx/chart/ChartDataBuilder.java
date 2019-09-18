@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.chart;
 
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Location;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -106,6 +107,11 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
         return (B)this;
     }
 
+    public final B gradientLookup(final GradientLookup GRADIENT_LOOKUP) {
+        properties.put("gradientLookup", new SimpleObjectProperty(GRADIENT_LOOKUP));
+        return (B)this;
+    }
+
     public final B onChartDataEvent(final ChartDataEventListener HANDLER) {
         properties.put("onChartDataEvent", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
@@ -137,6 +143,8 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
                 DATA.setMinValue(((DoubleProperty) properties.get(key)).get());
             } else if("maxValue".equals(key)) {
                 DATA.setMaxValue(((DoubleProperty) properties.get(key)).get());
+            } else if ("gradientLookup".equals(key)) {
+                DATA.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
             } else if ("onChartDataEvent".equals(key)) {
                 DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
             }

@@ -31,49 +31,7 @@ import eu.hansolo.tilesfx.events.TimeEvent;
 import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.skins.BarChartItem;
-import eu.hansolo.tilesfx.skins.BarChartTileSkin;
-import eu.hansolo.tilesfx.skins.BarGaugeTileSkin;
-import eu.hansolo.tilesfx.skins.CalendarTileSkin;
-import eu.hansolo.tilesfx.skins.CharacterTileSkin;
-import eu.hansolo.tilesfx.skins.CircularProgressTileSkin;
-import eu.hansolo.tilesfx.skins.ClockTileSkin;
-import eu.hansolo.tilesfx.skins.CountryTileSkin;
-import eu.hansolo.tilesfx.skins.CustomTileSkin;
-import eu.hansolo.tilesfx.skins.DateTileSkin;
-import eu.hansolo.tilesfx.skins.DonutChartTileSkin;
-import eu.hansolo.tilesfx.skins.EphemerisTileSkin;
-import eu.hansolo.tilesfx.skins.FlipTileSkin;
-import eu.hansolo.tilesfx.skins.GaugeSparkLineTileSkin;
-import eu.hansolo.tilesfx.skins.GaugeTileSkin;
-import eu.hansolo.tilesfx.skins.HighLowTileSkin;
-import eu.hansolo.tilesfx.skins.ImageTileSkin;
-import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.skins.LeaderBoardTileSkin;
-import eu.hansolo.tilesfx.skins.MapTileSkin;
-import eu.hansolo.tilesfx.skins.MatrixTileSkin;
-import eu.hansolo.tilesfx.skins.NumberTileSkin;
-import eu.hansolo.tilesfx.skins.PercentageTileSkin;
-import eu.hansolo.tilesfx.skins.PlusMinusTileSkin;
-import eu.hansolo.tilesfx.skins.RadarChartTileSkin;
-import eu.hansolo.tilesfx.skins.RadialChartTileSkin;
-import eu.hansolo.tilesfx.skins.RadialPercentageTileSkin;
-import eu.hansolo.tilesfx.skins.SliderTileSkin;
-import eu.hansolo.tilesfx.skins.SmoothAreaChartTileSkin;
-import eu.hansolo.tilesfx.skins.SmoothedChartTileSkin;
-import eu.hansolo.tilesfx.skins.SparkLineTileSkin;
-import eu.hansolo.tilesfx.skins.StatusTileSkin;
-import eu.hansolo.tilesfx.skins.StockTileSkin;
-import eu.hansolo.tilesfx.skins.SunburstChartTileSkin;
-import eu.hansolo.tilesfx.skins.SwitchSliderTileSkin;
-import eu.hansolo.tilesfx.skins.SwitchTileSkin;
-import eu.hansolo.tilesfx.skins.TextTileSkin;
-import eu.hansolo.tilesfx.skins.TileSkin;
-import eu.hansolo.tilesfx.skins.TimelineTileSkin;
-import eu.hansolo.tilesfx.skins.TimeTileSkin;
-import eu.hansolo.tilesfx.skins.TimerControlTileSkin;
-import eu.hansolo.tilesfx.skins.WeatherTileSkin;
-import eu.hansolo.tilesfx.skins.WorldMapTileSkin;
+import eu.hansolo.tilesfx.skins.*;
 import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
@@ -180,7 +138,7 @@ public class Tile extends Control {
                            DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"), MATRIX("MatrixTileSkin"),
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
-                           IMAGE("ImageTileSkin"), TIMELINE("TimelineTileSkin");
+                           IMAGE("ImageTileSkin"), TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5634,6 +5592,7 @@ public class Tile extends Control {
             case BAR_GAUGE        : return new BarGaugeTileSkin(Tile.this);
             case IMAGE            : return new ImageTileSkin(Tile.this);
             case TIMELINE         : return new TimelineTileSkin(Tile.this);
+            case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -5778,6 +5737,14 @@ public class Tile extends Control {
                 setDecimals(0);
                 setTickLabelDecimals(0);
                 break;
+            case CLUSTER_MONITOR:
+                setTitle("IP Address");
+                setText("Last ping 0s");
+                setUnit("\u0025");
+                setAnimated(false);
+                setDecimals(1);
+                setBarColor(BLUE);
+                break;
             default:
                 break;
         }
@@ -5825,6 +5792,8 @@ public class Tile extends Control {
             case STATUS           : setSkin(new StatusTileSkin(Tile.this)); break;
             case BAR_GAUGE        : setSkin(new BarGaugeTileSkin(Tile.this)); break;
             case IMAGE            : setSkin(new ImageTileSkin(Tile.this)); break;
+            case TIMELINE         : setSkin(new TimelineTileSkin(Tile.this)); break;
+            case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

@@ -27,6 +27,8 @@ import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
 import eu.hansolo.tilesfx.tools.Statistics;
 import eu.hansolo.tilesfx.tools.TimeData;
+import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -67,6 +69,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -133,6 +139,7 @@ public class TimelineTileSkin extends TileSkin {
     private              Color                    tickLineColor;
     private              Color                    tickLabelColor;
     private              Text                     trendText;
+    private              Instant                  lastUpdate;
     private              double                   dotRadius;
     private              EventHandler<MouseEvent> mouseListener;
     private              Tooltip                  dotTooltip;
@@ -147,6 +154,14 @@ public class TimelineTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        TimerTask timerTask = new TimerTask() {
+            @Override public void run() {
+                Platform.runLater(() -> checkForOutdated());
+            }
+        };
+        Timer timer = new Timer("Timer");
+        timer.scheduleAtFixedRate(timerTask, 0l, 500l);
 
         dotTooltip = new Tooltip("");
         dotTooltip.setAutoHide(true);
@@ -294,6 +309,8 @@ public class TimelineTileSkin extends TileSkin {
         trendText.setTextOrigin(VPos.TOP);
         trendText.setFill(tile.getTextColor());
 
+        lastUpdate = Instant.now();
+
         path = new Path();
         path.setMouseTransparent(true);
         path.setStrokeLineJoin(StrokeLineJoin.ROUND);
@@ -423,6 +440,8 @@ public class TimelineTileSkin extends TileSkin {
         range = (maxValue - minValue);
 
         Instant now = Instant.now();
+        lastUpdate = now;
+
         long maxTime = now.getEpochSecond();
         long minTime = now.minus(timePeriod.toSeconds(), ChronoUnit.SECONDS).getEpochSecond();
 
@@ -673,6 +692,10 @@ public class TimelineTileSkin extends TileSkin {
     @Override public void dispose() {
         tile.timePeriodProperty().removeListener(periodListener);
         super.dispose();
+    }
+
+    private void checkForOutdated() {
+        valueText.setOpacity(((Instant.now().toEpochMilli() - lastUpdate.toEpochMilli())) > tile.getTimeoutMs() ? 0.5 : 1.0);
     }
 
     private void analyse(final List<ChartData> clampedDataList) {

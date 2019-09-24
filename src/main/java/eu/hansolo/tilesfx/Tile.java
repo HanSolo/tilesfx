@@ -554,6 +554,8 @@ public class Tile extends Control {
     private              ObjectProperty<Node>                          rightGraphics;
     private              boolean                                       _trendVisible;
     private              BooleanProperty                               trendVisible;
+    private              long                                          _timeoutMs;
+    private              LongProperty                                  timeoutMs;
     private              int                                           _numberOfValuesForTrendCalculation;
     private              IntegerProperty                               numberOfValuesForTrendCalculation;
     private              EventHandler<MouseEvent>                      infoRegionHandler;
@@ -702,6 +704,7 @@ public class Tile extends Control {
                 @NamedArg(value="middleGraphics", defaultValue="null") Node middleGraphics,
                 @NamedArg(value="rightGraphics", defaultValue="null") Node rightGraphics,
                 @NamedArg(value="trendVisible", defaultValue="true") boolean trendVisible,
+                @NamedArg(value="timeoutMs", defaultValue="1000") long timeoutMs,
                 @NamedArg(value="numberOfValuesForTrendCalculation", defaultValue="3") int numberOfValuesForTrendCalculation,
                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
                 @NamedArg(value="increment", defaultValue="1") int increment
@@ -912,6 +915,7 @@ public class Tile extends Control {
         _middleGraphics                     = null;
         _rightGraphics                      = null;
         _trendVisible                       = false;
+        _timeoutMs                          = 1000; //
         _numberOfValuesForTrendCalculation  = 3;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
@@ -5338,6 +5342,30 @@ public class Tile extends Control {
         }
         return trendVisible;
     }
+
+    /**
+     * Returns a timeout period in ms which is used e.g. in the TimelineTileSkin
+     * @return a timeout period in ms which is used e.g. in the TimelineTileSkin
+     */
+    public long getTimeoutMs() { return null == timeoutMs ? _timeoutMs : timeoutMs.get(); }
+    public void setTimeoutMs(final long TIMEOUT_MS) {
+        if (null == timeoutMs) {
+            _timeoutMs = TIMEOUT_MS;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            timeoutMs.set(TIMEOUT_MS);
+        }
+    }
+    public LongProperty timeoutMsProperty() {
+        if (null == timeoutMs) {
+            timeoutMs = new LongPropertyBase(_timeoutMs) {
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "timeoutMs"; }
+            };
+        }
+        return timeoutMs;
+    }
+
 
     public int getNumberOfValuesForTrendCalculation() { return null == numberOfValuesForTrendCalculation ? _numberOfValuesForTrendCalculation : numberOfValuesForTrendCalculation.get(); }
     public void setNumberOfValuesForTrendCalculation(final int NUMBER) {

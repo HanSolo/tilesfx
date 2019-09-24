@@ -977,6 +977,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B timeoutMs(final long TIMEOUT_MS) {
+        properties.put("timeoutMs", new SimpleLongProperty(TIMEOUT_MS));
+        return (B)this;
+    }
+
     public final B numberOfValuesForTrendCalculation(final int NUMBER) {
         properties.put("numberOfValuesForTrendCalculation", new SimpleIntegerProperty(NUMBER));
         return (B)this;
@@ -1664,6 +1669,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setRightGraphics(((ObjectProperty<Node>) properties.get(key)).get());
             } else if ("trendVisible".equals(key)) {
                 TILE.setTrendVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("timeoutMs".equals(key)) {
+                TILE.setTimeoutMs(((LongProperty) properties.get(key)).get());
             } else if ("numberOfValuesForTrendCalculation".equals(key)) {
                 TILE.setNumberOfValuesForTrendCalculation(((IntegerProperty) properties.get(key)).get());
             } else if ("backgroundImage".equals(key)) {

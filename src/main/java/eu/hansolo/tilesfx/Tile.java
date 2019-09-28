@@ -248,7 +248,9 @@ public class Tile extends Control {
     private        final TileEvent   BKG_IMAGE_EVENT           = new TileEvent(EventType.BACKGROUND_IMAGE);
     private        final TileEvent   REGIONS_ON_TOP_EVENT      = new TileEvent(EventType.REGIONS_ON_TOP);
     private        final TileEvent   INFO_REGION_HANDLER_EVENT = new TileEvent(EventType.INFO_REGION_HANDLER);
-    
+
+    private static       String      userAgentStyleSheet;
+
     // Tile events
     private              Queue<TileEvent>         tileEventQueue      = new LinkedBlockingQueue<>();
     private              List<TileEventListener>  tileEventListeners  = new CopyOnWriteArrayList<>();
@@ -5642,7 +5644,10 @@ public class Tile extends Control {
         }
     }
 
-    @Override public String getUserAgentStylesheet() { return getClass().getResource("tilesfx.css").toExternalForm(); }
+    @Override public String getUserAgentStylesheet() {
+        if (null == userAgentStyleSheet) { userAgentStyleSheet = getClass().getResource("tilesfx.css").toExternalForm(); }
+        return userAgentStyleSheet;
+    }
 
     private void presetTileParameters(final SkinType SKIN_TYPE) {
         switch (SKIN_TYPE) {

@@ -935,6 +935,73 @@ public class Tile extends Control {
             }
             fireTileEvent(FINISHED_EVENT);
         });
+        presetTileParameters(skinType);
+    }
+
+    public void reInit() {
+        setTrackColor(TileColor.BLUE);
+        setTextSize(TextSize.NORMAL);
+        setRoundedCorners(true);
+        setMinMeasuredValueVisible(false);
+        setMaxMeasuredValueVisible(false);
+        setOldValueVisible(false);
+        setValueVisible(true);
+        setForegroundColor(FOREGROUND);
+        setBackgroundColor(BACKGROUND);
+        setBorderColor(Color.TRANSPARENT);
+        setBorderWidth(1);
+        setKnobColor(FOREGROUND);
+        setActiveColor(BLUE);
+        setAnimated(false);
+        setShadowsEnabled(false);
+        setNeedleColor(FOREGROUND);
+        setHourColor(FOREGROUND);
+        setMinuteColor(FOREGROUND);
+        setSecondColor(FOREGROUND);
+        setBarColor(BLUE);
+        setBarBackgroundColor(BACKGROUND);
+        setTitleColor(FOREGROUND);
+        setDescriptionColor(FOREGROUND);
+        setUnitColor(FOREGROUND);
+        setValueColor(FOREGROUND);
+        setTextColor(FOREGROUND);
+        setDateColor(FOREGROUND);
+        setHourTickMarkColor(FOREGROUND);
+        setMinuteTickMarkColor(FOREGROUND);
+        setAlarmColor(FOREGROUND);
+        setTickLabelColor(FOREGROUND);
+        setTickMarkColor(FOREGROUND);
+        setThresholdColor(RED);
+        setLowerThresholdColor(RED);
+        setInnerShadowEnabled(false);
+        setThresholdVisible(false);
+        setAverageVisible(false);
+        setSectionsVisible(false);
+        setSectionsAlwaysVisible(false);
+        setSectionTextVisible(false);
+        setSectionIconsVisible(false);
+        setHighlightSections(false);
+        setOrientation(Orientation.HORIZONTAL);
+        setKeepAspect(true);
+        setSmoothing(false);
+        setSecondsVisible(false);
+        setTextVisible(false);
+        setDateVisible(false);
+        setHourTickMarksVisible(false);
+        setMinuteTickMarksVisible(false);
+        setAlarmsVisible(false);
+        setStrokeWithGradient(false);
+        setFillWithGradient(false);
+        setChartGridColor(Tile.GRAY);
+        setDataPointsVisible(false);
+        setSnapToTicks(false);
+        setNotifyRegionBackgroundColor(Tile.YELLOW);
+        setNotifyRegionForegroundColor(Tile.BACKGROUND);
+        setInfoRegionBackgroundColor(Tile.DARK_BLUE);
+        setInfoRegionForegroundColor(Tile.FOREGROUND);
+        setBackgroundImageOpacity(0.2);
+        setBackgroundImageKeepAspect(true);
+        setTrendVisible(false);
     }
 
     private void registerListeners() {
@@ -5649,7 +5716,8 @@ public class Tile extends Control {
         return userAgentStyleSheet;
     }
 
-    private void presetTileParameters(final SkinType SKIN_TYPE) {
+    public void presetTileParameters(final SkinType SKIN_TYPE) {
+        reInit();
         switch (SKIN_TYPE) {
             case SMOOTHED_CHART:
                 break;

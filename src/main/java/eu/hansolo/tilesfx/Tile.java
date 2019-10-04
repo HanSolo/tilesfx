@@ -985,7 +985,6 @@ public class Tile extends Control {
         setKeepAspect(true);
         setSmoothing(false);
         setSecondsVisible(false);
-        setTextVisible(false);
         setDateVisible(false);
         setHourTickMarksVisible(false);
         setMinuteTickMarksVisible(false);
@@ -5764,6 +5763,8 @@ public class Tile extends Control {
                 setSectionsVisible(true);
                 setHighlightSections(true);
                 setCheckSectionsForValue(true);
+                setHourTickMarksVisible(true);
+                setMinuteTickMarksVisible(true);
                 break;
             case NUMBER:
                 break;

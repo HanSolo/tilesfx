@@ -20,7 +20,7 @@ import eu.hansolo.tilesfx.tools.TreeNode;
 
 
 public class TreeNodeEvent<T> {
-    public enum EventType { PARENT_CHANGED, CHILDREN_CHANGED, NODE_SELECTED }
+    public enum EventType { PARENT_CHANGED, CHILDREN_CHANGED, CHILD_ADDED, CHILD_REMOVED, NODE_SELECTED }
 
     private final TreeNode<T>  SRC;
     private final EventType TYPE;

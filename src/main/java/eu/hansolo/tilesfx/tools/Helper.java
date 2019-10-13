@@ -37,6 +37,8 @@ import javafx.util.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -51,6 +53,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import static eu.hansolo.tilesfx.tools.Country.AD;
@@ -301,18 +304,18 @@ import static eu.hansolo.tilesfx.tools.Country.ZW;
  * Created by hansolo on 11.12.15.
  */
 public class Helper {
-    private static final double                         EPSILON                  = 1E-6;
-    private static final String                         HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
-    private static final String                         LORES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/lowres.properties";
-    private static       Properties                     hiresCountryProperties;
-    private static       Properties                     loresCountryProperties;
+    private static final double       EPSILON                  = 1E-6;
+    private static final String       HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
+    private static final String       LORES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/lowres.properties";
+    private static       Properties   hiresCountryProperties;
+    private static       Properties   loresCountryProperties;
 
-    public static final double   MAP_WIDTH         = 1009.1149817705154 - 1.154000163078308;
-    public static final double   MAP_HEIGHT        = 665.2420043945312;
-    public static final double   MAP_OFFSET_X      = -MAP_WIDTH * 0.0285;
-    public static final double   MAP_OFFSET_Y      = MAP_HEIGHT * 0.195;
+    public  static final double       MAP_WIDTH    = 1009.1149817705154 - 1.154000163078308;
+    public  static final double       MAP_HEIGHT   = 665.2420043945312;
+    public  static final double       MAP_OFFSET_X = -MAP_WIDTH * 0.0285;
+    public  static final double       MAP_OFFSET_Y = MAP_HEIGHT * 0.195;
 
-    public static final double   MIN_FONT_SIZE     = 5;
+    public static final double        MIN_FONT_SIZE = 5;
 
     public static final CountryGroup AMERICAS = new CountryGroup("AMERICAS", AI, AG, AR, AW, BS, BB, BZ, BM, BO, BR, CA, KY, CL, CO, CR, CU, DM, DO, EC, SV, GF, GD, GP, GT, GY, HT, HN, JM, MQ, MX, MS, NI, PA, PY, PE, PR, BL, KN, LC, MF, PM, VC, SR, TT, TC, US, UY, VE, VG, VI);
     public static final CountryGroup APAC     = new CountryGroup("APAC", AS, AU, BD, BN, BT, CC, CK, CN, CX, FJ, FM, GU, HK, ID, IN, IO, JP, KH, KI, KP, KR, LA, LK, MH, MM, MN, MO, MP, MV, MY, NC, NF, NP, NR, NU, NZ, PF, PG, PH, PK, PN, PW, SB, SG, TH, TK, TL, TO, TV, TW, VN, VU, WF, WS);
@@ -364,6 +367,15 @@ public class Helper {
                                                       "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
                                                       "W", "X", "Y", "Z", "-", "/", ":", ",", "", ";", "@",
                                                       "#", "+", "?", "!", "%", "$", "=", "<", ">", "\u00C4", "\u00D6", "\u00DC", "\u00DF"};
+
+    public static final java.time.Duration   TIME_PERIOD_24_HOURS  = Duration.ofHours(24);
+    public static final java.time.Duration   TIME_PERIOD_3_DAYS    = Duration.ofDays(3);
+    public static final java.time.Duration   TIME_PERIOD_5_DAYS    = Duration.ofDays(5);
+    public static final java.time.Duration   TIME_PERIOD_7_DAYS    = Duration.ofDays(7);
+    public static final java.time.Duration   TIME_PERIOD_1_MONTH   = Duration.ofSeconds(Period.ofMonths(1).getDays() * 86_400);
+    public static final java.time.Duration   TIME_PERIOD_3_MONTH   = Duration.ofSeconds(Period.ofMonths(3).getDays() * 86_400);
+    public static final java.time.Duration   TIME_PERIOD_6_MONTH   = Duration.ofSeconds(Period.ofMonths(6).getDays() * 86_400);
+    public static final java.time.Duration   TIME_PERIOD_12_MONTH  = Duration.ofSeconds(Period.ofYears(1).getDays() * 86_400);
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;
@@ -435,6 +447,65 @@ public class Helper {
         niceMaxValue   = (Math.ceil(MAX_VALUE / majorTickSpace) * majorTickSpace);
         minorTickSpace = calcNiceNumber(majorTickSpace / (maxNoOfMinorTicks - 1), true);
         return new double[]{ niceMinValue, niceMaxValue, majorTickSpace, minorTickSpace };
+    }
+
+    /**
+     * Calculates nice minValue, maxValue and stepSize for given MIN and MAX values
+     * @param MIN
+     * @param MAX
+     * @return array of doubles with [niceMin, niceMax, niceRange, niceStep]
+     */
+    public static final double[] getNiceScale(final double MIN, final double MAX) {
+        return getNiceScale(MIN, MAX, 20);
+    }
+    /**
+     * Calculates nice minValue, maxValue and stepSize for given MIN and MAX values
+     * @param MIN
+     * @param MAX
+     * @param MAX_NO_OF_TICKS
+     * @return array of doubles with [niceMin, niceMax, niceRange, niceStep]
+     */
+    public static final double[] getNiceScale(final double MIN, final double MAX, final int MAX_NO_OF_TICKS) {
+        // Minimal increment to avoid round extreme values to be on the edge of the chart
+        double minimum = MIN;
+        double maximum = MAX;
+        double epsilon = (MAX - MIN) / 1e6;
+        maximum += epsilon;
+        minimum -= epsilon;
+        double range = maximum - minimum;
+
+        // Target number of values to be displayed on the Y axis (it may be less)
+        int stepCount = MAX_NO_OF_TICKS;
+        // First approximation
+        double roughStep = range / (stepCount - 1);
+
+        // Set best niceStep for the range
+        //double[] goodNormalizedSteps = { 1, 1.5, 2, 2.5, 5, 7.5, 10 }; // keep the 10 at the end
+        double[] goodNormalizedSteps = { 1, 2, 5, 10 };
+
+        // Normalize rough niceStep to find the normalized one that fits best
+        double stepPower          = Math.pow(10, -Math.floor(Math.log10(Math.abs(roughStep))));
+        double normalizedStep     = roughStep * stepPower;
+        double goodNormalizedStep = 1;
+        for (double step : goodNormalizedSteps) {
+            if (Double.compare(step, normalizedStep) >= 0) {
+                goodNormalizedStep = step;
+                break;
+            }
+        }
+
+        double niceStep           = goodNormalizedStep / stepPower;
+
+        // Determine the scale limits based on the chosen niceStep.
+        double niceMin = minimum < 0 ? Math.floor(minimum / niceStep) * niceStep : Math.ceil(minimum / niceStep) * niceStep;
+        double niceMax = maximum < 0 ? Math.floor(maximum / niceStep) * niceStep : Math.ceil(maximum / niceStep) * niceStep;
+
+        if (MIN % niceStep == 0) { niceMin = MIN; }
+        if (MAX % niceStep == 0) { niceMax = MAX; }
+
+        double niceRange = niceMax - niceMin;
+
+        return new double[] { niceMin, niceMax, niceRange, niceStep };
     }
 
     /**
@@ -559,10 +630,12 @@ public class Helper {
     }
 
     public static final ThreadFactory getThreadFactory(final String THREAD_NAME, final boolean IS_DAEMON) {
-        return runnable -> {
-            Thread thread = new Thread(runnable, THREAD_NAME);
-            thread.setDaemon(IS_DAEMON);
-            return thread;
+        return new ThreadFactory() {
+            @Override public Thread newThread(final Runnable runnable) {
+                Thread thread = new Thread(runnable, THREAD_NAME);
+                thread.setDaemon(IS_DAEMON);
+                return thread;
+            }
         };
     }
 
@@ -828,6 +901,48 @@ public class Helper {
     }
 
     // Smooth given path defined by it's list of path elements
+    public static final void smoothPath(final Path PATH, final boolean FILLED) {
+        List<PathElement> pathElements = PATH.getElements();
+        if (pathElements.isEmpty()) { return; }
+        final Point[] dataPoints = new Point[pathElements.size()];
+        for (int i = 0; i < pathElements.size(); i++) {
+            final PathElement element = pathElements.get(i);
+            if (element instanceof MoveTo) {
+                MoveTo move   = (MoveTo) element;
+                dataPoints[i] = new Point(move.getX(), move.getY());
+            } else if (element instanceof LineTo) {
+                LineTo line   = (LineTo) element;
+                dataPoints[i] = new Point(line.getX(), line.getY());
+            }
+        }
+        double                 zeroY               = ((MoveTo) pathElements.get(0)).getY();
+        List<PathElement>      smoothedElements    = new ArrayList<>();
+        Pair<Point[], Point[]> result              = calcCurveControlPoints(dataPoints);
+        Point[]                firstControlPoints  = result.getKey();
+        Point[]                secondControlPoints = result.getValue();
+        // Start path dependent on filled or not
+        if (FILLED) {
+            smoothedElements.add(new MoveTo(dataPoints[0].getX(), zeroY));
+            smoothedElements.add(new LineTo(dataPoints[0].getX(), dataPoints[0].getY()));
+        } else {
+            smoothedElements.add(new MoveTo(dataPoints[0].getX(), dataPoints[0].getY()));
+        }
+        // Add curves
+        for (int i = 2; i < dataPoints.length; i++) {
+            final int ci = i - 1;
+            smoothedElements.add(new CubicCurveTo(
+                firstControlPoints[ci].getX(), firstControlPoints[ci].getY(),
+                secondControlPoints[ci].getX(), secondControlPoints[ci].getY(),
+                dataPoints[i].getX(), dataPoints[i].getY()));
+        }
+        // Close the path if filled
+        if (FILLED) {
+            smoothedElements.add(new LineTo(dataPoints[dataPoints.length - 1].getX(), zeroY));
+            smoothedElements.add(new ClosePath());
+        }
+        PATH.getElements().setAll(smoothedElements);
+    }
+
     public static final Path smoothPath(final ObservableList<PathElement> ELEMENTS, final boolean FILLED) {
         if (ELEMENTS.isEmpty()) { return new Path(); }
         final Point[] dataPoints = new Point[ELEMENTS.size()];
@@ -874,10 +989,8 @@ public class Helper {
         int n = DATA_POINTS.length - 1;
         if (n == 1) { // Special case: Bezier curve should be a straight line.
             firstControlPoints     = new Point[1];
-
             firstControlPoints[0]  = new Point((2 * DATA_POINTS[0].getX() + DATA_POINTS[1].getX()) / 3, (2 * DATA_POINTS[0].getY() + DATA_POINTS[1].getY()) / 3);
             secondControlPoints    = new Point[1];
-
             secondControlPoints[0] = new Point(2 * firstControlPoints[0].getX() - DATA_POINTS[0].getX(), 2 * firstControlPoints[0].getY() - DATA_POINTS[0].getY());
             return new Pair<>(firstControlPoints, secondControlPoints);
         }
@@ -960,7 +1073,7 @@ public class Helper {
         double[]     pointsX             = new double[noOfPointsInPolygon];
         double[]     pointsY             = new double[noOfPointsInPolygon];
         int          pointCounter        = 0;
-        
+
         for (int i = 0, size = points.size() ; i < size - 1 ; i += 2) {
             pointsX[pointCounter] = points.get(i);
             pointsY[pointCounter] = points.get(i + 1);
@@ -1054,7 +1167,7 @@ public class Helper {
         double angle       = (theta + ANGLE_OFFSET) % 360;
         return angle;
     }
-    
+
     public static final Point rotatePointAroundRotationCenter(final Point POINT, final Point ROTATION_CENTER, final double ANGLE) {
         double[] xy = rotatePointAroundRotationCenter(POINT.getX(), POINT.getY(), ROTATION_CENTER.getX(), ROTATION_CENTER.getY(), ANGLE);
         return new Point(xy[0], xy[1]);
@@ -1094,7 +1207,7 @@ public class Helper {
     }
 
     public static final <T> Predicate<T> not(final Predicate<T> PREDICATE) { return PREDICATE.negate(); }
-    
+
     public static final List<Point> createSmoothedConvexHull(final List<Point> POINTS, final int SUB_DIVISIONS) {
         List<Point> hullPolygon = createConvexHull(POINTS);
         return subdividePoints(hullPolygon, SUB_DIVISIONS);
@@ -1188,5 +1301,22 @@ public class Helper {
     private static final <T extends Point> int pointLocation(final T P1, final T P2, final T P3) {
         double cp1 = (P2.getX() - P1.getX()) * (P3.getY() - P1.getY()) - (P2.getY() - P1.getY()) * (P3.getX() - P1.getX());
         return cp1 > 0 ? 1 : Double.compare(cp1, 0) == 0 ? 0 : -1;
+    }
+
+    public static final String padLeft(final String text, final String filler, final int n) {
+        return String.format("%" + n + "s", text).replace(" ", filler);
+    }
+    public static final String padRight(final String text, final String filler, final int n) {
+        return String.format("%-" + n + "s", text).replace(" ", filler);
+    }
+    
+    public static int calcNumberOfDatapointsForPeriod(final Duration TIME_PERIOD, final TimeUnit RESOLUTION) {
+        switch(RESOLUTION) {
+            case DAYS   : return (int) TIME_PERIOD.getSeconds() / 86_400;
+            case HOURS  : return (int) TIME_PERIOD.getSeconds() / 3_600;
+            case MINUTES: return (int) TIME_PERIOD.getSeconds() / 60;
+            case SECONDS:
+            default     : return (int) TIME_PERIOD.getSeconds();
+        }
     }
 }

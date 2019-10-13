@@ -60,6 +60,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
@@ -69,6 +70,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -109,6 +111,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B threshold(final double VALUE) {
         properties.put("threshold", new SimpleDoubleProperty(VALUE));
+        return (B)this;
+    }
+
+    public final B lowerThreshold(final double VALUE) {
+        properties.put("lowerThreshold", new SimpleDoubleProperty(VALUE));
         return (B)this;
     }
 
@@ -174,6 +181,21 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B averagingPeriod(final int PERIOD) {
         properties.put("averagingPeriod", new SimpleIntegerProperty(PERIOD));
+        return (B)this;
+    }
+
+    public final B timePeriod(final java.time.Duration PERIOD) {
+        properties.put("timePeriod", new SimpleObjectProperty(PERIOD));
+        return (B)this;
+    }
+
+    public final B maxTimePeriod(final java.time.Duration MAX_PERIOD) {
+        properties.put("maxTimePeriod", new SimpleObjectProperty<>(MAX_PERIOD));
+        return (B)this;
+    }
+
+    public final B timePeriodResolution(final TimeUnit RESOLUTION) {
+        properties.put("timePeriodResolution", new SimpleObjectProperty(RESOLUTION));
         return (B)this;
     }
 
@@ -412,6 +434,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public B lowerThresholdColor(final Color COLOR) {
+        properties.put("lowerThresholdColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B checkSectionsForValue(final boolean CHECK) {
         properties.put("checkSectionsForValue", new SimpleBooleanProperty(CHECK));
         return (B)this;
@@ -587,6 +614,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B tickLabelColor(final Color COLOR) {
+        properties.put("tickLabelColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B tickMarkColor(final Color COLOR) {
+        properties.put("tickMarkColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B hourTickMarksVisible(final boolean VISIBLE) {
         properties.put("hourTickMarksVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -647,6 +684,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B onTileEvent(final TileEventListener LISTENER) {
+        properties.put("onTileEvent", new SimpleObjectProperty(LISTENER));
+        return (B)this;
+    }
+
     public final B increment(final double INCREMENT) {
         properties.put("increment", new SimpleDoubleProperty(INCREMENT));
         return (B)this;
@@ -669,6 +711,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B graphic(final Node GRAPHIC) {
         properties.put("graphic", new SimpleObjectProperty(GRAPHIC));
+        return (B)this;
+    }
+
+    public final B svgPath(final SVGPath SVG_PATH) {
+        properties.put("svgPath", new SimpleObjectProperty(SVG_PATH));
         return (B)this;
     }
 
@@ -873,6 +920,21 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B rightGraphics(final Node NODE) {
         properties.put("rightGraphics", new SimpleObjectProperty(NODE));
+        return (B)this;
+    }
+
+    public final B trendVisible(final boolean VISIBLE) {
+        properties.put("trendVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B timeoutMs(final long TIMEOUT_MS) {
+        properties.put("timeoutMs", new SimpleLongProperty(TIMEOUT_MS));
+        return (B)this;
+    }
+
+    public final B numberOfValuesForTrendCalculation(final int NUMBER) {
+        properties.put("numberOfValuesForTrendCalculation", new SimpleIntegerProperty(NUMBER));
         return (B)this;
     }
 
@@ -1101,6 +1163,14 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case IMAGE:
                     TILE.setTextAlignment(TextAlignment.CENTER);
                     break;
+                case CLUSTER_MONITOR:
+                    TILE.setTitle("");
+                    TILE.setTextVisible(false);
+                    TILE.setUnit("\u0025");
+                    TILE.setAnimated(false);
+                    TILE.setDecimals(0);
+                    TILE.setBarColor(Tile.BLUE);
+                    break;
                 default:
                     break;
             }
@@ -1266,6 +1336,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
             } else if("averagingPeriod".equals(key)) {
                 TILE.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
+            } else if ("timePeriod".equals(key)) {
+                TILE.setTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
+            } else if ("maxTimePeriod".equals(key)) {
+                TILE.setMaxTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
+            } else if ("timePeriodResolution".equals(key)) {
+                TILE.setTimePeriodResolution(((ObjectProperty<TimeUnit>) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {
@@ -1336,6 +1412,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("thresholdColor".equals(key)) {
                 TILE.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("lowerThresholdColor".equals(key)) {
+                TILE.setLowerThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("orientation".equals(key)) {
                 TILE.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
             } else if ("checkSectionsForValue".equals(key)) {
@@ -1348,6 +1426,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setKeepAspect(((BooleanProperty) properties.get(key)).get());
             } else if ("threshold".equals(key)) {
                 TILE.setThreshold(((DoubleProperty) properties.get(key)).get());
+            } else if ("lowerThreshold".equals(key)) {
+                TILE.setLowerThreshold(((DoubleProperty) properties.get(key)).get());
             } else if ("referenceValue".equals(key)) {
                 TILE.setReferenceValue(((DoubleProperty) properties.get(key)).get());
             } else if ("autoReferenceValue".equals(key)) {
@@ -1388,6 +1468,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("alarmColor".equals(key)) {
                 TILE.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("tickLabelColor".equals(key)) {
+                TILE.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("tickMarkColor".equals(key)) {
+                TILE.setTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("hourTickMarksVisible".equals(key)) {
                 TILE.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("minuteTickMarksVisible".equals(key)) {
@@ -1402,6 +1486,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
             } else if ("onTimeEvent".equals(key)) {
                 TILE.setOnTimeEvent(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
+            } else if ("onTileEvent".equals(key)) {
+                TILE.setOnTileEvent(((ObjectProperty<TileEventListener>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
                 TILE.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("alarmsVisible".equals(key)) {
@@ -1426,6 +1512,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setImageMask(((ObjectProperty<ImageMask>) properties.get(key)).get());
             } else if ("graphic".equals(key)) {
                 TILE.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
+            } else if ("svgPath".equals(key)) {
+                TILE.setSVGPath(((ObjectProperty<SVGPath>) properties.get(key)).get());
             } else if ("roundedCorners".equals(key)) {
                 TILE.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
             } else if ("textSize".equals(key)) {
@@ -1502,6 +1590,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setMiddleGraphics(((ObjectProperty<Node>) properties.get(key)).get());
             } else if ("rightGraphics".equals(key)) {
                 TILE.setRightGraphics(((ObjectProperty<Node>) properties.get(key)).get());
+            } else if ("trendVisible".equals(key)) {
+                TILE.setTrendVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("timeoutMs".equals(key)) {
+                TILE.setTimeoutMs(((LongProperty) properties.get(key)).get());
+            } else if ("numberOfValuesForTrendCalculation".equals(key)) {
+                TILE.setNumberOfValuesForTrendCalculation(((IntegerProperty) properties.get(key)).get());
             } else if ("backgroundImage".equals(key)) {
                 TILE.setBackgroundImage(((ObjectProperty<Image>) properties.get(key)).get());
             } else if ("backgroundImageOpacity".equals(key)) {

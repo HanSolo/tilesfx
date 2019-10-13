@@ -16,7 +16,6 @@
 
 package eu.hansolo.tilesfx.tools;
 
-import eu.hansolo.tilesfx.Tile;
 import javafx.beans.NamedArg;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.IntegerPropertyBase;
@@ -44,7 +43,52 @@ public class FlowGridPane extends GridPane {
 
     // ******************** Constructors **************************************
     public FlowGridPane(final @NamedArg("NO_OF_COLS")int NO_OF_COLS, final @NamedArg("NO_OF_ROWS")int NO_OF_ROWS) {
-        this(NO_OF_COLS, NO_OF_ROWS, null);
+        super();
+        internalCall = false;
+        _noOfCols    = NO_OF_COLS;
+        _noOfRows    = NO_OF_ROWS;
+        noOfCols     = new IntegerPropertyBase(NO_OF_COLS) {
+            @Override protected void invalidated() {
+                ObservableList<ColumnConstraints> constraints = getColumnConstraints();
+                constraints.clear();
+                int cols = get();
+                for (int i = 0 ; i < cols ; ++i) {
+                    ColumnConstraints c = new ColumnConstraints();
+                    c.setHalignment(HPos.CENTER);
+                    c.setHgrow(Priority.ALWAYS);
+                    c.setMinWidth(60);
+                    constraints.add(c);
+                }
+                set(cols);
+                relayout();
+                if (internalCall) return;
+                _noOfCols = cols;
+            }
+            @Override public Object getBean() { return FlowGridPane.this; }
+            @Override public String getName() { return "noOfCols"; }
+        };
+        noOfRows     = new IntegerPropertyBase(NO_OF_ROWS) {
+            @Override protected void invalidated() {
+                ObservableList<RowConstraints> constraints = getRowConstraints();
+                constraints.clear();
+                int rows = get();
+                for (int i=0; i < rows; ++i) {
+                    RowConstraints r = new RowConstraints();
+                    r.setValignment(VPos.CENTER);
+                    r.setVgrow(Priority.ALWAYS);
+                    r.setMinHeight(20);
+                    constraints.add(r);
+                }
+                set(rows);
+                relayout();
+                if (internalCall) return;
+                _noOfRows = rows;
+            }
+            @Override public Object getBean() { return FlowGridPane.this; }
+            @Override public String getName() { return "noOfRows"; }
+        };
+        getChildren().addListener((ListChangeListener<Node>) change -> relayout());
+        registerListeners();
     }
     public FlowGridPane(final @NamedArg("NO_OF_COLS")int NO_OF_COLS, final @NamedArg("NO_OF_ROWS")int NO_OF_ROWS, final Node... NODES) {
         super();

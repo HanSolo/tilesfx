@@ -20,6 +20,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
+import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Location;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -59,6 +60,10 @@ public class ChartData implements Comparable<ChartData> {
     private       List<ChartDataEventListener> listenerList = new CopyOnWriteArrayList<>();
     private       DoubleProperty               currentValue;
     private       Timeline                     timeline;
+    private       String                       formatString;
+    private       double                       minValue;
+    private       double                       maxValue;
+    private       GradientLookup               gradientLookup;
 
 
     // ******************** Constructors **************************************
@@ -118,6 +123,9 @@ public class ChartData implements Comparable<ChartData> {
         timeline          = new Timeline();
         animated          = ANIMATED;
         animationDuration = ANIMATION_DURATION;
+        formatString      = "";
+        minValue          = 0;
+        maxValue          = 100;
 
         timeline.setOnFinished(e -> fireChartDataEvent(FINISHED_EVENT));
     }
@@ -183,7 +191,7 @@ public class ChartData implements Comparable<ChartData> {
         fireChartDataEvent(UPDATE_EVENT);
     }
 
-    public ZonedDateTime getTimestampAdDateTime() { return getTimestampAsDateTime(ZoneId.systemDefault()); }
+    public ZonedDateTime getTimestampAsDateTime() { return getTimestampAsDateTime(ZoneId.systemDefault()); }
     public ZonedDateTime getTimestampAsDateTime(final ZoneId ZONE_ID) { return ZonedDateTime.ofInstant(timestamp, ZONE_ID); }
 
     public LocalDate getTimestampAsLocalDate() { return getTimestampAsLocalDate(ZoneId.systemDefault()); }
@@ -194,6 +202,25 @@ public class ChartData implements Comparable<ChartData> {
 
     public long getAnimationDuration() { return animationDuration; }
     public void setAnimationDuration(final long DURATION) { animationDuration = clamp(10, 10000, DURATION); }
+
+    public boolean isWithinTimePeriod(final java.time.Duration PERIOD) {
+        return isWithinTimePeriod(Instant.now(), PERIOD);
+    }
+    public boolean isWithinTimePeriod(final Instant PERIOD_START, final java.time.Duration PERIOD) {
+        return timestamp.isBefore(PERIOD_START) && timestamp.isAfter(PERIOD_START.minus(PERIOD));
+    }
+
+    public String getFormatString() { return formatString; }
+    public void setFormatString(final String FORMAT_STRING) { formatString = FORMAT_STRING; }
+
+    public double getMaxValue() { return maxValue; }
+    public void setMaxValue(final double MAX_VALUE) { maxValue = MAX_VALUE; }
+
+    public double getMinValue() { return minValue; }
+    public void setMinValue(final double MIN_VALUE) { minValue = MIN_VALUE; }
+
+    public GradientLookup getGradientLookup() { return gradientLookup; }
+    public void setGradientLookup(final GradientLookup GRADIENT_LOOKUP) { gradientLookup = GRADIENT_LOOKUP; }
 
     @Override public String toString() {
         return new StringBuilder().append("{\n")

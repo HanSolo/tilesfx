@@ -30,47 +30,7 @@ import eu.hansolo.tilesfx.events.TimeEvent;
 import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
 import eu.hansolo.tilesfx.events.TimeEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.skins.BarChartItem;
-import eu.hansolo.tilesfx.skins.BarChartTileSkin;
-import eu.hansolo.tilesfx.skins.BarGaugeTileSkin;
-import eu.hansolo.tilesfx.skins.CalendarTileSkin;
-import eu.hansolo.tilesfx.skins.CharacterTileSkin;
-import eu.hansolo.tilesfx.skins.CircularProgressTileSkin;
-import eu.hansolo.tilesfx.skins.ClockTileSkin;
-import eu.hansolo.tilesfx.skins.CountryTileSkin;
-import eu.hansolo.tilesfx.skins.CustomTileSkin;
-import eu.hansolo.tilesfx.skins.DateTileSkin;
-import eu.hansolo.tilesfx.skins.DonutChartTileSkin;
-import eu.hansolo.tilesfx.skins.EphemerisTileSkin;
-import eu.hansolo.tilesfx.skins.FlipTileSkin;
-import eu.hansolo.tilesfx.skins.GaugeSparkLineTileSkin;
-import eu.hansolo.tilesfx.skins.GaugeTileSkin;
-import eu.hansolo.tilesfx.skins.HighLowTileSkin;
-import eu.hansolo.tilesfx.skins.ImageTileSkin;
-import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.skins.LeaderBoardTileSkin;
-import eu.hansolo.tilesfx.skins.MapTileSkin;
-import eu.hansolo.tilesfx.skins.MatrixTileSkin;
-import eu.hansolo.tilesfx.skins.NumberTileSkin;
-import eu.hansolo.tilesfx.skins.PercentageTileSkin;
-import eu.hansolo.tilesfx.skins.PlusMinusTileSkin;
-import eu.hansolo.tilesfx.skins.RadarChartTileSkin;
-import eu.hansolo.tilesfx.skins.RadialChartTileSkin;
-import eu.hansolo.tilesfx.skins.RadialPercentageTileSkin;
-import eu.hansolo.tilesfx.skins.SliderTileSkin;
-import eu.hansolo.tilesfx.skins.SmoothAreaChartTileSkin;
-import eu.hansolo.tilesfx.skins.SmoothedChartTileSkin;
-import eu.hansolo.tilesfx.skins.SparkLineTileSkin;
-import eu.hansolo.tilesfx.skins.StatusTileSkin;
-import eu.hansolo.tilesfx.skins.StockTileSkin;
-import eu.hansolo.tilesfx.skins.SwitchSliderTileSkin;
-import eu.hansolo.tilesfx.skins.SwitchTileSkin;
-import eu.hansolo.tilesfx.skins.TextTileSkin;
-import eu.hansolo.tilesfx.skins.TileSkin;
-import eu.hansolo.tilesfx.skins.TimeTileSkin;
-import eu.hansolo.tilesfx.skins.TimerControlTileSkin;
-import eu.hansolo.tilesfx.skins.WeatherTileSkin;
-import eu.hansolo.tilesfx.skins.WorldMapTileSkin;
+import eu.hansolo.tilesfx.skins.*;
 import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
@@ -125,6 +85,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
@@ -141,6 +102,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -176,7 +138,7 @@ public class Tile extends Control {
                            DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), MATRIX("MatrixTileSkin"),
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
-                           IMAGE("ImageTileSkin");
+                           IMAGE("ImageTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -236,23 +198,25 @@ public class Tile extends Control {
         NONE, ROUND, RECTANGULAR
     }
 
-    public  static final Color       BACKGROUND                = Color.rgb(42, 42, 42);
-    public  static final Color       FOREGROUND                = Color.rgb(223, 223, 223);
-    public  static final Color       GRAY                      = TileColor.GRAY.color;
-    public  static final Color       RED                       = TileColor.RED.color;
-    public  static final Color       LIGHT_RED                 = TileColor.LIGHT_RED.color;
-    public  static final Color       GREEN                     = TileColor.GREEN.color;
-    public  static final Color       LIGHT_GREEN               = TileColor.LIGHT_GREEN.color;
-    public  static final Color       BLUE                      = TileColor.BLUE.color;
-    public  static final Color       DARK_BLUE                 = TileColor.DARK_BLUE.color;
-    public  static final Color       ORANGE                    = TileColor.ORANGE.color;
-    public  static final Color       YELLOW_ORANGE             = TileColor.YELLOW_ORANGE.color;
-    public  static final Color       YELLOW                    = TileColor.YELLOW.color;
-    public  static final Color       MAGENTA                   = TileColor.MAGENTA.color;
-    public  static final Color       PINK                      = TileColor.PINK.color;
-    public  static final int         SHORT_INTERVAL            = 20;
-    public  static final int         LONG_INTERVAL             = 1000;
-    private static final int         MAX_NO_OF_DECIMALS        = 3;
+    public  static final Color              BACKGROUND                     = Color.rgb(42, 42, 42); // #2a2a2a
+    public  static final Color              FOREGROUND                     = Color.rgb(223, 223, 223); // #dfdfdf
+    public  static final Color              GRAY                           = TileColor.GRAY.color;
+    public  static final Color              RED                            = TileColor.RED.color;
+    public  static final Color              LIGHT_RED                      = TileColor.LIGHT_RED.color;
+    public  static final Color              GREEN                          = TileColor.GREEN.color;
+    public  static final Color              LIGHT_GREEN                    = TileColor.LIGHT_GREEN.color;
+    public  static final Color              BLUE                           = TileColor.BLUE.color;
+    public  static final Color              DARK_BLUE                      = TileColor.DARK_BLUE.color;
+    public  static final Color              ORANGE                         = TileColor.ORANGE.color;
+    public  static final Color              YELLOW_ORANGE                  = TileColor.YELLOW_ORANGE.color;
+    public  static final Color              YELLOW                         = TileColor.YELLOW.color;
+    public  static final Color              MAGENTA                        = TileColor.MAGENTA.color;
+    public  static final Color              PINK                           = TileColor.PINK.color;
+    public  static final int                SHORT_INTERVAL                 = 20;
+    public  static final int                LONG_INTERVAL                  = 1000;
+    public  static final java.time.Duration DEFAULT_TIME_PERIOD            = java.time.Duration.ofMinutes(1);
+    public  static final TimeUnit           DEFAULT_TIME_PERIOD_RESOLUTION = TimeUnit.SECONDS;
+    private static final int                MAX_NO_OF_DECIMALS             = 3;
 
     private        final TileEvent   SHOW_NOTIFY_REGION_EVENT  = new TileEvent(EventType.SHOW_NOTIFY_REGION);
     private        final TileEvent   HIDE_NOTIFY_REGION_EVENT  = new TileEvent(EventType.HIDE_NOTIFY_REGION);
@@ -275,6 +239,7 @@ public class Tile extends Control {
     private        final TileEvent   FINISHED_EVENT            = new TileEvent(EventType.FINISHED);
     private        final TileEvent   GRAPHIC_EVENT             = new TileEvent(EventType.GRAPHIC);
     private        final TileEvent   AVERAGING_EVENT           = new TileEvent(EventType.AVERAGING);
+    private        final TileEvent   TIME_PERIOD_EVENT         = new TileEvent(EventType.TIME_PERIOD);
     private        final TileEvent   LOCATION_EVENT            = new TileEvent(EventType.LOCATION);
     private        final TileEvent   TRACK_EVENT               = new TileEvent(EventType.TRACK);
     private        final TileEvent   MAP_PROVIDER_EVENT        = new TileEvent(EventType.MAP_PROVIDER);
@@ -282,7 +247,9 @@ public class Tile extends Control {
     private        final TileEvent   BKG_IMAGE_EVENT           = new TileEvent(EventType.BACKGROUND_IMAGE);
     private        final TileEvent   REGIONS_ON_TOP_EVENT      = new TileEvent(EventType.REGIONS_ON_TOP);
     private        final TileEvent   INFO_REGION_HANDLER_EVENT = new TileEvent(EventType.INFO_REGION_HANDLER);
-    
+
+    private static       String      userAgentStyleSheet;
+
     // Tile events
     private              Queue<TileEvent>         tileEventQueue      = new LinkedBlockingQueue<>();
     private              List<TileEventListener>  tileEventListeners  = new CopyOnWriteArrayList<>();
@@ -304,6 +271,8 @@ public class Tile extends Control {
     private              DoubleProperty                                range;
     private              double                                        _threshold;
     private              DoubleProperty                                threshold;
+    private              double                                        _lowerThreshold;
+    private              DoubleProperty                                lowerThreshold;
     private              double                                        _referenceValue;
     private              DoubleProperty                                referenceValue;
     private              boolean                                       _autoReferenceValue;
@@ -331,6 +300,12 @@ public class Tile extends Control {
     private              BooleanProperty                               averagingEnabled;
     private              int                                           _averagingPeriod;
     private              IntegerProperty                               averagingPeriod;
+    private              java.time.Duration                            _timePeriod;
+    private              ObjectProperty<java.time.Duration>            timePeriod;
+    private              java.time.Duration                            _maxTimePeriod;
+    private              ObjectProperty<java.time.Duration>            maxTimePeriod;
+    private              TimeUnit                                      _timePeriodResolution;
+    private              ObjectProperty<TimeUnit>                      timePeriodResolution;
     private              MovingAverage                                 movingAverage;
     private              ObservableList<Section>                       sections;
     private              ObservableList<TilesFXSeries<String, Number>> series;
@@ -348,6 +323,7 @@ public class Tile extends Control {
     private              ImageMask                                     _imageMask;
     private              ObjectProperty<ImageMask>                     imageMask;
     private              ObjectProperty<Node>                          graphic;
+    private              ObjectProperty<SVGPath>                       svgPath;
     private              Location                                      _currentLocation;
     private              ObjectProperty<Location>                      currentLocation;
     private              ObservableList<Location>                      poiList;
@@ -431,6 +407,8 @@ public class Tile extends Control {
     private              ObjectProperty<Color>                         valueColor;
     private              Color                                         _thresholdColor;
     private              ObjectProperty<Color>                         thresholdColor;
+    private              Color                                         _lowerThresholdColor;
+    private              ObjectProperty<Color>                         lowerThresholdColor;
     private              boolean                                       _checkSectionsForValue;
     private              BooleanProperty                               checkSectionsForValue;
     private              boolean                                       _checkThreshold;
@@ -496,6 +474,10 @@ public class Tile extends Control {
     private              ObjectProperty<Color>                         minuteTickMarkColor;
     private              Color                                         _alarmColor;
     private              ObjectProperty<Color>                         alarmColor;
+    private              Color                                         _tickLabelColor;
+    private              ObjectProperty<Color>                         tickLabelColor;
+    private              Color                                         _tickMarkColor;
+    private              ObjectProperty<Color>                         tickMarkColor;
     private              boolean                                       _hourTickMarksVisible;
     private              BooleanProperty                               hourTickMarksVisible;
     private              boolean                                       _minuteTickMarksVisible;
@@ -570,6 +552,12 @@ public class Tile extends Control {
     private              ObjectProperty<Node>                          middleGraphics;
     private              Node                                          _rightGraphics;
     private              ObjectProperty<Node>                          rightGraphics;
+    private              boolean                                       _trendVisible;
+    private              BooleanProperty                               trendVisible;
+    private              long                                          _timeoutMs;
+    private              LongProperty                                  timeoutMs;
+    private              int                                           _numberOfValuesForTrendCalculation;
+    private              IntegerProperty                               numberOfValuesForTrendCalculation;
     private              EventHandler<MouseEvent>                      infoRegionHandler;
 
     private volatile     ScheduledFuture<?>                            periodicTickTask;
@@ -650,6 +638,7 @@ public class Tile extends Control {
         formerValue                         = new SimpleDoubleProperty(Tile.this, "formerValue", value.get());
         _range                              = _maxValue - _minValue;
         _threshold                          = _maxValue;
+        _lowerThreshold                     = _minValue;
         _referenceValue                     = _minValue;
         _autoReferenceValue                 = true;
 
@@ -669,6 +658,9 @@ public class Tile extends Control {
         _textAlignment                      = TextAlignment.LEFT;
         _averagingEnabled                   = false;
         _averagingPeriod                    = 10;
+        _timePeriod                         = DEFAULT_TIME_PERIOD;
+        _maxTimePeriod                      = DEFAULT_TIME_PERIOD;
+        _timePeriodResolution               = DEFAULT_TIME_PERIOD_RESOLUTION;
         _duration                           = LocalTime.of(1, 0);
         _imageMask                          = ImageMask.NONE;
         _currentLocation                    = new Location(0, 0);
@@ -718,7 +710,10 @@ public class Tile extends Control {
         _hourTickMarkColor                  = FOREGROUND;
         _minuteTickMarkColor                = FOREGROUND;
         _alarmColor                         = FOREGROUND;
+        _tickLabelColor                     = FOREGROUND;
+        _tickMarkColor                      = FOREGROUND;
         _thresholdColor                     = RED;
+        _lowerThresholdColor                = RED;
         _checkSectionsForValue              = false;
         _checkThreshold                     = false;
         _innerShadowEnabled                 = false;
@@ -779,6 +774,9 @@ public class Tile extends Control {
         _leftGraphics                       = null;
         _middleGraphics                     = null;
         _rightGraphics                      = null;
+        _trendVisible                       = false;
+        _timeoutMs                          = 1000;
+        _numberOfValuesForTrendCalculation  = 3;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
         originalMinValue                    = -Double.MAX_VALUE;
@@ -795,6 +793,72 @@ public class Tile extends Control {
             }
             fireTileEvent(FINISHED_EVENT);
         });
+        presetTileParameters(skinType);
+    }
+
+    public void reInit() {
+        setTrackColor(TileColor.BLUE);
+        setTextSize(TextSize.NORMAL);
+        setRoundedCorners(true);
+        setMinMeasuredValueVisible(false);
+        setMaxMeasuredValueVisible(false);
+        setOldValueVisible(false);
+        setValueVisible(true);
+        setForegroundColor(FOREGROUND);
+        setBackgroundColor(BACKGROUND);
+        setBorderColor(Color.TRANSPARENT);
+        setBorderWidth(1);
+        setKnobColor(FOREGROUND);
+        setActiveColor(BLUE);
+        setAnimated(false);
+        setShadowsEnabled(false);
+        setNeedleColor(FOREGROUND);
+        setHourColor(FOREGROUND);
+        setMinuteColor(FOREGROUND);
+        setSecondColor(FOREGROUND);
+        setBarColor(BLUE);
+        setBarBackgroundColor(BACKGROUND);
+        setTitleColor(FOREGROUND);
+        setDescriptionColor(FOREGROUND);
+        setUnitColor(FOREGROUND);
+        setValueColor(FOREGROUND);
+        setTextColor(FOREGROUND);
+        setDateColor(FOREGROUND);
+        setHourTickMarkColor(FOREGROUND);
+        setMinuteTickMarkColor(FOREGROUND);
+        setAlarmColor(FOREGROUND);
+        setTickLabelColor(FOREGROUND);
+        setTickMarkColor(FOREGROUND);
+        setThresholdColor(RED);
+        setLowerThresholdColor(RED);
+        setInnerShadowEnabled(false);
+        setThresholdVisible(false);
+        setAverageVisible(false);
+        setSectionsVisible(false);
+        setSectionsAlwaysVisible(false);
+        setSectionTextVisible(false);
+        setSectionIconsVisible(false);
+        setHighlightSections(false);
+        setOrientation(Orientation.HORIZONTAL);
+        setKeepAspect(true);
+        setSmoothing(false);
+        setSecondsVisible(false);
+        setDateVisible(false);
+        setHourTickMarksVisible(false);
+        setMinuteTickMarksVisible(false);
+        setAlarmsVisible(false);
+        setStrokeWithGradient(false);
+        setFillWithGradient(false);
+        setChartGridColor(Tile.GRAY);
+        setDataPointsVisible(false);
+        setSnapToTicks(false);
+        setNotifyRegionBackgroundColor(Tile.YELLOW);
+        setNotifyRegionForegroundColor(Tile.BACKGROUND);
+        setInfoRegionBackgroundColor(Tile.DARK_BLUE);
+        setInfoRegionForegroundColor(Tile.FOREGROUND);
+        setBackgroundImageOpacity(0.2);
+        setBackgroundImageKeepAspect(true);
+        setTrendVisible(false);
     }
 
     private void registerListeners() {
@@ -1042,6 +1106,29 @@ public class Tile extends Control {
             };
         }
         return threshold;
+    }
+
+    public double getLowerThreshold() { return null == lowerThreshold ? _lowerThreshold : lowerThreshold.get(); }
+    public void setLowerThreshold(final double THRESHOLD) {
+        if (null == lowerThreshold) {
+            _lowerThreshold = clamp(getMinValue(), getMaxValue(), THRESHOLD);
+            fireTileEvent(RESIZE_EVENT);
+        } else {
+            lowerThreshold.set(THRESHOLD);
+        }
+    }
+    public DoubleProperty lowerThresholdProperty() {
+        if (null == lowerThreshold) {
+            lowerThreshold = new DoublePropertyBase(_lowerThreshold) {
+                @Override protected void invalidated() {
+                    set(clamp(getMinValue(), getMaxValue(), get()));
+                    fireTileEvent(RESIZE_EVENT);
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "lowerThreshold"; }
+            };
+        }
+        return lowerThreshold;
     }
 
     /**
@@ -1428,6 +1515,103 @@ public class Tile extends Control {
     public double getTimeBasedAverageOf(final java.time.Duration DURATION) { return movingAverage.getTimeBasedAverageOf(DURATION); }
 
     /**
+     * Returns the duration that should be used for the data shown in the TimelineTileSkin
+     * @return the duration that should be used for the data shown in the TimelineTileSkin
+     */
+    public java.time.Duration getTimePeriod() { return null == timePeriod ? _timePeriod : timePeriod.get(); }
+    /**
+     * Defines the duration that should be used for the data shown in the TimelineTileSkin
+     * @param PERIOD
+     */
+    public void setTimePeriod(final java.time.Duration PERIOD) {
+        if (null == timePeriod) {
+            _timePeriod = PERIOD;
+            if (PERIOD.getSeconds() > getMaxTimePeriod().getSeconds()) {
+                setMaxTimePeriod(PERIOD);
+            }
+            fireTileEvent(TIME_PERIOD_EVENT);
+        } else {
+            timePeriod.set(PERIOD);
+        }
+    }
+    public ObjectProperty<java.time.Duration> timePeriodProperty() {
+        if (null == timePeriod) {
+            timePeriod = new ObjectPropertyBase<java.time.Duration>(_timePeriod) {
+                @Override protected void invalidated() {
+                    if (get().getSeconds() > getMaxTimePeriod().getSeconds()) {
+                        setMaxTimePeriod(get());
+                    }
+                    fireTileEvent(TIME_PERIOD_EVENT);
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "timePeriod"; }
+            };
+            _timePeriod = null;
+        }
+        return timePeriod;
+    }
+
+    /**
+     * Returns the duration that will be used to store datapoints in the skin
+     * Values that are not within that duration won't be stored.
+     * @return the duration that will be used to store datapoints in the skin
+     */
+    public java.time.Duration getMaxTimePeriod() { return null == maxTimePeriod ? _maxTimePeriod : maxTimePeriod.get(); }
+    /**
+     * Defines the duration that will be used to store datapoints in the skin
+     * @param MAX_PERIOD
+     */
+    public void setMaxTimePeriod(final java.time.Duration MAX_PERIOD) {
+        if (null == maxTimePeriod) {
+            _maxTimePeriod = MAX_PERIOD;
+            if (getTimePeriod().getSeconds() > _maxTimePeriod.getSeconds()) {
+                setTimePeriod(MAX_PERIOD);
+                fireTileEvent(TIME_PERIOD_EVENT);
+            }
+        } else {
+            maxTimePeriod.set(MAX_PERIOD);
+        }
+    }
+    public ObjectProperty<java.time.Duration> maxTimePeriodProperty() {
+        if (null == maxTimePeriod) {
+            maxTimePeriod = new ObjectPropertyBase<java.time.Duration>(_maxTimePeriod) {
+                @Override protected void invalidated() {
+                    if (getTimePeriod().getSeconds() < get().getSeconds()) {
+                        setTimePeriod(get());
+                    }
+                    fireTileEvent(TIME_PERIOD_EVENT);
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "maxTimePeriod"; }
+            };
+            _maxTimePeriod = null;
+        }
+
+        return maxTimePeriod;
+    }
+
+    public TimeUnit getTimePeriodResolution() { return null == timePeriodResolution ? _timePeriodResolution : timePeriodResolution.get(); }
+    public void setTimePeriodResolution(final TimeUnit RESOLUTION) {
+        if (null == timePeriodResolution) {
+            _timePeriodResolution = RESOLUTION;
+            fireTileEvent(TIME_PERIOD_EVENT);
+        } else {
+            timePeriodResolution.set(RESOLUTION);
+        }
+    }
+    public ObjectProperty<TimeUnit> timePeriodResolutionProperty() {
+        if (null == timePeriodResolution) {
+            timePeriodResolution = new ObjectPropertyBase<TimeUnit>(_timePeriodResolution) {
+                @Override protected void invalidated() { fireTileEvent(TIME_PERIOD_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "timePeriodResolution"; }
+            };
+            _timePeriodResolution = null;
+        }
+        return timePeriodResolution;
+    }
+
+    /**
      * Returns a duration that will be used in the TimeTileSkin
      * @return a duration that will be used in the TimeTileSkin
      */
@@ -1700,6 +1884,21 @@ public class Tile extends Control {
             };
         }
         return graphic;
+    }
+
+    public SVGPath getSVGPath() { return null == svgPath ? null : svgPath.get(); }
+    public void setSVGPath(final SVGPath SVG_PATH) { svgPathProperty().set(SVG_PATH); }
+    public ObjectProperty<SVGPath> svgPathProperty() {
+        if (null == svgPath) {
+            svgPath = new ObjectPropertyBase<SVGPath>() {
+                @Override protected void invalidated() {
+                    fireTileEvent(RESIZE_EVENT);
+                }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "svgPath"; }
+            };
+        }
+        return svgPath;
     }
 
     public Location getCurrentLocation() { return null == currentLocation ? _currentLocation : currentLocation.get(); }
@@ -3025,6 +3224,27 @@ public class Tile extends Control {
         return thresholdColor;
     }
 
+    public Color getLowerThresholdColor() { return null == lowerThresholdColor ? _lowerThresholdColor : lowerThresholdColor.get(); }
+    public void setLowerThresholdColor(final Color COLOR) {
+        if (null == lowerThresholdColor) {
+            _lowerThresholdColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            lowerThresholdColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> lowerThresholdColorProperty() {
+        if (null == lowerThresholdColor) {
+            lowerThresholdColor = new ObjectPropertyBase<Color>(_lowerThresholdColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "lowerThresholdColor"; }
+            };
+            _lowerThresholdColor = null;
+        }
+        return lowerThresholdColor;
+    }
+
     /**
      * Returns true if the value of the gauge should be checked against
      * all sections (if sections not empty). If a value enters a section
@@ -4046,6 +4266,56 @@ public class Tile extends Control {
     }
 
     /**
+     * Returns the color that will be used to colorize tick labels (e.g. in the SparkLineTileSkin)
+     * @return the color that will be used to colorize tick labels (e.g. in the SparkLineTileSkin)
+     */
+    public Color getTickLabelColor() { return null == tickLabelColor ? _tickLabelColor : tickLabelColor.get(); }
+    public void setTickLabelColor(final Color COLOR) {
+        if (null == tickLabelColor) {
+            _tickLabelColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            tickLabelColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> tickLabelColorProperty() {
+        if (null == tickLabelColor) {
+            tickLabelColor = new ObjectPropertyBase<Color>(_tickLabelColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "tickLabelColor"; }
+            };
+            _tickLabelColor = null;
+        }
+        return tickLabelColor;
+    }
+
+    /**
+     * Returns the color that will be used to colorize tick marks in some skins
+     * @return the color that will be used to colorize tick marks in some skins
+     */
+    public Color getTickMarkColor() { return null == tickMarkColor ? _tickMarkColor : tickMarkColor.get(); }
+    public void setTickMarkColor(final Color COLOR) {
+        if (null == tickMarkColor) {
+            _tickMarkColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            tickMarkColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> tickMarkColorProperty() {
+        if (null == tickMarkColor) {
+            tickMarkColor = new ObjectPropertyBase<Color>(_tickMarkColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "tickMarkColor"; }
+            };
+            _tickMarkColor = null;
+        }
+        return tickMarkColor;
+    }
+    
+    /**
      * Returns true if the hour tickmarks will be drawn.
      * @return true if the hour tickmarks will be drawn
      */
@@ -4984,6 +5254,76 @@ public class Tile extends Control {
         return rightGraphics;
     }
 
+    /**
+     * Returns true if the trend indicator in the TimelineTileSkin is visible
+     * @return true if the trend indicator in the TimelineTileSkin is visible
+     */
+    public boolean isTrendVisible() { return null == trendVisible ? _trendVisible : trendVisible.get(); }
+    /**
+     * Defines the visibility of the trend indicator in the TimelineTileSkin
+     * @param VISIBLE
+     */
+    public void setTrendVisible(final boolean VISIBLE) {
+        if (null == trendVisible) {
+            _trendVisible = VISIBLE;
+            fireTileEvent(VISIBILITY_EVENT);
+        } else {
+            trendVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty trendVisibleProperty() {
+        if (null == trendVisible) {
+            trendVisible = new BooleanPropertyBase(_trendVisible) {
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "trendVisible"; }
+            };
+        }
+        return trendVisible;
+    }
+
+    /**
+     * Returns a timeout period in ms which is used e.g. in the TimelineTileSkin
+     * @return a timeout period in ms which is used e.g. in the TimelineTileSkin
+     */
+    public long getTimeoutMs() { return null == timeoutMs ? _timeoutMs : timeoutMs.get(); }
+    public void setTimeoutMs(final long TIMEOUT_MS) {
+        if (null == timeoutMs) {
+            _timeoutMs = TIMEOUT_MS;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            timeoutMs.set(TIMEOUT_MS);
+        }
+    }
+    public LongProperty timeoutMsProperty() {
+        if (null == timeoutMs) {
+            timeoutMs = new LongPropertyBase(_timeoutMs) {
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "timeoutMs"; }
+            };
+        }
+        return timeoutMs;
+    }
+
+
+    public int getNumberOfValuesForTrendCalculation() { return null == numberOfValuesForTrendCalculation ? _numberOfValuesForTrendCalculation : numberOfValuesForTrendCalculation.get(); }
+    public void setNumberOfValuesForTrendCalculation(final int NUMBER) {
+        if (null == numberOfValuesForTrendCalculation) {
+            _numberOfValuesForTrendCalculation = NUMBER;
+        } else {
+            numberOfValuesForTrendCalculation.set(NUMBER);
+        }
+    }
+    public IntegerProperty numberOfValuesForTrendCalculationProperty() {
+        if (null == numberOfValuesForTrendCalculation) {
+            numberOfValuesForTrendCalculation = new IntegerPropertyBase(_numberOfValuesForTrendCalculation) {
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "numberOfValuesForTrendCalculation"; }
+            };
+        }
+        return numberOfValuesForTrendCalculation;
+    }
+
     public void showNotifyRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFY_REGION_EVENT : HIDE_NOTIFY_REGION_EVENT); }
 
     public void showInfoRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_INFO_REGION_EVENT : HIDE_INFO_REGION_EVENT); }
@@ -5234,13 +5574,18 @@ public class Tile extends Control {
             case STATUS           : return new StatusTileSkin(Tile.this);
             case BAR_GAUGE        : return new BarGaugeTileSkin(Tile.this);
             case IMAGE            : return new ImageTileSkin(Tile.this);
+            case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
 
-    @Override public String getUserAgentStylesheet() { return getClass().getResource("tilesfx.css").toExternalForm(); }
+    @Override public String getUserAgentStylesheet() {
+        if (null == userAgentStyleSheet) { userAgentStyleSheet = getClass().getResource("tilesfx.css").toExternalForm(); }
+        return userAgentStyleSheet;
+    }
 
-    private void presetTileParameters(final SkinType SKIN_TYPE) {
+    public void presetTileParameters(final SkinType SKIN_TYPE) {
+        reInit();
         switch (SKIN_TYPE) {
             case SMOOTHED_CHART:
                 break;
@@ -5287,6 +5632,8 @@ public class Tile extends Control {
                 setSectionsVisible(true);
                 setHighlightSections(true);
                 setCheckSectionsForValue(true);
+                setHourTickMarksVisible(true);
+                setMinuteTickMarksVisible(true);
                 break;
             case NUMBER:
                 break;
@@ -5368,6 +5715,14 @@ public class Tile extends Control {
             case IMAGE:
                 setTextAlignment(TextAlignment.CENTER);
                 break;
+            case CLUSTER_MONITOR:
+                setTitle("");
+                setTextVisible(false);
+                setUnit("\u0025");
+                setAnimated(false);
+                setDecimals(0);
+                setBarColor(BLUE);
+                break;
             default:
                 break;
         }
@@ -5414,6 +5769,7 @@ public class Tile extends Control {
             case STATUS           : setSkin(new StatusTileSkin(Tile.this)); break;
             case BAR_GAUGE        : setSkin(new BarGaugeTileSkin(Tile.this)); break;
             case IMAGE            : setSkin(new ImageTileSkin(Tile.this)); break;
+            case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

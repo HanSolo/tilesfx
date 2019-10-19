@@ -49,6 +49,8 @@ public class BarGaugeTileSkin extends TileSkin {
     private              Arc            bar;
     private              Line           threshold;
     private              Text           thresholdText;
+    private              Line           lowerThreshold;
+    private              Text           lowerThresholdText;
 
 
     // ******************** Constructors **************************************
@@ -101,18 +103,26 @@ public class BarGaugeTileSkin extends TileSkin {
         bar.setStrokeLineCap(StrokeLineCap.BUTT);
         bar.setFill(null);
 
+        lowerThreshold = new Line();
+        lowerThreshold.setStroke(tile.getLowerThresholdColor());
+        lowerThreshold.setStrokeLineCap(StrokeLineCap.BUTT);
+        Helper.enableNode(lowerThreshold, tile.isLowerThresholdVisible());
+
+        lowerThresholdText = new Text(String.format(locale, formatString, tile.getLowerThreshold()));
+        Helper.enableNode(lowerThresholdText, tile.isLowerThresholdVisible());
+        
         threshold = new Line();
         threshold.setStroke(tile.getThresholdColor());
         threshold.setStrokeLineCap(StrokeLineCap.BUTT);
         Helper.enableNode(threshold, tile.isThresholdVisible());
-
+        
         thresholdText = new Text(String.format(locale, formatString, tile.getThreshold()));
         Helper.enableNode(thresholdText, tile.isThresholdVisible());
-
+        
         minValueText = new Text();
         maxValueText = new Text();
 
-        getPane().getChildren().addAll(barBackground, bar, threshold, thresholdText, minValueText, maxValueText, titleText, valueUnitFlow, text);
+        getPane().getChildren().addAll(barBackground, bar, lowerThreshold, lowerThresholdText, threshold, thresholdText, minValueText, maxValueText, titleText, valueUnitFlow, text);
     }
 
     @Override protected void registerListeners() {
@@ -129,6 +139,8 @@ public class BarGaugeTileSkin extends TileSkin {
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(lowerThreshold, tile.isLowerThresholdVisible());
+            Helper.enableNode(lowerThresholdText, tile.isLowerThresholdVisible());
             Helper.enableNode(threshold, tile.isThresholdVisible());
             Helper.enableNode(thresholdText, tile.isThresholdVisible());
             sectionsVisible = tile.getSectionsVisible();
@@ -277,6 +289,22 @@ public class BarGaugeTileSkin extends TileSkin {
         bar.setRadiusY(size * 0.325);
         bar.setStrokeWidth(size * 0.15);
 
+        lowerThreshold.setStrokeWidth(Helper.clamp(1.0, 2.0, 0.00675676 * size));
+        double lowerThresholdInnerRadius = 0.25 * size;
+        double lowerThresholdOuterRadius = 0.40 * size;
+        double lowerThresholdAngle       = Helper.clamp(90.0, 270.0, (tile.getThreshold() - minValue) * angleStep + 90.0);
+        lowerThreshold.setStartX(centerX + lowerThresholdInnerRadius * Math.sin(-Math.toRadians(lowerThresholdAngle)));
+        lowerThreshold.setStartY(centerY + lowerThresholdInnerRadius * Math.cos(-Math.toRadians(lowerThresholdAngle)));
+        lowerThreshold.setEndX(centerX + lowerThresholdOuterRadius * Math.sin(-Math.toRadians(lowerThresholdAngle)));
+        lowerThreshold.setEndY(centerY + lowerThresholdOuterRadius * Math.cos(-Math.toRadians(lowerThresholdAngle)));
+
+        double lowerThresholdTextRadius = 0.43 * size;
+        lowerThresholdText.setText(String.format(locale, tickLabelFormatString, tile.getThreshold()));
+        lowerThresholdText.setFont(Fonts.latoRegular(size * 0.047));
+        lowerThresholdText.setRotate(lowerThresholdAngle + 180);
+        lowerThresholdText.relocate(centerX - (lowerThresholdText.getLayoutBounds().getWidth() * 0.5) + lowerThresholdTextRadius * Math.sin(-Math.toRadians(lowerThresholdAngle)),
+                               centerY - (lowerThresholdText.getLayoutBounds().getWidth() * 0.5) + lowerThresholdTextRadius * Math.cos(-Math.toRadians(lowerThresholdAngle)));
+        
         threshold.setStrokeWidth(Helper.clamp(1.0, 2.0, 0.00675676 * size));
         double thresholdInnerRadius = 0.25 * size;
         double thresholdOuterRadius = 0.40 * size;
@@ -302,6 +330,7 @@ public class BarGaugeTileSkin extends TileSkin {
 
         barBackground.setStroke(tile.getBarBackgroundColor());
         setBar(tile.getCurrentValue());
+        lowerThreshold.setStroke(tile.getLowerThresholdColor());
         threshold.setStroke(tile.getThresholdColor());
 
         titleText.setText(tile.getTitle());
@@ -320,6 +349,7 @@ public class BarGaugeTileSkin extends TileSkin {
         minValueText.setFill(tile.getTextColor());
         maxValueText.setFill(tile.getTextColor());
 
+        lowerThresholdText.setFill(tile.getValueColor());
         thresholdText.setFill(tile.getValueColor());
     }
 }

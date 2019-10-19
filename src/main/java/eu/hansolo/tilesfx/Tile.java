@@ -419,6 +419,8 @@ public class Tile extends Control {
     private              BooleanProperty                               innerShadowEnabled;
     private              boolean                                       _thresholdVisible;
     private              BooleanProperty                               thresholdVisible;
+    private              boolean                                       _lowerThresholdVisible;
+    private              BooleanProperty                               lowerThresholdVisible;
     private              boolean                                       _averageVisible;
     private              BooleanProperty                               averageVisible;
     private              boolean                                       _sectionsVisible;
@@ -860,6 +862,7 @@ public class Tile extends Control {
         _checkThreshold                     = false;
         _innerShadowEnabled                 = false;
         _thresholdVisible                   = false;
+        _lowerThresholdVisible              = false;
         _averageVisible                     = false;
         _sectionsVisible                    = false;
         _sectionsAlwaysVisible              = false;
@@ -3488,6 +3491,36 @@ public class Tile extends Control {
             };
         }
         return thresholdVisible;
+    }
+
+    /**
+     * Returns true if the lower threshold indicator should be drawn.
+     *
+     * @return true if the lower threshold indicator should be drawn
+     */
+    public boolean isLowerThresholdVisible() { return null == lowerThresholdVisible ? _lowerThresholdVisible : lowerThresholdVisible.get(); }
+    /**
+     * Defines if the lower threshold indicator should be drawn
+     *
+     * @param VISIBLE
+     */
+    public void setLowerThresholdVisible(final boolean VISIBLE) {
+        if (null == lowerThresholdVisible) {
+            _lowerThresholdVisible = VISIBLE;
+            fireTileEvent(VISIBILITY_EVENT);
+        } else {
+            lowerThresholdVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty lowerThresholdVisibleProperty() {
+        if (null == lowerThresholdVisible) {
+            lowerThresholdVisible = new BooleanPropertyBase(_lowerThresholdVisible) {
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "lowerThresholdVisible"; }
+            };
+        }
+        return lowerThresholdVisible;
     }
 
     /**

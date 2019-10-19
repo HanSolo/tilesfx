@@ -463,6 +463,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B lowerThresholdVisible(final boolean VISIBLE) {
+        properties.put("lowerThresholdVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B averageVisible(final boolean VISIBLE) {
         properties.put("averageVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -1449,6 +1454,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("thresholdVisible".equals(key)) {
                 TILE.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("lowerThresholdVisible".equals(key)) {
+                TILE.setLowerThresholdVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("averageVisible".equals(key)) {
                 TILE.setAverageVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsVisible".equals(key)) {

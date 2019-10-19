@@ -33,10 +33,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -73,8 +76,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     private List<Point>                   points;
     private Path                          fillPath;
     private Path                          strokePath;
-    private Canvas                        canvas;
-    private GraphicsContext               ctx;
+    private Pane                          dataPointGroup;
     private boolean                       dataPointsVisible;
     private boolean                       smoothing;
     private double                        hStepSize;
@@ -137,9 +139,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         Helper.enableNode(fillPath, ChartType.AREA == tile.getChartType());
 
-        canvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        canvas.setMouseTransparent(true);
-        ctx    = canvas.getGraphicsContext2D();
+        dataPointGroup = new Pane();
+        dataPointGroup.setMouseTransparent(true);
 
         dataPointsVisible = tile.getDataPointsVisible();
 
@@ -174,7 +175,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         handleData();
 
-        getPane().getChildren().addAll(titleText, fillPath, strokePath, canvas, valueUnitFlow, selector);
+        getPane().getChildren().addAll(titleText, fillPath, strokePath, dataPointGroup, valueUnitFlow, selector);
     }
 
     @Override protected void registerListeners() {
@@ -203,8 +204,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
-            dataPointsVisible = tile.getDataPointsVisible();
-            if (dataPointsVisible) { drawChart(points); } else { ctx.clearRect(0, 0, width, height); }
+            Helper.enableNode(dataPointGroup, tile.getDataPointsVisible());
         } else if ("SERIES".equals(EVENT_TYPE)) {
             Helper.enableNode(fillPath, ChartType.AREA == tile.getChartType());
         }
@@ -259,7 +259,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         if (DATA.isEmpty()) { return; }
         final double LOWER_BOUND_X = 0;
         final double LOWER_BOUND_Y = tile.getMinValue();
-        ctx.clearRect(0, 0, width, height);
+        dataPointGroup.getChildren().clear();
         for (Point point : DATA) {
             double x = (point.getX() - LOWER_BOUND_X);
             double y = (point.getY() - LOWER_BOUND_Y);
@@ -268,16 +268,12 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     }
 
     private void drawDataPoint(final double X, final double Y, final Color COLOR) {
-        double borderSize     = size * 0.06;
-        double symbolSize     = size * 0.04;
-        double halfBorderSize = borderSize * 0.5;
-        double halfSymbolSize = symbolSize * 0.5;
-        ctx.save();
-        ctx.setFill(tile.getBackgroundColor());
-        ctx.fillOval(X -halfBorderSize, Y - halfBorderSize, borderSize, borderSize);
-        ctx.setFill(COLOR);
-        ctx.fillOval(X - halfSymbolSize, Y - halfSymbolSize, symbolSize, symbolSize);
-        ctx.restore();
+        double radius = size * 0.02;
+        Circle circle = new Circle(X, Y, radius);
+        circle.setStroke(tile.getBackgroundColor());
+        circle.setFill(COLOR);
+        circle.setStrokeWidth(size * 0.01);
+        dataPointGroup.getChildren().add(circle);
     }
 
     private void select(final MouseEvent EVT) {
@@ -399,8 +395,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         handleData();
         strokePath.setStrokeWidth(size * 0.02);
 
-        canvas.setWidth(width);
-        canvas.setHeight(height);
+        dataPointGroup.setPrefSize(width, height);
 
         double cornerRadius = tile.getRoundedCorners() ? size * 0.05 : 0;
 

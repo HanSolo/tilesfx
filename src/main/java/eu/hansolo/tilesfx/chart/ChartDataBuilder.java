@@ -112,6 +112,11 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
         return (B)this;
     }
 
+    public final B useChartDataColor(final boolean USE) {
+        properties.put("useChartDataColor", new SimpleBooleanProperty(USE));
+        return (B)this;
+    }
+
     public final B onChartDataEvent(final ChartDataEventListener HANDLER) {
         properties.put("onChartDataEvent", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
@@ -145,6 +150,8 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
                 DATA.setMaxValue(((DoubleProperty) properties.get(key)).get());
             } else if ("gradientLookup".equals(key)) {
                 DATA.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
+            } else if ("useChartDataColor".equals(key)) {
+                DATA.setUseChartDataColors(((BooleanProperty) properties.get(key)).get());
             } else if ("onChartDataEvent".equals(key)) {
                 DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
             }

@@ -64,6 +64,7 @@ public class ChartData implements Comparable<ChartData> {
     private       double                       minValue;
     private       double                       maxValue;
     private       GradientLookup               gradientLookup;
+    private       boolean                      useChartDataColors;
 
 
     // ******************** Constructors **************************************
@@ -104,14 +105,14 @@ public class ChartData implements Comparable<ChartData> {
         this(NAME, VALUE, FILL_COLOR, STROKE_COLOR, Tile.FOREGROUND, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Color TEXT_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
-        name              = NAME;
-        value             = VALUE;
-        oldValue          = 0;
-        fillColor         = FILL_COLOR;
-        strokeColor       = STROKE_COLOR;
-        textColor         = TEXT_COLOR;
-        timestamp         = TIMESTAMP;
-        currentValue      = new DoublePropertyBase(value) {
+        name               = NAME;
+        value              = VALUE;
+        oldValue           = 0;
+        fillColor          = FILL_COLOR;
+        strokeColor        = STROKE_COLOR;
+        textColor          = TEXT_COLOR;
+        timestamp          = TIMESTAMP;
+        currentValue       = new DoublePropertyBase(value) {
             @Override protected void invalidated() {
                 oldValue = value;
                 value    = get();
@@ -120,12 +121,13 @@ public class ChartData implements Comparable<ChartData> {
             @Override public Object getBean() { return ChartData.this; }
             @Override public String getName() { return "currentValue"; }
         };
-        timeline          = new Timeline();
-        animated          = ANIMATED;
-        animationDuration = ANIMATION_DURATION;
-        formatString      = "";
-        minValue          = 0;
-        maxValue          = 100;
+        timeline           = new Timeline();
+        animated           = ANIMATED;
+        animationDuration  = ANIMATION_DURATION;
+        formatString       = "";
+        minValue           = 0;
+        maxValue           = 100;
+        useChartDataColors = false;
 
         timeline.setOnFinished(e -> fireChartDataEvent(FINISHED_EVENT));
     }
@@ -142,6 +144,8 @@ public class ChartData implements Comparable<ChartData> {
     public double getValue() { return value; }
     public void setValue(final double VALUE) {
         if (animated) {
+            oldValue = value;
+            value = VALUE;
             timeline.stop();
             KeyValue kv1 = new KeyValue(currentValue, value, Interpolator.EASE_BOTH);
             KeyValue kv2 = new KeyValue(currentValue, VALUE, Interpolator.EASE_BOTH);
@@ -221,6 +225,9 @@ public class ChartData implements Comparable<ChartData> {
 
     public GradientLookup getGradientLookup() { return gradientLookup; }
     public void setGradientLookup(final GradientLookup GRADIENT_LOOKUP) { gradientLookup = GRADIENT_LOOKUP; }
+
+    public boolean getUseChartDataColor() { return useChartDataColors; }
+    public void setUseChartDataColors(final boolean USE) { useChartDataColors = USE; }
 
     @Override public String toString() {
         return new StringBuilder().append("{\n")

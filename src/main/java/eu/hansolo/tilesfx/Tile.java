@@ -565,7 +565,7 @@ public class Tile extends Control {
     private              EventHandler<MouseEvent>                      infoRegionHandler;
 
     private volatile     ScheduledFuture<?>                            periodicTickTask;
-    private static       ScheduledExecutorService                      periodicTickExecutorService;
+    private              ScheduledExecutorService                      periodicTickExecutorService;
 
 
     // ******************** Constructors **************************************

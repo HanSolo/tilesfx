@@ -33,12 +33,16 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -96,8 +100,8 @@ public class TimelineTileSkin extends TileSkin {
     private              Text                     upperUnitText;
     private              Line                     fractionLine;
     private              Text                     unitText;
-    private              TextFlow                 unitFlow;
-    private              TextFlow                 valueUnitFlow;
+    private              VBox                     unitFlow;
+    private              HBox                     valueUnitFlow;
     private              Text                     averageText;
     private              Text                     averageText2;
     private              Text                     minText;
@@ -225,11 +229,11 @@ public class TimelineTileSkin extends TileSkin {
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        unitFlow = new TextFlow(upperUnitText, unitText);
-        unitFlow.setTextAlignment(TextAlignment.RIGHT);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
 
-        valueUnitFlow = new TextFlow(valueText, unitFlow);
-        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
 
         averageText = new Text(String.format(locale, "\u2300 " + formatString, tile.getAverage()));
         averageText.setFill(Tile.FOREGROUND);
@@ -423,13 +427,11 @@ public class TimelineTileSkin extends TileSkin {
             valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
 
             fractionLine.setStartX(width - 0.17 * size);
-            fractionLine.setStartY(size * 0.3);
+            fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
             fractionLine.setEndX(width - 0.05 * size);
-            fractionLine.setEndY(size * 0.3);
+            fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
             fractionLine.setStroke(tile.getUnitColor());
             fractionLine.setStrokeWidth(size * 0.005);
-
-            unitFlow.setTranslateY(valueText.getLayoutBounds().getMinY() - upperUnitText.getLayoutBounds().getHeight());
         }
     }
 
@@ -861,15 +863,16 @@ public class TimelineTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
 
         fractionLine.setStartX(width - 0.17 * size);
-        fractionLine.setStartY(size * 0.3);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
         fractionLine.setEndX(width - 0.05 * size);
-        fractionLine.setEndY(size * 0.3);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
         fractionLine.setStroke(tile.getUnitColor());
         fractionLine.setStrokeWidth(size * 0.005);
 
-        unitFlow.setTranslateY(valueText.getLayoutBounds().getMinY() - upperUnitText.getLayoutBounds().getHeight());
+        unitFlow.setTranslateY(-size * 0.005);
     }
 
     @Override protected void redraw() {
@@ -879,11 +882,11 @@ public class TimelineTileSkin extends TileSkin {
 
         if (tile.getUnit().contains("/")) {
             String[] units = tile.getUnit().split("/");
-            upperUnitText.setText(units[0] + "\n");
+            upperUnitText.setText(units[0]);
             unitText.setText(units[1]);
             Helper.enableNode(fractionLine, true);
         } else {
-            upperUnitText.setText("");
+            upperUnitText.setText(" ");
             unitText.setText(tile.getUnit());
             Helper.enableNode(fractionLine, false);
         }

@@ -185,6 +185,7 @@ public class ImageTileSkin extends TileSkin {
                             break;
                         case NONE:
                         default  :
+                            imgView.setClip(null);
                             roundFrame.setManaged(false);
                             roundFrame.setVisible(false);
                             rectangularFrame.setManaged(false);

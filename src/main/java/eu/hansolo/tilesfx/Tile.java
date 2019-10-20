@@ -1979,7 +1979,7 @@ public class Tile extends Control {
     public void setImageMask(final ImageMask MASK) {
         if (null == imageMask) {
             _imageMask = MASK;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvent(RESIZE_EVENT);
         } else {
             imageMask.set(MASK);
         }

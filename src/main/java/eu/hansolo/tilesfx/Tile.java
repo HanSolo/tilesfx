@@ -5497,6 +5497,7 @@ public class Tile extends Control {
     }
 
     public boolean isShowing() { return null == showing ? false : showing.get(); }
+    public BooleanBinding showingProperty() { return showing; }
 
     private Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();

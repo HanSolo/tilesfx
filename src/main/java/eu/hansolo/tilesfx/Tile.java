@@ -5883,6 +5883,7 @@ public class Tile extends Control {
                 setTextAlignment(TextAlignment.CENTER);
                 break;
             case TIMELINE:
+                setDataPointsVisible(true);
                 setTextVisible(false);
                 setAnimated(false);
                 setAveragingEnabled(true);

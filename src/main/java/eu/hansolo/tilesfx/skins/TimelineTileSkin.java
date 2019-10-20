@@ -316,8 +316,12 @@ public class TimelineTileSkin extends TileSkin {
 
         dots = new LinkedHashMap<>(noOfDatapoints);
         dotGroup = new Group();
-        dotGroup.getChildren().setAll(dots.values());
-        dotGroup.getChildren().add(path);
+        if (tile.getDataPointsVisible()) {
+            dotGroup.getChildren().setAll(dots.values());
+            dotGroup.getChildren().add(path);
+        } else {
+            dotGroup.getChildren().setAll(path);
+        }
 
         getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, dotGroup, percentageInSectionGroup, averageLine, averageText, averageText2, minText, maxText, highText, lowText, trendText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
@@ -406,7 +410,12 @@ public class TimelineTileSkin extends TileSkin {
                 dot.addEventHandler(MouseEvent.MOUSE_EXITED, mouseListener);
                 dots.put(data, dot);
             });
-            dotGroup.getChildren().setAll(dots.values());
+            if (tile.getDataPointsVisible()) {
+                dotGroup.getChildren().setAll(dots.values());
+                dotGroup.getChildren().add(path);
+            } else {
+                dotGroup.getChildren().setAll(path);
+            }
 
             redraw();
         } else if (TileEvent.EventType.REGIONS_ON_TOP.name().equals(EVENT_TYPE)) {
@@ -623,16 +632,20 @@ public class TimelineTileSkin extends TileSkin {
             dot.addEventHandler(MouseEvent.MOUSE_EXITED, mouseListener);
             dots.put(data, dot);
         });
-        dotGroup.getChildren().setAll(dots.values());
-        dotGroup.getChildren().add(path);
+        if (tile.getDataPointsVisible()) {
+            dotGroup.getChildren().setAll(dots.values());
+            dotGroup.getChildren().add(path);
+        } else {
+            dotGroup.getChildren().setAll(path);
+        }
 
         int n = Helper.clamp(2, reducedDataList.size(), tile.getNumberOfValuesForTrendCalculation());
         if (reducedDataList.size() > n) {
             List<Double> firstNValues = reducedDataList.stream().map(ChartData::getValue).limit(n).collect(Collectors.toList());
-            Model        model       = DoubleExponentialSmoothingForLinearSeries.fit(firstNValues.stream().mapToDouble(Double::doubleValue).toArray(), 0.8, 0.2);
-            String forecast   = String.format(tile.getLocale(), "%.0f", model.forecast(1)[0]);
-            double stepX      = graphBounds.getWidth() / (noOfDatapoints - 1);
-            double trendAngle = (Helper.getAngleFromXY(0, DATA.getValue(), stepX, model.forecast(1)[0]) - 90);
+            Model        model        = DoubleExponentialSmoothingForLinearSeries.fit(firstNValues.stream().mapToDouble(Double::doubleValue).toArray(), 0.8, 0.2);
+            String       forecast     = String.format(tile.getLocale(), "%.0f", model.forecast(1)[0]);
+            double       stepX        = graphBounds.getWidth() / (noOfDatapoints - 1);
+            double       trendAngle   = (Helper.getAngleFromXY(0, DATA.getValue(), stepX, model.forecast(1)[0]) - 90);
             if (90 <= trendAngle && trendAngle < 112.5) {
                 trendText.setText("\u2191");
             } else if (112.5 <= trendAngle && trendAngle < 147.5) {

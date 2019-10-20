@@ -1220,6 +1220,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setTextAlignment(TextAlignment.CENTER);
                     break;
                 case TIMELINE:
+                    TILE.setDataPointsVisible(true);
                     TILE.setTextVisible(false);
                     TILE.setAnimated(false);
                     TILE.setAveragingEnabled(true);

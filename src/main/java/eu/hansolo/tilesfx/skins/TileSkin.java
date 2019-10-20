@@ -19,6 +19,8 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.InfoRegion;
@@ -182,12 +184,12 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected Pane getPane() { return pane; }
 
     protected void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
+        if (EventType.RESIZE.name().equals(EVENT_TYPE)) {
             resize();
             redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
+        } else if (EventType.REDRAW.name().equals(EVENT_TYPE)) {
             redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
+        } else if (EventType.RECALC.name().equals(EVENT_TYPE)) {
             minValue          = tile.getMinValue();
             maxValue          = tile.getMaxValue();
             range             = tile.getRange();
@@ -198,17 +200,17 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             highlightSections = tile.isHighlightSections();
             redraw();
             handleCurrentValue(tile.getCurrentValue());
-        } else if ("SECTION".equals(EVENT_TYPE)) {
+        } else if (EventType.SECTION.name().equals(EVENT_TYPE)) {
             sections = tile.getSections();
-        } else if ("SHOW_NOTIFY_REGION".equals(EVENT_TYPE)) {
+        } else if (EventType.SHOW_NOTIFY_REGION.name().equals(EVENT_TYPE)) {
             enableNode(notifyRegion, true);
-        } else if ("HIDE_NOTIFY_REGION".equals(EVENT_TYPE)) {
+        } else if (EventType.HIDE_NOTIFY_REGION.equals(EVENT_TYPE)) {
             enableNode(notifyRegion, false);
-        } else if ("SHOW_INFO_REGION".equals(EVENT_TYPE)) {
+        } else if (EventType.SHOW_INFO_REGION.name().equals(EVENT_TYPE)) {
             enableNode(infoRegion, true);
-        } else if ("HIDE_INFO_REGION".equals(EVENT_TYPE)) {
+        } else if (EventType.HIDE_INFO_REGION.name().equals(EVENT_TYPE)) {
             enableNode(infoRegion, false);
-        } else if ("BACKGROUND_IMAGE".equals(EVENT_TYPE)) {
+        } else if (EventType.BACKGROUND_IMAGE.name().equals(EVENT_TYPE)) {
             if (null == tile.getBackgroundImage()) {
                 enableNode(backgroundImageView, false);
             } else {
@@ -217,11 +219,11 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
                 backgroundImageView.setFitHeight(height);
                 enableNode(backgroundImageView, true);
             }
-        } else if ("REGIONS_ON_TOP".equals(EVENT_TYPE)) {
+        } else if (EventType.REGIONS_ON_TOP.name().equals(EVENT_TYPE)) {
             // Set upper left and upper right notifiers to front
             notifyRegion.toFront();
             infoRegion.toFront();
-        } else if ("INFO_REGION_HANDLER".equals(EVENT_TYPE)) {
+        } else if (EventType.INFO_REGION_HANDLER.name().equals(EVENT_TYPE)) {
             if (null != infoRegionHandler) { infoRegion.removeEventHandler(MouseEvent.ANY, infoRegionHandler); }
             infoRegionHandler = tile.getInfoRegionHandler();
             if (null == infoRegionHandler) { return; }

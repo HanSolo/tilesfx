@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries;
 import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries.Model;
@@ -27,7 +28,6 @@ import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
 import eu.hansolo.tilesfx.tools.Statistics;
 import eu.hansolo.tilesfx.tools.TimeData;
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
@@ -71,8 +71,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -360,7 +358,7 @@ public class TimelineTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
         if(tile.isAnimated()) { tile.setAnimated(false); }
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (TileEvent.EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
@@ -376,11 +374,11 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(percentageInSectionGroup, tile.getSectionsVisible());
             Helper.enableNode(trendText, tile.isTrendVisible());
             redraw();
-        } else if ("VALUE".equals(EVENT_TYPE)) {
+        } else if (TileEvent.EventType.VALUE.name().equals(EVENT_TYPE)) {
             double value = clamp(minValue, maxValue, tile.getValue());
             addData(new ChartData("", value, Instant.now()));
             handleCurrentValue(value);
-        } else if ("SECTION".equals(EVENT_TYPE)) {
+        } else if (TileEvent.EventType.SECTION.name().equals(EVENT_TYPE)) {
             percentageInSections.clear();
             tile.getSections().forEach(section -> {
                 Label sectionLabel = new Label();
@@ -389,7 +387,7 @@ public class TimelineTileSkin extends TileSkin {
                 percentageInSections.put(section, sectionLabel);
             });
             percentageInSectionGroup.getChildren().setAll(percentageInSections.values());
-        } else if ("TIME_PERIOD".equals(EVENT_TYPE)) {
+        } else if (TileEvent.EventType.TIME_PERIOD.name().equals(EVENT_TYPE)) {
             timePeriod        = tile.getTimePeriod();
             noOfDatapoints    = calcNumberOfDatapointsForPeriod(timePeriod);
             maxNoOfDatapoints = calcNumberOfDatapointsForPeriod(tile.getMaxTimePeriod());
@@ -411,6 +409,18 @@ public class TimelineTileSkin extends TileSkin {
             dotGroup.getChildren().setAll(dots.values());
 
             redraw();
+        } else if (TileEvent.EventType.REGIONS_ON_TOP.name().equals(EVENT_TYPE)) {
+            valueUnitFlow.setPrefWidth(width - size * 0.1);
+            valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+
+            fractionLine.setStartX(width - 0.17 * size);
+            fractionLine.setStartY(size * 0.3);
+            fractionLine.setEndX(width - 0.05 * size);
+            fractionLine.setEndY(size * 0.3);
+            fractionLine.setStroke(tile.getUnitColor());
+            fractionLine.setStrokeWidth(size * 0.005);
+
+            unitFlow.setTranslateY(valueText.getLayoutBounds().getMinY() - upperUnitText.getLayoutBounds().getHeight());
         }
     }
 
@@ -665,26 +675,26 @@ public class TimelineTileSkin extends TileSkin {
 
     private String createTimeSpanText() {
         long          timeSpan        = timePeriod.getSeconds();
-        StringBuilder timeSpanBuilder = new StringBuilder(movingAverage.isFilling() ? "\u22a2 " : "\u2190 ");
+        StringBuilder timeSpanBuilder = new StringBuilder();
         if (timeSpan > SEC_MONTH) { // 1 Month (30 days)
             int    months = (int)(timeSpan / SEC_MONTH);
             double days   = timeSpan % SEC_MONTH;
-            timeSpanBuilder.append(months).append("M").append(String.format(Locale.US, "%.0f", days)).append("d").append(" \u2192");
+            timeSpanBuilder.append(months).append("M").append(String.format(Locale.US, "%.0f", days)).append("d");
         } else if (timeSpan > SEC_DAY) { // 1 Day
             int    days  = (int) (timeSpan / SEC_DAY);
             double hours = (timeSpan - (days * SEC_DAY)) / SEC_HOUR;
-            timeSpanBuilder.append(days).append("d").append(String.format(Locale.US, "%.0f", hours)).append("h").append(" \u2192");
+            timeSpanBuilder.append(days).append("d").append(String.format(Locale.US, "%.0f", hours)).append("h");
         } else if (timeSpan > SEC_HOUR) { // 1 Hour
             int    hours   = (int)(timeSpan / SEC_HOUR);
             double minutes = (timeSpan - (hours * SEC_HOUR)) / SEC_MINUTE;
-            timeSpanBuilder.append(hours).append("h").append(String.format(Locale.US, "%.0f", minutes)).append("m").append(" \u2192");
+            timeSpanBuilder.append(hours).append("h").append(String.format(Locale.US, "%.0f", minutes)).append("m");
         } else if (timeSpan > SEC_MINUTE) { // 1 Minute
             int    minutes = (int)(timeSpan / SEC_MINUTE);
             double seconds = (timeSpan - (minutes * SEC_MINUTE));
-            timeSpanBuilder.append(minutes).append("m").append(String.format(Locale.US, "%.0f", seconds)).append("s").append(" \u2192");
+            timeSpanBuilder.append(minutes).append("m").append(String.format(Locale.US, "%.0f", seconds)).append("s");
         } else {
             int seconds = (int)timeSpan;
-            timeSpanBuilder.append(seconds).append("s").append(" \u2192");
+            timeSpanBuilder.append(seconds).append("s");
         }
         return timeSpanBuilder.toString();
     }

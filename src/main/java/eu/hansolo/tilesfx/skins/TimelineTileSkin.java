@@ -664,16 +664,6 @@ public class TimelineTileSkin extends TileSkin {
         }
 
         stdDeviation = Statistics.getChartDataStdDev(reducedDataList);
-        if (DATA.getValue() <= tile.getLowerThreshold()) {
-            tile.showNotifyRegion(true);
-            tile.setTooltipText("Value below lower threshold");
-        } else if (DATA.getValue() >= tile.getThreshold()) {
-            tile.showNotifyRegion(true);
-            tile.setTooltipText("Value above upper threshold");
-        } else {
-            tile.showNotifyRegion(false);
-            tile.setTooltipText("");
-        }
 
         analyse(reducedDataList);
 

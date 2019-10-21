@@ -738,6 +738,7 @@ public class TimelineTileSkin extends TileSkin {
         } else {
             averageText.setY(averageLine.getStartY() - (size * 0.0075));
         }
+        averageText.setVisible(fontSize > 6);
 
         fontSize = size * 0.06;
         minText.setFont(Fonts.latoRegular(fontSize));
@@ -777,9 +778,10 @@ public class TimelineTileSkin extends TileSkin {
         timeSpanText.relocate((width - timeSpanText.getLayoutBounds().getWidth()) * 0.5, height - size * 0.1);
 
         percentageInSections.entrySet().forEach(entry -> {
-            entry.getValue().setFont(Fonts.latoRegular(size * 0.02));
+            entry.getValue().setFont(Fonts.latoRegular(size * 0.025));
             entry.getValue().setPrefWidth(size * 0.065);
             entry.getValue().relocate(size * 0.05, sections.get(entry.getKey()).getLayoutBounds().getCenterY() - entry.getValue().getLayoutBounds().getCenterY());
+            entry.getValue().setVisible(size * 0.025 > 6);
         });
     }
     @Override protected void resizeStaticText() {

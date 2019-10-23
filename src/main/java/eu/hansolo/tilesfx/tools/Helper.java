@@ -370,14 +370,19 @@ public class Helper {
                                                       "W", "X", "Y", "Z", "-", "/", ":", ",", "", ";", "@",
                                                       "#", "+", "?", "!", "%", "$", "=", "<", ">", "\u00C4", "\u00D6", "\u00DC", "\u00DF"};
 
+    public static final long                 SECONDS_PER_MINUTE    = 60;
+    public static final long                 SECONDS_PER_HOUR      = 3_600;
+    public static final long                 SECONDS_PER_DAY       = 86_400;
+    public static final long                 SECONDS_PER_MONTH     = 2_592_000;
+
     public static final java.time.Duration   TIME_PERIOD_24_HOURS  = Duration.ofHours(24);
     public static final java.time.Duration   TIME_PERIOD_3_DAYS    = Duration.ofDays(3);
     public static final java.time.Duration   TIME_PERIOD_5_DAYS    = Duration.ofDays(5);
     public static final java.time.Duration   TIME_PERIOD_7_DAYS    = Duration.ofDays(7);
-    public static final java.time.Duration   TIME_PERIOD_1_MONTH   = Duration.ofSeconds(Period.ofMonths(1).getDays() * 86_400);
-    public static final java.time.Duration   TIME_PERIOD_3_MONTH   = Duration.ofSeconds(Period.ofMonths(3).getDays() * 86_400);
-    public static final java.time.Duration   TIME_PERIOD_6_MONTH   = Duration.ofSeconds(Period.ofMonths(6).getDays() * 86_400);
-    public static final java.time.Duration   TIME_PERIOD_12_MONTH  = Duration.ofSeconds(Period.ofYears(1).getDays() * 86_400);
+    public static final java.time.Duration   TIME_PERIOD_1_MONTH   = Duration.ofSeconds(Period.ofMonths(1).getDays() * SECONDS_PER_DAY);
+    public static final java.time.Duration   TIME_PERIOD_3_MONTH   = Duration.ofSeconds(Period.ofMonths(3).getDays() * SECONDS_PER_DAY);
+    public static final java.time.Duration   TIME_PERIOD_6_MONTH   = Duration.ofSeconds(Period.ofMonths(6).getDays() * SECONDS_PER_DAY);
+    public static final java.time.Duration   TIME_PERIOD_12_MONTH  = Duration.ofSeconds(Period.ofYears(1).getDays() * SECONDS_PER_DAY);
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;
@@ -1313,13 +1318,23 @@ public class Helper {
         }, ArrayList::new);
     }
 
-    public static int calcNumberOfDatapointsForPeriod(final Duration TIME_PERIOD, final TimeUnit RESOLUTION) {
+    public static final int calcNumberOfDatapointsForPeriod(final Duration TIME_PERIOD, final TimeUnit RESOLUTION) {
         switch(RESOLUTION) {
-            case DAYS   : return (int) TIME_PERIOD.getSeconds() / 86_400;
-            case HOURS  : return (int) TIME_PERIOD.getSeconds() / 3_600;
-            case MINUTES: return (int) TIME_PERIOD.getSeconds() / 60;
+            case DAYS   : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_DAY);
+            case HOURS  : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_HOUR);
+            case MINUTES: return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_MINUTE);
             case SECONDS:
             default     : return (int) TIME_PERIOD.getSeconds();
+        }
+    }
+
+    public static final int calcNumberOfVerticalTickLinesForPeriod(final Duration TIME_PERIOD, final TimeUnit RESOLUTION) {
+        switch(RESOLUTION) {
+            case DAYS   : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_MONTH);  // return Months
+            case HOURS  : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_DAY);    // return Days
+            case MINUTES: return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_HOUR);   // return Hours
+            case SECONDS:
+            default     : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_MINUTE); // return Minutes
         }
     }
 }

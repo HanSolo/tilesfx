@@ -191,7 +191,7 @@ public class TimelineTileSkin extends TileSkin {
         verticalTickLines   = new ArrayList<>(16);
         tickLabelsX         = new ArrayList<>(16);
         tickLabelsY         = new ArrayList<>(5);
-        int noOfVerticalLines = Helper.calcNumberOfVerticalTickLinesForPeriod(timePeriod, tile.getTimePeriodResolution());
+        int noOfVerticalLines = getNoOfVerticalLines(Instant.now(), timePeriod);
         for (long i = 0 ; i < noOfVerticalLines ; i++) {
             Line vLine = new Line(0, 0, 0, 0);
             vLine.getStrokeDashArray().addAll(1.0, 2.0);
@@ -516,8 +516,6 @@ public class TimelineTileSkin extends TileSkin {
         int    lineCountY        = 1;
         int    tickLabelOffsetY  = 1;
         double tickSpacingY      = niceScaleY.getTickSpacing();
-        int    noOfVerticalLines = Helper.calcNumberOfVerticalTickLinesForPeriod(timePeriod, tile.getTimePeriodResolution());
-        double tickStepX         = graphBounds.getWidth() / noOfVerticalLines;
         double tickStepY         = tickSpacingY * stepY;
         double tickStartY        = maxY - tickStepY;
         if (tickSpacingY < minValue) {
@@ -603,9 +601,7 @@ public class TimelineTileSkin extends TileSkin {
                 line.setEndY(maxY);
                 line.setStroke(tickLineColor);
                 lineCountX++;
-                lineCountX = clamp(0, noOfVerticalLines - 1, lineCountX);
             }
-
         }
 
         if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
@@ -815,6 +811,46 @@ public class TimelineTileSkin extends TileSkin {
             double noOfPointsInSection = clampedDataList.stream().filter(chartData -> entry.getKey().contains(chartData.getValue())).mapToDouble(ChartData::getValue).count();
             entry.getValue().setText(String.format(tile.getLocale(), "%.0f%%", ((noOfPointsInSection / noOfPointsInTimePeriod * 100))));
         });
+    }
+
+    private int getNoOfVerticalLines(final Instant START, final Duration TIME_PERIOD) {
+        long maxTime    = START.getEpochSecond();
+        long minTime    = START.minus(TIME_PERIOD.toSeconds(), ChronoUnit.SECONDS).getEpochSecond();
+        int  lineCountX = 0;
+        ZonedDateTime dateTime;
+        for (long t = minTime ;  t < maxTime ; t++) {
+            dateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(t), tile.getZoneId());
+            if (TIME_PERIOD.getSeconds() > Helper.SECONDS_PER_MONTH) {
+                if (1 == dateTime.getDayOfMonth() && 0 == dateTime.getHour() && 0 == dateTime.getMinute() && 0 == dateTime.getSecond()) { // Full day
+                    lineCountX++;
+                }
+            } else if (TIME_PERIOD.getSeconds() > Helper.SECONDS_PER_DAY) {
+                if (0 == dateTime.getHour() && 0 == dateTime.getMinute() && 0 == dateTime.getSecond()) { // Full day
+                    lineCountX++;
+                }
+            } else if (TIME_PERIOD.getSeconds() > Helper.SECONDS_PER_DAY / 2) {
+                if (dateTime.getHour() % 2 == 0 && 0 == dateTime.getMinute() && 0 == dateTime.getSecond()) { // Full hour
+                    lineCountX++;
+                }
+            } else if (TIME_PERIOD.getSeconds() > Helper.SECONDS_PER_DAY / 4) {
+                if (0 == dateTime.getMinute() && 0 == dateTime.getSecond()) { // Full hour
+                    lineCountX++;
+                }
+            } else if (TIME_PERIOD.getSeconds() > Helper.SECONDS_PER_HOUR) {
+                if ((0 == dateTime.getMinute() || 30 == dateTime.getMinute()) && 0 == dateTime.getSecond()) { // Full hour and half hour
+                    lineCountX++;
+                }
+            } else if (TIME_PERIOD.getSeconds() > Helper.SECONDS_PER_MINUTE) {
+                if (0 == dateTime.getSecond() && dateTime.getMinute() % 5 == 0) { // 5 minutes
+                    lineCountX++;
+                }
+            } else {
+                if (dateTime.getSecond() % 10 == 0) { // 10 seconds
+                    lineCountX++;
+                }
+            }
+        }
+        return lineCountX;
     }
 
 

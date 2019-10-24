@@ -211,7 +211,7 @@ public class ChartData implements Comparable<ChartData> {
         return isWithinTimePeriod(Instant.now(), PERIOD);
     }
     public boolean isWithinTimePeriod(final Instant PERIOD_START, final java.time.Duration PERIOD) {
-        return timestamp.isBefore(PERIOD_START) && timestamp.isAfter(PERIOD_START.minus(PERIOD));
+        return (timestamp.isBefore(PERIOD_START) || timestamp.equals(PERIOD_START)) && (timestamp.equals(PERIOD_START.minus(PERIOD)) || timestamp.isAfter(PERIOD_START.minus(PERIOD.plusSeconds(1))));
     }
 
     public String getFormatString() { return formatString; }

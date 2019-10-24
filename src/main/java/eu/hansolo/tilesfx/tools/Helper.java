@@ -1330,11 +1330,11 @@ public class Helper {
 
     public static final int calcNumberOfVerticalTickLinesForPeriod(final Duration TIME_PERIOD, final TimeUnit RESOLUTION) {
         switch(RESOLUTION) {
-            case DAYS   : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_MONTH);  // return Months
-            case HOURS  : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_DAY);    // return Days
-            case MINUTES: return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_HOUR);   // return Hours
+            case DAYS   : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_DAY);
+            case HOURS  : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_HOUR);
+            case MINUTES: return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_MINUTE);
             case SECONDS:
-            default     : return (int) (TIME_PERIOD.getSeconds() / SECONDS_PER_MINUTE); // return Minutes
+            default     : return (int) (TIME_PERIOD.getSeconds());
         }
     }
 }

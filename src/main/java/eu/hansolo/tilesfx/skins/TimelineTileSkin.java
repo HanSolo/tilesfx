@@ -61,7 +61,11 @@ import javafx.scene.text.TextFlow;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -89,12 +93,17 @@ import static eu.hansolo.tilesfx.tools.Helper.enableNode;
  * Time: 03:12
  */
 public class TimelineTileSkin extends TileSkin {
-    private static final int                      SEC_MONTH     = 2_592_000;
-    private static final int                      SEC_DAY       = 86_400;
-    private static final int                      SEC_HOUR      = 3_600;
-    private static final int                      SEC_MINUTE    = 60;
-    private              DateTimeFormatter        DTF           = DateTimeFormatter.ofPattern("dd.YY HH:mm");
-    private              DateTimeFormatter        timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private static final int                      SEC_MONTH        = 2_592_000;
+    private static final int                      SEC_DAY          = 86_400;
+    private static final int                      SEC_HOUR         = 3_600;
+    private static final int                      SEC_MINUTE       = 60;
+    private static final DateTimeFormatter        MONTH_FORMATTER  = DateTimeFormatter.ofPattern("MM");
+    private static final DateTimeFormatter        DAY_FORMATTER    = DateTimeFormatter.ofPattern("dd");
+    private static final DateTimeFormatter        HOUR_FORMATTER   = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter        MINUTE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter        SECOND_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private              DateTimeFormatter        DTF              = DateTimeFormatter.ofPattern("dd.YY HH:mm");
+    private              DateTimeFormatter        timeFormatter    = DateTimeFormatter.ofPattern("HH:mm");
     private              Text                     titleText;
     private              Text                     valueText;
     private              Text                     upperUnitText;
@@ -136,7 +145,9 @@ public class TimelineTileSkin extends TileSkin {
     private              NiceScale                niceScaleY;
     private              List<Line>               horizontalTickLines;
     private              double                   horizontalLineOffset;
+    private              List<Line>               verticalTickLines;
     private              double                   tickLabelFontSize;
+    private              List<Text>               tickLabelsX;
     private              List<Text>               tickLabelsY;
     private              Color                    tickLineColor;
     private              Color                    tickLabelColor;
@@ -157,24 +168,18 @@ public class TimelineTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        TimerTask timerTask = new TimerTask() {
-            @Override public void run() {
-                Platform.runLater(() -> checkForOutdated());
-            }
-        };
-        Timer timer = new Timer("Timer");
-        timer.scheduleAtFixedRate(timerTask, 0l, 500l);
-
         dotTooltip = new Tooltip("");
         dotTooltip.setAutoHide(true);
         dotTooltip.setHideDelay(javafx.util.Duration.seconds(0));
         dotTooltip.setShowDuration(javafx.util.Duration.seconds(5));
 
-        periodListener = o -> handleEvents("PERIOD");
+        periodListener     = o -> handleEvents("PERIOD");
 
-        mouseListener  = e -> handleMouseEvents(e);
+        mouseListener      = e -> handleMouseEvents(e);
 
-        timeFormatter = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
+        timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
+
+        timePeriod         = tile.getTimePeriod();
 
         if (tile.isAutoScale()) { tile.calcAutoScale(); }
 
@@ -183,7 +188,22 @@ public class TimelineTileSkin extends TileSkin {
         tickLineColor       = Color.color(tile.getChartGridColor().getRed(), tile.getChartGridColor().getGreen(), tile.getChartGridColor().getBlue(), 0.5);
         tickLabelColor      = tile.getTickLabelColor();
         horizontalTickLines = new ArrayList<>(5);
+        verticalTickLines   = new ArrayList<>(16);
+        tickLabelsX         = new ArrayList<>(16);
         tickLabelsY         = new ArrayList<>(5);
+        int noOfVerticalLines = Helper.calcNumberOfVerticalTickLinesForPeriod(timePeriod, tile.getTimePeriodResolution());
+        for (long i = 0 ; i < noOfVerticalLines ; i++) {
+            Line vLine = new Line(0, 0, 0, 0);
+            vLine.getStrokeDashArray().addAll(1.0, 2.0);
+            vLine.setStroke(Color.TRANSPARENT);
+            vLine.setMouseTransparent(true);
+            verticalTickLines.add(vLine);
+            Text tickLabelX = new Text("");
+            tickLabelX.setTextOrigin(VPos.BOTTOM);
+            tickLabelX.setMouseTransparent(true);
+            tickLabelsX.add(tickLabelX);
+        }
+
         for (int i = 0 ; i < 5 ; i++) {
             Line hLine = new Line(0, 0, 0, 0);
             hLine.getStrokeDashArray().addAll(1.0, 2.0);
@@ -202,7 +222,6 @@ public class TimelineTileSkin extends TileSkin {
         movingAverage     = tile.getMovingAverage();
         dataList          = new ArrayList<>();
         reducedDataList   = new ArrayList<>();
-        timePeriod        = tile.getTimePeriod();
         dotRadius         = 3;
         noOfDatapoints    = calcNumberOfDatapointsForPeriod(timePeriod);
         maxNoOfDatapoints = calcNumberOfDatapointsForPeriod(tile.getMaxTimePeriod());
@@ -328,8 +347,18 @@ public class TimelineTileSkin extends TileSkin {
         }
 
         getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, sectionGroup, stdDeviationArea, thresholdLine, lowerThresholdLine, dotGroup, percentageInSectionGroup, averageLine, averageText, averageText2, minText, maxText, highText, lowText, trendText, timeSpanText, text);
+        getPane().getChildren().addAll(verticalTickLines);
         getPane().getChildren().addAll(horizontalTickLines);
+        getPane().getChildren().addAll(tickLabelsX);
         getPane().getChildren().addAll(tickLabelsY);
+
+        TimerTask timerTask = new TimerTask() {
+            @Override public void run() {
+                Platform.runLater(() -> checkForOutdated());
+            }
+        };
+        Timer timer = new Timer("Timer");
+        timer.scheduleAtFixedRate(timerTask, 1000, 500);
     }
 
     @Override protected void registerListeners() {
@@ -469,9 +498,9 @@ public class TimelineTileSkin extends TileSkin {
         TimeUnit resolution = tile.getTimePeriodResolution();
         long resolutionStep;
         switch(resolution) {
-            case DAYS   : resolutionStep = 86_400; break;
-            case HOURS  : resolutionStep = 3_600;  break;
-            case MINUTES: resolutionStep = 60;     break;
+            case DAYS   : resolutionStep = Helper.SECONDS_PER_DAY; break;
+            case HOURS  : resolutionStep = Helper.SECONDS_PER_HOUR; break;
+            case MINUTES: resolutionStep = Helper.SECONDS_PER_MINUTE; break;
             case SECONDS:
             default     : resolutionStep = 1;      break;
         }
@@ -484,18 +513,23 @@ public class TimelineTileSkin extends TileSkin {
         double stepY = graphBounds.getHeight() / range;
 
         niceScaleY.setMinMax(minValue, maxValue);
-        int    lineCountY       = 1;
-        int    tickLabelOffsetY = 1;
-        double tickSpacingY     = niceScaleY.getTickSpacing();
-        double tickStepY        = tickSpacingY * stepY;
-        double tickStartY       = maxY - tickStepY;
+        int    lineCountY        = 1;
+        int    tickLabelOffsetY  = 1;
+        double tickSpacingY      = niceScaleY.getTickSpacing();
+        int    noOfVerticalLines = Helper.calcNumberOfVerticalTickLinesForPeriod(timePeriod, tile.getTimePeriodResolution());
+        double tickStepX         = graphBounds.getWidth() / noOfVerticalLines;
+        double tickStepY         = tickSpacingY * stepY;
+        double tickStartY        = maxY - tickStepY;
         if (tickSpacingY < minValue) {
             tickLabelOffsetY = (int) (minValue / tickSpacingY) + 1;
             tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - minValue) * stepY;
         }
 
+        verticalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
         horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
+        tickLabelsX.forEach(label -> label.setFill(Color.TRANSPARENT));
         tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+
         horizontalLineOffset = 0;
         for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
             Line line  = horizontalTickLines.get(lineCountY);
@@ -512,6 +546,68 @@ public class TimelineTileSkin extends TileSkin {
             lineCountY++;
             lineCountY = clamp(0, 4, lineCountY);
         }
+
+        int  lineCountX = 0;
+        ZonedDateTime dateTime;
+        for (long t = minTime ;  t < maxTime ; t++) {
+            dateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(t), tile.getZoneId());
+            double x        = -1;
+            String timeText = "";
+            if (timePeriod.getSeconds() > Helper.SECONDS_PER_MONTH) {
+                if (1 == dateTime.getDayOfMonth() && 0 == dateTime.getHour() && 0 == dateTime.getMinute() && 0 == dateTime.getSecond()) { // Full day
+                    x = minX + ((t - minTime) * stepX);
+                    timeText = MONTH_FORMATTER.format(dateTime);
+                }
+            } else if (timePeriod.getSeconds() > Helper.SECONDS_PER_DAY) {
+                if (0 == dateTime.getHour() && 0 == dateTime.getMinute() && 0 == dateTime.getSecond()) { // Full day
+                    x = minX + ((t - minTime) * stepX);
+                    timeText = DAY_FORMATTER.format(dateTime);
+                }
+            } else if (timePeriod.getSeconds() > Helper.SECONDS_PER_DAY / 2) {
+                if (dateTime.getHour() % 2 == 0 && 0 == dateTime.getMinute() && 0 == dateTime.getSecond()) { // Full hour
+                    x = minX + ((t - minTime) * stepX);
+                    timeText = HOUR_FORMATTER.format(dateTime);
+                }
+            } else if (timePeriod.getSeconds() > Helper.SECONDS_PER_DAY / 4) {
+                if (0 == dateTime.getMinute() && 0 == dateTime.getSecond()) { // Full hour
+                    x = minX + ((t - minTime) * stepX);
+                    timeText = HOUR_FORMATTER.format(dateTime);
+                }
+            } else if (timePeriod.getSeconds() > Helper.SECONDS_PER_HOUR) {
+                if ((0 == dateTime.getMinute() || 30 == dateTime.getMinute()) && 0 == dateTime.getSecond()) { // Full hour and half hour
+                    x = minX + ((t - minTime) * stepX);
+                    timeText = HOUR_FORMATTER.format(dateTime);
+                }
+            } else if (timePeriod.getSeconds() > Helper.SECONDS_PER_MINUTE) {
+                if (0 == dateTime.getSecond() && dateTime.getMinute() % 5 == 0) { // 5 minutes
+                    x = minX + ((t - minTime) * stepX);
+                    timeText = MINUTE_FORMATTER.format(dateTime);
+                }
+            } else {
+                if (dateTime.getSecond() % 10 == 0) { // 10 seconds
+                    x = minX + ((t - minTime) * stepX);
+                    timeText = SECOND_FORMATTER.format(dateTime);
+                }
+            }
+            if (x > -1) {
+                x     = minX + ((t - minTime) * stepX);
+                Line   line  = verticalTickLines.get(lineCountX);
+                Text   label = tickLabelsX.get(lineCountX);
+                label.setText(timeText);
+                label.setX(x - (label.getLayoutBounds().getWidth() * 0.5));
+                label.setY(graphBounds.getY());
+                label.setFill(tickLabelColor);
+                line.setStartX(x);
+                line.setEndX(x);
+                line.setStartY(minY);
+                line.setEndY(maxY);
+                line.setStroke(tickLineColor);
+                lineCountX++;
+                lineCountX = clamp(0, noOfVerticalLines - 1, lineCountX);
+            }
+
+        }
+
         if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
         horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
         tickLabelsY.forEach(label -> label.setX(maxX - label.getLayoutBounds().getWidth()));
@@ -597,7 +693,7 @@ public class TimelineTileSkin extends TileSkin {
 
         if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
             timeSpanText.setText(createTimeSpanText());
-            text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
+            text.setText(HOUR_FORMATTER.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
         }
 
         resizeDynamicText();
@@ -747,7 +843,7 @@ public class TimelineTileSkin extends TileSkin {
 
         maxText.setFont(Fonts.latoRegular(fontSize));
         if (maxText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxText, maxWidth, fontSize); }
-        maxText.setY(graphBounds.getY() - size * 0.0125);
+        maxText.setY(graphBounds.getY() - size * 0.0175);
 
         lowText.setFont(Fonts.latoRegular(fontSize));
         if (lowText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(lowText, maxWidth, fontSize); }
@@ -755,7 +851,7 @@ public class TimelineTileSkin extends TileSkin {
 
         highText.setFont(Fonts.latoRegular(fontSize));
         if (highText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(highText, maxWidth, fontSize); }
-        highText.setY(graphBounds.getY() - size * 0.0125);
+        highText.setY(graphBounds.getY() - size * 0.0175);
 
         trendText.setFont(Fonts.latoRegular(fontSize));
         if (trendText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(trendText, maxWidth, fontSize); }
@@ -827,6 +923,14 @@ public class TimelineTileSkin extends TileSkin {
             label.setFont(tickLabelFont);
         });
         horizontalTickLines.forEach(line -> line.setStrokeWidth(0.5));
+
+        double miniLabelFontSize = size * 0.022;
+        Font miniTickLabelFont = Fonts.latoRegular(miniLabelFontSize);
+        tickLabelsX.forEach(label -> {
+            enableNode(label, miniLabelFontSize >= 6);
+            label.setFont(miniTickLabelFont);
+        });
+        verticalTickLines.forEach(line -> line.setStrokeWidth(0.5));
 
         stdDeviationArea.setX(graphBounds.getX());
         stdDeviationArea.setWidth(graphBounds.getWidth());

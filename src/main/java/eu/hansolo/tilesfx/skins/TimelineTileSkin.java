@@ -655,7 +655,7 @@ public class TimelineTileSkin extends TileSkin {
                 rectangle.setFill(section.getColor());
             });
 
-            double average  = tile.getAverage();
+            double average  = Statistics.getChartDataAverage(reducedDataList);
             double averageY = clamp(minY, maxY, maxY - Math.abs(minValue - average) * stepY);
 
             averageLine.setStartX(minX);

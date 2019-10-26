@@ -68,4 +68,11 @@ public class Statistics {
         return getMax(DATA.stream().map(ChartData::getValue).collect(Collectors.toList()));
     }
     public static final double getMax(final List<Double> DATA) { return DATA.stream().mapToDouble(v -> v).max().orElse(0); }
+
+    public static final double getChartDataAverage(final List<ChartData> DATA) {
+        return getAverage(DATA.stream().map(ChartData::getValue).collect(Collectors.toList()));
+    }
+    public static final double getAverage(final List<Double> DATA) {
+        return DATA.stream().mapToDouble(data -> data.doubleValue()).average().orElse(-1);
+    }
 }

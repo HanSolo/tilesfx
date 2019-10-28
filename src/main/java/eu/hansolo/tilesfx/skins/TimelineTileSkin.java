@@ -77,6 +77,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -413,8 +414,7 @@ public class TimelineTileSkin extends TileSkin {
             redraw();
         } else if (TileEvent.EventType.VALUE.name().equals(EVENT_TYPE)) {
             double value = clamp(minValue, maxValue, tile.getValue());
-            addData(new ChartData("", value, Instant.now()));
-            handleCurrentValue(value);
+            tile.getChartData().add(new ChartData("", value, Instant.now()));
         } else if (TileEvent.EventType.SECTION.name().equals(EVENT_TYPE)) {
             percentageInSections.clear();
             tile.getSections().forEach(section -> {
@@ -703,6 +703,9 @@ public class TimelineTileSkin extends TileSkin {
             dataList.add(DATA);
             if (tile.isAveragingEnabled()) { movingAverage.addData(new TimeData(DATA.getValue(), DATA.getTimestamp())); }
         }
+
+        Set<ChartData> dataSet = tile.getChartData().stream().filter(data -> !dataList.contains(data)).collect(Collectors.toSet());
+        Platform.runLater(() -> tile.removeChartData(new ArrayList<>(dataSet)));
 
         Predicate<ChartData> isNotInTimePeriod = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
         reducedDataList.clear();

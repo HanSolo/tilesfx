@@ -920,7 +920,7 @@ public class Tile extends Control {
         _middleGraphics                     = null;
         _rightGraphics                      = null;
         _trendVisible                       = false;
-        _timeoutMs                          = 1000; //
+        _timeoutMs                          = 1000;
         _numberOfValuesForTrendCalculation  = 3;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
@@ -2169,7 +2169,8 @@ public class Tile extends Control {
         getChartData().setAll(DATA);
         updateChartData();
     }
-    public void removeChartData(final ChartData DATA) { getChartData().remove(DATA); }
+    public void removeChartData(final ChartData... DATA) { removeChartData(Arrays.asList(DATA)); }
+    public void removeChartData(final List<ChartData> DATA) { getChartData().removeAll(DATA); }
     public void clearChartData() { getChartData().clear(); }
     private void updateChartData() {
         getChartData().forEach(chartData -> {

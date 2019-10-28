@@ -36,6 +36,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
@@ -241,6 +242,19 @@ public class ChartData implements Comparable<ChartData> {
     }
 
     @Override public int compareTo(final ChartData DATA) { return Double.compare(getValue(), DATA.getValue()); }
+
+    @Override public boolean equals(final Object OBJ) {
+        if (OBJ == this) { return true; }
+        if (!(OBJ instanceof ChartData)) { return false; }
+        ChartData other = (ChartData) OBJ;
+        boolean timestampEquals = (this.timestamp.equals(other.getTimestamp()));
+        boolean valueEquals     = (Double.compare(this.value, other.getValue()) == 0);
+        return timestampEquals && valueEquals;
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(name, value, timestamp);
+    }
 
 
     // ******************** Event Handling ************************************

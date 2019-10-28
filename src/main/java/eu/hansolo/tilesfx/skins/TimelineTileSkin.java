@@ -371,6 +371,8 @@ public class TimelineTileSkin extends TileSkin {
                     c.getAddedSubList().forEach(chartData -> addData(chartData));
                 }
             }
+            Set<ChartData> dataSet = tile.getChartData().stream().filter(data -> !dataList.contains(data)).collect(Collectors.toSet());
+            Platform.runLater(() -> tile.removeChartData(new ArrayList<>(dataSet)));
         });
         tile.getSections().addListener((ListChangeListener<Section>) c -> {
             while(c.next()) {
@@ -701,9 +703,6 @@ public class TimelineTileSkin extends TileSkin {
             dataList.add(DATA);
             if (tile.isAveragingEnabled()) { movingAverage.addData(new TimeData(DATA.getValue(), DATA.getTimestamp())); }
         }
-
-        Set<ChartData> dataSet = tile.getChartData().stream().filter(data -> !dataList.contains(data)).collect(Collectors.toSet());
-        Platform.runLater(() -> tile.removeChartData(new ArrayList<>(dataSet)));
 
         Predicate<ChartData> isNotInTimePeriod = chartData -> !chartData.isWithinTimePeriod(Instant.now(), timePeriod);
         reducedDataList.clear();

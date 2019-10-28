@@ -369,8 +369,6 @@ public class TimelineTileSkin extends TileSkin {
             while(c.next()) {
                 if (c.wasAdded()) {
                     c.getAddedSubList().forEach(chartData -> addData(chartData));
-                } else if (c.wasRemoved()) {
-                    c.getRemoved().forEach(chartData -> dataList.remove(chartData));
                 }
             }
         });

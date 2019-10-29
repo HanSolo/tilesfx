@@ -28,18 +28,15 @@ import eu.hansolo.tilesfx.tools.Point;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
-import javafx.scene.Group;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -57,6 +54,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -200,13 +198,22 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             Helper.enableNode(dataPointGroup, tile.getDataPointsVisible());
-        } else if ("SERIES".equals(EVENT_TYPE)) {
+        } else if (EventType.SERIES.name().equals(EVENT_TYPE)) {
             Helper.enableNode(fillPath, ChartType.AREA == tile.getChartType());
+        } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+            Platform.runLater(() -> {
+                tile.clearChartData();
+                fillPath.setVisible(false);
+                strokePath.setVisible(false);
+                Helper.enableNode(dataPointGroup, false);
+                valueText.setText(String.format(locale, formatString, minValue));
+            });
+            handleData();
         }
     }
 
@@ -214,7 +221,14 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         selectorTooltip.hide();
         selector.setVisible(false);
         List<ChartData> data = tile.getChartData();
-        if (null == data || data.isEmpty()) { return; }
+        if (null == data || data.isEmpty() || data.size() < 2) { return; }
+
+        if (!strokePath.isVisible() && !fillPath.isVisible()) {
+            fillPath.setVisible(true);
+            strokePath.setVisible(true);
+            Helper.enableNode(dataPointGroup, tile.getDataPointsVisible());
+        }
+
         Optional<ChartData> lastDataEntry = data.stream().reduce((first, second) -> second);
         if (lastDataEntry.isPresent()) {
             valueText.setText(String.format(locale, formatString, lastDataEntry.get().getValue()));
@@ -258,7 +272,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     private void drawDataPoints(final List<Point> DATA, final Color COLOR) {
         if (DATA.isEmpty()) { return; }
         final double LOWER_BOUND_X = 0;
-        final double LOWER_BOUND_Y = tile.getMinValue();
+        final double LOWER_BOUND_Y = minValue;
         dataPointGroup.getChildren().clear();
         for (Point point : DATA) {
             double x = (point.getX() - LOWER_BOUND_X);
@@ -284,7 +298,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         if (Double.compare(EVENT_X, CHART_X) < 0 || Double.compare(EVENT_X, CHART_WIDTH) > 0) { return; }
 
         double            upperBound   = tile.getChartData().stream().max(Comparator.comparing(ChartData::getValue)).get().getValue();
-        double            range        = upperBound - tile.getMinValue();
+        double            range        = upperBound - minValue;
         double            factor       = range / (height * 0.5);
         List<PathElement> elements     = strokePath.getElements();
         int               noOfElements = elements.size();

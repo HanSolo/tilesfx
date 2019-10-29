@@ -248,6 +248,8 @@ public class Tile extends Control {
     private        final TileEvent   BKG_IMAGE_EVENT           = new TileEvent(EventType.BACKGROUND_IMAGE);
     private        final TileEvent   REGIONS_ON_TOP_EVENT      = new TileEvent(EventType.REGIONS_ON_TOP);
     private        final TileEvent   INFO_REGION_HANDLER_EVENT = new TileEvent(EventType.INFO_REGION_HANDLER);
+    private        final TileEvent   CLEAR_DATA_EVENT          = new TileEvent(EventType.CLEAR_DATA);
+    private        final TileEvent   HIGHLIGHT_SECTIONS        = new TileEvent(EventType.HIGHLIGHT_SECTIONS);
 
     private static       String      userAgentStyleSheet;
 
@@ -3694,7 +3696,8 @@ public class Tile extends Control {
     public void setHighlightSections(final boolean HIGHLIGHT) {
         if (null == highlightSections) {
             _highlightSections = HIGHLIGHT;
-            fireTileEvent(REDRAW_EVENT);
+            //fireTileEvent(REDRAW_EVENT);
+            fireTileEvent(HIGHLIGHT_SECTIONS);
         } else {
             highlightSections.set(HIGHLIGHT);
         }
@@ -3702,7 +3705,7 @@ public class Tile extends Control {
     public BooleanProperty highlightSectionsProperty() {
         if (null == highlightSections) {
             highlightSections = new BooleanPropertyBase(_highlightSections) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvent(HIGHLIGHT_SECTIONS); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "highlightSections"; }
             };
@@ -5498,6 +5501,10 @@ public class Tile extends Control {
 
     public boolean isShowing() { return null == showing ? false : showing.get(); }
     public BooleanBinding showingProperty() { return showing; }
+
+    public void clearData() {
+        fireTileEvent(CLEAR_DATA_EVENT);
+    }
 
     private Properties readProperties(final String FILE_NAME) {
         final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();

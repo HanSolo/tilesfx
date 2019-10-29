@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -116,7 +117,7 @@ public class SparkLineTileSkin extends TileSkin {
 
         if (tile.isAutoScale()) tile.calcAutoScale();
 
-        niceScaleY = new NiceScale(tile.getMinValue(), tile.getMaxValue());
+        niceScaleY = new NiceScale(minValue, maxValue);
         niceScaleY.setMaxTicks(5);
         tickLineColor       = Color.color(tile.getChartGridColor().getRed(), tile.getChartGridColor().getGreen(), tile.getChartGridColor().getBlue(), 0.5);
         tickLabelColor      = tile.getTickLabelColor();
@@ -133,9 +134,9 @@ public class SparkLineTileSkin extends TileSkin {
         }
 
         gradientLookup = new GradientLookup(tile.getGradientStops());
-        low            = tile.getMaxValue();
+        low            = maxValue;
         lastLow        = low;
-        high           = tile.getMinValue();
+        high           = minValue;
         lastHigh       = high;
         stdDeviation   = 0;
         movingAverage  = tile.getMovingAverage();
@@ -221,7 +222,7 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
@@ -231,12 +232,12 @@ public class SparkLineTileSkin extends TileSkin {
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
-        } else if ("VALUE".equals(EVENT_TYPE)) {
+        } else if (EventType.VALUE.name().equals(EVENT_TYPE)) {
             if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, tile.getValue());
             handleCurrentValue(value);
-        } else if ("AVERAGING".equals(EVENT_TYPE)) {
+        } else if (EventType.AVERAGING.name().equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
 
             // To get smooth lines in the chart we need at least 4 values
@@ -247,6 +248,9 @@ public class SparkLineTileSkin extends TileSkin {
             for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
             sparkLine.getElements().setAll(pathElements);
             redraw();
+        } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+            dataList.clear();
+            handleCurrentValue(minValue);
         }
     }
 

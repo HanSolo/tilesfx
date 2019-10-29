@@ -33,12 +33,10 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -56,15 +54,10 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -184,7 +177,7 @@ public class TimelineTileSkin extends TileSkin {
 
         if (tile.isAutoScale()) { tile.calcAutoScale(); }
 
-        niceScaleY = new NiceScale(tile.getMinValue(), tile.getMaxValue());
+        niceScaleY = new NiceScale(minValue, tile.getMaxValue());
         niceScaleY.setMaxTicks(5);
         tickLineColor       = Color.color(tile.getChartGridColor().getRed(), tile.getChartGridColor().getGreen(), tile.getChartGridColor().getBlue(), 0.5);
         tickLabelColor      = tile.getTickLabelColor();
@@ -217,8 +210,8 @@ public class TimelineTileSkin extends TileSkin {
             tickLabelsY.add(tickLabelY);
         }
 
-        low               = tile.getMaxValue();
-        high              = tile.getMinValue();
+        low               = maxValue;
+        high              = minValue;
         stdDeviation      = 0;
         movingAverage     = tile.getMovingAverage();
         dataList          = new ArrayList<>();
@@ -461,6 +454,11 @@ public class TimelineTileSkin extends TileSkin {
             fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
             fractionLine.setStroke(tile.getUnitColor());
             fractionLine.setStrokeWidth(size * 0.005);
+        } else if (TileEvent.EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+            Platform.runLater(() -> tile.clearChartData());
+            dataList.clear();
+            reducedDataList.clear();
+            handleCurrentValue(minValue);
         }
     }
 
@@ -482,8 +480,6 @@ public class TimelineTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        if (reducedDataList.size() < 4) { return; }
-
         low  = reducedDataList.stream().min(Comparator.comparingDouble(ChartData::getValue)).map(data -> data.getValue()).orElse(tile.getLowerThreshold());
         high = reducedDataList.stream().max(Comparator.comparingDouble(ChartData::getValue)).map(data -> data.getValue()).orElse(tile.getThreshold());
 

@@ -18,6 +18,8 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -252,7 +254,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
@@ -262,11 +264,11 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
-        } else if ("VALUE".equals(EVENT_TYPE)) {
+        } else if (EventType.VALUE.name().equals(EVENT_TYPE)) {
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
+        } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
             addData(clamp(minValue, maxValue, tile.getValue()));
-        } else if ("AVERAGING".equals(EVENT_TYPE)) {
+        } else if (EventType.AVERAGING.name().equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
 
             // To get smooth lines in the chart we need at least 4 values
@@ -277,12 +279,16 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
             sparkLine.getElements().setAll(pathElements);
             redraw();
-        } else if ("HIGHLIGHT_SECTIONS".equals(EVENT_TYPE)) {
+        } else if (EventType.HIGHLIGHT_SECTIONS.name().equals(EVENT_TYPE)) {
             boolean isHighlightSections = tile.isHighlightSections();
             sectionCanvas.setVisible(!isHighlightSections);
             sectionCanvas.setManaged(!isHighlightSections);
             highlightSectionCanvas.setVisible(isHighlightSections);
             highlightSectionCanvas.setManaged(isHighlightSections);
+        } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+            dataList.clear();
+            addData(minValue);
+            //handleCurrentValue(tile.getMinValue());
         }
     }
 
@@ -394,7 +400,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         if (tile.isHighlightSections()) { drawHighLightSections(VALUE); }
     }
 
-    private void setBar( final double VALUE ) {
+    private void setBar(final double VALUE) {
         double barLength    = 0;
         double barStart     = 0;
         double min          = tile.getMinValue();

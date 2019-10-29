@@ -1111,7 +1111,7 @@ public class Tile extends Control {
             if (isStartFromZero() && _minValue < 0) setValue(0);
             if (Helper.equals(originalThreshold, getThreshold())) { setThreshold(clamp(_minValue, getMaxValue(), originalThreshold)); }
             fireTileEvent(RECALC_EVENT);
-            if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
+            if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
         } else {
             minValue.set(VALUE);
         }
@@ -1127,7 +1127,7 @@ public class Tile extends Control {
                     if (isStartFromZero() && _minValue < 0) Tile.this.setValue(0);
                     if (Helper.lessThan(originalThreshold, getThreshold())) { setThreshold(clamp(value, getMaxValue(), originalThreshold)); }
                     fireTileEvent(RECALC_EVENT);
-                    if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
+                    if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "minValue";}
@@ -1157,7 +1157,7 @@ public class Tile extends Control {
             if (Helper.equals(originalMaxValue, Double.MAX_VALUE)) originalMaxValue = _maxValue;
             if (Helper.biggerThan(originalThreshold, getThreshold())) { setThreshold(clamp(getMinValue(), _maxValue, originalThreshold)); }
             fireTileEvent(RECALC_EVENT);
-            if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
+            if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
         } else {
             maxValue.set(VALUE);
         }
@@ -1172,7 +1172,7 @@ public class Tile extends Control {
                     if (Helper.equals(originalMaxValue, Double.MAX_VALUE)) originalMaxValue = VALUE;
                     if (Helper.biggerThan(originalThreshold, getThreshold())) { setThreshold(clamp(getMinValue(), VALUE, originalThreshold)); }
                     fireTileEvent(RECALC_EVENT);
-                    if (!valueProperty().isBound()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
+                    if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "maxValue"; }
@@ -5177,7 +5177,6 @@ public class Tile extends Control {
         if (darkSky.update()) {
             fireTileEvent(REDRAW_EVENT);
         } else {
-            //System.out.println("Wrong or missing DarkSky API key");
             throw new IllegalArgumentException("Do you use a valid DarkSKY API key?");
         }
     }

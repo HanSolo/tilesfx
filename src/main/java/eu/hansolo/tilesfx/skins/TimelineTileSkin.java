@@ -455,10 +455,15 @@ public class TimelineTileSkin extends TileSkin {
             fractionLine.setStroke(tile.getUnitColor());
             fractionLine.setStrokeWidth(size * 0.005);
         } else if (TileEvent.EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
-            Platform.runLater(() -> tile.clearChartData());
-            dataList.clear();
-            reducedDataList.clear();
-            handleCurrentValue(minValue);
+            Platform.runLater(() -> {
+                tile.clearChartData();
+                dataList.clear();
+                reducedDataList.clear();
+                path.getElements().clear();
+                dots.clear();
+                dotGroup.getChildren().clear();
+                handleCurrentValue(minValue);
+            });
         }
     }
 

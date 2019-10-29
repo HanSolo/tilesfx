@@ -288,7 +288,6 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
             dataList.clear();
             addData(minValue);
-            //handleCurrentValue(tile.getMinValue());
         }
     }
 

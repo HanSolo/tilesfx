@@ -907,6 +907,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B notifyRegionTooltipText(final String TEXT) {
+        properties.put("notifyRegionTooltipText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }    
+    
     public final B showNotifyRegion(final boolean SHOW) {
         properties.put("showNotifyRegion", new SimpleBooleanProperty(SHOW));
         return (B)this;
@@ -1691,7 +1696,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setInfoRegionEventHandler(((ObjectProperty<EventHandler<MouseEvent>>) properties.get(key)).get());
             } else if ("infoRegionTooltipText".equals(key)) {
                 TILE.setInfoRegionTooltipText(((StringProperty) properties.get(key)).get());
-            }
+            } else if ("notifyRegionTooltipText".equals(key)) {
+                TILE.setNotifyRegionTooltipText(((StringProperty) properties.get(key)).get());
+            } 
         }
         properties.clear();
         return TILE;

@@ -777,19 +777,23 @@ public class TimelineTileSkin extends TileSkin {
         if (timeSpan > SEC_MONTH) { // 1 Month (30 days)
             int    months = (int)(timeSpan / SEC_MONTH);
             double days   = timeSpan % SEC_MONTH;
-            timeSpanBuilder.append(months).append("M").append(String.format(Locale.US, "%.0f", days)).append("d");
+            timeSpanBuilder.append(months).append("M");
+            if(days > 0) { timeSpanBuilder.append(String.format(Locale.US, "%.0f", days)).append("d"); }
         } else if (timeSpan > SEC_DAY) { // 1 Day
             int    days  = (int) (timeSpan / SEC_DAY);
             double hours = (timeSpan - (days * SEC_DAY)) / SEC_HOUR;
-            timeSpanBuilder.append(days).append("d").append(String.format(Locale.US, "%.0f", hours)).append("h");
+            timeSpanBuilder.append(days).append("d");
+            if (hours > 0) { timeSpanBuilder.append(String.format(Locale.US, "%.0f", hours)).append("h"); }
         } else if (timeSpan > SEC_HOUR) { // 1 Hour
             int    hours   = (int)(timeSpan / SEC_HOUR);
             double minutes = (timeSpan - (hours * SEC_HOUR)) / SEC_MINUTE;
-            timeSpanBuilder.append(hours).append("h").append(String.format(Locale.US, "%.0f", minutes)).append("m");
+            timeSpanBuilder.append(hours).append("h");
+            if (minutes > 0) { timeSpanBuilder.append(String.format(Locale.US, "%.0f", minutes)).append("m"); }
         } else if (timeSpan > SEC_MINUTE) { // 1 Minute
             int    minutes = (int)(timeSpan / SEC_MINUTE);
             double seconds = (timeSpan - (minutes * SEC_MINUTE));
-            timeSpanBuilder.append(minutes).append("m").append(String.format(Locale.US, "%.0f", seconds)).append("s");
+            timeSpanBuilder.append(minutes).append("m");
+            if (seconds > 0) { timeSpanBuilder.append(String.format(Locale.US, "%.0f", seconds)).append("s"); }
         } else {
             int seconds = (int)timeSpan;
             timeSpanBuilder.append(seconds).append("s");

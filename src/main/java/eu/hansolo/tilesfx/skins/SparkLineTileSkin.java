@@ -27,7 +27,9 @@ import eu.hansolo.tilesfx.tools.Point;
 import eu.hansolo.tilesfx.tools.Statistics;
 import javafx.beans.InvalidationListener;
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -43,8 +45,6 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class SparkLineTileSkin extends TileSkin {
     private Text                 titleText;
     private Text                 valueText;
     private Text                 unitText;
-    private TextFlow             valueUnitFlow;
+    private HBox                 valueUnitFlow;
     private Text                 averageText;
     private Text                 highText;
     private Text                 lowText;
@@ -160,8 +160,8 @@ public class SparkLineTileSkin extends TileSkin {
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
-        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+        valueUnitFlow = new HBox(valueText, unitText);
+        valueUnitFlow.setAlignment(Pos.BASELINE_RIGHT);
 
         averageText = new Text(String.format(locale, formatString, tile.getAverage()));
         averageText.setFill(Tile.FOREGROUND);
@@ -515,9 +515,10 @@ public class SparkLineTileSkin extends TileSkin {
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
 
-        maxWidth = width - size * 0.275;
+        maxWidth = width - (width - size * 0.275);
         fontSize = size * 0.12;
         unitText.setFont(Fonts.latoRegular(fontSize));
+
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
         averageText.setX(size * 0.05);
@@ -651,7 +652,6 @@ public class SparkLineTileSkin extends TileSkin {
                 timeSpanText.setText(createTimeSpanText());
                 text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
             }
-            resizeDynamicText();
 
             lastLow  = low;
             lastHigh = high;
@@ -675,6 +675,7 @@ public class SparkLineTileSkin extends TileSkin {
 
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
     }
 
     @Override protected void redraw() {

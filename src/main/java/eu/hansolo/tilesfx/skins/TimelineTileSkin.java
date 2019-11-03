@@ -464,6 +464,14 @@ public class TimelineTileSkin extends TileSkin {
                 dots.clear();
                 dotGroup.getChildren().clear();
             });
+        } else if (TileEvent.EventType.THRESHOLD_EXCEEDED.equals(EVENT_TYPE)) {
+
+        } else if (TileEvent.EventType.THRESHOLD_UNDERRUN.equals(EVENT_TYPE)) {
+
+        } else if (TileEvent.EventType.LOWER_THRESHOLD_EXCEEDED.equals(EVENT_TYPE)) {
+
+        } else if (TileEvent.EventType.LOWER_THRESHOLD_UNDERRUN.equals(EVENT_TYPE)) {
+
         }
     }
 

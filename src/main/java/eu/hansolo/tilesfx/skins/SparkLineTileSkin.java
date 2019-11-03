@@ -30,6 +30,7 @@ import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -68,7 +69,10 @@ public class SparkLineTileSkin extends TileSkin {
     private DateTimeFormatter    timeFormatter   = DateTimeFormatter.ofPattern("HH:mm");
     private Text                 titleText;
     private Text                 valueText;
+    private Text                 upperUnitText;
+    private Line                 fractionLine;
     private Text                 unitText;
+    private VBox                 unitFlow;
     private HBox                 valueUnitFlow;
     private Text                 averageText;
     private Text                 highText;
@@ -156,12 +160,21 @@ public class SparkLineTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
         unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new HBox(valueText, unitText);
-        valueUnitFlow.setAlignment(Pos.BASELINE_RIGHT);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
 
         averageText = new Text(String.format(locale, formatString, tile.getAverage()));
         averageText.setFill(Tile.FOREGROUND);
@@ -207,7 +220,7 @@ public class SparkLineTileSkin extends TileSkin {
         dot = new Circle();
         dot.setFill(tile.getBarColor());
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
         getPane().getChildren().addAll(tickLabelsY);
     }
@@ -226,13 +239,13 @@ public class SparkLineTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(valueUnitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(timeSpanText, !tile.isTextVisible());
             Helper.enableNode(averageLine, tile.isAverageVisible());
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
-        } else if (EventType.VALUE.name().equals(EVENT_TYPE)) {
+        } else if (EventType.VALUE.equals(EVENT_TYPE)) {
             if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, tile.getValue());
@@ -251,6 +264,9 @@ public class SparkLineTileSkin extends TileSkin {
         } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
             dataList.clear();
             handleCurrentValue(minValue);
+        } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
+            double value = clamp(minValue, maxValue, tile.getValue());
+            handleCurrentValue(value);
         }
     }
 
@@ -310,7 +326,7 @@ public class SparkLineTileSkin extends TileSkin {
             horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
             tickLabelsY.forEach(label -> {
                 label.setX(maxX - label.getLayoutBounds().getWidth());
-                label.toFront();
+                //label.toFront();
             });
 
             highText.setText(String.format(locale, formatString, high));
@@ -463,7 +479,7 @@ public class SparkLineTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
+        double maxWidth = valueUnitFlow.isVisible() ? width - size * 0.275 : width - size * 0.1;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
@@ -516,9 +532,12 @@ public class SparkLineTileSkin extends TileSkin {
         }
 
         maxWidth = width - (width - size * 0.275);
-        fontSize = size * 0.12;
-        unitText.setFont(Fonts.latoRegular(fontSize));
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
 
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
         averageText.setX(size * 0.05);
@@ -600,7 +619,7 @@ public class SparkLineTileSkin extends TileSkin {
                 horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
                 tickLabelsY.forEach(label -> {
                     label.setX(maxX - label.getLayoutBounds().getWidth());
-                    label.toFront();
+                    //label.toFront();
                 });
 
                 highText.setText(String.format(locale, formatString, high));
@@ -676,13 +695,33 @@ public class SparkLineTileSkin extends TileSkin {
         valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
         valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(-size * 0.005);
     }
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        unitText.setText(tile.getUnit());
+
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0]);
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText(" ");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
+
         if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
 
         if (tile.isTextVisible()) {
@@ -696,6 +735,8 @@ public class SparkLineTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        unitText.setFill(tile.getUnitColor());
         highText.setFill(tile.getValueColor());
         lowText.setFill(tile.getValueColor());
         text.setFill(tile.getTextColor());

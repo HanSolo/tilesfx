@@ -453,6 +453,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B checkLowerThreshold(final boolean CHECK) {
+        properties.put("checkLowerThreshold", new SimpleBooleanProperty(CHECK));
+        return (B)this;
+    }
+
     public final B innerShadowEnabled(final boolean ENABLED) {
         properties.put("innerShadowEnabled", new SimpleBooleanProperty(ENABLED));
         return (B)this;
@@ -1492,6 +1497,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
             } else if ("checkThreshold".equals(key)) {
                 TILE.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
+            } else if ("checkLowerThreshold".equals(key)) {
+                TILE.setCheckLowerThreshold(((BooleanProperty) properties.get(key)).get());
             } else if ("onValueChanged".equals(key)) {
                 TILE.currentValueProperty().addListener(((ObjectProperty<InvalidationListener>) properties.get(key)).get());
             } else if ("keepAspect".equals(key)) {

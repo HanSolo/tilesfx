@@ -417,6 +417,8 @@ public class Tile extends Control {
     private              BooleanProperty                               checkSectionsForValue;
     private              boolean                                       _checkThreshold;
     private              BooleanProperty                               checkThreshold;
+    private              boolean                                       _checkLowerThreshold;
+    private              BooleanProperty                               checkLowerThreshold;
     private              boolean                                       _innerShadowEnabled;
     private              BooleanProperty                               innerShadowEnabled;
     private              boolean                                       _thresholdVisible;
@@ -863,6 +865,7 @@ public class Tile extends Control {
         _lowerThresholdColor                = RED;
         _checkSectionsForValue              = false;
         _checkThreshold                     = false;
+        _checkLowerThreshold                = false;
         _innerShadowEnabled                 = false;
         _thresholdVisible                   = false;
         _lowerThresholdVisible              = false;
@@ -3406,22 +3409,18 @@ public class Tile extends Control {
         if (null == checkSectionsForValue) { checkSectionsForValue = new SimpleBooleanProperty(Tile.this, "checkSectionsForValue", _checkSectionsForValue); }
         return checkSectionsForValue;
     }
-    
+
     /**
-     * Returns true if the value of the gauge should be checked against
-     * the threshold. If a value crosses the threshold it will fire an
-     * event (EXCEEDED and UNDERRUN. The check will be performed
+     * Returns true if the value of the tile should be checked against
+     * the threshold. In case the value exceeds or underruns the threshold an
+     * event (EXCEEDED / UNDERRUN) will be fired. The check will be performed
      * after the animation is finished (if animated == true).
      *
-     * @return true if the value of the gauge should be checked against the threshold
+     * @return true if the value of the tile should be checked against the threshold
      */
     public boolean isCheckThreshold() { return null == checkThreshold ? _checkThreshold : checkThreshold.get(); }
     /**
-     * Defines if the value of the gauge should be checked against
-     * the threshold. If a value crosses the threshold it will fire an
-     * event (EXCEEDED and UNDERRUN. The check will be performed
-     * after the animation is finished (if animated == true).
-     *
+     * Defines if the current value should be checked against the threshold
      * @param CHECK
      */
     public void setCheckThreshold(final boolean CHECK) {
@@ -3434,6 +3433,31 @@ public class Tile extends Control {
     public BooleanProperty checkThresholdProperty() {
         if (null == checkThreshold) { checkThreshold = new SimpleBooleanProperty(Tile.this, "checkThreshold", _checkThreshold); }
         return checkThreshold;
+    }
+
+    /**
+     * Returns true if the value of the tile should be checked against
+     * the lower threshold. In case the value exceeds or underruns the lower threshold an
+     * event (EXCEEDED / UNDERRUN) will be fired. The check will be performed
+     * after the animation is finished (if animated == true).
+     *
+     * @return true if the value of the tile should be checked against the lower threshold
+     */
+    public boolean isCheckLowerThreshold() { return null == checkLowerThreshold ? _checkLowerThreshold : checkLowerThreshold.get(); }
+    /**
+     * Defines if the current value should be checked against the lower threshold
+     * @param CHECK
+     */
+    public void setCheckLowerThreshold(final boolean CHECK) {
+        if (null == checkLowerThreshold) {
+            _checkLowerThreshold = CHECK;
+        } else {
+            checkLowerThreshold.set(CHECK);
+        }
+    }
+    public BooleanProperty checkLowerThresholdProperty() {
+        if (null == checkLowerThreshold) { checkLowerThreshold = new SimpleBooleanProperty(Tile.this, "checkLowerThreshold", _checkLowerThreshold); }
+        return checkLowerThreshold;
     }
 
     /**

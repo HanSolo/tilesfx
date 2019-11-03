@@ -393,7 +393,7 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(valueUnitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(timeSpanText, !tile.isTextVisible());
             Helper.enableNode(averageLine, tile.isAverageVisible());
             Helper.enableNode(averageText, tile.isAverageVisible());
@@ -455,14 +455,14 @@ public class TimelineTileSkin extends TileSkin {
             fractionLine.setStroke(tile.getUnitColor());
             fractionLine.setStrokeWidth(size * 0.005);
         } else if (TileEvent.EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+            tile.clearChartData();
+            dataList.clear();
+            reducedDataList.clear();
+            handleCurrentValue(minValue);
             Platform.runLater(() -> {
-                tile.clearChartData();
-                dataList.clear();
-                reducedDataList.clear();
                 path.getElements().clear();
                 dots.clear();
                 dotGroup.getChildren().clear();
-                handleCurrentValue(minValue);
             });
         }
     }
@@ -861,7 +861,7 @@ public class TimelineTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
+        double maxWidth = valueUnitFlow.isVisible() ? (width - (size * 0.275)) : (width - (size * 0.1));
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
@@ -938,12 +938,11 @@ public class TimelineTileSkin extends TileSkin {
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
 
-        maxWidth = width - size * 0.275;
+        maxWidth = width - (width - size * 0.275);
         fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
         upperUnitText.setFont(Fonts.latoRegular(fontSize));
         if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
 
-        maxWidth = width - size * 0.275;
         fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }

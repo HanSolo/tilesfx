@@ -659,6 +659,7 @@ public class Tile extends Control {
                 @NamedArg(value="lowerThresholdColor", defaultValue="#e5504c") Color _lowerThresholdColor,
                 @NamedArg(value="checkSectionsForValue", defaultValue="false") boolean checkSectionsForValue,
                 @NamedArg(value="checkThreshold", defaultValue="false") boolean checkThreshold,
+                @NamedArg(value="checkLowerThreshold", defaultValue="false") boolean checkLowerThreshold,
                 @NamedArg(value="innerShadowEnabled", defaultValue="false") boolean innerShadowEnabled,
                 @NamedArg(value="thresholdVisible", defaultValue="false") boolean thresholdVisible,
                 @NamedArg(value="averageVisible", defaultValue="false") boolean averageVisible,

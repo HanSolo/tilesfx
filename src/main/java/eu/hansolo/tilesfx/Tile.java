@@ -219,37 +219,39 @@ public class Tile extends Control {
     public  static final TimeUnit           DEFAULT_TIME_PERIOD_RESOLUTION = TimeUnit.SECONDS;
     private static final int                MAX_NO_OF_DECIMALS             = 3;
 
-    private        final TileEvent   SHOW_NOTIFY_REGION_EVENT  = new TileEvent(EventType.SHOW_NOTIFY_REGION);
-    private        final TileEvent   HIDE_NOTIFY_REGION_EVENT  = new TileEvent(EventType.HIDE_NOTIFY_REGION);
-    private        final TileEvent   SHOW_INFO_REGION_EVENT    = new TileEvent(EventType.SHOW_INFO_REGION);
-    private        final TileEvent   HIDE_INFO_REGION_EVENT    = new TileEvent(EventType.HIDE_INFO_REGION);
-    private        final TileEvent   EXCEEDED_EVENT            = new TileEvent(EventType.THRESHOLD_EXCEEDED);
-    private        final TileEvent   UNDERRUN_EVENT            = new TileEvent(EventType.THRESHOLD_UNDERRUN);
-    private        final TileEvent   MAX_VALUE_EXCEEDED        = new TileEvent(EventType.MAX_VALUE_EXCEEDED);
-    private        final TileEvent   MIN_VALUE_UNDERRUN        = new TileEvent(EventType.MIN_VALUE_UNDERRUN);
-    private        final TileEvent   VALUE_IN_RANGE            = new TileEvent(EventType.VALUE_IN_RANGE);
-    private        final TileEvent   RECALC_EVENT              = new TileEvent(EventType.RECALC);
-    private        final TileEvent   REDRAW_EVENT              = new TileEvent(EventType.REDRAW);
-    private        final TileEvent   RESIZE_EVENT              = new TileEvent(EventType.RESIZE);
-    private        final TileEvent   VISIBILITY_EVENT          = new TileEvent(EventType.VISIBILITY);
-    private        final TileEvent   SECTION_EVENT             = new TileEvent(EventType.SECTION);
-    private        final TileEvent   SERIES_EVENT              = new TileEvent(EventType.SERIES);
-    private        final TileEvent   DATA_EVENT                = new TileEvent(EventType.DATA);
-    private        final TileEvent   ALERT_EVENT               = new TileEvent(EventType.ALERT);
-    private        final TileEvent   VALUE_EVENT               = new TileEvent(EventType.VALUE);
-    private        final TileEvent   FINISHED_EVENT            = new TileEvent(EventType.FINISHED);
-    private        final TileEvent   GRAPHIC_EVENT             = new TileEvent(EventType.GRAPHIC);
-    private        final TileEvent   AVERAGING_EVENT           = new TileEvent(EventType.AVERAGING);
-    private        final TileEvent   TIME_PERIOD_EVENT         = new TileEvent(EventType.TIME_PERIOD);
-    private        final TileEvent   LOCATION_EVENT            = new TileEvent(EventType.LOCATION);
-    private        final TileEvent   TRACK_EVENT               = new TileEvent(EventType.TRACK);
-    private        final TileEvent   MAP_PROVIDER_EVENT        = new TileEvent(EventType.MAP_PROVIDER);
-    private        final TileEvent   FLIP_START_EVENT          = new TileEvent(EventType.FLIP_START);
-    private        final TileEvent   BKG_IMAGE_EVENT           = new TileEvent(EventType.BACKGROUND_IMAGE);
-    private        final TileEvent   REGIONS_ON_TOP_EVENT      = new TileEvent(EventType.REGIONS_ON_TOP);
-    private        final TileEvent   INFO_REGION_HANDLER_EVENT = new TileEvent(EventType.INFO_REGION_HANDLER);
-    private        final TileEvent   CLEAR_DATA_EVENT          = new TileEvent(EventType.CLEAR_DATA);
-    private        final TileEvent   HIGHLIGHT_SECTIONS        = new TileEvent(EventType.HIGHLIGHT_SECTIONS);
+    private        final TileEvent SHOW_NOTIFY_REGION_EVENT       = new TileEvent(EventType.SHOW_NOTIFY_REGION);
+    private        final TileEvent HIDE_NOTIFY_REGION_EVENT       = new TileEvent(EventType.HIDE_NOTIFY_REGION);
+    private        final TileEvent SHOW_INFO_REGION_EVENT         = new TileEvent(EventType.SHOW_INFO_REGION);
+    private        final TileEvent HIDE_INFO_REGION_EVENT         = new TileEvent(EventType.HIDE_INFO_REGION);
+    private        final TileEvent EXCEEDED_THRESHOLD_EVENT       = new TileEvent(EventType.THRESHOLD_EXCEEDED);
+    private        final TileEvent UNDERRUN_THRESHOLD_EVENT       = new TileEvent(EventType.THRESHOLD_UNDERRUN);
+    private        final TileEvent EXCEEDED_LOWER_THRESHOLD_EVENT = new TileEvent(EventType.LOWER_THRESHOLD_EXCEEDED);
+    private        final TileEvent UNDERRUN_LOWER_THRESHOLD_EVENT = new TileEvent(EventType.LOWER_THRESHOLD_UNDERRUN);
+    private        final TileEvent MAX_VALUE_EXCEEDED             = new TileEvent(EventType.MAX_VALUE_EXCEEDED);
+    private        final TileEvent MIN_VALUE_UNDERRUN             = new TileEvent(EventType.MIN_VALUE_UNDERRUN);
+    private        final TileEvent VALUE_IN_RANGE                 = new TileEvent(EventType.VALUE_IN_RANGE);
+    private        final TileEvent RECALC_EVENT                   = new TileEvent(EventType.RECALC);
+    private        final TileEvent REDRAW_EVENT                   = new TileEvent(EventType.REDRAW);
+    private        final TileEvent RESIZE_EVENT                   = new TileEvent(EventType.RESIZE);
+    private        final TileEvent VISIBILITY_EVENT               = new TileEvent(EventType.VISIBILITY);
+    private        final TileEvent SECTION_EVENT                  = new TileEvent(EventType.SECTION);
+    private        final TileEvent SERIES_EVENT                   = new TileEvent(EventType.SERIES);
+    private        final TileEvent DATA_EVENT                     = new TileEvent(EventType.DATA);
+    private        final TileEvent ALERT_EVENT                    = new TileEvent(EventType.ALERT);
+    private        final TileEvent VALUE_EVENT                    = new TileEvent(EventType.VALUE);
+    private        final TileEvent FINISHED_EVENT                 = new TileEvent(EventType.FINISHED);
+    private        final TileEvent GRAPHIC_EVENT                  = new TileEvent(EventType.GRAPHIC);
+    private        final TileEvent AVERAGING_EVENT                = new TileEvent(EventType.AVERAGING);
+    private        final TileEvent TIME_PERIOD_EVENT              = new TileEvent(EventType.TIME_PERIOD);
+    private        final TileEvent LOCATION_EVENT                 = new TileEvent(EventType.LOCATION);
+    private        final TileEvent TRACK_EVENT                    = new TileEvent(EventType.TRACK);
+    private        final TileEvent MAP_PROVIDER_EVENT             = new TileEvent(EventType.MAP_PROVIDER);
+    private        final TileEvent FLIP_START_EVENT               = new TileEvent(EventType.FLIP_START);
+    private        final TileEvent BKG_IMAGE_EVENT                = new TileEvent(EventType.BACKGROUND_IMAGE);
+    private        final TileEvent REGIONS_ON_TOP_EVENT           = new TileEvent(EventType.REGIONS_ON_TOP);
+    private        final TileEvent INFO_REGION_HANDLER_EVENT      = new TileEvent(EventType.INFO_REGION_HANDLER);
+    private        final TileEvent CLEAR_DATA_EVENT               = new TileEvent(EventType.CLEAR_DATA);
+    private        final TileEvent HIGHLIGHT_SECTIONS             = new TileEvent(EventType.HIGHLIGHT_SECTIONS);
 
     private static       String      userAgentStyleSheet;
 
@@ -766,13 +768,23 @@ public class Tile extends Control {
             @Override protected void invalidated() {
                 final double VALUE = get();
                 if (isCheckThreshold()) {
-                    double thrshld = getThreshold();
-                    if (formerValue.get() < thrshld && VALUE > thrshld) {
-                        fireTileEvent(EXCEEDED_EVENT);
-                    } else if (formerValue.get() > thrshld && VALUE < thrshld) {
-                        fireTileEvent(UNDERRUN_EVENT);
+                    double threshold = getThreshold();
+                    if (formerValue.get() < threshold && VALUE > threshold) {
+                        fireTileEvent(EXCEEDED_THRESHOLD_EVENT);
+                    } else if (formerValue.get() > threshold && VALUE < threshold) {
+                        fireTileEvent(UNDERRUN_THRESHOLD_EVENT);
                     }
                 }
+
+                if (isCheckLowerThreshold()) {
+                    double lowerThreshold = getLowerThreshold();
+                    if (formerValue.get() < lowerThreshold && VALUE > lowerThreshold) {
+                        fireTileEvent(EXCEEDED_LOWER_THRESHOLD_EVENT);
+                    } else if (formerValue.get() > lowerThreshold && VALUE < lowerThreshold) {
+                        fireTileEvent(UNDERRUN_LOWER_THRESHOLD_EVENT);
+                    }
+                }
+
                 if (VALUE < getMinMeasuredValue()) {
                     setMinMeasuredValue(VALUE);
                 } else if (VALUE > getMaxMeasuredValue()) {

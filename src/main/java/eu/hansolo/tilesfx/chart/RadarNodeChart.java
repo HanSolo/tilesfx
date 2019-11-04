@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 by Gerrit Grunwald
+ * Copyright (c) 2019 by Gerrit Grunwald
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,16 +35,10 @@ import javafx.beans.property.StringPropertyBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.VPos;
-import javafx.scene.CacheHint;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.Group;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -52,6 +46,13 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.ArcTo;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -65,78 +66,78 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 import static eu.hansolo.tilesfx.tools.Helper.getContrastColor;
 
 
-/**
- * Created by hansolo on 10.06.17.
- */
-public class RadarChart extends Region {
-    private static final int                            MIN_NO_OF_SECTORS = 4;
-    private static final int                            MAX_NO_OF_SECTORS = 128;
-    private static final double                         PREFERRED_WIDTH   = 120;
-    private static final double                         PREFERRED_HEIGHT  = 120;
-    private static final double                         MINIMUM_WIDTH     = 10;
-    private static final double                         MINIMUM_HEIGHT    = 10;
-    private static final double                         MAXIMUM_WIDTH     = 1024;
-    private static final double                         MAXIMUM_HEIGHT    = 1024;
-    private              double                         size;
-    private              Pane                           pane;
-    private              Canvas                         chartCanvas;
-    private              GraphicsContext                chartCtx;
-    private              Canvas                         overlayCanvas;
-    private              GraphicsContext                overlayCtx;
-    private              Text                           unitText;
-    private              Text                           minValueText;
-    private              Text                           legend1Text;
-    private              Text                           legend2Text;
-    private              Text                           legend3Text;
-    private              Text                           legend4Text;
-    private              Text                           maxValueText;
-    private              DropShadow                     dropShadow;
-    private              double                         legendStep;
-    private              int                            decimals;
-    private              String                         formatString;
-    private              int                            _noOfSectors;
-    private              IntegerProperty                noOfSectors;
-    private              double                         angleStep;
-    private              ObservableList<ChartData>      data;
-    private              double                         _minValue;
-    private              DoubleProperty                 minValue;
-    private              double                         _maxValue;
-    private              DoubleProperty                 maxValue;
-    private              double                         _threshold;
-    private              DoubleProperty                 threshold;
-    private              double                         _range;
-    private              DoubleProperty                 range;
-    private              String                         _unit;
-    private              StringProperty                 unit;
-    private              boolean                        _legendVisible;
-    private              BooleanProperty                legendVisible;
-    private              boolean                        _thresholdVisible;
-    private              BooleanProperty                thresholdVisible;
-    private              ObservableList<Stop>           gradientStops;
-    private              List<Stop>                     stops;
-    private              boolean                        _smoothing;
-    private              Color                          _chartBackgroundColor;
-    private              ObjectProperty<Color>          chartBackgroundColor;
-    private              Color                          _chartForegroundColor;
-    private              ObjectProperty<Color>          chartForegroundColor;
-    private              Color                          _chartTextColor;
-    private              ObjectProperty<Color>          chartTextColor;
-    private              Color                          _gridColor;
-    private              ObjectProperty<Color>          gridColor;
-    private              Paint                          _chartFill;
-    private              ObjectProperty<Paint>          chartFill;
-    private              Color                          _thresholdColor;
-    private              ObjectProperty<Color>          thresholdColor;
-    private              RadarChartMode                 _RadarChart_mode;
-    private              ObjectProperty<RadarChartMode> mode;
-    private              double                         legendScaleFactor;
-    private              InvalidationListener           resizeListener;
-    private              ListChangeListener<Stop>       gradientListener;
+public class RadarNodeChart extends Region {
+    private static final int                             MIN_NO_OF_SECTORS = 4;
+    private static final int                             MAX_NO_OF_SECTORS = 128;
+    private static final double                          PREFERRED_WIDTH   = 120;
+    private static final double                          PREFERRED_HEIGHT  = 120;
+    private static final double                          MINIMUM_WIDTH     = 10;
+    private static final double                          MINIMUM_HEIGHT    = 10;
+    private static final double                          MAXIMUM_WIDTH     = 1024;
+    private static final double                          MAXIMUM_HEIGHT    = 1024;
+    private              double                          width;
+    private              double                          height;
+    private              double                          size;
+    private              Pane                            pane;
+    private              Path                            chartPath;
+    private              Path                            overlayPath;
+    private              Circle                          centerCircle;
+    private              Circle                          thresholdCircle;
+    private              Group                           textGroup;
+    private              Text                            unitText;
+    private              Text                            minValueText;
+    private              Text                            legend1Text;
+    private              Text                            legend2Text;
+    private              Text                            legend3Text;
+    private              Text                            legend4Text;
+    private              Text                            maxValueText;
+    private              DropShadow                      dropShadow;
+    private              double                          legendStep;
+    private              int                             decimals;
+    private              String                          formatString;
+    private              int                             _noOfSectors;
+    private              IntegerProperty                 noOfSectors;
+    private              double                          angleStep;
+    private              ObservableList<ChartData>       data;
+    private              double                          _minValue;
+    private              DoubleProperty                  minValue;
+    private              double                          _maxValue;
+    private              DoubleProperty                  maxValue;
+    private              double                          _threshold;
+    private              DoubleProperty                  threshold;
+    private              double                          _range;
+    private              DoubleProperty                  range;
+    private              String                          _unit;
+    private              StringProperty                  unit;
+    private              boolean                         _legendVisible;
+    private              BooleanProperty                 legendVisible;
+    private              boolean                         _thresholdVisible;
+    private              BooleanProperty                 thresholdVisible;
+    private              ObservableList<Stop>            gradientStops;
+    private              List<Stop>                      stops;
+    private              boolean                         _smoothing;
+    private              Color                           _chartBackgroundColor;
+    private              ObjectProperty<Color>           chartBackgroundColor;
+    private              Color                           _chartForegroundColor;
+    private              ObjectProperty<Color>           chartForegroundColor;
+    private              Color                           _chartTextColor;
+    private              ObjectProperty<Color>           chartTextColor;
+    private              Color                           _gridColor;
+    private              ObjectProperty<Color>           gridColor;
+    private              Paint                           _chartFill;
+    private              ObjectProperty<Paint>           chartFill;
+    private              Color                           _thresholdColor;
+    private              ObjectProperty<Color>           thresholdColor;
+    private              RadarChartMode                  _mode;
+    private              ObjectProperty<RadarChartMode>  mode;
+    private              double                          legendScaleFactor;
+    private              InvalidationListener            resizeListener;
+    private              ListChangeListener<Stop>        gradientListener;
 
 
     // ******************** Constructors **************************************
-    public RadarChart() { this(null); }
-    public RadarChart(final List<ChartData> DATA) {
+    public RadarNodeChart() { this(null); }
+    public RadarNodeChart(final List<ChartData> DATA) {
         _minValue             = 0;
         _maxValue             = 100;
         _range                = 100;
@@ -145,7 +146,7 @@ public class RadarChart extends Region {
         _unit                 = "";
         _legendVisible        = false;
         _thresholdVisible     = false;
-        _RadarChart_mode      = RadarChartMode.POLYGON;
+        _mode                 = RadarChartMode.POLYGON;
         gradientStops         = FXCollections.observableArrayList();
         decimals              = 0;
         formatString          = new StringBuilder("%.").append(decimals).append("f").toString();
@@ -210,11 +211,15 @@ public class RadarChart extends Region {
             stops.add(new Stop(stop.getOffset() * 0.69924 + 0.285, stop.getColor()));
         }
 
-        chartCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        chartCtx    = chartCanvas.getGraphicsContext2D();
+        chartPath   = new Path();
 
-        overlayCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        overlayCtx    = overlayCanvas.getGraphicsContext2D();
+        overlayPath = new Path();
+        overlayPath.setFill(Color.TRANSPARENT);
+
+        centerCircle = new Circle();
+
+        thresholdCircle = new Circle();
+        thresholdCircle.setFill(Color.TRANSPARENT);
 
         unitText = new Text(getUnit());
         unitText.setTextAlignment(TextAlignment.CENTER);
@@ -260,9 +265,10 @@ public class RadarChart extends Region {
         maxValueText.setVisible(isLegendVisible());
         maxValueText.setEffect(dropShadow);
 
+        textGroup = new Group();
+
         // Add all nodes
-        pane = new Pane(chartCanvas, overlayCanvas, unitText, minValueText, legend1Text, legend2Text, legend3Text, legend4Text, maxValueText);
-        pane.setBackground(new Background(new BackgroundFill(getChartBackgroundColor(), new CornerRadii(1024), Insets.EMPTY)));
+        pane = new Pane(chartPath, overlayPath, centerCircle, thresholdCircle, textGroup, unitText, minValueText, legend1Text, legend2Text, legend3Text, legend4Text, maxValueText);
 
         getChildren().setAll(pane);
     }
@@ -299,7 +305,7 @@ public class RadarChart extends Region {
                     super.set(clamp(-Double.MAX_VALUE, getMaxValue(), MIN_VALUE));
                     setRange(getMaxValue() - get());
                 }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "minValue"; }
             };
         }
@@ -324,7 +330,7 @@ public class RadarChart extends Region {
                     setRange(_maxValue - getMinValue());
                     redraw();
                 }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "maxValue"; }
             };
         }
@@ -344,7 +350,7 @@ public class RadarChart extends Region {
         if (null == range) {
             range = new DoublePropertyBase(_range) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "range"; }
             };
         }
@@ -369,7 +375,7 @@ public class RadarChart extends Region {
                     setRange(getMaxValue() - get());
                     drawOverlay();
                 }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "threshold"; }
             };
         }
@@ -394,7 +400,7 @@ public class RadarChart extends Region {
                     angleStep = 360.0 / get();
                     redraw();
                 }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "noOfSectors"; }
             };
         }
@@ -414,7 +420,7 @@ public class RadarChart extends Region {
         if (null == thresholdVisible) {
             thresholdVisible = new BooleanPropertyBase(_thresholdVisible) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "thresholdVisible"; }
             };
         }
@@ -439,7 +445,7 @@ public class RadarChart extends Region {
         if (null == unit) {
             unit = new StringPropertyBase(_unit) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "unit"; }
             };
             _unit = null;
@@ -460,7 +466,7 @@ public class RadarChart extends Region {
         if (null == legendVisible) {
             legendVisible = new BooleanPropertyBase(_legendVisible) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "legendVisible"; }
             };
         }
@@ -497,7 +503,7 @@ public class RadarChart extends Region {
         if (null == chartBackgroundColor) {
             chartBackgroundColor = new ObjectPropertyBase<Color>(_chartBackgroundColor) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "chartBackgroundColor"; }
             };
             _chartBackgroundColor = null;
@@ -518,7 +524,7 @@ public class RadarChart extends Region {
         if (null == chartForegroundColor) {
             chartForegroundColor = new ObjectPropertyBase<Color>(_chartForegroundColor) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "chartForegroundColor"; }
             };
             _chartForegroundColor = null;
@@ -539,7 +545,7 @@ public class RadarChart extends Region {
         if (null == chartTextColor) {
             chartTextColor  = new ObjectPropertyBase<Color>(_chartTextColor) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "chartTextColor"; }
             };
             _chartTextColor = null;
@@ -560,7 +566,7 @@ public class RadarChart extends Region {
         if (null == gridColor) {
             gridColor  = new ObjectPropertyBase<Color>(_gridColor) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "gridColor"; }
             };
             _gridColor = null;
@@ -581,7 +587,7 @@ public class RadarChart extends Region {
         if (null == chartFill) {
             chartFill  = new ObjectPropertyBase<Paint>(_chartFill) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "chartFill"; }
             };
             _chartFill = null;
@@ -602,7 +608,7 @@ public class RadarChart extends Region {
         if (null == thresholdColor) {
             thresholdColor  = new ObjectPropertyBase<Color>(_thresholdColor) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "thresholdColor"; }
             };
             _thresholdColor = null;
@@ -615,23 +621,23 @@ public class RadarChart extends Region {
         drawText();
     }
 
-    public RadarChartMode getMode() { return null == mode ? _RadarChart_mode : mode.get(); }
-    public void setMode(final RadarChartMode RadarChartMODE) {
+    public RadarChartMode getMode() { return null == mode ? _mode : mode.get(); }
+    public void setMode(final RadarChartMode MODE) {
         if (null == mode) {
-            _RadarChart_mode = RadarChartMODE;
+            _mode = MODE;
             redraw();
         } else {
-            mode.set(RadarChartMODE);
+            mode.set(MODE);
         }
     }
     public ObjectProperty<RadarChartMode> modeProperty() {
         if (null == mode) {
-            mode = new ObjectPropertyBase<RadarChartMode>(_RadarChart_mode) {
+            mode = new ObjectPropertyBase<RadarChartMode>(_mode) {
                 @Override protected void invalidated() { redraw(); }
-                @Override public Object getBean() { return RadarChart.this; }
+                @Override public Object getBean() { return RadarNodeChart.this; }
                 @Override public String getName() { return "mode"; }
             };
-            _RadarChart_mode = null;
+            _mode = null;
         }
         return mode;
     }
@@ -642,51 +648,57 @@ public class RadarChart extends Region {
         redraw();
     }
 
+    private void addCircle(final Path PATH, final double CENTER_X, final double CENTER_Y, final double RADIUS) {
+        // Control point calculation: (4/3)*tan(pi/8) = 4*(sqrt(2)-1)/3 = 0.552284749831
+        double cp = RADIUS * 0.552284749831;
+        MoveTo       mt1 = new MoveTo(CENTER_X, CENTER_Y - RADIUS);
+        CubicCurveTo cc1 = new CubicCurveTo(CENTER_X + cp, CENTER_Y - RADIUS,
+                                            CENTER_X + RADIUS, CENTER_Y - cp,
+                                            CENTER_X + RADIUS, CENTER_Y);
+        CubicCurveTo cc2 = new CubicCurveTo(CENTER_X + RADIUS, CENTER_Y + cp,
+                                            CENTER_X + cp, CENTER_Y + RADIUS,
+                                            CENTER_X, CENTER_Y + RADIUS);
+        CubicCurveTo cc3 = new CubicCurveTo(CENTER_X - cp, CENTER_Y + RADIUS,
+                                            CENTER_X - RADIUS, CENTER_Y + cp,
+                                            CENTER_X - RADIUS, CENTER_Y);
+        CubicCurveTo cc4 = new CubicCurveTo(CENTER_X - RADIUS, CENTER_Y - cp,
+                                            CENTER_X - cp, CENTER_Y - RADIUS,
+                                            CENTER_X, CENTER_Y - RADIUS);
+        PATH.getElements().addAll(mt1, cc1, cc2, cc3, cc4);
+    }
+
 
     // ******************** Style related *************************************
     @Override public String getUserAgentStylesheet() {
-        return RadarChart.class.getResource("radarchart.css").toExternalForm();
+        return RadarNodeChart.class.getResource("radarchart.css").toExternalForm();
     }
 
 
     // ******************** Private Methods ***********************************
     private void resize() {
-        double width  = getWidth() - getInsets().getLeft() - getInsets().getRight();
-        double height = getHeight() - getInsets().getTop() - getInsets().getBottom();
-        size          = width < height ? width : height;
+        width  = getWidth() - getInsets().getLeft() - getInsets().getRight();
+        height = getHeight() - getInsets().getTop() - getInsets().getBottom();
+        size   = width < height ? width : height;
 
         if (size > 0) {
-            pane.setMaxSize(size, size);
-            pane.relocate((getWidth() - size) * 0.5, (getHeight() - size) * 0.5);
-            pane.setBackground(new Background(new BackgroundFill(getChartBackgroundColor(), new CornerRadii(1024), Insets.EMPTY)));
-
-            chartCanvas.setWidth(size);
-            chartCanvas.setHeight(size);
-
-            overlayCanvas.setWidth(size);
-            overlayCanvas.setHeight(size);
-
+            pane.setMaxSize(width, height);
+            pane.relocate((getWidth() - width) * 0.5, (getHeight() - height) * 0.5);
+            //pane.setBackground(new Background(new BackgroundFill(getChartBackgroundColor(), new CornerRadii(1024), Insets.EMPTY)));
             redraw();
         }
     }
 
     public void redraw() {
-        chartCanvas.setCache(false);
         drawChart();
-        chartCanvas.setCache(true);
-        chartCanvas.setCacheHint(CacheHint.QUALITY);
 
-        overlayCanvas.setCache(false);
         drawOverlay();
-        overlayCanvas.setCache(true);
-        overlayCanvas.setCacheHint(CacheHint.QUALITY);
 
         drawText();
     }
 
     private void drawChart() {
-        final double CENTER_X      = 0.5 * size;
-        final double CENTER_Y      = CENTER_X;
+        final double CENTER_X      = 0.5 * width;
+        final double CENTER_Y      = 0.5 * height;
         final double CIRCLE_SIZE   = 0.9 * size;
         final double DATA_RANGE    = getRange();
         final double RANGE         = 0.35714 * CIRCLE_SIZE;
@@ -695,20 +707,19 @@ public class RadarChart extends Region {
         final double MIN_VALUE     = getMinValue();
         final double MAX_VALUE     = getMaxValue();
 
-        // clear the chartCanvas
-        chartCtx.clearRect(0, 0, size, size);
-
+        // clear the chartPath
+        chartPath.getElements().clear();
 
         // draw the chart data
-        chartCtx.save();
+        chartPath.setStroke(Color.TRANSPARENT);
         if (gradientStops.isEmpty()) {
-            chartCtx.setFill(getChartFill());
+            chartPath.setFill(getChartFill());
         } else {
-            chartCtx.setFill(new RadialGradient(0, 0,
-                                                CENTER_X, CENTER_Y,
-                                                CIRCLE_SIZE * 0.5,
-                                                false, CycleMethod.NO_CYCLE,
-                                                stops));
+            chartPath.setFill(new RadialGradient(0, 0,
+                                                 CENTER_X, CENTER_Y,
+                                                 CIRCLE_SIZE * 0.5,
+                                                 false, CycleMethod.NO_CYCLE,
+                                                 stops));
         }
 
         double radiusFactor;
@@ -719,10 +730,8 @@ public class RadarChart extends Region {
                     double      radAngleStep = Math.toRadians(angleStep);
                     List<Point> points       = new ArrayList<>();
 
-                    double x = CENTER_X + (-Math.sin(radAngle) * (CENTER_Y - (0.36239 * size)));
-                    double y = CENTER_Y + (+Math.cos(radAngle) * (CENTER_Y - (0.36239 * size)));
-                    points.add(new Point(x, y));
-
+                    double x;
+                    double y;
                     for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
                         double r1 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
                         x = CENTER_X + (-Math.sin(radAngle) * r1);
@@ -737,150 +746,129 @@ public class RadarChart extends Region {
 
                     Point[] interpolatedPoints = Helper.subdividePoints(points.toArray(new Point[0]), 8);
 
-                    chartCtx.beginPath();
-                    chartCtx.moveTo(interpolatedPoints[0].getX(), interpolatedPoints[0].getY());
+                    chartPath.getElements().add(new MoveTo(interpolatedPoints[0].getX(), interpolatedPoints[0].getY()));
                     for (int i = 0 ; i < interpolatedPoints.length - 1 ; i++) {
                         Point point = interpolatedPoints[i];
-                        chartCtx.lineTo(point.getX(), point.getY());
+                        chartPath.getElements().add(new LineTo(point.getX(), point.getY()));
                     }
-                    chartCtx.lineTo(interpolatedPoints[interpolatedPoints.length - 1].getX(), interpolatedPoints[interpolatedPoints.length - 1].getY());
-                    chartCtx.closePath();
-
-                    chartCtx.fill();
+                    //chartPath.getElements().add(new LineTo(interpolatedPoints[interpolatedPoints.length - 1].getX(), interpolatedPoints[interpolatedPoints.length - 1].getY()));
+                    chartPath.getElements().add(new ClosePath());
                 } else {
-                    chartCtx.beginPath();
-                    chartCtx.moveTo(CENTER_X, 0.36239 * size);
+                    chartPath.getElements().add(new MoveTo(CENTER_X, 0.36239 * size));
                     for (int i = 0; i < NO_OF_SECTORS; i++) {
                         radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (data.get(i).getValue()) - MIN_VALUE) / DATA_RANGE);
-                        //chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
-
-
-                        double r1 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
-                        double x = CENTER_X + (-Math.sin(Math.toRadians(180)) * r1);
-                        double y = CENTER_Y + (+Math.cos(Math.toRadians(180)) * r1);
-
-                        chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
-
-                        chartCtx.translate(CENTER_X, CENTER_Y);
-                        chartCtx.rotate(angleStep);
-                        chartCtx.translate(-CENTER_X, -CENTER_Y);
+                        double angle = i * angleStep;
+                        double r1 = (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE));
+                        double x = CENTER_X + (-Math.sin(Math.toRadians(180 + angle)) * r1);
+                        double y = CENTER_Y + (+Math.cos(Math.toRadians(180 + angle)) * r1);
+                        chartPath.getElements().add(new LineTo(x, y));
                     }
                     radiusFactor = ((clamp(MIN_VALUE, MAX_VALUE, data.get(NO_OF_SECTORS - 1).getValue()) - MIN_VALUE) / DATA_RANGE);
-                    chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
-                    chartCtx.closePath();
-                    chartCtx.fill();
+                    chartPath.getElements().add(new LineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE));
+                    chartPath.getElements().add(new ClosePath());
                 }
                 break;
             case SECTOR:
-                chartCtx.translate(CENTER_X, CENTER_Y);
-                chartCtx.rotate(-90);
-                chartCtx.translate(-CENTER_X, -CENTER_Y);
                 // sector mode
+                double angle = 0;
                 for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
                     radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (data.get(i).getValue() - MIN_VALUE)) / DATA_RANGE);
-                    chartCtx.beginPath();
-                    chartCtx.moveTo(CENTER_X, CENTER_Y);
-                    chartCtx.arc(CENTER_X, CENTER_Y, radiusFactor * RANGE + OFFSET, radiusFactor * RANGE + OFFSET, 0, -angleStep);
-                    chartCtx.closePath();
-                    chartCtx.fill();
-
-                    chartCtx.translate(CENTER_X, CENTER_Y);
-                    chartCtx.rotate(angleStep);
-                    chartCtx.translate(-CENTER_X, -CENTER_Y);
+                    angle = i * angleStep;
+                    double r1 = (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE));
+                    double x1 = CENTER_X + (-Math.sin(Math.toRadians(180 + angle)) * r1);
+                    double y1 = CENTER_Y + (+Math.cos(Math.toRadians(180 + angle)) * r1);
+                    double x2 = CENTER_X + (-Math.sin(Math.toRadians(180 + angle + angleStep)) * r1);
+                    double y2 = CENTER_Y + (+Math.cos(Math.toRadians(180 + angle + angleStep)) * r1);
+                    chartPath.getElements().add(new MoveTo(CENTER_X, CENTER_Y));
+                    chartPath.getElements().add(new LineTo(x1, y1));
+                    chartPath.getElements().add(new ArcTo(r1, r1, 0, x2, y2, false, true));
+                    chartPath.getElements().add(new LineTo(x2, y2));
+                    chartPath.getElements().add(new LineTo(CENTER_X, CENTER_Y));
+                    chartPath.getElements().add(new ClosePath());
                 }
                 break;
         }
-        chartCtx.restore();
     }
 
     private void drawOverlay() {
         final Paint  CHART_BKG     = getChartBackgroundColor();
-        final double CENTER_X      = 0.5 * size;
-        final double CENTER_Y      = CENTER_X;
-        final double CIRCLE_SIZE   = 0.90 * size;
+        final double CENTER_X      = 0.5 * width;
+        final double CENTER_Y      = 0.5 * height;
+        final double CIRCLE_RADIUS = 0.45 * size;
         final double DATA_RANGE    = getRange();
-        final double RANGE         = 0.35714 * CIRCLE_SIZE;
-        final double OFFSET        = 0.14286 * CIRCLE_SIZE;
+        final double RANGE         = 0.35714 * 2 * CIRCLE_RADIUS;
+        final double OFFSET        = 0.14286 * 2 * CIRCLE_RADIUS;
         final int    NO_OF_SECTORS = getNoOfSectors();
         final double MIN_VALUE     = getMinValue();
         final double MAX_VALUE     = getMaxValue();
         double radius;
 
-        // clear the chartCanvas
-        overlayCtx.clearRect(0, 0, size, size);
+        // clear the overlayPath
+        overlayPath.getElements().clear();
 
         // draw center point
-        overlayCtx.save();
-        overlayCtx.setFill(CHART_BKG);
-        overlayCtx.translate(CENTER_X - OFFSET, CENTER_Y - OFFSET);
-        overlayCtx.fillOval(0, 0, 2 * OFFSET, 2 * OFFSET);
-        overlayCtx.restore();
+        centerCircle.setCenterX(CENTER_X);
+        centerCircle.setCenterY(CENTER_Y);
+        centerCircle.setRadius(0.28571 * CIRCLE_RADIUS);
+        centerCircle.setFill(CHART_BKG);
+        centerCircle.setStroke(getGridColor());
+        overlayPath.setStroke(getGridColor());
+        overlayPath.setStrokeWidth(1);
+        addCircle(overlayPath, CENTER_X, CENTER_Y, CIRCLE_RADIUS);
 
         // draw concentric rings
-        overlayCtx.setLineWidth(1);
-        overlayCtx.setStroke(getGridColor());
-        double ringStepSize = (CIRCLE_SIZE - CIRCLE_SIZE * 0.28571) / 20.0;
-        double pos          = 0.5 * (size - CIRCLE_SIZE);
-        double ringSize     = CIRCLE_SIZE;
+        double ringStepSize = (CIRCLE_RADIUS - CIRCLE_RADIUS * 0.28571) / 20.0;
+        double ringSize     = CIRCLE_RADIUS;
+
         for (int i = 0 ; i < 11 ; i++) {
-            overlayCtx.strokeOval(pos, pos, ringSize, ringSize);
-            pos      += ringStepSize;
+            addCircle(overlayPath,CENTER_X, CENTER_Y, ringSize);
             ringSize -= 2 * ringStepSize;
         }
 
         // draw star lines
-        overlayCtx.save();
         for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
-            overlayCtx.strokeLine(CENTER_X, 0.37 * size, CENTER_X, 0.5 * (size - CIRCLE_SIZE));
-            overlayCtx.translate(CENTER_X, CENTER_Y);
-            overlayCtx.rotate(angleStep);
-            overlayCtx.translate(-CENTER_X, -CENTER_Y);
+            double[] xy = Helper.rotatePointAroundRotationCenter(CENTER_X, CENTER_Y - CIRCLE_RADIUS, CENTER_X, CENTER_Y, i * angleStep);
+            overlayPath.getElements().add(new MoveTo(CENTER_X, CENTER_Y));
+            overlayPath.getElements().add(new LineTo(xy[0], xy[1]));
         }
-        overlayCtx.restore();
 
         // draw threshold line
         if (isThresholdVisible()) {
-            radius = ((getThreshold() - MIN_VALUE) / DATA_RANGE);
             double radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (getThreshold()) - MIN_VALUE) / DATA_RANGE);
             double r = (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE));
-            overlayCtx.setLineWidth(clamp(1d, 3d, size * 0.005));
-            overlayCtx.setStroke(getThresholdColor());
-            /*
-            overlayCtx.strokeOval(0.5 * size - OFFSET - radius * RANGE, 0.5 * size - OFFSET - radius * RANGE,
-                                  2 * (radius * RANGE + OFFSET), 2 * (radius * RANGE + OFFSET));
-            */
-            overlayCtx.strokeOval(0.5 * size - r, 0.5 * size - r,
-                                  2 * r, 2 * r);
-        }
-
-        // prerotate if sectormode
-        overlayCtx.save();
-
-        if (RadarChartMode.SECTOR == getMode()) {
-            overlayCtx.translate(CENTER_X, CENTER_Y);
-            overlayCtx.rotate(angleStep * 0.5);
-            overlayCtx.translate(-CENTER_X, -CENTER_Y);
+            thresholdCircle.setCenterX(CENTER_X);
+            thresholdCircle.setCenterY(CENTER_Y);
+            thresholdCircle.setRadius(r);
+            thresholdCircle.setStroke(getThresholdColor());
+            thresholdCircle.setStrokeWidth(clamp(1d, 3d, size * 0.005));
         }
 
         // draw text
-        overlayCtx.save();
-        overlayCtx.setFont(Fonts.latoRegular(0.035 * size));
-        overlayCtx.setTextAlign(TextAlignment.CENTER);
-        overlayCtx.setTextBaseline(VPos.CENTER);
-        if (NO_OF_SECTORS == 0) { overlayCtx.setFill(getChartForegroundColor()); }
+        Font   font         = Fonts.latoRegular(0.035 * size);
+        double radAngle     = RadarChartMode.SECTOR == getMode() ? Math.toRadians(180 + angleStep * 0.5) : Math.toRadians(180);
+        double radAngleStep = Math.toRadians(angleStep);
+        textGroup.getChildren().clear();
         for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
-            overlayCtx.setFill(data.get(i).getTextColor());
-            overlayCtx.fillText(data.get(i).getName(), CENTER_X, size * 0.02);
-            overlayCtx.translate(CENTER_X, CENTER_Y);
-            overlayCtx.rotate(angleStep);
-            overlayCtx.translate(-CENTER_X, -CENTER_Y);
-        }
-        overlayCtx.restore();
+            double r = size * 0.48;
+            double x  = CENTER_X - size * 0.014286 + (-Math.sin(radAngle) * r);
+            double y  = CENTER_Y + (+Math.cos(radAngle) * r);
 
-        overlayCtx.restore();
+            Text text = new Text(data.get(i).getName());
+            text.setFont(font);
+            text.setFill(data.get(i).getTextColor());
+            text.setTextOrigin(VPos.CENTER);
+            text.setTextAlignment(TextAlignment.CENTER);
+            text.setRotate(Math.toDegrees(radAngle) - 180);
+            text.setX(x);
+            text.setY(y);
+            textGroup.getChildren().add(text);
+            radAngle += radAngleStep;
+        }
     }
 
     private void drawText() {
+        final double OFFSET_Y = height * 0.5 - 0.109 * size;
+
         Color textColor = getChartTextColor();
         dropShadow.setColor(null == textColor ? Color.BLACK : getContrastColor(textColor));
         dropShadow.setRadius(size * 0.025);
@@ -889,7 +877,7 @@ public class RadarChart extends Region {
         unitText.setText(getUnit());
         unitText.setFont(Fonts.latoRegular(size * 0.1));
         adjustTextSize(unitText, size * 0.22, size * 0.1);
-        unitText.relocate((size - unitText.getLayoutBounds().getWidth()) * 0.5, (size - unitText.getLayoutBounds().getHeight()) * 0.5);
+        unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, (height - unitText.getLayoutBounds().getHeight()) * 0.5);
 
         minValueText.setVisible(isLegendVisible());
         legend1Text.setVisible(isLegendVisible());
@@ -904,34 +892,34 @@ public class RadarChart extends Region {
             minValueText.setFill(textColor);
             minValueText.setText(String.format(Locale.US, formatString, getMinValue()));
             minValueText.setFont(font);
-            minValueText.relocate((size - minValueText.getLayoutBounds().getWidth()) * 0.5, 0.3435 * size);
+            minValueText.relocate((width - minValueText.getLayoutBounds().getWidth()) * 0.5, OFFSET_Y - 0.048 * size);
 
             legendStep = getRange() / 5.0;
 
             legend1Text.setFill(textColor);
             legend1Text.setText(String.format(Locale.US, formatString, (getMinValue() + legendStep) * legendScaleFactor));
             legend1Text.setFont(font);
-            legend1Text.relocate((size - legend1Text.getLayoutBounds().getWidth()) * 0.5, 0.29 * size);
+            legend1Text.relocate((width - legend1Text.getLayoutBounds().getWidth()) * 0.5, OFFSET_Y - 0.099 * size);
 
             legend2Text.setFill(textColor);
             legend2Text.setText(String.format(Locale.US, formatString, (getMinValue() + legendStep * 2) * legendScaleFactor));
             legend2Text.setFont(font);
-            legend2Text.relocate((size - legend2Text.getLayoutBounds().getWidth()) * 0.5, 0.225 * size);
+            legend2Text.relocate((width - legend2Text.getLayoutBounds().getWidth()) * 0.5, OFFSET_Y - 0.165 * size);
 
             legend3Text.setFill(textColor);
             legend3Text.setText(String.format(Locale.US, formatString, (getMinValue() + legendStep * 3) * legendScaleFactor));
             legend3Text.setFont(font);
-            legend3Text.relocate((size - legend3Text.getLayoutBounds().getWidth()) * 0.5, 0.1599 * size);
+            legend3Text.relocate((width - legend3Text.getLayoutBounds().getWidth()) * 0.5, OFFSET_Y - 0.23 * size);
 
             legend4Text.setFill(textColor);
             legend4Text.setText(String.format(Locale.US, formatString, (getMinValue() + legendStep * 4) * legendScaleFactor));
             legend4Text.setFont(font);
-            legend4Text.relocate((size - legend4Text.getLayoutBounds().getWidth()) * 0.5, 0.097 * size);
+            legend4Text.relocate((width - legend4Text.getLayoutBounds().getWidth()) * 0.5, OFFSET_Y - 0.295 * size);
 
             maxValueText.setFill(textColor);
             maxValueText.setText(String.format(Locale.US, formatString, getMaxValue()));
             maxValueText.setFont(font);
-            maxValueText.relocate((size - maxValueText.getLayoutBounds().getWidth()) * 0.5, 0.048 * size);
+            maxValueText.relocate((width - maxValueText.getLayoutBounds().getWidth()) * 0.5, OFFSET_Y - 0.3435 * size);
         }
     }
 }

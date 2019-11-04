@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 by Gerrit Grunwald
+ * Copyright (c) 2019 by Gerrit Grunwald
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.chart.RadarChart;
+import eu.hansolo.tilesfx.chart.RadarNodeChart;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -27,19 +27,16 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 
-/**
- * Created by hansolo on 10.06.17.
- */
-public class RadarChartTileSkin extends TileSkin {
+public class RadarNodeChartTileSkin extends TileSkin {
     private Text                          titleText;
     private Text                          text;
-    private RadarChart                    radarChart;
+    private RadarNodeChart                radarChart;
     private ListChangeListener<ChartData> chartDataListener;
     private ChartDataEventListener        chartEventListener;
 
 
     // ******************** Constructors **************************************
-    public RadarChartTileSkin(final Tile TILE) {
+    public RadarNodeChartTileSkin(final Tile TILE) {
         super(TILE);
     }
 
@@ -48,7 +45,7 @@ public class RadarChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        radarChart = new RadarChart(tile.getChartData());
+        radarChart = new RadarNodeChart(tile.getChartData());
         radarChart.setMaxValue(tile.getMaxValue());
         radarChart.setUnit(tile.getUnit());
         radarChart.setLegendVisible(true);
@@ -152,16 +149,12 @@ public class RadarChartTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double chartWidth   = contentBounds.getWidth();
-        double chartHeight  = contentBounds.getHeight();
-        double chartSize    = chartWidth < chartHeight ? chartWidth : chartHeight;
-
         if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
 
-            radarChart.setPrefSize(chartSize, chartSize);
-            radarChart.relocate((width - chartSize) * 0.5, contentBounds.getY() + (contentBounds.getHeight() - chartSize) * 0.5);
+            radarChart.setPrefSize(contentBounds.getWidth(), contentBounds.getHeight());
+            radarChart.relocate((width - contentBounds.getWidth()) * 0.5, contentBounds.getY());
 
             resizeStaticText();
         }
@@ -172,6 +165,8 @@ public class RadarChartTileSkin extends TileSkin {
         radarChart.setSmoothing(tile.isSmoothing());
         radarChart.setUnit(tile.getUnit());
         radarChart.setMode(tile.getRadarChartMode());
+        radarChart.setThreshold(tile.getThreshold());
+        radarChart.setThresholdVisible(tile.isThresholdVisible());
 
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());

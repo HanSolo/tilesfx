@@ -22,7 +22,7 @@ import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.Tile.TileColor;
-import eu.hansolo.tilesfx.chart.RadarChart;
+import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
@@ -805,8 +805,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B radarChartMode(final RadarChart.Mode MODE) {
-       properties.put("radarChartMode", new SimpleObjectProperty(MODE));
+    public final B radarChartMode(final RadarChartMode RadarChartMODE) {
+       properties.put("radarChartMode", new SimpleObjectProperty(RadarChartMODE));
        return (B)this;
     }
 
@@ -1189,6 +1189,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setChartType(ChartType.AREA);
                     break;
                 case RADAR_CHART:
+                    break;
+                case RADAR_NODE_CHART:
                     break;
                 case COUNTRY:
                     break;
@@ -1610,7 +1612,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
             } else if ("yAxis".equals(key)) {
                 TILE.setYAxis(((ObjectProperty<Axis>) properties.get(key)).get());
             } else if ("radarChartMode".equals(key)) {
-                TILE.setRadarChartMode(((ObjectProperty<RadarChart.Mode>) properties.get(key)).get());
+                TILE.setRadarChartMode(((ObjectProperty<RadarChartMode>) properties.get(key)).get());
             } else if ("chartGridColor".equals(key)) {
                 TILE.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("country".equals(key)) {

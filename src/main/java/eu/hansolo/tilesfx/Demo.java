@@ -23,7 +23,7 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.chart.RadarChart.Mode;
+import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
@@ -531,7 +531,7 @@ public class Demo extends Application {
                                      .maxValue(50)
                                      .title("RadarChart Sector")
                                      .unit("Unit")
-                                     .radarChartMode(Mode.SECTOR)
+                                     .radarChartMode(RadarChartMode.SECTOR)
                                      .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
                                                     new Stop(0.00001, Color.web("#3552a0")),
                                                     new Stop(0.09090, Color.web("#456acf")),
@@ -556,7 +556,7 @@ public class Demo extends Application {
                                      .maxValue(50)
                                      .title("RadarChart Polygon")
                                      .unit("Unit")
-                                     .radarChartMode(Mode.POLYGON)
+                                     .radarChartMode(RadarChartMode.POLYGON)
                                      .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
                                                     new Stop(0.00001, Color.web("#3552a0")),
                                                     new Stop(0.09090, Color.web("#456acf")),

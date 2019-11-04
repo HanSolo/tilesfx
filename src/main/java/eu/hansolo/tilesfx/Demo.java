@@ -62,13 +62,14 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -147,6 +148,7 @@ public class Demo extends Application {
     private Tile            statusTile;
     private Tile            barGaugeTile;
     private Tile            imageTile;
+    private Tile            timelineTile;
 
 
     private long            lastTimerCall;
@@ -249,7 +251,6 @@ public class Demo extends Application {
         chartData6 = new ChartData("Item 6", 13.0, Tile.BLUE);
         chartData7 = new ChartData("Item 7", 13.0, Tile.BLUE);
         chartData8 = new ChartData("Item 8", 13.0, Tile.BLUE);
-        //ChartData.animated = false;
 
         smoothChartData1 = new ChartData("Item 1", RND.nextDouble() * 25, Tile.BLUE);
         smoothChartData2 = new ChartData("Item 2", RND.nextDouble() * 25, Tile.BLUE);
@@ -772,6 +773,48 @@ public class Demo extends Application {
                                .textAlignment(TextAlignment.CENTER)
                                .build();
 
+        timelineTile = TileBuilder.create()
+                                  .skinType(SkinType.TIMELINE)
+                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                  .title("Timeline Tile")
+                                  .unit("mg/dl")
+                                  .minValue(0)
+                                  .maxValue(350)
+                                  .smoothing(true)
+                                  .lowerThreshold(70)
+                                  .lowerThresholdColor(TileColor.RED.color)
+                                  .threshold(240)
+                                  .thresholdColor(TileColor.RED.color)
+                                  .thresholdVisible(true)
+                                  .tickLabelColor(Helper.getColorWithOpacity(Tile.FOREGROUND, 0.5))
+                                  .sections(new Section(0, 70, "Low", Helper.getColorWithOpacity(Dark.RED, 0.1)),
+                                            new Section(70, 140, "Ok", Helper.getColorWithOpacity(Bright.GREEN, 0.15)),
+                                            new Section(140, 350, "High", Helper.getColorWithOpacity(Dark.RED, 0.1)))
+                                  .highlightSections(true)
+                                  .sectionsVisible(true)
+                                  .textAlignment(TextAlignment.CENTER)
+                                  .timePeriod(java.time.Duration.ofMinutes(1))
+                                  .maxTimePeriod(java.time.Duration.ofMinutes(1))
+                                  .timePeriodResolution(TimeUnit.SECONDS)
+                                  .numberOfValuesForTrendCalculation(5)
+                                  .trendVisible(true)
+                                  .maxTimePeriod(java.time.Duration.ofSeconds(60))
+                                  .gradientStops(new Stop(0, Dark.RED),
+                                                 new Stop(0.15, Dark.RED),
+                                                 new Stop(0.2, Bright.YELLOW_ORANGE),
+                                                 new Stop(0.25, Bright.GREEN),
+                                                 new Stop(0.3, Bright.GREEN),
+                                                 new Stop(0.35, Bright.GREEN),
+                                                 new Stop(0.45, Bright.YELLOW_ORANGE),
+                                                 new Stop(0.5, Bright.ORANGE),
+                                                 new Stop(0.685, Dark.RED),
+                                                 new Stop(1.0, Dark.RED))
+                                  .strokeWithGradient(true)
+                                  .averageVisible(true)
+                                  .averagingPeriod(60)
+                                  .timeoutMs(60000)
+                                  .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -829,6 +872,8 @@ public class Demo extends Application {
 
                     barGaugeTile.setValue(RND.nextDouble() * 100);
 
+                    timelineTile.addChartData(new ChartData("", RND.nextDouble() * 300 + 50, Instant.now()));
+
                     lastTimerCall = now;
                 }
             }
@@ -849,7 +894,8 @@ public class Demo extends Application {
                                              gaugeSparkLineTile, radarChartTile1, radarChartTile2,
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
-                                             matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile);//, weatherTile);
+                                             matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
+                                             timelineTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

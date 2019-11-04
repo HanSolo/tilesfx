@@ -23,9 +23,13 @@ import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -39,24 +43,27 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class SliderTileSkin extends TileSkin {
-    private final TileEvent VALUE_CHANGING = new TileEvent(TileEvent.EventType.VALUE_CHANGING);
-    private final TileEvent VALUE_CHANGED  = new TileEvent(TileEvent.EventType.VALUE_CHANGED);
-    private Text                     titleText;
-    private Text                     text;
-    private Text                     valueText;
-    private Text                     unitText;
-    private TextFlow                 valueUnitFlow;
-    private Label                    description;
-    private Circle                   thumb;
-    private Rectangle                barBackground;
-    private Rectangle                bar;
-    private Point2D                  dragStart;
-    private double                   centerX;
-    private double                   centerY;
-    private double                   formerThumbPos;
-    private double                   trackStart;
-    private double                   trackLength;
-    private EventHandler<MouseEvent> mouseEventHandler;
+    private final TileEvent                VALUE_CHANGING = new TileEvent(TileEvent.EventType.VALUE_CHANGING);
+    private final TileEvent                VALUE_CHANGED  = new TileEvent(TileEvent.EventType.VALUE_CHANGED);
+    private       Text                     titleText;
+    private       Text                     text;
+    private       Text                     valueText;
+    private       Text                     upperUnitText;
+    private       Line                     fractionLine;
+    private       Text                     unitText;
+    private       VBox                     unitFlow;
+    private       HBox                     valueUnitFlow;
+    private       Label                    description;
+    private       Circle                   thumb;
+    private       Rectangle                barBackground;
+    private       Rectangle                bar;
+    private       Point2D                  dragStart;
+    private       double                   centerX;
+    private       double                   centerY;
+    private       double                   formerThumbPos;
+    private       double                   trackStart;
+    private       double                   trackLength;
+    private       EventHandler<MouseEvent> mouseEventHandler;
 
 
     // ******************** Constructors **************************************
@@ -97,12 +104,22 @@ public class SliderTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
         unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
-        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
+        valueUnitFlow.setMouseTransparent(true);
 
         description = new Label(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
@@ -117,7 +134,7 @@ public class SliderTileSkin extends TileSkin {
         thumb = new Circle(PREFERRED_WIDTH * 0.09);
         thumb.setEffect(shadow);
 
-        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, barBackground, bar, thumb);
+        getPane().getChildren().addAll(titleText, text, valueUnitFlow, fractionLine, description, barBackground, bar, thumb);
     }
 
     @Override protected void registerListeners() {
@@ -136,7 +153,7 @@ public class SliderTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     }
@@ -203,9 +220,12 @@ public class SliderTileSkin extends TileSkin {
         }
         text.setY(height - size * 0.05);
 
-        maxWidth = width - size * 0.275;
-        fontSize = size * 0.12;
-        unitText.setText(tile.getUnit());
+        maxWidth = width - (width - size * 0.275);
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
@@ -242,13 +262,33 @@ public class SliderTileSkin extends TileSkin {
         bar.setArcWidth(size * 0.0275);
         bar.setArcHeight(size * 0.0275);
 
-        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
-        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(-size * 0.005);
     }
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0]);
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText(" ");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
         text.setText(tile.getText());
         description.setText(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
@@ -258,6 +298,8 @@ public class SliderTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        fractionLine.setStroke(tile.getUnitColor());
         unitText.setFill(tile.getUnitColor());
         barBackground.setFill(tile.getBarBackgroundColor());
         bar.setFill(tile.getBarColor());

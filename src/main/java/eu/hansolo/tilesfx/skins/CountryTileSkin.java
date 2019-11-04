@@ -25,10 +25,14 @@ import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -41,20 +45,23 @@ import java.util.List;
  * Created by hansolo on 11.06.17.
  */
 public class CountryTileSkin extends TileSkin {
-    private Text                                       titleText;
-    private Text                                       text;
-    private Text                                       valueText;
-    private Text                                       unitText;
-    private TextFlow                                   valueUnitFlow;
-    private Country                                    country;
-    private StackPane                                  countryContainer;
-    private Group                                      countryGroup;
-    private EventHandler<MouseEvent>                   clickHandler;
-    private List<CountryPath>                          countryPaths;
-    private double                                     countryMinX;
-    private double                                     countryMinY;
-    private double                                     countryMaxX;
-    private double                                     countryMaxY;
+    private Text                     titleText;
+    private Text                     text;
+    private Text                     valueText;
+    private Text                     upperUnitText;
+    private Line                     fractionLine;
+    private Text                     unitText;
+    private VBox                     unitFlow;
+    private HBox                     valueUnitFlow;
+    private Country                  country;
+    private StackPane                countryContainer;
+    private Group                    countryGroup;
+    private EventHandler<MouseEvent> clickHandler;
+    private List<CountryPath>        countryPaths;
+    private double                   countryMinX;
+    private double                   countryMinY;
+    private double                   countryMaxX;
+    private double                   countryMaxY;
     //private ObservableMap<Location, Circle>            chartDataLocations;
     //private ObservableMap<Location, Circle>            poiLocations;
     //private ListChangeListener<Location>               poiListener;
@@ -131,16 +138,25 @@ public class CountryTileSkin extends TileSkin {
         valueText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(valueText, tile.isValueVisible());
 
-        unitText = new Text(" " + tile.getUnit());
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
+        unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
-        unitText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
-        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
+        valueUnitFlow.setMouseTransparent(true);
         valueUnitFlow.setMouseTransparent(true);
 
-        getPane().getChildren().addAll(titleText, countryContainer, valueUnitFlow, text);
+        getPane().getChildren().addAll(titleText, countryContainer, valueUnitFlow, fractionLine, text);
         //getPane().getChildren().addAll(poiLocations.values());
     }
 
@@ -157,6 +173,8 @@ public class CountryTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
+            Helper.enableNode(valueText, tile.isValueVisible());
+            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             countryContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
             countryContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
         } else if ("RECALC".equals(EVENT_TYPE)) {
@@ -216,6 +234,15 @@ public class CountryTileSkin extends TileSkin {
             case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
         }
         text.setY(height - size * 0.05);
+
+        maxWidth = width - (width - size * 0.275);
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        unitText.setFont(Fonts.latoRegular(fontSize));
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
     }
 
     @Override protected void resize() {
@@ -224,8 +251,18 @@ public class CountryTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
-        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(-size * 0.005);
 
         double containerWidth  = contentBounds.getWidth();
         double containerHeight = contentBounds.getHeight();
@@ -269,7 +306,16 @@ public class CountryTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         text.setText(tile.getCountry().getDisplayName());
         valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
-        unitText.setText(tile.getUnit());
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0]);
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText(" ");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
 
         resizeDynamicText();
         resizeStaticText();
@@ -277,6 +323,8 @@ public class CountryTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        fractionLine.setStroke(tile.getUnitColor());
         unitText.setFill(tile.getUnitColor());
         countryPaths.forEach(path -> path.setFill(Helper.getColorWithOpacity(tile.getBarColor(), 0.5)));
     }

@@ -23,11 +23,15 @@ import javafx.animation.FillTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.text.Font;
@@ -59,8 +63,11 @@ public class HighLowTileSkin extends TileSkin {
     private Text      titleText;
     private Text      text;
     private Text      valueText;
+    private Text      upperUnitText;
+    private Line      fractionLine;
     private Text      unitText;
-    private TextFlow  valueUnitFlow;
+    private VBox      unitFlow;
+    private HBox      valueUnitFlow;
     private Label     description;
     private Text      deviationText;
     private Text      deviationUnitText;
@@ -95,12 +102,22 @@ public class HighLowTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
         unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
-        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
+        valueUnitFlow.setMouseTransparent(true);
 
         description = new Label(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
@@ -122,7 +139,7 @@ public class HighLowTileSkin extends TileSkin {
         referenceUnitFlow = new TextFlow(indicatorPane, deviationText, deviationUnitText);
         referenceUnitFlow.setTextAlignment(TextAlignment.LEFT);
 
-        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, referenceUnitFlow);
+        getPane().getChildren().addAll(titleText, text, valueUnitFlow, fractionLine, description, referenceUnitFlow);
 
         //handleCurrentValue(tile.getValue());
     }
@@ -140,7 +157,7 @@ public class HighLowTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     }
@@ -246,8 +263,12 @@ public class HighLowTileSkin extends TileSkin {
         }
         text.setY(height - size * 0.05);
 
-        maxWidth = width - size * 0.275;
-        fontSize = size * 0.12;
+        maxWidth = width - (width - size * 0.275);
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
@@ -269,8 +290,18 @@ public class HighLowTileSkin extends TileSkin {
         referenceUnitFlow.setPrefWidth(width - size * 0.1);
         referenceUnitFlow.relocate(size * 0.05, height * 0.595);
 
-        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
-        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(-size * 0.005);
     }
 
     @Override protected void redraw() {
@@ -278,7 +309,16 @@ public class HighLowTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
         deviationText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", calculateDeviation()));
-        unitText.setText(tile.getUnit());
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0]);
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText(" ");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
         description.setText(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
 
@@ -287,6 +327,8 @@ public class HighLowTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        fractionLine.setStroke(tile.getUnitColor());
         unitText.setFill(tile.getUnitColor());
         description.setTextFill(tile.getDescriptionColor());
         deviationText.setFill(state.color);

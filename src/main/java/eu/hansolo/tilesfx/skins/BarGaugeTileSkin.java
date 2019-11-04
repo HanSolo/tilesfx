@@ -21,7 +21,10 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Line;
@@ -37,8 +40,11 @@ public class BarGaugeTileSkin extends TileSkin {
     private static final double         ANGLE_RANGE  = 180;
     private              Text           titleText;
     private              Text           valueText;
+    private              Text           upperUnitText;
+    private              Line           fractionLine;
     private              Text           unitText;
-    private              TextFlow       valueUnitFlow;
+    private              VBox           unitFlow;
+    private              HBox           valueUnitFlow;
     private              Text           text;
     private              GradientLookup gradientLookup;
     private              boolean        colorGradientEnabled;
@@ -78,12 +84,22 @@ public class BarGaugeTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
         unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
-        valueUnitFlow.setTextAlignment(TextAlignment.CENTER);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.CENTER);
+        valueUnitFlow.setMouseTransparent(true);
 
         text = new Text(tile.getText());
         text.setTextOrigin(VPos.TOP);
@@ -122,7 +138,7 @@ public class BarGaugeTileSkin extends TileSkin {
         minValueText = new Text();
         maxValueText = new Text();
 
-        getPane().getChildren().addAll(barBackground, bar, lowerThreshold, lowerThresholdText, threshold, thresholdText, minValueText, maxValueText, titleText, valueUnitFlow, text);
+        getPane().getChildren().addAll(barBackground, bar, lowerThreshold, lowerThresholdText, threshold, thresholdText, minValueText, maxValueText, titleText, valueUnitFlow, fractionLine, text);
     }
 
     @Override protected void registerListeners() {
@@ -138,7 +154,7 @@ public class BarGaugeTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(lowerThreshold, tile.isLowerThresholdVisible());
             Helper.enableNode(lowerThresholdText, tile.isLowerThresholdVisible());
             Helper.enableNode(threshold, tile.isThresholdVisible());
@@ -229,8 +245,12 @@ public class BarGaugeTileSkin extends TileSkin {
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
 
-        maxWidth = width - size * 0.275;
-        fontSize = size * 0.12;
+        maxWidth = width - (width - size * 0.275);
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
@@ -274,8 +294,18 @@ public class BarGaugeTileSkin extends TileSkin {
         double centerX = width * 0.5;
         double centerY = height * 0.85;
 
-        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
-        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(-size * 0.005);
 
         barBackground.setCenterX(centerX);
         barBackground.setCenterY(centerY);
@@ -335,7 +365,16 @@ public class BarGaugeTileSkin extends TileSkin {
 
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        unitText.setText(tile.getUnit());
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0]);
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText(" ");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
         if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
 
         text.setText(tile.getText());
@@ -344,6 +383,9 @@ public class BarGaugeTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        fractionLine.setStroke(tile.getUnitColor());
+        unitText.setFill(tile.getUnitColor());
         text.setFill(tile.getTextColor());
 
         minValueText.setFill(tile.getTextColor());

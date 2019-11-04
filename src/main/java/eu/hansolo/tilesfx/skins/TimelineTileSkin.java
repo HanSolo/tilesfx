@@ -247,6 +247,7 @@ public class TimelineTileSkin extends TileSkin {
 
         valueUnitFlow = new HBox(valueText, unitFlow);
         valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
+        valueUnitFlow.setMouseTransparent(true);
 
         averageText = new Text(String.format(locale, "\u2300 " + formatString, tile.getAverage()));
         averageText.setFill(Tile.FOREGROUND);
@@ -393,7 +394,7 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(valueUnitFlow, !tile.getUnit().isEmpty());
+            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(timeSpanText, !tile.isTextVisible());
             Helper.enableNode(averageLine, tile.isAverageVisible());
             Helper.enableNode(averageText, tile.isAverageVisible());
@@ -1049,6 +1050,7 @@ public class TimelineTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
         upperUnitText.setFill(tile.getUnitColor());
+        fractionLine.setStroke(tile.getUnitColor());
         unitText.setFill(tile.getUnitColor());
         minText.setFill(tile.getValueColor());
         maxText.setFill(tile.getValueColor());

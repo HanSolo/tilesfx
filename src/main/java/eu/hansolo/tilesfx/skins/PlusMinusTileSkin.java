@@ -30,6 +30,9 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -45,8 +48,11 @@ public class PlusMinusTileSkin extends TileSkin {
     private Text                     titleText;
     private Text                     text;
     private Text                     valueText;
+    private Text                     upperUnitText;
+    private Line                     fractionLine;
     private Text                     unitText;
-    private TextFlow                 valueUnitFlow;
+    private VBox                     unitFlow;
+    private HBox                     valueUnitFlow;
     private Label                    description;
     private Label                    plusLabel;
     private Label                    minusLabel;
@@ -95,12 +101,22 @@ public class PlusMinusTileSkin extends TileSkin {
         valueText.setFill(tile.getValueColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
         unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
-        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
+        valueUnitFlow.setMouseTransparent(true);
 
         description = new Label(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
@@ -118,7 +134,7 @@ public class PlusMinusTileSkin extends TileSkin {
         minusLabel.setEffect(shadow);
         minusLabel.setPickOnBounds(false);
 
-        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description, minusLabel, plusLabel);
+        getPane().getChildren().addAll(titleText, text, valueUnitFlow, fractionLine, description, minusLabel, plusLabel);
     }
 
     @Override protected void registerListeners() {
@@ -138,7 +154,7 @@ public class PlusMinusTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
         }
     }
@@ -206,8 +222,12 @@ public class PlusMinusTileSkin extends TileSkin {
         }
         text.setY(height - size * 0.05);
 
-        maxWidth = width - size * 0.275;
-        fontSize = size * 0.12;
+        maxWidth = width - (width - size * 0.275);
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
@@ -240,15 +260,34 @@ public class PlusMinusTileSkin extends TileSkin {
         plusLabel.setBorder(new Border(new BorderStroke(tile.getForegroundColor(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(size * 0.01))));
         plusLabel.relocate(width - size * 0.05 - buttonSize, height - size * 0.20 - buttonSize);
 
-        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
-        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(-size * 0.005);
     }
 
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        unitText.setText(tile.getUnit());
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0]);
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText(" ");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
         description.setText(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
 
@@ -257,6 +296,8 @@ public class PlusMinusTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        fractionLine.setStroke(tile.getUnitColor());
         unitText.setFill(tile.getUnitColor());
         plusLabel.setTextFill(tile.getForegroundColor());
         minusLabel.setTextFill(tile.getForegroundColor());

@@ -33,16 +33,20 @@ import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -67,8 +71,11 @@ import java.util.Optional;
 public class SmoothAreaChartTileSkin extends TileSkin {
     private Text                          titleText;
     private Text                          valueText;
+    private Text                          upperUnitText;
+    private Line                          fractionLine;
     private Text                          unitText;
-    private TextFlow                      valueUnitFlow;
+    private VBox                          unitFlow;
+    private HBox                          valueUnitFlow;
     private int                           dataSize;
     private double                        maxValue;
     private List<Point>                   points;
@@ -147,13 +154,22 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         valueText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(valueText, tile.isValueVisible());
 
-        unitText = new Text(" " + tile.getUnit());
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
+        unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
-        unitText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
-        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
+        valueUnitFlow.setMouseTransparent(true);
 
         selector        = new Circle();
         selectorTooltip = new Tooltip("");
@@ -173,7 +189,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         handleData();
 
-        getPane().getChildren().addAll(titleText, fillPath, strokePath, dataPointGroup, valueUnitFlow, selector);
+        getPane().getChildren().addAll(titleText, fillPath, strokePath, dataPointGroup, valueUnitFlow, fractionLine, selector);
     }
 
     @Override protected void registerListeners() {
@@ -201,7 +217,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(dataPointGroup, tile.getDataPointsVisible());
         } else if (EventType.SERIES.name().equals(EVENT_TYPE)) {
             Helper.enableNode(fillPath, ChartType.AREA == tile.getChartType());
@@ -392,13 +408,32 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
+
+        maxWidth = width - (width - size * 0.275);
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        unitText.setFont(Fonts.latoRegular(fontSize));
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
     }
 
     @Override protected void resize() {
         super.resize();
 
-        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
-        valueUnitFlow.relocate(contentBounds.getX(), contentBounds.getY());
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
+        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(-size * 0.005);
 
         hStepSize = width / dataSize;
         vStepSize = (height * 0.5) / maxValue;
@@ -436,13 +471,24 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
 
         valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
-        unitText.setText(tile.getUnit());
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0]);
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText(" ");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
 
         resizeDynamicText();
         resizeStaticText();
 
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        fractionLine.setStroke(tile.getUnitColor());
         unitText.setFill(tile.getUnitColor());
         selector.setStroke(tile.getForegroundColor());
         selector.setFill(tile.getBackgroundColor());

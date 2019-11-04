@@ -20,10 +20,13 @@ import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
@@ -60,8 +63,11 @@ public class GaugeTileSkin extends TileSkin {
     private Rotate            needleRectRotate;
     private Text              titleText;
     private Text              valueText;
+    private Text              upperUnitText;
+    private Line              fractionLine;
     private Text              unitText;
-    private TextFlow          valueUnitFlow;
+    private VBox              unitFlow;
+    private HBox              valueUnitFlow;
     private Text              minValueText;
     private Text              maxValueText;
     private Rectangle         thresholdRect;
@@ -144,13 +150,22 @@ public class GaugeTileSkin extends TileSkin {
         valueText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(valueText, tile.isValueVisible() && !tile.isAlert());
 
+        upperUnitText = new Text("");
+        upperUnitText.setFill(tile.getUnitColor());
+        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
+
+        fractionLine = new Line();
+
         unitText = new Text(tile.getUnit());
         unitText.setFill(tile.getUnitColor());
-        unitText.setTextOrigin(VPos.BASELINE);
-        Helper.enableNode(unitText, tile.isValueVisible() && !tile.isAlert());
+        Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        valueUnitFlow = new TextFlow(valueText, unitText);
-        valueUnitFlow.setTextAlignment(TextAlignment.CENTER);
+        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        valueUnitFlow = new HBox(valueText, unitFlow);
+        valueUnitFlow.setAlignment(Pos.CENTER);
+        valueUnitFlow.setMouseTransparent(true);
 
         minValueText = new Text(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", tile.getMinValue()));
         minValueText.setFill(tile.getTitleColor());
@@ -166,7 +181,7 @@ public class GaugeTileSkin extends TileSkin {
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : Tile.GRAY);
         Helper.enableNode(thresholdText, tile.isThresholdVisible());
 
-        getPane().getChildren().addAll(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, valueUnitFlow, minValueText, maxValueText, thresholdRect, thresholdText);
+        getPane().getChildren().addAll(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, valueUnitFlow, fractionLine, minValueText, maxValueText, thresholdRect, thresholdText);
     }
 
     @Override protected void registerListeners() {
@@ -184,7 +199,7 @@ public class GaugeTileSkin extends TileSkin {
             Helper.enableNode(sectionPane, tile.getSectionsVisible());
             Helper.enableNode(thresholdRect, tile.isThresholdVisible());
             Helper.enableNode(thresholdText, tile.isThresholdVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             sectionsVisible = tile.getSectionsVisible();
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = tile.getSections();
@@ -390,10 +405,6 @@ public class GaugeTileSkin extends TileSkin {
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
-        fontSize = size * 0.1;
-        unitText.setFont(Fonts.latoRegular(fontSize));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : tile.getBackgroundColor());
         if (!sectionsVisible) {
             fontSize = size * 0.08;
@@ -458,6 +469,15 @@ public class GaugeTileSkin extends TileSkin {
             thresholdText.setX((width - thresholdText.getLayoutBounds().getWidth()) * 0.5);
             thresholdText.setY(thresholdRect.getLayoutBounds().getMinY() + thresholdRect.getHeight() * 0.5);
         }
+
+        maxWidth = width - (width - size * 0.275);
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        unitText.setFont(Fonts.latoRegular(fontSize));
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
     }
 
     @Override protected void resize() {
@@ -505,8 +525,18 @@ public class GaugeTileSkin extends TileSkin {
         resizeStaticText();
         resizeDynamicText();
 
-        valueUnitFlow.setPrefWidth(width * 0.9);
+        valueUnitFlow.setPrefWidth(width - size * 0.1);
         valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
+        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+
+        fractionLine.setStartX(width - 0.17 * size);
+        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setEndX(width - 0.05 * size);
+        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStroke(tile.getUnitColor());
+        fractionLine.setStrokeWidth(size * 0.005);
+
+        unitFlow.setTranslateY(-size * 0.005);
 
         thresholdRect.setWidth(thresholdText.getLayoutBounds().getWidth() + size * 0.05);
         thresholdRect.setHeight(thresholdText.getLayoutBounds().getHeight());
@@ -519,7 +549,16 @@ public class GaugeTileSkin extends TileSkin {
     @Override protected void redraw() {
         super.redraw();
         titleText.setText(tile.getTitle());
-        unitText.setText(tile.getUnit());
+        if (tile.getUnit().contains("/")) {
+            String[] units = tile.getUnit().split("/");
+            upperUnitText.setText(units[0]);
+            unitText.setText(units[1]);
+            Helper.enableNode(fractionLine, true);
+        } else {
+            upperUnitText.setText(" ");
+            unitText.setText(tile.getUnit());
+            Helper.enableNode(fractionLine, false);
+        }
         minValueText.setText(String.format(locale, tickLabelFormatString, tile.getMinValue()));
         maxValueText.setText(String.format(locale, tickLabelFormatString, tile.getMaxValue()));
         thresholdText.setText(String.format(locale, tickLabelFormatString, tile.getThreshold()));
@@ -538,6 +577,9 @@ public class GaugeTileSkin extends TileSkin {
         thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : tile.getValue() > tile.getThreshold() ? tile.getThresholdColor() : Tile.GRAY);
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : tile.getBackgroundColor());
         valueText.setFill(tile.getValueColor());
+        upperUnitText.setFill(tile.getUnitColor());
+        fractionLine.setStroke(tile.getUnitColor());
+        unitText.setFill(tile.getUnitColor());
 
         drawSections();
         highlightSections(tile.getValue());

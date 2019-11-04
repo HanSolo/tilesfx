@@ -99,6 +99,7 @@ public class RadarChartTileSkin extends TileSkin {
             Helper.enableNode(text, tile.isTextVisible());
             radarChart.setThresholdVisible(tile.isThresholdVisible());
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            radarChart.setMinValue(tile.getMinValue());
             radarChart.setMaxValue(tile.getMaxValue());
             radarChart.setUnit(tile.getUnit());
             radarChart.setMode(tile.getRadarChartMode());

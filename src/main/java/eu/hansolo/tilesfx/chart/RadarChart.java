@@ -336,6 +336,7 @@ public class RadarChart extends Region {
     private void setRange(final double VALUE) {
         if (null == range) {
             _range = VALUE;
+            redraw();
         } else {
             range.set(VALUE);
         }
@@ -343,6 +344,7 @@ public class RadarChart extends Region {
     public ReadOnlyDoubleProperty rangeProperty() {
         if (null == range) {
             range = new DoublePropertyBase(_range) {
+                @Override protected void invalidated() { redraw(); }
                 @Override public Object getBean() { return RadarChart.this; }
                 @Override public String getName() { return "range"; }
             };

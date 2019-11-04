@@ -700,6 +700,7 @@ public class RadarNodeChart extends Region {
         final double CENTER_X      = 0.5 * width;
         final double CENTER_Y      = 0.5 * height;
         final double CIRCLE_SIZE   = 0.9 * size;
+        final double CIRCLE_RADIUS = 0.45 * size;
         final double DATA_RANGE    = getRange();
         final double RANGE         = 0.35714 * CIRCLE_SIZE;
         final double OFFSET        = 0.14286 * CIRCLE_SIZE;
@@ -733,13 +734,13 @@ public class RadarNodeChart extends Region {
                     double x;
                     double y;
                     for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
-                        double r1 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
+                        double r1 = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE)));
                         x = CENTER_X + (-Math.sin(radAngle) * r1);
                         y = CENTER_Y + (+Math.cos(radAngle) * r1);
                         points.add(new Point(x, y));
                         radAngle += radAngleStep;
                     }
-                    double r3 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(NO_OF_SECTORS - 1).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
+                    double r3 = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(NO_OF_SECTORS - 1).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE)));
                     x = CENTER_X + (-Math.sin(radAngle) * r3);
                     y = CENTER_Y + (+Math.cos(radAngle) * r3);
                     points.add(new Point(x, y));
@@ -751,30 +752,28 @@ public class RadarNodeChart extends Region {
                         Point point = interpolatedPoints[i];
                         chartPath.getElements().add(new LineTo(point.getX(), point.getY()));
                     }
-                    //chartPath.getElements().add(new LineTo(interpolatedPoints[interpolatedPoints.length - 1].getX(), interpolatedPoints[interpolatedPoints.length - 1].getY()));
-                    chartPath.getElements().add(new ClosePath());
+                    chartPath.getElements().add(new LineTo(interpolatedPoints[interpolatedPoints.length - 1].getX(), interpolatedPoints[interpolatedPoints.length - 1].getY()));
                 } else {
-                    chartPath.getElements().add(new MoveTo(CENTER_X, 0.36239 * size));
+                    chartPath.getElements().add(new MoveTo(CENTER_X, 0.28571 * CIRCLE_RADIUS));
                     for (int i = 0; i < NO_OF_SECTORS; i++) {
-                        radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (data.get(i).getValue()) - MIN_VALUE) / DATA_RANGE);
+                        radiusFactor = (data.get(i).getValue() - MIN_VALUE) / DATA_RANGE;
                         double angle = i * angleStep;
-                        double r1 = (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE));
+                        double r1 = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE)));
                         double x = CENTER_X + (-Math.sin(Math.toRadians(180 + angle)) * r1);
                         double y = CENTER_Y + (+Math.cos(Math.toRadians(180 + angle)) * r1);
                         chartPath.getElements().add(new LineTo(x, y));
                     }
                     radiusFactor = ((clamp(MIN_VALUE, MAX_VALUE, data.get(NO_OF_SECTORS - 1).getValue()) - MIN_VALUE) / DATA_RANGE);
-                    chartPath.getElements().add(new LineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE));
-                    chartPath.getElements().add(new ClosePath());
+                    chartPath.getElements().add(new LineTo(CENTER_X, clamp(0, CIRCLE_RADIUS, CENTER_Y - OFFSET - radiusFactor * RANGE)));
                 }
                 break;
             case SECTOR:
                 // sector mode
                 double angle = 0;
                 for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
-                    radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (data.get(i).getValue() - MIN_VALUE)) / DATA_RANGE);
+                    radiusFactor = (data.get(i).getValue() - MIN_VALUE) / DATA_RANGE;
                     angle = i * angleStep;
-                    double r1 = (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE));
+                    double r1 = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE)));
                     double x1 = CENTER_X + (-Math.sin(Math.toRadians(180 + angle)) * r1);
                     double y1 = CENTER_Y + (+Math.cos(Math.toRadians(180 + angle)) * r1);
                     double x2 = CENTER_X + (-Math.sin(Math.toRadians(180 + angle + angleStep)) * r1);
@@ -800,8 +799,6 @@ public class RadarNodeChart extends Region {
         final double OFFSET        = 0.14286 * 2 * CIRCLE_RADIUS;
         final int    NO_OF_SECTORS = getNoOfSectors();
         final double MIN_VALUE     = getMinValue();
-        final double MAX_VALUE     = getMaxValue();
-        double radius;
 
         // clear the overlayPath
         overlayPath.getElements().clear();
@@ -834,8 +831,8 @@ public class RadarNodeChart extends Region {
 
         // draw threshold line
         if (isThresholdVisible()) {
-            double radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (getThreshold()) - MIN_VALUE) / DATA_RANGE);
-            double r = (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE));
+            double radiusFactor = (getThreshold() - MIN_VALUE) / DATA_RANGE;
+            double r = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE)));
             thresholdCircle.setCenterX(CENTER_X);
             thresholdCircle.setCenterY(CENTER_Y);
             thresholdCircle.setRadius(r);
@@ -850,7 +847,7 @@ public class RadarNodeChart extends Region {
         textGroup.getChildren().clear();
         for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
             double r = size * 0.48;
-            double x  = CENTER_X - size * 0.014286 + (-Math.sin(radAngle) * r);
+            double x  = CENTER_X - size * 0.015 + (-Math.sin(radAngle) * r);
             double y  = CENTER_Y + (+Math.cos(radAngle) * r);
 
             Text text = new Text(data.get(i).getName());

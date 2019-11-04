@@ -688,6 +688,7 @@ public class RadarChart extends Region {
         final double CENTER_X      = 0.5 * size;
         final double CENTER_Y      = CENTER_X;
         final double CIRCLE_SIZE   = 0.9 * size;
+        final double CIRCLE_RADIUS = 0.45 * size;
         final double DATA_RANGE    = getRange();
         final double RANGE         = 0.35714 * CIRCLE_SIZE;
         final double OFFSET        = 0.14286 * CIRCLE_SIZE;
@@ -724,13 +725,13 @@ public class RadarChart extends Region {
                     points.add(new Point(x, y));
 
                     for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
-                        double r1 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
+                        double r1 = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE)));
                         x = CENTER_X + (-Math.sin(radAngle) * r1);
                         y = CENTER_Y + (+Math.cos(radAngle) * r1);
                         points.add(new Point(x, y));
                         radAngle += radAngleStep;
                     }
-                    double r3 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(NO_OF_SECTORS - 1).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
+                    double r3 = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(NO_OF_SECTORS - 1).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE)));
                     x = CENTER_X + (-Math.sin(radAngle) * r3);
                     y = CENTER_Y + (+Math.cos(radAngle) * r3);
                     points.add(new Point(x, y));
@@ -751,11 +752,10 @@ public class RadarChart extends Region {
                     chartCtx.beginPath();
                     chartCtx.moveTo(CENTER_X, 0.36239 * size);
                     for (int i = 0; i < NO_OF_SECTORS; i++) {
-                        radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (data.get(i).getValue()) - MIN_VALUE) / DATA_RANGE);
+                        radiusFactor = (((data.get(i).getValue()) - MIN_VALUE) / DATA_RANGE);
                         //chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
 
-
-                        double r1 = (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE));
+                        double r1 = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - ((data.get(i).getValue() - MIN_VALUE) / DATA_RANGE) * RANGE)));
                         double x = CENTER_X + (-Math.sin(Math.toRadians(180)) * r1);
                         double y = CENTER_Y + (+Math.cos(Math.toRadians(180)) * r1);
 
@@ -766,7 +766,7 @@ public class RadarChart extends Region {
                         chartCtx.translate(-CENTER_X, -CENTER_Y);
                     }
                     radiusFactor = ((clamp(MIN_VALUE, MAX_VALUE, data.get(NO_OF_SECTORS - 1).getValue()) - MIN_VALUE) / DATA_RANGE);
-                    chartCtx.lineTo(CENTER_X, CENTER_Y - OFFSET - radiusFactor * RANGE);
+                    chartCtx.lineTo(CENTER_X, clamp(0, CIRCLE_RADIUS, CENTER_Y - OFFSET - radiusFactor * RANGE));
                     chartCtx.closePath();
                     chartCtx.fill();
                 }
@@ -775,12 +775,14 @@ public class RadarChart extends Region {
                 chartCtx.translate(CENTER_X, CENTER_Y);
                 chartCtx.rotate(-90);
                 chartCtx.translate(-CENTER_X, -CENTER_Y);
+                double radius;
                 // sector mode
                 for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
                     radiusFactor = (clamp(MIN_VALUE, MAX_VALUE, (data.get(i).getValue() - MIN_VALUE)) / DATA_RANGE);
+                    radius = clamp(0, CIRCLE_RADIUS, radiusFactor * RANGE + OFFSET);
                     chartCtx.beginPath();
                     chartCtx.moveTo(CENTER_X, CENTER_Y);
-                    chartCtx.arc(CENTER_X, CENTER_Y, radiusFactor * RANGE + OFFSET, radiusFactor * RANGE + OFFSET, 0, -angleStep);
+                    chartCtx.arc(CENTER_X, CENTER_Y, radius, radius, 0, -angleStep);
                     chartCtx.closePath();
                     chartCtx.fill();
 

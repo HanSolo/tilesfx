@@ -276,7 +276,10 @@ public class RadarNodeChart extends Region {
     private void registerListeners() {
         widthProperty().addListener(resizeListener);
         heightProperty().addListener(resizeListener);
-        //data.addListener((MapChangeListener<Integer, ChartData>) change -> redraw());
+        noOfSectorsProperty().addListener(o -> {
+            drawChart();
+            drawText();
+        });
         gradientStops.addListener(gradientListener);
     }
 
@@ -683,17 +686,14 @@ public class RadarNodeChart extends Region {
         if (size > 0) {
             pane.setMaxSize(width, height);
             pane.relocate((getWidth() - width) * 0.5, (getHeight() - height) * 0.5);
-            //pane.setBackground(new Background(new BackgroundFill(getChartBackgroundColor(), new CornerRadii(1024), Insets.EMPTY)));
-            redraw();
+            drawChart();
+            drawOverlay();
+            drawText();
         }
     }
 
     public void redraw() {
         drawChart();
-
-        drawOverlay();
-
-        drawText();
     }
 
     private void drawChart() {
@@ -787,51 +787,10 @@ public class RadarNodeChart extends Region {
                 }
                 break;
         }
-    }
-
-    private void drawOverlay() {
-        final Paint  CHART_BKG     = getChartBackgroundColor();
-        final double CENTER_X      = 0.5 * width;
-        final double CENTER_Y      = 0.5 * height;
-        final double CIRCLE_RADIUS = 0.45 * size;
-        final double DATA_RANGE    = getRange();
-        final double RANGE         = 0.35714 * 2 * CIRCLE_RADIUS;
-        final double OFFSET        = 0.14286 * 2 * CIRCLE_RADIUS;
-        final int    NO_OF_SECTORS = getNoOfSectors();
-        final double MIN_VALUE     = getMinValue();
-
-        // clear the overlayPath
-        overlayPath.getElements().clear();
-
-        // draw center point
-        centerCircle.setCenterX(CENTER_X);
-        centerCircle.setCenterY(CENTER_Y);
-        centerCircle.setRadius(0.28571 * CIRCLE_RADIUS);
-        centerCircle.setFill(CHART_BKG);
-        centerCircle.setStroke(getGridColor());
-        overlayPath.setStroke(getGridColor());
-        overlayPath.setStrokeWidth(1);
-        addCircle(overlayPath, CENTER_X, CENTER_Y, CIRCLE_RADIUS);
-
-        // draw concentric rings
-        double ringStepSize = (CIRCLE_RADIUS - CIRCLE_RADIUS * 0.28571) / 20.0;
-        double ringSize     = CIRCLE_RADIUS;
-
-        for (int i = 0 ; i < 11 ; i++) {
-            addCircle(overlayPath,CENTER_X, CENTER_Y, ringSize);
-            ringSize -= 2 * ringStepSize;
-        }
-
-        // draw star lines
-        for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
-            double[] xy = Helper.rotatePointAroundRotationCenter(CENTER_X, CENTER_Y - CIRCLE_RADIUS, CENTER_X, CENTER_Y, i * angleStep);
-            overlayPath.getElements().add(new MoveTo(CENTER_X, CENTER_Y));
-            overlayPath.getElements().add(new LineTo(xy[0], xy[1]));
-        }
 
         // draw threshold line
         if (isThresholdVisible()) {
-            double radiusFactor = (getThreshold() - MIN_VALUE) / DATA_RANGE;
+            radiusFactor = (getThreshold() - MIN_VALUE) / DATA_RANGE;
             double r = clamp(0, CIRCLE_RADIUS, (CENTER_Y - (CENTER_Y - OFFSET - radiusFactor * RANGE)));
             thresholdCircle.setCenterX(CENTER_X);
             thresholdCircle.setCenterY(CENTER_Y);
@@ -840,30 +799,7 @@ public class RadarNodeChart extends Region {
             thresholdCircle.setStrokeWidth(clamp(1d, 3d, size * 0.005));
         }
 
-        // draw text
-        Font   font         = Fonts.latoRegular(0.035 * size);
-        double radAngle     = RadarChartMode.SECTOR == getMode() ? Math.toRadians(180 + angleStep * 0.5) : Math.toRadians(180);
-        double radAngleStep = Math.toRadians(angleStep);
-        textGroup.getChildren().clear();
-        for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
-            double r = size * 0.48;
-            double x  = CENTER_X - size * 0.015 + (-Math.sin(radAngle) * r);
-            double y  = CENTER_Y + (+Math.cos(radAngle) * r);
-
-            Text text = new Text(data.get(i).getName());
-            text.setFont(font);
-            text.setFill(data.get(i).getTextColor());
-            text.setTextOrigin(VPos.CENTER);
-            text.setTextAlignment(TextAlignment.CENTER);
-            text.setRotate(Math.toDegrees(radAngle) - 180);
-            text.setX(x);
-            text.setY(y);
-            textGroup.getChildren().add(text);
-            radAngle += radAngleStep;
-        }
-    }
-
-    private void drawText() {
+        // draw legend
         final double OFFSET_Y = height * 0.5 - 0.109 * size;
 
         Color textColor = getChartTextColor();
@@ -917,6 +853,70 @@ public class RadarNodeChart extends Region {
             maxValueText.setText(String.format(Locale.US, formatString, getMaxValue()));
             maxValueText.setFont(font);
             maxValueText.relocate((width - maxValueText.getLayoutBounds().getWidth()) * 0.5, OFFSET_Y - 0.3435 * size);
+        }
+    }
+
+    private void drawOverlay() {
+        final Paint  CHART_BKG     = getChartBackgroundColor();
+        final double CENTER_X      = 0.5 * width;
+        final double CENTER_Y      = 0.5 * height;
+        final double CIRCLE_RADIUS = 0.45 * size;
+        final int    NO_OF_SECTORS = getNoOfSectors();
+
+        // clear the overlayPath
+        overlayPath.getElements().clear();
+
+        // draw center point
+        centerCircle.setCenterX(CENTER_X);
+        centerCircle.setCenterY(CENTER_Y);
+        centerCircle.setRadius(0.28571 * CIRCLE_RADIUS);
+        centerCircle.setFill(CHART_BKG);
+        centerCircle.setStroke(getGridColor());
+        overlayPath.setStroke(getGridColor());
+        overlayPath.setStrokeWidth(1);
+        addCircle(overlayPath, CENTER_X, CENTER_Y, CIRCLE_RADIUS);
+
+        // draw concentric rings
+        double ringStepSize = (CIRCLE_RADIUS - CIRCLE_RADIUS * 0.28571) / 20.0;
+        double ringSize     = CIRCLE_RADIUS;
+
+        for (int i = 0 ; i < 11 ; i++) {
+            addCircle(overlayPath,CENTER_X, CENTER_Y, ringSize);
+            ringSize -= 2 * ringStepSize;
+        }
+
+        // draw star lines
+        for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
+            double[] xy = Helper.rotatePointAroundRotationCenter(CENTER_X, CENTER_Y - CIRCLE_RADIUS, CENTER_X, CENTER_Y, i * angleStep);
+            overlayPath.getElements().add(new MoveTo(CENTER_X, CENTER_Y));
+            overlayPath.getElements().add(new LineTo(xy[0], xy[1]));
+        }
+    }
+
+    private void drawText() {
+        final double CENTER_X      = 0.5 * width;
+        final double CENTER_Y      = 0.5 * height;
+        final int    NO_OF_SECTORS = getNoOfSectors();
+
+        Font   font         = Fonts.latoRegular(0.035 * size);
+        double radAngle     = RadarChartMode.SECTOR == getMode() ? Math.toRadians(180 + angleStep * 0.5) : Math.toRadians(180);
+        double radAngleStep = Math.toRadians(angleStep);
+        textGroup.getChildren().clear();
+        for (int i = 0 ; i < NO_OF_SECTORS ; i++) {
+            double r = size * 0.48;
+            double x  = CENTER_X - size * 0.015 + (-Math.sin(radAngle) * r);
+            double y  = CENTER_Y + (+Math.cos(radAngle) * r);
+
+            Text text = new Text(data.get(i).getName());
+            text.setFont(font);
+            text.setFill(data.get(i).getTextColor());
+            text.setTextOrigin(VPos.CENTER);
+            text.setTextAlignment(TextAlignment.CENTER);
+            text.setRotate(Math.toDegrees(radAngle) - 180);
+            text.setX(x);
+            text.setY(y);
+            textGroup.getChildren().add(text);
+            radAngle += radAngleStep;
         }
     }
 }

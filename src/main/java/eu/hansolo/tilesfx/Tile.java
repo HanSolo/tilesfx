@@ -138,7 +138,8 @@ public class Tile extends Control {
                            DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"), MATRIX("MatrixTileSkin"),
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
-                           IMAGE("ImageTileSkin"), TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin");
+                           IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
+                           TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -1063,7 +1064,7 @@ public class Tile extends Control {
      * the value at the end of the animation. Where currentValue represents the
      * current value during the animation.
      *
-     * @return the value of the gauge
+     * @return the value of the tile
      */
     public double getValue() { return value.get(); }
     /**
@@ -1080,7 +1081,7 @@ public class Tile extends Control {
      * represents the current value during the animation. Otherwise it's returns
      * the same value as the getValue() method.
      *
-     * @return the current value of the gauge
+     * @return the current value of the tile
      */
     public double getCurrentValue() { return currentValue.get(); }
     public ReadOnlyDoubleProperty currentValueProperty() { return currentValue; }
@@ -1091,7 +1092,7 @@ public class Tile extends Control {
      * If you need to get the last value during an animation you should use
      * formerValue instead.
      *
-     * @return the last value of the gauge
+     * @return the last value of the tile
      */
     public double getOldValue() { return oldValue.get(); }
     public ReadOnlyDoubleProperty oldValueProperty() { return oldValue; }
@@ -1103,20 +1104,27 @@ public class Tile extends Control {
      * you don't use animation at all (when using real values) you should use
      * oldValue instead.
      *
-     * @return the last value of the gauge during an animation
+     * @return the last value of the tile during an animation
      */
     public double getFormerValue() { return formerValue.get(); }
     public ReadOnlyDoubleProperty formerValueProperty() { return formerValue; }
 
+    public void increaseValue(final double value) {
+        setValue(getValue() + value);
+    }
+    public void decreaseValue(final double value) {
+        setValue(getValue() - value);
+    }
+
     /**
      * Returns the minimum value of the scale. This value represents the lower
-     * limit of the visible gauge values.
+     * limit of the visible tile values.
      *
-     * @return the minimum value of the gauge scale
+     * @return the minimum value of the tile scale
      */
     public double getMinValue() { return null == minValue ? _minValue : minValue.get(); }
     /**
-     * Sets the minimum value of the gauge scale to the given value
+     * Sets the minimum value of the tile scale to the given value
      *
      * @param VALUE
      */
@@ -1157,13 +1165,13 @@ public class Tile extends Control {
 
     /**
      * Returns the maximum value of the scale. This value represents the upper limit
-     * of the visible gauge values.
+     * of the visible tile values.
      *
-     * @return the maximum value of the gauge scale
+     * @return the maximum value of the tile scale
      */
     public double getMaxValue() { return null == maxValue ? _maxValue : maxValue.get(); }
     /**
-     * Sets the maximum value of the gauge scale to the given value
+     * Sets the maximum value of the tile scale to the given value
      *
      * @param VALUE
      */
@@ -1201,11 +1209,11 @@ public class Tile extends Control {
     }
 
     /**
-     * Always returns the range of the gauge scale (maxValue - minValue).
+     * Always returns the range of the tile scale (maxValue - minValue).
      * This value will be automatically calculated each time
      * the min- or maxValue will change.
      *
-     * @return the range of the gauge scale
+     * @return the range of the tile scale
      */
     public double getRange() { return null == range ? _range : range.get(); }
     /**
@@ -1237,14 +1245,14 @@ public class Tile extends Control {
      * Returns the threshold value that can be used to visualize a
      * threshold value on the scale. There are also events that will
      * be fired if the threshold was exceeded or underrun.
-     * The value will be clamped to range of the gauge.
+     * The value will be clamped to range of the tile.
      *
-     * @return the threshold value of the gauge
+     * @return the threshold value of the tile
      */
     public double getThreshold() { return null == threshold ? _threshold : threshold.get(); }
     /**
-     * Sets the threshold of the gauge to the given value. The value
-     * will be clamped to the range of the gauge.
+     * Sets the threshold of the tile to the given value. The value
+     * will be clamped to the range of the tile.
      *
      * @param THRESHOLD
      */
@@ -1357,14 +1365,14 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the title of the gauge. This title will usually
+     * Returns the title of the tile. This title will usually
      * only be visible if it is not empty.
      *
-     * @return the title of the gauge
+     * @return the title of the tile
      */
     public String getTitle() { return null == title ? _title : title.get(); }
     /**
-     * Sets the title of the gauge. This title will only be visible
+     * Sets the title of the tile. This title will only be visible
      * if it is not empty.
      *
      * @param TITLE
@@ -1428,14 +1436,14 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the description text of the gauge. This description text will usually
+     * Returns the description text of the tile. This description text will usually
      * only be visible if it is not empty.
      *
-     * @return the description text of the gauge
+     * @return the description text of the tile
      */
     public String getDescription() { return null == description ? _description : description.get(); }
     /**
-     * Sets the description text of the gauge. This description text will usually
+     * Sets the description text of the tile. This description text will usually
      * only be visible if it is not empty.
      *
      * @param DESCRIPTION
@@ -1495,14 +1503,14 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the unit of the gauge. This unit will usually only
+     * Returns the unit of the tile. This unit will usually only
      * be visible if it is not empty.
      *
-     * @return the unit of the gauge
+     * @return the unit of the tile
      */
     public String getUnit() { return null == unit ? _unit : unit.get(); }
     /**
-     * Sets the unit of the gauge. This unit will usually only be
+     * Sets the unit of the tile. This unit will usually only be
      * visible if it is not empty.
      *
      * @param UNIT
@@ -1810,7 +1818,7 @@ public class Tile extends Control {
     /**
      * Returns an observable list of Section objects. The sections
      * will be used to colorize areas with a special meaning such
-     * as the red area in a rpm gauge. Sections in the Medusa library
+     * as the red area in a rpm tile. Sections in the Medusa library
      * usually are less eye-catching than Areas.
      *
      * @return an observable list of Section objects
@@ -1822,7 +1830,7 @@ public class Tile extends Control {
     /**
      * Sets the sections to the given list of Section objects. The
      * sections will be used to colorize areas with a special
-     * meaning such as the red area in a rpm gauge.
+     * meaning such as the red area in a rpm tile.
      * Sections in the Medusa library
      * usually are less eye-catching than Areas.
      *
@@ -1836,7 +1844,7 @@ public class Tile extends Control {
     /**
      * Sets the sections to the given array of Section objects. The
      * sections will be used to colorize areas with a special
-     * meaning such as the red area in a rpm gauge.
+     * meaning such as the red area in a rpm tile.
      *
      * @param SECTIONS
      */
@@ -2277,7 +2285,7 @@ public class Tile extends Control {
 
     /**
      * Returns true if the visualization of the value should start from 0. This
-     * is especially useful when you work for example with a gauge that has a
+     * is especially useful when you work for example with a tile that has a
      * range with a negative minValue
      *
      * @return true if the visualization of the value should start from 0
@@ -2286,7 +2294,7 @@ public class Tile extends Control {
     /**
      * Defines the behavior of the visualization where the needle/bar should
      * start from 0 instead of the minValue. This is especially useful when
-     * working with a gauge that has a range with a negative minValue
+     * working with a tile that has a range with a negative minValue
      *
      * @param IS_TRUE
      */
@@ -2353,7 +2361,7 @@ public class Tile extends Control {
 
     /**
      * Returns the smallest value that was measured after the last reset.
-     * The default value is the maxValue of the gauge.
+     * The default value is the maxValue of the tile.
      *
      * @return the smallest value that was measured after the last reset
      */
@@ -2377,7 +2385,7 @@ public class Tile extends Control {
 
     /**
      * Returns the biggest value that was measured after the last reset.
-     * The default value is the minValue of the gauge.
+     * The default value is the minValue of the tile.
      *
      * @return the biggest value that was measured after the last reset
      */
@@ -2402,7 +2410,7 @@ public class Tile extends Control {
     }
 
     /**
-     * Resets the min- and maxMeasuredValue to the value of the gauge.
+     * Resets the min- and maxMeasuredValue to the value of the tile.
      */
     public void resetMeasuredValues() {
         setMinMeasuredValue(getValue());
@@ -2470,13 +2478,13 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns true if the old value of the gauge is visible (not implemented)
+     * Returns true if the old value of the tile is visible (not implemented)
      *
-     * @return true if the old value of the gauge is visible (not implemented)
+     * @return true if the old value of the tile is visible (not implemented)
      */
     public boolean isOldValueVisible() { return null == oldValueVisible ? _oldValueVisible : oldValueVisible.get(); }
     /**
-     * Defines if the old value of the gauge should be visible (not implemented)
+     * Defines if the old value of the tile should be visible (not implemented)
      *
      * @param VISIBLE
      */
@@ -2500,14 +2508,14 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns true if the visualization of the gauge value is visible.
+     * Returns true if the visualization of the tile value is visible.
      * Usually this is a Label or Text node.
      *
-     * @return true if the visualization of the gauge value is visible
+     * @return true if the visualization of the tile value is visible
      */
     public boolean isValueVisible() { return null == valueVisible ? _valueVisible : valueVisible.get(); }
     /**
-     * Defines if the visualization of the gauge value should be visible.
+     * Defines if the visualization of the tile value should be visible.
      *
      * @param VISIBLE
      */
@@ -2531,14 +2539,14 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the Paint object that will be used to fill the gauge foreground.
+     * Returns the Paint object that will be used to fill the tile foreground.
      * This is usally a Color object.
      *
-     * @return the Paint object that will be used to fill the gauge foreground
+     * @return the Paint object that will be used to fill the tile foreground
      */
     public Color getForegroundColor() { return null == foregroundColor ? _foregroundColor : foregroundColor.get(); }
     /**
-     * Defines the Paint object that will be used to fill the gauge foreground.
+     * Defines the Paint object that will be used to fill the tile foreground.
      *
      * @param COLOR
      */
@@ -2563,14 +2571,14 @@ public class Tile extends Control {
     }
     
     /**
-     * Returns the Paint object that will be used to fill the gauge background.
+     * Returns the Paint object that will be used to fill the tile background.
      * This is usally a Color object.
      *
-     * @return the Paint object that will be used to fill the gauge background
+     * @return the Paint object that will be used to fill the tile background
      */
     public Color getBackgroundColor() { return null == backgroundColor ? _backgroundColor : backgroundColor.get(); }
     /**
-     * Defines the Paint object that will be used to fill the gauge background.
+     * Defines the Paint object that will be used to fill the tile background.
      *
      * @param COLOR
      */
@@ -2595,14 +2603,14 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the Paint object that will be used to draw the border of the gauge.
+     * Returns the Paint object that will be used to draw the border of the tile.
      * Usually this is a Color object.
      *
-     * @return the Paint object that will be used to draw the border of the gauge
+     * @return the Paint object that will be used to draw the border of the tile
      */
     public Color getBorderColor() { return null == borderColor ? _borderColor : borderColor.get(); }
     /**
-     * Defines the Paint object that will be used to draw the border of the gauge.
+     * Defines the Paint object that will be used to draw the border of the tile.
      *
      * @param PAINT
      */
@@ -2627,14 +2635,14 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns the width in pixels that will be used to draw the border of the gauge.
+     * Returns the width in pixels that will be used to draw the border of the tile.
      * The value will be clamped between 0 and 50 pixels.
      *
-     * @return the width in pixels that will be used to draw the border of the gauge
+     * @return the width in pixels that will be used to draw the border of the tile
      */
     public double getBorderWidth() { return null == borderWidth ? _borderWidth : borderWidth.get(); }
     /**
-     * Defines the width in pixels that will be used to draw the border of the gauge.
+     * Defines the width in pixels that will be used to draw the border of the tile.
      * The value will be clamped between 0 and 50 pixels.
      *
      * @param WIDTH
@@ -2664,14 +2672,14 @@ public class Tile extends Control {
 
     /**
      * Returns the color that will be used to colorize the knob of
-     * the radial gauges.
+     * the radial tiles.
      *
-     * @return the color that will be used to colorize the knob of the radial gauges
+     * @return the color that will be used to colorize the knob of the radial tiles
      */
     public Color getKnobColor() { return null == knobColor ? _knobColor : knobColor.get(); }
     /**
      * Defines the color that will be used to colorize the knob of
-     * the radial gauges.
+     * the radial tiles.
      *
      * @param COLOR
      */
@@ -2717,17 +2725,17 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns true if setting the value of the gauge will be animated
+     * Returns true if setting the value of the tile will be animated
      * using the duration defined in animationDuration [ms].
      * Keep in mind that it only makes sense to animate the setting if
      * the data rate is low (more than 1 value per second). If you use real
      * live measured data you should set animated to false.
      *
-     * @return true if setting the value of the gauge will be animated
+     * @return true if setting the value of the tile will be animated
      */
     public boolean isAnimated() { return null == animated ? _animated : animated.get(); }
     /**
-     * Defines if setting the value of the gauge should be animated using
+     * Defines if setting the value of the tile should be animated using
      * the duration defined in animationDuration [ms].
      * Keep in mind that it only makes sense to animate the setting if
      * the data rate is low (more than 1 value per second). If you use real
@@ -2756,7 +2764,7 @@ public class Tile extends Control {
 
     /**
      * Returns the duration in milliseconds that will be used to animate
-     * the needle/bar of the gauge from the last value to the next value.
+     * the needle/bar of the tile from the last value to the next value.
      * This will only be used if animated == true. This value will be
      * clamped in the range of 10ms - 10s.
      *
@@ -2765,7 +2773,7 @@ public class Tile extends Control {
     public long getAnimationDuration() { return animationDuration; }
     /**
      * Defines the duration in milliseconds that will be used to animate
-     * the needle/bar of the gauge from the last value to the next value.
+     * the needle/bar of the tile from the last value to the next value.
      * This will only be used if animated == true. This value will be
      * clamped in the range of 10ms - 10s.
      *
@@ -2775,22 +2783,22 @@ public class Tile extends Control {
 
     /**
      * Returns the angle in degree that defines the start of the scale with
-     * it's minValue in a radial gauge. If set to 0 the scale will start at
+     * it's minValue in a radial tile. If set to 0 the scale will start at
      * the bottom center and the direction of counting is mathematical correct
      * counter-clockwise.
      * Means if you would like to start the scale on the left side in the
-     * middle of the gauge height the startAngle should be set to 270 degrees.
+     * middle of the tile height the startAngle should be set to 270 degrees.
      *
      * @return the angle in degree that defines the start of the scale
      */
     public double getStartAngle() { return null == startAngle ? _startAngle : startAngle.get(); }
     /**
      * Defines the angle in degree that defines the start of the scale with
-     * it's minValue in a radial gauge. If set to 0 the scale will start at
+     * it's minValue in a radial tile. If set to 0 the scale will start at
      * the bottom center and the direction of counting is mathematical correct
      * counter-clockwise.
      * Means if you would like to start the scale on the left side in the
-     * middle of the gauge height the startAngle should be set to 270 degrees.
+     * middle of the tile height the startAngle should be set to 270 degrees.
      *
      * @param ANGLE
      */
@@ -2819,7 +2827,7 @@ public class Tile extends Control {
 
     /**
      * Returns the angle range in degree that will be used to draw the scale
-     * of the radial gauge. The given range will be clamped in the range of
+     * of the radial tile. The given range will be clamped in the range of
      * 0 - 360 degrees and will be drawn in the direction dependent on the
      * scaleDirection.
      *
@@ -2828,7 +2836,7 @@ public class Tile extends Control {
     public double getAngleRange() { return null == angleRange ? _angleRange : angleRange.get(); }
     /**
      * Defines the angle range in degree that will be used to draw the scale
-     * of the radial gauge. The given range will be clamped in the range of
+     * of the radial tile. The given range will be clamped in the range of
      * 0 - 360 degrees. The range will start at the startAngle and will be
      * drawn in the direction dependent on the scaleDirection.
      *
@@ -2944,7 +2952,7 @@ public class Tile extends Control {
 
     /**
      * Returns true if effects like shadows will be drawn.
-     * In some gauges inner- and dropshadows will be used which will be
+     * In some tiles inner- and dropshadows will be used which will be
      * switched on/off by setting the shadowsEnabled property.
      *
      * @return true if effects like shadows will be drawn
@@ -2952,7 +2960,7 @@ public class Tile extends Control {
     public boolean isShadowsEnabled() { return null == shadowsEnabled ? _shadowsEnabled : shadowsEnabled.get(); }
     /**
      * Defines if effects like shadows should be drawn.
-     * In some gauges inner- and dropshadows will be used which will be
+     * In some tiles inner- and dropshadows will be used which will be
      * switched on/off by setting the shadowsEnabled property.
      *
      * @param ENABLED
@@ -3002,14 +3010,14 @@ public class Tile extends Control {
 
     /**
      * Returns the number format that will be used to format the value
-     * in the gauge (NOT USED AT THE MOMENT)
+     * in the tile (NOT USED AT THE MOMENT)
      *
      * @return the number format that will bused to format the value
      */
     public NumberFormat getNumberFormat() { return null == numberFormat ? _numberFormat : numberFormat.get(); }
     /**
      * Defines the number format that will be used to format the value
-     * in the gauge (NOT USED AT THE MOMENT)
+     * in the tile (NOT USED AT THE MOMENT)
      *
      * @param FORMAT
      */
@@ -3038,7 +3046,7 @@ public class Tile extends Control {
 
     /**
      * Returns the number of decimals that will be used to format the
-     * value of the gauge. The number of decimals will be clamped to
+     * value of the tile. The number of decimals will be clamped to
      * a value between 0-3.
      *
      * @return the number of decimals that will be used to format the value
@@ -3046,7 +3054,7 @@ public class Tile extends Control {
     public int getDecimals() { return null == decimals ? _decimals : decimals.get(); }
     /**
      * Defines the number of decimals that will be used to format the
-     * value of the gauge. The number of decimals will be clamped to
+     * value of the tile. The number of decimals will be clamped to
      * a value between 0-3.
      *
      * @param DECIMALS
@@ -3076,7 +3084,7 @@ public class Tile extends Control {
 
     /**
      * Returns the number of tickLabelDecimals that will be used to format the
-     * ticklabels of the gauge. The number of tickLabelDecimals will be clamped to
+     * ticklabels of the tile. The number of tickLabelDecimals will be clamped to
      * a value between 0-3.
      *
      * @return the number of tickLabelDecimals that will be used to format the ticklabels
@@ -3084,7 +3092,7 @@ public class Tile extends Control {
     public int getTickLabelDecimals() { return null == tickLabelDecimals ? _tickLabelDecimals : tickLabelDecimals.get(); }
     /**
      * Defines the number of tickLabelDecimals that will be used to format the
-     * ticklabels of the gauge. The number of tickLabelDecimals will be clamped to
+     * ticklabels of the tile. The number of tickLabelDecimals will be clamped to
      * a value between 0-3.
      *
      * @param DECIMALS
@@ -3114,14 +3122,14 @@ public class Tile extends Control {
     
     /**
      * Returns the color that will be used to colorize the needle of
-     * the radial gauges.
+     * the radial tiles.
      *
      * @return the color that wil be used to colorize the needle
      */
     public Color getNeedleColor() { return null == needleColor ? _needleColor : needleColor.get(); }
     /**
      * Defines the color that will be used to colorize the needle of
-     * the radial gauges.
+     * the radial tiles.
      *
      * @param COLOR
      */
@@ -3147,14 +3155,14 @@ public class Tile extends Control {
 
     /**
      * Returns the color that will be used to colorize the bar of
-     * the gauge (if it has a bar).
+     * the tile (if it has a bar).
      *
      * @return the color that will be used to colorized the bar (if available)
      */
     public Color getBarColor() { return null == barColor ? _barColor : barColor.get(); }
     /**
      * Defines the color that will be used to colorize the bar of
-     * the gauge (if it has a bar).
+     * the tile (if it has a bar).
      *
      * @param COLOR
      */
@@ -3180,14 +3188,14 @@ public class Tile extends Control {
 
     /**
      * Returns the color that will be used to colorize the bar background of
-     * the gauge (if it has a bar).
+     * the tile (if it has a bar).
      *
      * @return the color that will be used to colorize the bar background
      */
     public Color getBarBackgroundColor() { return null == barBackgroundColor ? _barBackgroundColor : barBackgroundColor.get(); }
     /**
      * Returns the color that will be used to colorize the bar background of
-     * the gauge (if it has a bar).
+     * the tile (if it has a bar).
      *
      * @param COLOR
      */
@@ -3213,14 +3221,14 @@ public class Tile extends Control {
 
     /**
      * Returns the color that will be used to colorize the title
-     * of the gauge.
+     * of the tile.
      *
      * @return the color that will be used to colorize the title
      */
     public Color getTitleColor() { return null == titleColor ? _titleColor : titleColor.get(); }
     /**
      * Defines the color that will be used to colorize the title
-     * of the gauge.
+     * of the tile.
      *
      * @param COLOR
      */
@@ -3246,14 +3254,14 @@ public class Tile extends Control {
 
     /**
      * Returns the color that will be used to colorize the description text
-     * of the gauge.
+     * of the tile.
      *
      * @return the color that will be used to colorize the description
      */
     public Color getDescriptionColor() { return null == descriptionColor ? _descriptionColor : descriptionColor.get(); }
     /**
      * Defines the color that will be used to colorize the description text
-     * of the gauge.
+     * of the tile.
      *
      * @param COLOR
      */
@@ -3279,14 +3287,14 @@ public class Tile extends Control {
 
     /**
      * Returns the color that will be used to colorize the unit
-     * of the gauge.
+     * of the tile.
      *
      * @return the color that will be used to colorize the unit
      */
     public Color getUnitColor() { return null == unitColor ? _unitColor : unitColor.get(); }
     /**
      * Defines the color that will be used to colorize the unit
-     * of the gauge.
+     * of the tile.
      *
      * @param COLOR
      */
@@ -3312,14 +3320,14 @@ public class Tile extends Control {
 
     /**
      * Returns the color that will be used to colorize the value
-     * of the gauge.
+     * of the tile.
      *
      * @return the color that will be used to colorize the value
      */
     public Color getValueColor() { return null == valueColor ? _valueColor : valueColor.get(); }
     /**
      * Defines the color that will be used to colorize the value
-     * of the gauge.
+     * of the tile.
      *
      * @param COLOR
      */
@@ -3345,14 +3353,14 @@ public class Tile extends Control {
 
     /**
      * Returns the color that will be used to colorize the threshold
-     * indicator of the gauge.
+     * indicator of the tile.
      *
      * @return the color that will be used to colorize the threshold indicator
      */
     public Color getThresholdColor() { return null == thresholdColor ? _thresholdColor : thresholdColor.get(); }
     /**
      * Defines the color that will be used to colorize the threshold
-     * indicator of the gauge.
+     * indicator of the tile.
      *
      * @param COLOR
      */
@@ -3398,16 +3406,16 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns true if the value of the gauge should be checked against
+     * Returns true if the value of the tile should be checked against
      * all sections (if sections not empty). If a value enters a section
      * or leaves a section it will fire an event. The check will be performed
      * after the animation is finished (if animated == true).
      *
-     * @return true if the value of the gauge should be checked against all sections
+     * @return true if the value of the tile should be checked against all sections
      */
     public boolean getCheckSectionsForValue() { return null == checkSectionsForValue ? _checkSectionsForValue : checkSectionsForValue.get(); }
     /**
-     * Defines if the value of the gauge should be checked against
+     * Defines if the value of the tile should be checked against
      * all sections (if sections not empty). If a value enters a section
      * or leaves a section it will fire an event. The check will be performed
      * after the animation is finished (if animated == true).
@@ -3473,14 +3481,14 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns true if an inner shadow should be drawn on the gauge
+     * Returns true if an inner shadow should be drawn on the tile
      * background.
      *
-     * @return true if an inner shadow should be drawn on the gauge background
+     * @return true if an inner shadow should be drawn on the tile background
      */
     public boolean isInnerShadowEnabled() { return null == innerShadowEnabled ? _innerShadowEnabled : innerShadowEnabled.get(); }
     /**
-     * Defines if an inner shadow should be drawn on the gauge
+     * Defines if an inner shadow should be drawn on the tile
      * background.
      *
      * @param ENABLED
@@ -5790,6 +5798,7 @@ public class Tile extends Control {
             case STATUS           : return new StatusTileSkin(Tile.this);
             case BAR_GAUGE        : return new BarGaugeTileSkin(Tile.this);
             case IMAGE            : return new ImageTileSkin(Tile.this);
+            case IMAGE_COUNTER    : return new ImageCounterTileSkin(Tile.this);
             case TIMELINE         : return new TimelineTileSkin(Tile.this);
             case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
@@ -5936,6 +5945,9 @@ public class Tile extends Control {
             case IMAGE:
                 setTextAlignment(TextAlignment.CENTER);
                 break;
+            case IMAGE_COUNTER:
+                setTextAlignment(TextAlignment.LEFT);
+                break;
             case TIMELINE:
                 setDataPointsVisible(true);
                 setTextVisible(false);
@@ -6001,6 +6013,7 @@ public class Tile extends Control {
             case STATUS           : setSkin(new StatusTileSkin(Tile.this)); break;
             case BAR_GAUGE        : setSkin(new BarGaugeTileSkin(Tile.this)); break;
             case IMAGE            : setSkin(new ImageTileSkin(Tile.this)); break;
+            case IMAGE_COUNTER    : setSkin(new ImageCounterTileSkin(Tile.this)); break;
             case TIMELINE         : setSkin(new TimelineTileSkin(Tile.this)); break;
             case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;

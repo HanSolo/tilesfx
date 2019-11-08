@@ -1231,6 +1231,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case IMAGE:
                     TILE.setTextAlignment(TextAlignment.CENTER);
                     break;
+                case IMAGE_COUNTER:
+                    TILE.setTextAlignment(TextAlignment.LEFT);
+                    break;
                 case TIMELINE:
                     TILE.setDataPointsVisible(true);
                     TILE.setTextVisible(false);

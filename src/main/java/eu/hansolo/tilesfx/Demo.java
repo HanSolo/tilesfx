@@ -62,8 +62,10 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,6 +151,7 @@ public class Demo extends Application {
     private Tile            barGaugeTile;
     private Tile            imageTile;
     private Tile            timelineTile;
+    private Tile            imageCounterTile;
 
 
     private long            lastTimerCall;
@@ -815,6 +818,16 @@ public class Demo extends Application {
                                   .timeoutMs(60000)
                                   .build();
 
+        imageCounterTile = TileBuilder.create()
+                                      .skinType(SkinType.IMAGE_COUNTER)
+                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                      .title("ImageCounter Tile")
+                                      .text("Whatever text")
+                                      .description("Whatever\nnumbers")
+                                      .image(new Image(Demo.class.getResourceAsStream("HanSolo.png")))
+                                      .imageMask(ImageMask.ROUND)
+                                      .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -874,6 +887,8 @@ public class Demo extends Application {
 
                     timelineTile.addChartData(new ChartData("", RND.nextDouble() * 300 + 50, Instant.now()));
 
+                    imageCounterTile.increaseValue(1);
+
                     lastTimerCall = now;
                 }
             }
@@ -895,7 +910,7 @@ public class Demo extends Application {
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
-                                             timelineTile);//, weatherTile);
+                                             timelineTile, imageCounterTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

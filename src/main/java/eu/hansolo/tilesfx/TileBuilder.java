@@ -1233,6 +1233,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case IMAGE_COUNTER:
                     TILE.setTextAlignment(TextAlignment.LEFT);
+                    TILE.setDecimals(0);
                     break;
                 case TIMELINE:
                     TILE.setDataPointsVisible(true);

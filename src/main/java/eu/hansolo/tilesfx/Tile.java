@@ -5947,6 +5947,7 @@ public class Tile extends Control {
                 break;
             case IMAGE_COUNTER:
                 setTextAlignment(TextAlignment.LEFT);
+                setDecimals(0);
                 break;
             case TIMELINE:
                 setDataPointsVisible(true);

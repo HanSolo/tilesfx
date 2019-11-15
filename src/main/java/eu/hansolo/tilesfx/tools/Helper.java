@@ -587,8 +587,8 @@ public class Helper {
         final String FONT_NAME          = TEXT.getFont().getName();
         double       adjustableFontSize = FONT_SIZE;
 
-        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > MIN_FONT_SIZE) {
-            adjustableFontSize -= 0.05;
+        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && adjustableFontSize > MIN_FONT_SIZE) {
+            adjustableFontSize -= 0.1;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
     }
@@ -596,8 +596,8 @@ public class Helper {
         final String FONT_NAME          = TEXT.getFont().getName();
         double       adjustableFontSize = FONT_SIZE;
 
-        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > MIN_FONT_SIZE) {
-            adjustableFontSize -= 0.05;
+        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && adjustableFontSize > MIN_FONT_SIZE) {
+            adjustableFontSize -= 0.1;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
     }

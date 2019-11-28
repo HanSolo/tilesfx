@@ -5,17 +5,16 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.2.0'
+        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.3.1'
     }
 }
 
 // TilesFX main build file
 plugins {
-    id 'com.gradle.build-scan' version '2.3'
     id 'idea'
     id 'java'
     id 'maven-publish'
-    id 'net.nemerosa.versioning' version '2.8.2'
+    id 'net.nemerosa.versioning' version '2.10.0'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'org.openjfx.javafxplugin' version '0.0.8'
 }
@@ -25,12 +24,7 @@ apply plugin: 'biz.aQute.bnd.builder'
 sourceCompatibility = '11'
 
 wrapper {
-    gradleVersion = '5.6.2'
-}
-
-buildScan {
-    termsOfServiceUrl   = 'https://gradle.com/terms-of-service'
-    termsOfServiceAgree = 'yes'
+    gradleVersion = '6.0.1'
 }
 
 description = 'TilesFX is a JavaFX library containing tiles for dashboards'
@@ -42,7 +36,7 @@ ext {
 }
 
 dependencies {
-    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
+    implementation ('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude group: 'org.hamcrest', module: 'hamcrest-core'
     }
 }
@@ -153,6 +147,11 @@ publishing {
             pom.withXml {
                 asNode().children().last() + pomConfig
                 asNode().appendNode('description', description)
+                asNode().dependencies.'*'.findAll() {
+                    it.groupId.text() == 'org.openjfx'
+                }.each {
+                    it.remove(it.classifier)
+                }
             }
         }
     }

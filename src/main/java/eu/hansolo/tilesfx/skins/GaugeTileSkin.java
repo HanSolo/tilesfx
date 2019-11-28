@@ -219,7 +219,11 @@ public class GaugeTileSkin extends TileSkin {
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
         needleRectRotate.setAngle(targetAngle);
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
         thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : tile.getValue() > tile.getThreshold() ? tile.getThresholdColor() : Tile.GRAY);
         resizeDynamicText();
         highlightSections(VALUE);

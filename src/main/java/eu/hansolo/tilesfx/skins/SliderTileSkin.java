@@ -161,9 +161,17 @@ public class SliderTileSkin extends TileSkin {
     @Override protected void handleCurrentValue(final double VALUE) {
         if (tile.isSnapToTicks()) {
             double value = Helper.snapToTicks(minValue, maxValue, VALUE, tile.getMinorTickCount(), tile.getMajorTickUnit());
-            valueText.setText(String.format(locale, formatString, value));
+            if (tile.getCustomDecimalFormatEnabled()) {
+                valueText.setText(decimalFormat.format(value));
+            } else {
+                valueText.setText(String.format(locale, formatString, value));
+            }
         } else {
-            valueText.setText(String.format(locale, formatString, VALUE));
+            if (tile.getCustomDecimalFormatEnabled()) {
+                valueText.setText(decimalFormat.format(VALUE));
+            } else {
+                valueText.setText(String.format(locale, formatString, VALUE));
+            }
         }
         resizeDynamicText();
         centerX = trackStart + (trackLength * ((VALUE - minValue) / range));

@@ -68,6 +68,7 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -515,6 +516,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B customFont(final Font FONT) {
         properties.put("customFont", new SimpleObjectProperty(FONT));
+        return (B)this;
+    }
+
+    public final B customDecimalFormatEnabled(final boolean ENABLED) {
+        properties.put("customDecimalFormatEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
+    public final B customDecimalFormat(final DecimalFormat DECIMAL_FORMAT) {
+        properties.put("customDecimalFormat", new SimpleObjectProperty<>(DECIMAL_FORMAT));
         return (B)this;
     }
 
@@ -1521,6 +1532,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("customFont".equals(key)) {
                 TILE.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
+            } else if ("customDecimalFormatEnabled".equals(key)) {
+                TILE.setCustomDecimalFormatEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if ("customDecimalFormat".equals(key)) {
+                TILE.setCustomDecimalFormat(((ObjectProperty<DecimalFormat>) properties.get(key)).get());
             } else if ("alertMessage".equals(key)) {
                 TILE.setAlertMessage(((StringProperty) properties.get(key)).get());
             } else if ("smoothing".equals(key)) {

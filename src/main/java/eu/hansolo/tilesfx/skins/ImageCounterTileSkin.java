@@ -140,7 +140,11 @@ public class ImageCounterTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
         resizeDynamicText();
     }
 
@@ -304,7 +308,11 @@ public class ImageCounterTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+        } else {
+            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+        }
         if (tile.getUnit().contains("/")) {
             String[] units = tile.getUnit().split("/");
             upperUnitText.setText(units[0]);

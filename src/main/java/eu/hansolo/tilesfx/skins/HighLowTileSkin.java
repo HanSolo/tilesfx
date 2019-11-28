@@ -165,7 +165,11 @@ public class HighLowTileSkin extends TileSkin {
     @Override protected void handleCurrentValue(final double VALUE) {
         double deviation = calculateDeviation(VALUE);
         updateState(deviation);
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
         deviationText.setText(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", deviation));
 
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(200), triangle);

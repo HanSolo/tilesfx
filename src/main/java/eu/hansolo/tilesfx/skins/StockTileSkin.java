@@ -300,7 +300,11 @@ public class StockTileSkin extends TileSkin {
             ParallelTransition parallelTransition = new ParallelTransition(rotateTransition, fillIndicatorTransition, fillReferenceTransition);
             parallelTransition.play();
         }
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
 
         highText.setText(String.format(locale, formatString, high));
         lowText.setText(String.format(locale, formatString, low));

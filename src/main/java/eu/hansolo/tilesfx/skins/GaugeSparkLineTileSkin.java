@@ -69,10 +69,10 @@ import static eu.hansolo.tilesfx.tools.Helper.enableNode;
  * Created by hansolo on 26.05.17.
  */
 public class GaugeSparkLineTileSkin extends TileSkin {
-    private static final int                  MONTH         = 2_592_000;
-    private static final int                  DAY           = 86_400;
-    private static final int                  HOUR          = 3_600;
-    private static final int                  MINUTE        = 60;
+    private static final int                  SEC_MONTH     = 2_592_000;
+    private static final int                  SEC_DAY       = 86_400;
+    private static final int                  SEC_HOUR      = 3_600;
+    private static final int                  SEC_MINUTE    = 60;
     private              DateTimeFormatter    timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
     private              Text                 titleText;
     private              Text                 valueText;
@@ -133,7 +133,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
 
         if (tile.isAutoScale()) tile.calcAutoScale();
 
-        niceScaleY = new NiceScale(tile.getMinValue(), tile.getMaxValue());
+        niceScaleY = new NiceScale(minValue, maxValue);
         niceScaleY.setMaxTicks(5);
         tickLineColor       = Color.color(Tile.FOREGROUND.getRed(), Tile.FOREGROUND.getGreen(), Tile.FOREGROUND.getBlue(), 0.50);
         tickLabelColor      = tile.getTickLabelColor();
@@ -150,9 +150,9 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         }
 
         gradientLookup = new GradientLookup(tile.getGradientStops());
-        low            = tile.getMaxValue();
-        high           = tile.getMinValue();
+        low            = maxValue;
         lastLow        = low;
+        high           = minValue;
         lastHigh       = high;
         stdDeviation   = 0;
         movingAverage  = tile.getMovingAverage();
@@ -264,10 +264,10 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
-        } else if (EventType.VALUE.name().equals(EVENT_TYPE)) {
+        } else if (EventType.VALUE.equals(EVENT_TYPE)) {
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
-        } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
-            addData(clamp(minValue, maxValue, tile.getValue()));
+            double value = clamp(minValue, maxValue, tile.getValue());
+            handleCurrentValue(value);
         } else if (EventType.AVERAGING.name().equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
 
@@ -287,13 +287,19 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             highlightSectionCanvas.setManaged(isHighlightSections);
         } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
             dataList.clear();
-            addData(minValue);
+            handleCurrentValue(minValue);
+        } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
+            double value = clamp(minValue, maxValue, tile.getValue());
+            handleCurrentValue(value);
         }
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
+        addData(VALUE);
+
         low  = Statistics.getMin(dataList);
         high = Statistics.getMax(dataList);
+
         if (Helper.equals(low, high)) {
             low  = minValue;
             high = maxValue;
@@ -308,15 +314,16 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         double stepY = graphBounds.getHeight() / range;
 
         niceScaleY.setMinMax(low, high);
-        int    lineCountY       = 1;
-        int    tickLabelOffsetY = 1;
+        int    lineCountY       = 0;
+        int    tickLabelOffsetY = 0;
         double tickSpacingY     = niceScaleY.getTickSpacing();
         double tickStepY        = tickSpacingY * stepY;
-        double tickStartY       = maxY - tickStepY;
-        if (tickSpacingY < low) {
-            tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
-            tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
-        }
+        if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
+        double tickStartY       = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+
+        double niceMinY = niceScaleY.getNiceMin();
+        double niceMaxY = niceScaleY.getNiceMax();
+        double rangeY   = niceMaxY - niceMinY;
 
         horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
         tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
@@ -324,8 +331,11 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
             Line line  = horizontalTickLines.get(lineCountY);
             Text label = tickLabelsY.get(lineCountY);
-            //label.setText(String.format(locale, "%.0f", (tickSpacingY * (lineCountY + tickLabelOffsetY))));
-            label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+            if (rangeY <= 4) {
+                label.setText(String.format(locale, "%.1f", low + lineCountY * tickSpacingY));
+            } else {
+                label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+            }
             label.setY(y + graphBounds.getHeight() * 0.03);
             label.setFill(tickLabelColor);
             horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
@@ -341,7 +351,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
         tickLabelsY.forEach(label -> {
             label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02);
-            label.toFront();
+            //label.toFront();
         });
 
         if (!dataList.isEmpty()) {
@@ -383,7 +393,11 @@ public class GaugeSparkLineTileSkin extends TileSkin {
 
             averageText.setText(String.format(locale, formatString, average));
         }
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+        } else {
+            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+        }
 
         if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
             timeSpanText.setText(createTimeSpanText());
@@ -512,22 +526,30 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     private String createTimeSpanText() {
         long          timeSpan        = movingAverage.getTimeSpan().getEpochSecond();
         StringBuilder timeSpanBuilder = new StringBuilder(movingAverage.isFilling() ? "\u22a2 " : "\u2190 ");
-        if (timeSpan > MONTH) { // 1 Month (30 days)
-            int    months = (int)(timeSpan / MONTH);
-            double days   = timeSpan % MONTH;
-            timeSpanBuilder.append(months).append("M").append(String.format(Locale.US, "%.0f", days)).append("d").append(" \u2192");
-        } else if (timeSpan > DAY) { // 1 Day
-            int    days  = (int) (timeSpan / DAY);
-            double hours = (timeSpan - (days * DAY)) / HOUR;
-            timeSpanBuilder.append(days).append("d").append(String.format(Locale.US, "%.0f", hours)).append("h").append(" \u2192");
-        } else if (timeSpan > HOUR) { // 1 Hour
-            int    hours   = (int)(timeSpan / HOUR);
-            double minutes = (timeSpan - (hours * HOUR)) / MINUTE;
-            timeSpanBuilder.append(hours).append("h").append(String.format(Locale.US, "%.0f", minutes)).append("m").append(" \u2192");
-        } else if (timeSpan > MINUTE) { // 1 Minute
-            int    minutes = (int)(timeSpan / MINUTE);
-            double seconds = (timeSpan - (minutes * MINUTE));
-            timeSpanBuilder.append(minutes).append("m").append(String.format(Locale.US, "%.0f", seconds)).append("s").append(" \u2192");
+        if (timeSpan > SEC_MONTH) { // 1 Month (30 days)
+            int    months = (int)(timeSpan / SEC_MONTH);
+            double days   = timeSpan % SEC_MONTH;
+            timeSpanBuilder.append(months).append("M");
+            if (days > 0) { timeSpanBuilder.append(String.format(Locale.US, "%.0f", days)).append("d"); }
+            timeSpanBuilder.append(" \u2192");
+        } else if (timeSpan > SEC_DAY) { // 1 Day
+            int    days  = (int) (timeSpan / SEC_DAY);
+            double hours = (timeSpan - (days * SEC_DAY)) / SEC_HOUR;
+            timeSpanBuilder.append(days).append("d");
+            if (hours > 0) { timeSpanBuilder.append(String.format(Locale.US, "%.0f", hours)).append("h"); }
+            timeSpanBuilder.append(" \u2192");
+        } else if (timeSpan > SEC_HOUR) { // 1 Hour
+            int    hours   = (int)(timeSpan / SEC_HOUR);
+            double minutes = (timeSpan - (hours * SEC_HOUR)) / SEC_MINUTE;
+            timeSpanBuilder.append(hours).append("h");
+            if (minutes > 0) { timeSpanBuilder.append(String.format(Locale.US, "%.0f", minutes)).append("m"); }
+            timeSpanBuilder.append(" \u2192");
+        } else if (timeSpan > SEC_MINUTE) { // 1 Minute
+            int    minutes = (int)(timeSpan / SEC_MINUTE);
+            double seconds = (timeSpan - (minutes * SEC_MINUTE));
+            timeSpanBuilder.append(minutes).append("m");
+            if (seconds > 0) { timeSpanBuilder.append(String.format(Locale.US, "%.0f", seconds)).append("s"); }
+            timeSpanBuilder.append(" \u2192");
         } else {
             int seconds = (int)timeSpan;
             timeSpanBuilder.append(seconds).append("s").append(" \u2192");
@@ -699,7 +721,124 @@ public class GaugeSparkLineTileSkin extends TileSkin {
 
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
-        handleCurrentValue(tile.getValue());
+        { // Update tile chart without affecting data
+            low  = Statistics.getMin(dataList);
+            high = Statistics.getMax(dataList);
+
+            if (Helper.equals(low, high)) {
+                low  = minValue;
+                high = maxValue;
+            }
+            range = high - low;
+
+            double minX  = graphBounds.getX();
+            double maxX  = minX + graphBounds.getWidth();
+            double minY  = graphBounds.getY();
+            double maxY  = minY + graphBounds.getHeight();
+            double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
+            double stepY = graphBounds.getHeight() / range;
+
+            niceScaleY.setMinMax(low, high);
+            int    lineCountY       = 0;
+            int    tickLabelOffsetY = 0;
+            double tickSpacingY     = niceScaleY.getTickSpacing();
+            double tickStepY        = tickSpacingY * stepY;
+            if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
+            double tickStartY       = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+
+            double niceMinY = niceScaleY.getNiceMin();
+            double niceMaxY = niceScaleY.getNiceMax();
+            double rangeY   = niceMaxY - niceMinY;
+
+            horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
+            tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+            horizontalLineOffset = 0;
+            for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
+                Line line  = horizontalTickLines.get(lineCountY);
+                Text label = tickLabelsY.get(lineCountY);
+                if (rangeY <= 4) {
+                    label.setText(String.format(locale, "%.1f", low + lineCountY * tickSpacingY));
+                } else {
+                    label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+                }
+                label.setY(y + graphBounds.getHeight() * 0.03);
+                label.setFill(tickLabelColor);
+                horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
+
+                line.setStartX(minX);
+                line.setStartY(y);
+                line.setEndY(y);
+                line.setStroke(tickLineColor);
+                lineCountY++;
+                lineCountY = clamp(0, 4, lineCountY);
+            }
+            if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
+            horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
+            tickLabelsY.forEach(label -> {
+                label.setX(maxX - label.getLayoutBounds().getWidth() + size * 0.02);
+                //label.toFront();
+            });
+
+            if (!dataList.isEmpty()) {
+                if (tile.isSmoothing()) {
+                    smooth(dataList);
+                } else {
+                    MoveTo begin = (MoveTo) pathElements.get(0);
+                    begin.setX(minX);
+                    begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+                    for (int i = 1; i < (noOfDatapoints - 1); i++) {
+                        LineTo lineTo = (LineTo) pathElements.get(i);
+                        lineTo.setX(minX + i * stepX);
+                        lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+                    }
+                    LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
+                    end.setX(maxX);
+                    end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
+
+                    dot.setCenterX(maxX);
+                    dot.setCenterY(end.getY());
+                }
+
+                if (tile.isStrokeWithGradient()) {
+                    setupGradient();
+                    dot.setFill(gradient);
+                    sparkLine.setStroke(gradient);
+                }
+
+                double average  = tile.getAverage();
+                double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
+
+                averageLine.setStartX(minX);
+                averageLine.setStartY(averageY);
+                averageLine.setEndX(maxX);
+                averageLine.setEndY(averageY);
+
+                stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
+                stdDeviationArea.setHeight(stdDeviation * stepY);
+
+                averageText.setText(String.format(locale, formatString, average));
+            }
+            if (tile.getCustomDecimalFormatEnabled()) {
+                valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+            } else {
+                valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            }
+
+            if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
+                timeSpanText.setText(createTimeSpanText());
+                text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
+            }
+            resizeDynamicText();
+
+            lastLow  = low;
+            lastHigh = high;
+
+            setBar(tile.getCurrentValue());
+
+            if (tile.isHighlightSections()) { drawHighLightSections(tile.getCurrentValue()); }
+        }
+
+
         if (tile.getAveragingPeriod() < 250) {
             sparkLine.setStrokeWidth(size * 0.005);
             dot.setRadius(size * 0.01);

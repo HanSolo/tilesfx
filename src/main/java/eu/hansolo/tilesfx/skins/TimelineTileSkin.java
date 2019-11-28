@@ -695,7 +695,12 @@ public class TimelineTileSkin extends TileSkin {
             averageText.setText(String.format(locale, "\u2300 " + formatString, average));
             averageText2.setText(String.format(locale, "\u2300 " + formatString, average));
         }
-        valueText.setText(String.format(locale, formatString, VALUE));
+
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
 
         if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
             timeSpanText.setText(createTimeSpanText());

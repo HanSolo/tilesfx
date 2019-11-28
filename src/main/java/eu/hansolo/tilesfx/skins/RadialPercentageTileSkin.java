@@ -201,7 +201,11 @@ public class RadialPercentageTileSkin extends TileSkin {
             bar.setLength(-VALUE * angleStep);
         }
 
-        percentageValueText.setText(String.format(locale, formatString, VALUE / sum * 100.0));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            percentageValueText.setText(decimalFormat.format(VALUE / sum * 100.0));
+        } else {
+            percentageValueText.setText(String.format(locale, formatString, VALUE / sum * 100.0));
+        }
         setProportionBar();
     }
 

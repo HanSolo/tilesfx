@@ -211,7 +211,11 @@ public class SwitchSliderTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
         resizeDynamicText();
         centerX = trackStart + (trackLength * ((VALUE - minValue) / range));
         thumb.setCenterX(clamp(trackStart, (trackStart + trackLength), centerX));

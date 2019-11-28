@@ -19,7 +19,6 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
-import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.CtxBounds;
@@ -45,6 +44,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -80,6 +80,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              double                   angleStep;
     protected              boolean                  highlightSections;
     protected              String                   formatString;
+    protected              DecimalFormat            decimalFormat;
     protected              String                   tickLabelFormatString;
     protected              Locale                   locale;
     protected              List<Section>            sections;
@@ -101,18 +102,18 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     public TileSkin(final Tile TILE) {
         super(TILE);
         tile                  = TILE;
-        minValue              = TILE.getMinValue();
-        maxValue              = TILE.getMaxValue();
-        range                 = TILE.getRange();
-        threshold             = TILE.getThreshold();
+        minValue              = tile.getMinValue();
+        maxValue              = tile.getMaxValue();
+        range                 = tile.getRange();
+        threshold             = tile.getThreshold();
         stepSize              = PREFERRED_WIDTH / range;
         angleRange            = clamp(90.0, 180.0, tile.getAngleRange());
         angleStep             = angleRange / range;
-        formatString          = new StringBuilder("%.").append(Integer.toString(TILE.getDecimals())).append("f").toString();
-        tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(TILE.getTickLabelDecimals())).append("f").toString();;
-        locale                = TILE.getLocale();
-        sections              = TILE.getSections();
-        sectionsVisible       = TILE.getSectionsVisible();
+        formatString          = new StringBuilder("%.").append(tile.getDecimals()).append("f").toString();
+        tickLabelFormatString = new StringBuilder("%.").append(tile.getTickLabelDecimals()).append("f").toString();;
+        locale                = tile.getLocale();
+        sections              = tile.getSections();
+        sectionsVisible       = tile.getSectionsVisible();
         highlightSections     = tile.isHighlightSections();
         textSize              = tile.getTextSize();
         infoRegionHandler     = tile.getInfoRegionHandler();
@@ -120,6 +121,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         tileEventListener     = e -> handleEvents(e.getEventType().name());
         currentValueListener  = o -> handleCurrentValue(tile.getCurrentValue());
         contentBounds         = new CtxBounds();
+        decimalFormat         = tile.getCustomDecimalFormat();
 
         initGraphics();
         registerListeners();
@@ -317,8 +319,12 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         infoRegion.setTooltipText(tile.getInfoRegionTooltipText());
 
         locale                = tile.getLocale();
-        formatString          = new StringBuilder("%.").append(Integer.toString(tile.getDecimals())).append("f").toString();
-        tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(tile.getTickLabelDecimals())).append("f").toString();
+        if (tile.getCustomDecimalFormatEnabled()) {
+            decimalFormat = tile.getCustomDecimalFormat();
+        } else {
+            formatString = new StringBuilder("%.").append(tile.getDecimals()).append("f").toString();
+        }
+        tickLabelFormatString = new StringBuilder("%.").append(tile.getTickLabelDecimals()).append("f").toString();
         sectionsVisible       = tile.getSectionsVisible();
         textSize              = tile.getTextSize();
     }

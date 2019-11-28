@@ -91,6 +91,7 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -447,6 +448,10 @@ public class Tile extends Control {
     private BooleanProperty                customFontEnabled;
     private Font                           _customFont;
     private ObjectProperty<Font>           customFont;
+    private boolean                        _customDecimalFormatEnabled;
+    private BooleanProperty                customDecimalFormatEnabled;
+    private DecimalFormat                  _customDecimalFormat;
+    private ObjectProperty<DecimalFormat>  customDecimalFormat;
     private boolean                        _alert;
     private BooleanProperty                alert;
     private String                         _alertMessage;
@@ -673,6 +678,8 @@ public class Tile extends Control {
                 @NamedArg(value="keepAspect", defaultValue="true") boolean keepAspect,
                 @NamedArg(value="customFontEnabled", defaultValue="false") boolean customFontEnabled,
                 @NamedArg(value="customFont", defaultValue="Fonts.latoRegular(12)") Font customFont,
+                @NamedArg(value="customDecimalFormatEnabled", defaultValue="false") boolean customDecimalFormatEnabled,
+                @NamedArg(value="customDecimalFormat", defaultValue="new DecimalFormat(\"#\")") DecimalFormat customDecimalFormat,
                 @NamedArg(value="alert", defaultValue="false") boolean alert,
                 @NamedArg(value="alertMessage", defaultValue="") String alertMessage,
                 @NamedArg(value="smoothing", defaultValue="false") boolean smoothing,
@@ -892,6 +899,8 @@ public class Tile extends Control {
         _keepAspect                         = true;
         _customFontEnabled                  = false;
         _customFont                         = Fonts.latoRegular(12);
+        _customDecimalFormatEnabled         = false;
+        _customDecimalFormat                = new DecimalFormat("#");
         _alert                              = false;
         _alertMessage                       = "";
         _smoothing                          = false;
@@ -5145,6 +5154,47 @@ public class Tile extends Control {
             _customFont = null;
         }
         return customFont;
+    }
+
+    public boolean getCustomDecimalFormatEnabled() { return null == customDecimalFormatEnabled ? _customDecimalFormatEnabled : customDecimalFormatEnabled.get(); }
+    public void setCustomDecimalFormatEnabled(final boolean ENABLED) {
+        if (null == customDecimalFormatEnabled) {
+            _customDecimalFormatEnabled = ENABLED;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            customDecimalFormatEnabled.set(ENABLED);
+        }
+    }
+    public BooleanProperty customDecimalFormatEnabledProperty() {
+        if (null == customDecimalFormatEnabled) {
+            customDecimalFormatEnabled = new BooleanPropertyBase(_customDecimalFormatEnabled) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "customDecimalFormatEnabled"; }
+            };
+        }
+        return customDecimalFormatEnabled;
+    }
+
+    public DecimalFormat getCustomDecimalFormat() { return null == customDecimalFormat ? _customDecimalFormat : customDecimalFormat.get(); }
+    public void setCustomDecimalFormat(final DecimalFormat DECIMAL_FORMAT) {
+        if (null == customDecimalFormat) {
+            _customDecimalFormat = DECIMAL_FORMAT;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            customDecimalFormat.set(DECIMAL_FORMAT);
+        }
+    }
+    public ObjectProperty<DecimalFormat> customDecimalFormatProperty() {
+        if (null == customDecimalFormat) {
+            customDecimalFormat = new ObjectPropertyBase(_customDecimalFormat) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "customDecimalFormat"; }
+            };
+            _customDecimalFormat = null;
+        }
+        return customDecimalFormat;
     }
 
     /**

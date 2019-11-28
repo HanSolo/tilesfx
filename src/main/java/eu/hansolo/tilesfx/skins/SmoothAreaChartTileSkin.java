@@ -227,7 +227,11 @@ public class SmoothAreaChartTileSkin extends TileSkin {
                 fillPath.setVisible(false);
                 strokePath.setVisible(false);
                 Helper.enableNode(dataPointGroup, false);
-                valueText.setText(String.format(locale, formatString, minValue));
+                if (tile.getCustomDecimalFormatEnabled()) {
+                    valueText.setText(decimalFormat.format(minValue));
+                } else {
+                    valueText.setText(String.format(locale, formatString, minValue));
+                }
             });
             handleData();
         }
@@ -247,7 +251,11 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         Optional<ChartData> lastDataEntry = data.stream().reduce((first, second) -> second);
         if (lastDataEntry.isPresent()) {
-            valueText.setText(String.format(locale, formatString, lastDataEntry.get().getValue()));
+            if (tile.getCustomDecimalFormatEnabled()) {
+                valueText.setText(decimalFormat.format(lastDataEntry.get().getValue()));
+            } else {
+                valueText.setText(String.format(locale, formatString, lastDataEntry.get().getValue()));
+            }
             tile.setValue(lastDataEntry.get().getValue());
             resizeDynamicText();
         }
@@ -470,7 +478,11 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         titleText.setText(tile.getTitle());
 
-        valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+        } else {
+            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+        }
         if (tile.getUnit().contains("/")) {
             String[] units = tile.getUnit().split("/");
             upperUnitText.setText(units[0]);

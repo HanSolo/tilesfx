@@ -294,15 +294,16 @@ public class SparkLineTileSkin extends TileSkin {
 
         if (loHiChanged) {
             niceScaleY.setMinMax(low, high);
-            int    lineCountY       = 1;
-            int    tickLabelOffsetY = 1;
+            int    lineCountY       = 0;
+            int    tickLabelOffsetY = 0;
             double tickSpacingY     = niceScaleY.getTickSpacing();
             double tickStepY        = tickSpacingY * stepY;
-            double tickStartY       = maxY - tickStepY;
-            if (tickSpacingY < low) {
-                tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
-                tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
-            }
+            if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
+            double tickStartY       = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+
+            double niceMinY = niceScaleY.getNiceMin();
+            double niceMaxY = niceScaleY.getNiceMax();
+            double rangeY   = niceMaxY - niceMinY;
 
             horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
             tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
@@ -310,8 +311,11 @@ public class SparkLineTileSkin extends TileSkin {
             for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
                 Line line  = horizontalTickLines.get(lineCountY);
                 Text label = tickLabelsY.get(lineCountY);
-                //label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
-                label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+                if (rangeY <= 4) {
+                    label.setText(String.format(locale, "%.1f", low + lineCountY * tickSpacingY));
+                } else {
+                    label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+                }
                 label.setY(y + graphBounds.getHeight() * 0.03);
                 label.setFill(tickLabelColor);
                 horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
@@ -373,7 +377,11 @@ public class SparkLineTileSkin extends TileSkin {
 
             averageText.setText(String.format(locale, formatString, average));
         }
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
 
         if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
             timeSpanText.setText(createTimeSpanText());
@@ -571,7 +579,7 @@ public class SparkLineTileSkin extends TileSkin {
             high = Statistics.getMax(dataList);
 
             if (Helper.equals(low, high)) {
-                low = minValue;
+                low  = minValue;
                 high = maxValue;
             }
             range = high - low;
@@ -587,15 +595,16 @@ public class SparkLineTileSkin extends TileSkin {
 
             if (loHiChanged) {
                 niceScaleY.setMinMax(low, high);
-                int    lineCountY       = 1;
-                int    tickLabelOffsetY = 1;
+                int    lineCountY       = 0;
+                int    tickLabelOffsetY = 0;
                 double tickSpacingY     = niceScaleY.getTickSpacing();
                 double tickStepY        = tickSpacingY * stepY;
-                double tickStartY       = maxY - tickStepY;
-                if (tickSpacingY < low) {
-                    tickLabelOffsetY = (int) (low / tickSpacingY) + 1;
-                    tickStartY = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
-                }
+                if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
+                double tickStartY       = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+
+                double niceMinY = niceScaleY.getNiceMin();
+                double niceMaxY = niceScaleY.getNiceMax();
+                double rangeY   = niceMaxY - niceMinY;
 
                 horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
                 tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
@@ -603,8 +612,12 @@ public class SparkLineTileSkin extends TileSkin {
                 for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
                     Line line  = horizontalTickLines.get(lineCountY);
                     Text label = tickLabelsY.get(lineCountY);
-                    //label.setText(String.format(locale, "%.0f", low + (tickSpacingY * (lineCountY + tickLabelOffsetY))));
-                    label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+                    if (rangeY <= 4) {
+                        label.setText(String.format(locale, "%.1f", low + lineCountY * tickSpacingY));
+                    } else {
+                        label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
+                    }
+
                     label.setY(y + graphBounds.getHeight() * 0.03);
                     label.setFill(tickLabelColor);
                     horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
@@ -666,7 +679,11 @@ public class SparkLineTileSkin extends TileSkin {
 
                 averageText.setText(String.format(locale, formatString, average));
             }
-            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            if (tile.getCustomDecimalFormatEnabled()) {
+                valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+            } else {
+                valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            }
 
             if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
                 timeSpanText.setText(createTimeSpanText());

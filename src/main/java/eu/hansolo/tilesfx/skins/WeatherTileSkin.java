@@ -207,7 +207,11 @@ public class WeatherTileSkin extends TileSkin {
         DataPoint today = darkSky.getToday();
         Unit      unit  = darkSky.getUnit();
 
-        valueText.setText(String.format(Locale.US, "%.0f", today.getTemperature()));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(today.getTemperature()));
+        } else {
+            valueText.setText(String.format(locale, formatString, today.getTemperature()));
+        }
         unitText.setText(unit.temperatureUnitString);
         weatherSymbol.setCondition(today.getCondition());
         text.setText(normalize(today.getSummary()));

@@ -137,7 +137,11 @@ public class PercentageTileSkin extends TileSkin {
     @Override protected void handleCurrentValue(final double VALUE) {
         double targetValue = (clamp(minValue, maxValue, VALUE) - minValue) * stepSize;
         bar.setWidth(targetValue);
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (tile.getCustomDecimalFormatEnabled()) {
+            valueText.setText(decimalFormat.format(VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
         percentageText.setText(String.format(locale, formatString, ((VALUE - minValue) / range * 100)));
         maxValueRect.setFill(Double.compare(VALUE, maxValue) >= 0 ? barColor : tile.getThresholdColor());
         resizeDynamicText();

@@ -124,9 +124,9 @@ public class LedTileSkin extends TileSkin {
         description.setPrefSize(contentBounds.getWidth(), size * 0.43);
         description.relocate(contentBounds.getX(), height * 0.42);
 
-        double diameter = ledBorder.getRadius() * 2;
+        double diameter = size / 7 * 2;
         double borderWidth = diameter / 11;
-        ledBorder.setRadius(size / 7);
+        ledBorder.setRadius(diameter / 2);
         ledBorder.setStrokeWidth(borderWidth);
         ledBorder.relocate((width - diameter - borderWidth) * 0.5, tile.getDescription().isEmpty() ? (height - diameter - borderWidth) * 0.5 : height - size * 0.40);
 
@@ -134,8 +134,8 @@ public class LedTileSkin extends TileSkin {
         diameter = led.getRadius() * 2;
         led.relocate((width - diameter) * 0.5, tile.getDescription().isEmpty() ? (height - diameter) * 0.5 : height - size * 0.39);
 
-        glassEffect.setRadiusX(diameter / 2.2);
-        glassEffect.setRadiusY(diameter / 3.7);
+        glassEffect.setRadiusX(diameter / 2.6);
+        glassEffect.setRadiusY(diameter / 3.5);
         glassEffect.relocate((width - (glassEffect.getRadiusX() * 2)) * 0.5, ((height - (glassEffect.getRadiusY() * 2)) / 2) - (diameter / 5));
     }
 
@@ -154,6 +154,7 @@ public class LedTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         description.setTextFill(tile.getDescriptionColor());
         ledBorder.setStroke(BORDER_COLOR);
+        ledBorder.setFill(Color.TRANSPARENT);
         updateLedStatus();
 
         Stop[] stops = new Stop[] { new Stop(0, new Color(1, 1, 1, 0.5)), new Stop(1, new Color(1, 1, 1, 0.05))};

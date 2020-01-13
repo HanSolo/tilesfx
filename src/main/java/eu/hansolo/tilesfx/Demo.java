@@ -152,6 +152,7 @@ public class Demo extends Application {
     private Tile            imageTile;
     private Tile            timelineTile;
     private Tile            imageCounterTile;
+    private Tile            ledTile;
 
 
     private long            lastTimerCall;
@@ -828,6 +829,14 @@ public class Demo extends Application {
                                       .imageMask(ImageMask.ROUND)
                                       .build();
 
+        ledTile = TileBuilder.create()
+                .skinType(SkinType.LED)
+                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                .title("LED Tile")
+                .activeColor(new Color(0, 1, 0.2, 1))
+                .text("Whatever text")
+                .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -889,6 +898,8 @@ public class Demo extends Application {
 
                     imageCounterTile.increaseValue(1);
 
+                    ledTile.setValue(Math.round(RND.nextDouble()));
+
                     lastTimerCall = now;
                 }
             }
@@ -910,7 +921,7 @@ public class Demo extends Application {
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
-                                             timelineTile, imageCounterTile);//, weatherTile);
+                                             timelineTile, imageCounterTile, ledTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

@@ -140,7 +140,8 @@ public class Tile extends Control {
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
                            IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
-                           TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin");
+                           TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
+                           LED("LedTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -2578,7 +2579,7 @@ public class Tile extends Control {
         }
         return foregroundColor;
     }
-    
+
     /**
      * Returns the Paint object that will be used to fill the tile background.
      * This is usally a Color object.
@@ -2992,7 +2993,7 @@ public class Tile extends Control {
         }
         return shadowsEnabled;
     }
-    
+
     public Locale getLocale() { return null == locale ? _locale : locale.get(); }
     public void setLocale(final Locale LOCALE) {
         if (null == locale) {
@@ -3128,7 +3129,7 @@ public class Tile extends Control {
         }
         return tickLabelDecimals;
     }
-    
+
     /**
      * Returns the color that will be used to colorize the needle of
      * the radial tiles.
@@ -3767,7 +3768,7 @@ public class Tile extends Control {
         }
         return highlightSections;
     }
-    
+
     /**
      * Returns the orientation of the control. This feature
      * will only be used in the BulletChartSkin and LinearSkin.
@@ -3802,7 +3803,7 @@ public class Tile extends Control {
         }
         return orientation;
     }
-    
+
     /**
      * Returns true if the control should keep it's aspect. This is
      * in principle only needed if the control has different width and
@@ -3994,7 +3995,7 @@ public class Tile extends Control {
         return zoneId;
     }
 
-    
+
     /**
      * Returns the text that was defined for the clock.
      * This text could be used for additional information.
@@ -4121,7 +4122,7 @@ public class Tile extends Control {
         getTimeSections().clear();
         fireTileEvent(SECTION_EVENT);
     }
-    
+
     /**
      * Returns true if the second hand of the clock should move
      * in discrete steps of 1 second. Otherwise it will move continuously like
@@ -4535,7 +4536,7 @@ public class Tile extends Control {
         }
         return tickMarkColor;
     }
-    
+
     /**
      * Returns true if the hour tickmarks will be drawn.
      * @return true if the hour tickmarks will be drawn
@@ -5291,12 +5292,12 @@ public class Tile extends Control {
         _notifyRegionForegroundColor = COLOR;
         fireTileEvent(REDRAW_EVENT);
     }
-    
+
     public String getNotifyRegionTooltipText() { return _notifyRegionTooltipText; }
     public void setNotifyRegionTooltipText(final String TEXT) {
         _notifyRegionTooltipText = TEXT;
         fireTileEvent(REDRAW_EVENT);
-    }    
+    }
 
     public Color getInfoRegionBackgroundColor() { return _infoRegionBackgroundColor; }
     public void setInfoRegionBackgroundColor(final Color COLOR) {
@@ -5397,7 +5398,7 @@ public class Tile extends Control {
         }
         return rightText;
     }
-    
+
     public double getLeftValue() { return null == leftValue ? _leftValue : leftValue.get(); }
     public void setLeftValue(final double VALUE) {
         if (null == leftValue) {
@@ -5457,7 +5458,7 @@ public class Tile extends Control {
         }
         return rightValue;
     }
-    
+
     public Node getLeftGraphics() { return null == leftGraphics ? _leftGraphics : leftGraphics.get(); }
     public void setLeftGraphics(final Node NODE) {
         if (null == leftGraphics) {
@@ -5741,7 +5742,7 @@ public class Tile extends Control {
 
     private void createShutdownHook() { Runtime.getRuntime().addShutdownHook(new Thread(() -> stop())); }
 
-    
+
     // ******************** Event handling ************************************
     public void setOnTileEvent(final TileEventListener LISTENER) { addTileEventListener(LISTENER); }
     public void addTileEventListener(final TileEventListener LISTENER) { if (!tileEventListeners.contains(LISTENER)) tileEventListeners.add(LISTENER); }
@@ -5756,7 +5757,7 @@ public class Tile extends Control {
         }
     }
 
-    
+
     public void setOnAlarm(final AlarmEventListener LISTENER) { addAlarmEventListener(LISTENER); }
     public void addAlarmEventListener(final AlarmEventListener LISTENER) { if (!alarmEventListeners.contains(LISTENER)) alarmEventListeners.add(LISTENER); }
     public void removeAlarmEventListener(final AlarmEventListener LISTENER) { if (alarmEventListeners.contains(LISTENER)) alarmEventListeners.remove(LISTENER); }
@@ -5789,9 +5790,9 @@ public class Tile extends Control {
                 return getScene().getWindow().isShowing();
             } else {
                 return false;
-            }            
+            }
         }, sceneProperty(), getScene().windowProperty(), getScene().getWindow().showingProperty());
-        
+
         showing.addListener(o -> {
         if (showing.get()) {
             while(tileEventQueue.peek() != null) {
@@ -5851,6 +5852,7 @@ public class Tile extends Control {
             case IMAGE_COUNTER    : return new ImageCounterTileSkin(Tile.this);
             case TIMELINE         : return new TimelineTileSkin(Tile.this);
             case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
+            case LED              : return new LedTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6016,6 +6018,8 @@ public class Tile extends Control {
                 setDecimals(0);
                 setBarColor(BLUE);
                 break;
+            case LED:
+                break;
             default:
                 break;
         }
@@ -6067,6 +6071,7 @@ public class Tile extends Control {
             case IMAGE_COUNTER    : setSkin(new ImageCounterTileSkin(Tile.this)); break;
             case TIMELINE         : setSkin(new TimelineTileSkin(Tile.this)); break;
             case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
+            case LED              : setSkin(new LedTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

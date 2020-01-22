@@ -20,6 +20,7 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
+import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
@@ -140,7 +141,8 @@ public class Tile extends Control {
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
                            IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
-                           TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin");
+                           TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
+                           LED("LedTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5851,6 +5853,7 @@ public class Tile extends Control {
             case IMAGE_COUNTER    : return new ImageCounterTileSkin(Tile.this);
             case TIMELINE         : return new TimelineTileSkin(Tile.this);
             case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
+            case LED              : return new LedTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6016,6 +6019,9 @@ public class Tile extends Control {
                 setDecimals(0);
                 setBarColor(BLUE);
                 break;
+            case LED:
+                setActiveColor(Bright.GREEN);
+                break;
             default:
                 break;
         }
@@ -6067,6 +6073,7 @@ public class Tile extends Control {
             case IMAGE_COUNTER    : setSkin(new ImageCounterTileSkin(Tile.this)); break;
             case TIMELINE         : setSkin(new TimelineTileSkin(Tile.this)); break;
             case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
+            case LED              : setSkin(new LedTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

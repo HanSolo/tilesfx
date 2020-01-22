@@ -26,6 +26,7 @@ import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
+import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
@@ -1262,6 +1263,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setAnimated(false);
                     TILE.setDecimals(0);
                     TILE.setBarColor(Tile.BLUE);
+                    break;
+                case LED:
+                    TILE.setActiveColor(Bright.GREEN);
                     break;
                 default:
                     break;

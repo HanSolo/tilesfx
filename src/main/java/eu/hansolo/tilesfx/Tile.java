@@ -564,8 +564,8 @@ public class Tile extends Control {
     private EventHandler<MouseEvent>       infoRegionHandler;
     private boolean                        _insetsEnabled;
     private BooleanProperty                insetsEnabled;
-    private boolean                        _contentCentered;
-    private BooleanProperty                contentCentered;
+    private boolean _contentFill;
+    private BooleanProperty contentFill;
     private TableColumn<?, ?>[]            _tableColumns;
     private ObjectProperty<TableColumn<?, ?>[]> tableColumns;
     private ObservableList<?>               _tableItems;
@@ -5606,14 +5606,14 @@ public class Tile extends Control {
         return insetsEnabled;
     }
 
-    public boolean isContentCentered() { return null == contentCentered ? _contentCentered : contentCentered.get(); }
+    public boolean isContentFill() { return null == contentFill ? _contentFill : contentFill.get(); }
 
-    public void setContentCentered(final boolean CONTENT_CENTERED) {
-        if (null == contentCentered) { _contentCentered = CONTENT_CENTERED; } else { contentCentered.set(CONTENT_CENTERED); }
+    public void setContentFill(final boolean CONTENT_CENTERED) {
+        if (null == contentFill) { _contentFill = CONTENT_CENTERED; } else { contentFill.set(CONTENT_CENTERED); }
     }
-    public BooleanProperty contentCenteredProperty() {
-        if (null == contentCentered) { contentCentered = new SimpleBooleanProperty(Tile.this, "contentCentered", _contentCentered); }
-        return contentCentered;
+    public BooleanProperty contentFillProperty() {
+        if (null == contentFill) { contentFill = new SimpleBooleanProperty(Tile.this, "contentFill", _contentFill); }
+        return contentFill;
     }
 
     public TableColumn<?, ?>[] getTableColumns () { return null == tableColumns ? _tableColumns : tableColumns.get(); }

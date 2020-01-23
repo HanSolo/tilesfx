@@ -1424,7 +1424,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
             } else if ("insetsEnabled".equals(key)) {
                 TILE.setInsetsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("contentCentered".equals(key)) {
-                TILE.setContentCentered(((BooleanProperty) properties.get(key)).get());
+                TILE.setContentFill(((BooleanProperty) properties.get(key)).get());
             } else if ("padding".equals(key)) {
                 TILE.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
             } else if("styleClass".equals(key)) {

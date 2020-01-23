@@ -50,22 +50,7 @@ import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.BooleanPropertyBase;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.DoublePropertyBase;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.IntegerPropertyBase;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.LongPropertyBase;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ObjectPropertyBase;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyLongProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.StringPropertyBase;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -79,6 +64,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -141,7 +127,7 @@ public class Tile extends Control {
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
                            IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
                            TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
-                           LED("LedTileSkin");
+                           LED("LedTileSkin"), TABLE("TableTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -576,6 +562,14 @@ public class Tile extends Control {
     private int                            _numberOfValuesForTrendCalculation;
     private IntegerProperty                numberOfValuesForTrendCalculation;
     private EventHandler<MouseEvent>       infoRegionHandler;
+    private boolean                        _insetsEnabled;
+    private BooleanProperty                insetsEnabled;
+    private boolean                        _contentCentered;
+    private BooleanProperty                contentCentered;
+    private TableColumn<?, ?>[]            _tableColumns;
+    private ObjectProperty<TableColumn<?, ?>[]> tableColumns;
+    private ObservableList<?>               _tableItems;
+    private ObjectProperty<ObservableList<?>> tableItems;
 
     private volatile ScheduledFuture<?>       periodicTickTask;
     private          ScheduledExecutorService periodicTickExecutorService;
@@ -5602,6 +5596,48 @@ public class Tile extends Control {
         fireTileEvent(INFO_REGION_HANDLER_EVENT);
     }
 
+    public boolean areInsetsEnabled() { return null == insetsEnabled ? _insetsEnabled : insetsEnabled.get(); }
+
+    public void setInsetsEnabled(final boolean INSETS_ENABLED) {
+        if (null == insetsEnabled) { _insetsEnabled = INSETS_ENABLED; } else { insetsEnabled.set(INSETS_ENABLED); }
+    }
+    public BooleanProperty insetsEnabledProperty() {
+        if (null == insetsEnabled) { insetsEnabled = new SimpleBooleanProperty(Tile.this, "insetsEnabled", _insetsEnabled); }
+        return insetsEnabled;
+    }
+
+    public boolean isContentCentered() { return null == contentCentered ? _contentCentered : contentCentered.get(); }
+
+    public void setContentCentered(final boolean CONTENT_CENTERED) {
+        if (null == contentCentered) { _contentCentered = CONTENT_CENTERED; } else { contentCentered.set(CONTENT_CENTERED); }
+    }
+    public BooleanProperty contentCenteredProperty() {
+        if (null == contentCentered) { contentCentered = new SimpleBooleanProperty(Tile.this, "contentCentered", _contentCentered); }
+        return contentCentered;
+    }
+
+    public TableColumn<?, ?>[] getTableColumns () { return null == tableColumns ? _tableColumns : tableColumns.get(); }
+
+    public void setTableColumns (final TableColumn<?, ?>[] TABLE_COLUMNS) {
+        if (null == tableColumns) { _tableColumns = TABLE_COLUMNS; } else { tableColumns.set(TABLE_COLUMNS); }
+    }
+
+    public ObjectProperty<TableColumn<?, ?>[]> tableColumnProperty() {
+        if (null == tableColumns) { tableColumns = new SimpleObjectProperty<>(Tile.this, "tableColumns", _tableColumns); }
+        return tableColumns;
+    }
+
+    public ObservableList<?> getTableItems () { return null == tableItems ? _tableItems : tableItems.get(); }
+
+    public void setTableItems (final ObservableList<?> TABLE_ITEMS) {
+        if (null == tableItems) { _tableItems = TABLE_ITEMS; } else { tableItems.set(TABLE_ITEMS); }
+    }
+
+    public ObjectProperty<ObservableList<?>> tableItemsProperty () {
+        if (null == tableItems) { tableItems = new SimpleObjectProperty<>(Tile.this, "tableItems", _tableItems); }
+        return tableItems;
+    }
+
     public boolean isShowing() { return null == showing ? false : showing.get(); }
     public BooleanBinding showingProperty() { return showing; }
 
@@ -5853,6 +5889,7 @@ public class Tile extends Control {
             case TIMELINE         : return new TimelineTileSkin(Tile.this);
             case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
             case LED              : return new LedTileSkin(Tile.this);
+            case TABLE            : return new TableTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6020,6 +6057,8 @@ public class Tile extends Control {
                 break;
             case LED:
                 break;
+            case TABLE:
+                break;
             default:
                 break;
         }
@@ -6072,6 +6111,7 @@ public class Tile extends Control {
             case TIMELINE         : setSkin(new TimelineTileSkin(Tile.this)); break;
             case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
             case LED              : setSkin(new LedTileSkin(Tile.this)); break;
+            case TABLE            : setSkin((new TableTileSkin(Tile.this))); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

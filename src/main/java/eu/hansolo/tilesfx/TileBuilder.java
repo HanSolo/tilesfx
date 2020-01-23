@@ -52,6 +52,7 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -60,6 +61,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.TableColumn;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -1105,6 +1107,26 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B insetsEnabled(final boolean INSETS_ENABLED) {
+        properties.put("insetsEnabled", new SimpleBooleanProperty(INSETS_ENABLED));
+        return (B)this;
+    }
+
+    public final B contentCentered(final boolean CONTENT_CENTERED) {
+        properties.put("contentCentered", new SimpleBooleanProperty(CONTENT_CENTERED));
+        return (B)this;
+    }
+
+    public final B tableColumns(final TableColumn<?, ?>... COLUMNS) {
+        properties.put("tableColumns", new SimpleObjectProperty(COLUMNS));
+        return (B)this;
+    }
+
+    public final B tableItems(final ObservableList<?> ITEMS) {
+        properties.put("tableItems", new SimpleObjectProperty(ITEMS));
+        return (B)this;
+    }
+
 
     public final Tile build() {
         final Tile TILE;
@@ -1399,6 +1421,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setTranslateX(((DoubleProperty) properties.get(key)).get());
             } else if ("translateY".equals(key)) {
                 TILE.setTranslateY(((DoubleProperty) properties.get(key)).get());
+            } else if ("insetsEnabled".equals(key)) {
+                TILE.setInsetsEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if ("contentCentered".equals(key)) {
+                TILE.setContentCentered(((BooleanProperty) properties.get(key)).get());
             } else if ("padding".equals(key)) {
                 TILE.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
             } else if("styleClass".equals(key)) {
@@ -1726,7 +1752,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setInfoRegionTooltipText(((StringProperty) properties.get(key)).get());
             } else if ("notifyRegionTooltipText".equals(key)) {
                 TILE.setNotifyRegionTooltipText(((StringProperty) properties.get(key)).get());
-            } 
+            } else if ("tableColumns".equals(key)) {
+                TILE.setTableColumns(((ObjectProperty<TableColumn<?, ?>[]>) properties.get(key)).get());
+            } else if ("tableItems".equals(key)) {
+                TILE.setTableItems(((ObjectProperty<ObservableList<?>>) properties.get(key)).get());
+            }
         }
         properties.clear();
         return TILE;

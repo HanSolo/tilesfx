@@ -256,15 +256,15 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         stepSize = width / range;
         shadow.setRadius(size * 0.012);
 
-        inset       = size * 0.05;
+        inset       = (tile.areInsetsEnabled() ? size * 0.05 : 0);
         doubleInset = inset * 2;
 
         if (tile.isShowing() && width > 0 && height > 0) {
             //pane.setMaxSize(size, size);
             //pane.relocate((width - size) * 0.5, (height - size) * 0.5);
 
-            double offsetTop    = tile.getTitle().isEmpty() ? inset : size * 0.15;
-            double offsetBottom = tile.getText().isEmpty() ? height - inset : height - size * 0.15;
+            double offsetTop    = (tile.isContentCentered() ? 0 : (tile.getTitle().isEmpty() ? inset : size * 0.15));
+            double offsetBottom = (tile.isContentCentered() ? height : (tile.isTextVisible() ? height - size * 0.15 : height - inset));
             contentBounds.setX(inset);
             contentBounds.setY(offsetTop);
             contentBounds.setWidth(width - doubleInset);

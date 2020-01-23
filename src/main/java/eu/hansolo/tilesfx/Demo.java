@@ -42,6 +42,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -51,6 +52,8 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -153,6 +156,7 @@ public class Demo extends Application {
     private Tile            timelineTile;
     private Tile            imageCounterTile;
     private Tile            ledTile;
+    private Tile            tableTile;
 
 
     private long            lastTimerCall;
@@ -837,6 +841,38 @@ public class Demo extends Application {
                 .text("Whatever text")
                 .build();
 
+        // setup table tile
+        TableColumn<String, Person> column1 = new TableColumn<>("First name");
+        column1.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        TableColumn<String, Person> column2 = new TableColumn<>("Last name");
+        column2.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        TableColumn<String, Person> column3 = new TableColumn<>("Birth place");
+        column3.setCellValueFactory(new PropertyValueFactory<>("birthPlace"));
+        TableColumn<Integer, Person> column4 = new TableColumn<>("Age");
+        column4.setCellValueFactory(new PropertyValueFactory<>("age"));
+//        TableColumn<Integer, Person> column5 = new TableColumn<>("Age");
+//        column5.setCellValueFactory(new PropertyValueFactory<>("age"));
+//        TableColumn<Integer, Person> column6 = new TableColumn<>("Loooooong");
+//        column6.setCellValueFactory(new PropertyValueFactory<>("age"));
+
+        Person a = new Person("Long", "Johnson", "Angera", 26);
+        Person b = new Person("Mike", "Funkyman", "Varese", 28);
+        Person c = new Person("Scott", "Tuner", "Bologna", 37);
+        Person d = new Person("Bryce", "Mice", "Comabbio", 47);
+        Person aa = new Person("Duke", "Lemover", "Angera", 26);
+        Person bb = new Person("Jason", "Moveon", "Varese", 28);
+        Person cc = new Person("Why", "Notsure", "Bologna", 37);
+        Person dd = new Person("Whatever", "Whatever", "Comabbio", 47);
+
+        tableTile = TileBuilder.create()
+                .skinType(SkinType.TABLE)
+                .prefSize(300, 200)
+                .title("Table Tile")
+                .insetsEnabled(false)
+                .tableColumns(column1, column2, column3, column4)
+                .tableItems(FXCollections.observableArrayList(a, b, c, d, aa, bb, cc, dd))
+                .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -921,7 +957,7 @@ public class Demo extends Application {
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
-                                             timelineTile, imageCounterTile, ledTile);//, weatherTile);
+                                             timelineTile, imageCounterTile, ledTile, tableTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);
@@ -981,5 +1017,34 @@ public class Demo extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+
+    public class Person {
+        public String firstName;
+        public String lastName;
+        public String birthPlace;
+        public Integer age;
+
+
+        public Person(String firstName, String lastName, String birthPlace, Integer age) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.birthPlace = birthPlace;
+            this.age = age;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+        public String getLastName() {
+            return lastName;
+        }
+        public String getBirthPlace() {
+            return birthPlace;
+        }
+        public Integer getAge() {
+            return age;
+        }
     }
 }

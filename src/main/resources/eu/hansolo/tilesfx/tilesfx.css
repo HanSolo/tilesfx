@@ -269,3 +269,113 @@
     -fx-background-color: -symbol-color;
     -fx-shape: "M 43.3719 33.1445 C 43.3719 25.9672 37.5511 20.1499 30.3707 20.1499 C 23.1904 20.1499 17.3696 25.9672 17.3696 33.1445 C 4.3684 33.1445 4.3684 33.1503 4.3684 33.1503 L 4.3684 35.1497 L 26.3704 35.1497 L 26.3704 33.1503 L 19.3698 33.1503 C 19.3698 27.088 24.3048 22.1492 30.3707 22.1492 C 36.4367 22.1492 41.3717 27.0821 41.3717 33.1445 C 34.3711 33.1445 34.3711 33.1503 34.3711 33.1503 L 34.3711 35.1497 L 56.3682 35.1497 L 56.3682 33.1503 L 43.3719 33.1445 ZM 31.364 41.6953 L 31.364 31.152 L 29.3638 31.152 L 29.3638 41.6953 L 25.1095 37.4428 L 23.6953 38.8564 L 30.3639 45.5221 L 37.0315 38.8564 L 35.6173 37.4428 L 31.364 41.6953 ZM 20.0456 21.4239 L 12.6846 14.066 L 11.2704 15.4796 L 18.6314 22.8375 L 20.0456 21.4239 ZM 49.4525 15.4747 L 48.0383 14.0612 L 40.6773 21.419 L 42.0915 22.8326 L 49.4525 15.4747 ZM 31.364 7.1602 L 29.3638 7.1602 L 29.3638 17.1567 L 31.364 17.1567 L 31.364 7.1602 Z";
 }
+
+.tile #tableTile {
+    -fx-background-color: black;
+    -fx-table-cell-border-color: transparent;
+}
+
+.tile #tableTile .label {
+    -fx-text-fill: #8b9092;
+}
+
+.tile #tableTile .column-header,
+.tile #tableTile .column-header .filler,
+.tile #tableTile .column-header-background,
+.tile #tableTile .column-header-background .filler {
+    -fx-pref-height: 20px;
+    -fx-padding: 0 0 0 5px;
+    -fx-background-color: #111;
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: #333;
+}
+
+/*.tile #tableTile .row-header-cell {*/
+/*    -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;*/
+
+/*}*/
+
+.tile #tableTile .column-header .label {
+    -fx-text-fill: #8b9092;
+    -fx-font-size: 10px;
+    -fx-font-weight: lighter;
+    -fx-alignment: center-left;
+}
+
+.tile #tableTile .table-cell {
+    -fx-text-fill: #dfdfdf;
+    -fx-font-size: 12px;
+    -fx-padding: 0 0 0 5px;
+    -fx-border-width: 0;
+}
+
+.tile #tableTile .table-row-cell {
+    -fx-background-color: #222;
+    -fx-pref-height: 24px;
+}
+
+.tile #tableTile .table-row-cell:odd {
+    -fx-background-color: transparent;
+}
+
+.tile #tableTile .table-row-cell:selected {
+    -fx-background-color: #37b3fc;
+}
+
+.tile #tableTile .table-row-cell:selected .table-cell {
+    -fx-text-fill: #333;
+    -fx-font-size: 13px;
+    -fx-background-color: #37b3fc;
+}
+
+/* The main scrollbar **track** CSS class  */
+.tile #tableTile .track-background, .tile #tableTile .corner {
+    -fx-background-color: #111;
+}
+
+.tile #tableTile .scroll-bar:horizontal .track,
+.tile #tableTile .scroll-bar:vertical .track{
+    -fx-background-color:transparent;
+    -fx-border-color:transparent;
+    -fx-background-radius: 0em;
+    -fx-border-radius:2em;
+}
+
+/* The increment and decrement button CSS class of scrollbar */
+.tile #tableTile .scroll-bar:horizontal .increment-button ,
+.tile #tableTile .scroll-bar:horizontal .decrement-button {
+    -fx-background-color:transparent;
+    -fx-background-radius: 0em;
+    -fx-padding:0 0 10 0;
+
+}
+
+/* The increment and decrement button CSS class of scrollbar */
+
+.tile #tableTile .scroll-bar:vertical .increment-button ,
+.tile #tableTile .scroll-bar:vertical .decrement-button {
+
+    -fx-background-color:transparent;
+    -fx-background-radius: 0em;
+    -fx-padding:0 10 0 0;
+
+}
+
+.tile #tableTile  .scroll-bar .increment-arrow,
+.tile #tableTile  .scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding:0;
+}
+
+/* The main scrollbar **thumb** CSS class which we drag every time (movable) */
+.tile #tableTile .scroll-bar:horizontal .thumb,
+.tile #tableTile .scroll-bar:vertical .thumb {
+    -fx-background-color:derive(black,90%);
+    -fx-background-insets: 2, 0, 0;
+    -fx-background-radius: 2em;
+}
+
+.tile #tableTile .scroll-bar .thumb:hover,
+.tile #tableTile .scroll-bar .thumb:pressed{
+    -fx-background-color: derive(#37b3fc, 30%);
+}

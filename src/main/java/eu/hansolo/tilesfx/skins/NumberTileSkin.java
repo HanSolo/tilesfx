@@ -19,36 +19,40 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 
 /**
  * Created by hansolo on 20.12.16.
  */
 public class NumberTileSkin extends TileSkin {
-    private Text  titleText;
-    private Text  text;
-    private Text  valueText;
-    private Text  upperUnitText;
-    private Line  fractionLine;
-    private Text  unitText;
-    private VBox  unitFlow;
-    private HBox  valueUnitFlow;
-    private Label description;
+    private Text     titleText;
+    private Text     text;
+    private Text     valueText;
+    private Text     unitText;
+    private TextFlow valueUnitFlow;
+    private Label    description;
+    private static NumberFormat valueFormat;
 
 
     // ******************** Constructors **************************************
     public NumberTileSkin(final Tile TILE) {
         super(TILE);
+
+        valueFormat = NumberFormat.getInstance();
+        valueFormat.setMaximumFractionDigits(2);
+        valueFormat.setGroupingUsed(false);
     }
 
 
@@ -69,22 +73,13 @@ public class NumberTileSkin extends TileSkin {
         valueText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(valueText, tile.isValueVisible());
 
-        upperUnitText = new Text("");
-        upperUnitText.setFill(tile.getUnitColor());
-        Helper.enableNode(upperUnitText, !tile.getUnit().isEmpty());
-
-        fractionLine = new Line();
-
-        unitText = new Text(tile.getUnit());
+        unitText = new Text(" " + tile.getUnit());
         unitText.setFill(tile.getUnitColor());
+        unitText.setTextOrigin(VPos.BASELINE);
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        unitFlow = new VBox(upperUnitText, unitText);
-        unitFlow.setAlignment(Pos.CENTER_RIGHT);
-
-        valueUnitFlow = new HBox(valueText, unitFlow);
-        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
-        valueUnitFlow.setMouseTransparent(true);
+        valueUnitFlow = new TextFlow(valueText, unitText);
+        valueUnitFlow.setTextAlignment(TextAlignment.RIGHT);
 
         description = new Label(tile.getText());
         description.setAlignment(tile.getDescriptionAlignment());
@@ -92,7 +87,9 @@ public class NumberTileSkin extends TileSkin {
         description.setTextFill(tile.getTextColor());
         Helper.enableNode(description, tile.isTextVisible());
 
-        getPane().getChildren().addAll(titleText, text, valueUnitFlow, fractionLine, description);
+        getPane().getChildren().addAll(titleText, text, valueUnitFlow, description);
+
+        valueUnitFlow.heightProperty().addListener((observable, oldValue, newValue) -> resize());
     }
 
     @Override protected void registerListeners() {
@@ -108,27 +105,47 @@ public class NumberTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
+            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
         }
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(VALUE));
-        } else {
-            valueText.setText(String.format(locale, formatString, VALUE));
-        }
+        valueText.setText(valueFormat.format(VALUE));
         resizeDynamicText();
     }
 
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
-        double fontSize = size * 0.24;
+        double maxWidth = unitText.isVisible() ? width - size * 0.35 : width - size * 0.1;
+        double digits = valueText.getText().length() - (valueText.getText().contains(".") ? 1 : 0);
+        double perc;
+
+        if (digits < 3) {
+            perc = 0.32;
+        }
+        else if (digits < 5) {
+            perc = 0.24;
+        }
+        else if (digits < 7) {
+            perc = 0.17;
+        }
+        else if (digits < 9) {
+            perc = 0.14;
+        }
+        else if (digits < 12) {
+            perc = 0.11;
+        }
+        else {
+            perc = 0.07;
+        }
+
+        double fontSize = size * (tile.isContentFill() ? perc : perc * 0.8);
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
     }
+
+
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;
@@ -158,12 +175,8 @@ public class NumberTileSkin extends TileSkin {
         }
         text.setY(height - size * 0.05);
 
-        maxWidth = width - (width - size * 0.275);
-        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
-        upperUnitText.setFont(Fonts.latoRegular(fontSize));
-        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
-
-        fontSize = upperUnitText.getText().isEmpty() ? size * 0.12 : size * 0.10;
+        maxWidth = width - size * 0.275;
+        fontSize = valueText.getFont().getSize() * 0.65;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
@@ -174,21 +187,17 @@ public class NumberTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
-        resizeDynamicText();
-        resizeStaticText();
+        double y;
 
-        valueUnitFlow.setPrefWidth(width - size * 0.1);
-        valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
-        valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
+        if (tile.isContentFill()) {
+            y = (tile.getHeight() / 2) - (valueUnitFlow.getHeight() / 2);
+        }
+        else {
+            y = contentBounds.getY();
+        }
 
-        fractionLine.setStartX(width - 0.17 * size);
-        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
-        fractionLine.setEndX(width - 0.05 * size);
-        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
-        fractionLine.setStroke(tile.getUnitColor());
-        fractionLine.setStrokeWidth(size * 0.005);
-
-        unitFlow.setTranslateY(-size * 0.005);
+        valueUnitFlow.setPrefWidth(contentBounds.getWidth());
+        valueUnitFlow.relocate(contentBounds.getX(), y);
 
         description.setPrefSize(width - size * 0.1, size * 0.43);
         description.relocate(size * 0.05, titleText.isVisible() ? height * 0.42 : height * 0.32);
@@ -198,21 +207,8 @@ public class NumberTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
-        } else {
-            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
-        }
-        if (tile.getUnit().contains("/")) {
-            String[] units = tile.getUnit().split("/");
-            upperUnitText.setText(units[0]);
-            unitText.setText(units[1]);
-            Helper.enableNode(fractionLine, true);
-        } else {
-            upperUnitText.setText(" ");
-            unitText.setText(tile.getUnit());
-            Helper.enableNode(fractionLine, false);
-        }
+        valueText.setText(valueFormat.format(tile.getCurrentValue()));
+        unitText.setText(tile.getUnit());
         description.setText(tile.getDescription());
         description.setAlignment(tile.getDescriptionAlignment());
 
@@ -222,8 +218,6 @@ public class NumberTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
         valueText.setFill(tile.getValueColor());
-        upperUnitText.setFill(tile.getUnitColor());
-        fractionLine.setStroke(tile.getUnitColor());
         unitText.setFill(tile.getUnitColor());
         description.setTextFill(tile.getDescriptionColor());
     }

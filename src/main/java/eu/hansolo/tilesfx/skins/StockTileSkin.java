@@ -193,7 +193,7 @@ public class StockTileSkin extends TileSkin {
         changeText.setTextFill(state.color);
         changeText.setAlignment(Pos.CENTER_RIGHT);
 
-        changePercentageText = new Text(new StringBuilder().append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() / tile.getReferenceValue() * 100.0) - 100.0)).append("\u0025").toString());
+        changePercentageText = new Text(new StringBuilder().append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() / tile.getReferenceValue() * 100.0) - 100.0)).append(Helper.PERCENTAGE).toString());
         changePercentageText.setFill(state.color);
 
         changePercentageFlow = new TextFlow(indicatorPane, changePercentageText);
@@ -282,7 +282,7 @@ public class StockTileSkin extends TileSkin {
             } else {
                 changePercentageTextBuilder.append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (VALUE / tile.getReferenceValue() * 100.0) - 100.0));
             }
-            changePercentageTextBuilder.append("\u0025");
+            changePercentageTextBuilder.append(Helper.PERCENTAGE);
             changePercentageText.setText(changePercentageTextBuilder.toString());
 
             RotateTransition rotateTransition = new RotateTransition(Duration.millis(200), triangle);
@@ -511,7 +511,7 @@ public class StockTileSkin extends TileSkin {
         } else {
             changePercentageTextBuilder.append(String.format(locale, "%." + tile.getTickLabelDecimals() + "f", (tile.getCurrentValue() / tile.getReferenceValue() * 100.0) - 100.0));
         }
-        changePercentageTextBuilder.append("\u0025");
+        changePercentageTextBuilder.append(Helper.PERCENTAGE);
         changePercentageText.setText(changePercentageTextBuilder.toString());
 
         resizeStaticText();

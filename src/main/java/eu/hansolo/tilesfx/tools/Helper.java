@@ -370,6 +370,9 @@ public class Helper {
                                                       "W", "X", "Y", "Z", "-", "/", ":", ",", "", ";", "@",
                                                       "#", "+", "?", "!", "%", "$", "=", "<", ">", "\u00C4", "\u00D6", "\u00DC", "\u00DF"};
 
+    public static final String               PERCENTAGE            = "\u0025";
+    public static final String               DEGREE                = "\u00B0";
+
     public static final long                 SECONDS_PER_MINUTE    = 60;
     public static final long                 SECONDS_PER_HOUR      = 3_600;
     public static final long                 SECONDS_PER_DAY       = 86_400;

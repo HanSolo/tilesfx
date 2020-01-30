@@ -144,7 +144,7 @@ public class RadialPercentageTileSkin extends TileSkin {
         percentageValueText.setTextOrigin(VPos.CENTER);
 
         percentageUnitText = new Text(tile.getUnit());
-        percentageUnitText = new Text("\u0025");
+        percentageUnitText = new Text(Helper.PERCENTAGE);
         percentageUnitText.setFont(Fonts.latoLight(PREFERRED_WIDTH * 0.08));
         percentageUnitText.setFill(tile.getUnitColor());
 
@@ -158,7 +158,7 @@ public class RadialPercentageTileSkin extends TileSkin {
         enableNode(descriptionText, tile.isValueVisible());
 
         unitText = new Text(tile.getUnit());
-        unitText = new Text("\u0025");
+        unitText = new Text(Helper.PERCENTAGE);
         unitText.setFont(Fonts.latoLight(PREFERRED_WIDTH * 0.08));
         unitText.setFill(tile.getUnitColor());
         enableNode(unitText, !tile.getUnit().isEmpty());

@@ -142,7 +142,7 @@ public class Tile extends Control {
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
                            IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
                            TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
-                           LED("LedTileSkin");
+                           LED("LedTileSkin"), COUNTDOWN_TIMER("CountdownTimerTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5854,6 +5854,7 @@ public class Tile extends Control {
             case TIMELINE         : return new TimelineTileSkin(Tile.this);
             case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
             case LED              : return new LedTileSkin(Tile.this);
+            case COUNTDOWN_TIMER  : return new CountdownTimerTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6014,13 +6015,18 @@ public class Tile extends Control {
             case CLUSTER_MONITOR:
                 setTitle("");
                 setTextVisible(false);
-                setUnit("\u0025");
+                setUnit(Helper.PERCENTAGE);
                 setAnimated(false);
                 setDecimals(0);
                 setBarColor(BLUE);
                 break;
             case LED:
                 setActiveColor(Bright.GREEN);
+                break;
+            case COUNTDOWN_TIMER:
+                setBarBackgroundColor(getBackgroundColor().brighter());
+                setAnimated(false);
+                setTimePeriod(java.time.Duration.ofSeconds(60));
                 break;
             default:
                 break;
@@ -6074,6 +6080,7 @@ public class Tile extends Control {
             case TIMELINE         : setSkin(new TimelineTileSkin(Tile.this)); break;
             case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
             case LED              : setSkin(new LedTileSkin(Tile.this)); break;
+            case COUNTDOWN_TIMER  : setSkin(new CountdownTimerTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

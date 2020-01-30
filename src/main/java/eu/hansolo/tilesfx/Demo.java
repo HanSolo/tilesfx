@@ -63,6 +63,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -153,6 +154,7 @@ public class Demo extends Application {
     private Tile            timelineTile;
     private Tile            imageCounterTile;
     private Tile            ledTile;
+    private Tile            countdownTile;
 
 
     private long            lastTimerCall;
@@ -266,7 +268,7 @@ public class Demo extends Application {
                                     .skinType(SkinType.PERCENTAGE)
                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                     .title("Percentage Tile")
-                                    .unit("\u0025")
+                                    .unit(Helper.PERCENTAGE)
                                     .description("Test")
                                     .maxValue(60)
                                     .build();
@@ -492,7 +494,7 @@ public class Demo extends Application {
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                           .title("CircularProgress")
                                           .text("Some text")
-                                          .unit("\u0025")
+                                          .unit(Helper.PERCENTAGE)
                                           //.graphic(new WeatherSymbol(ConditionAndIcon.CLEAR_DAY, 48, Color.WHITE))
                                           .build();
 
@@ -528,7 +530,7 @@ public class Demo extends Application {
                                                        new Stop(0.67, Tile.LIGHT_RED),
                                                        new Stop(1.0, Tile.LIGHT_RED))
                                         .build();
-
+        /*
         radarChartTile1 = TileBuilder.create().skinType(SkinType.RADAR_CHART)
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .minValue(0)
@@ -578,6 +580,57 @@ public class Demo extends Application {
                                      .tooltipText("")
                                      .animated(true)
                                      //.smoothing(true)
+                                     .build();
+        */
+
+        radarChartTile1 = TileBuilder.create().skinType(SkinType.RADAR_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .minValue(0)
+                                     .maxValue(50)
+                                     .title("RadarChart Sector")
+                                     .unit("Unit")
+                                     .radarChartMode(RadarChartMode.SECTOR)
+                                     .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
+                                                    new Stop(0.00001, Color.web("#3552a0")),
+                                                    new Stop(0.09090, Color.web("#456acf")),
+                                                    new Stop(0.27272, Color.web("#45a1cf")),
+                                                    new Stop(0.36363, Color.web("#30c8c9")),
+                                                    new Stop(0.45454, Color.web("#30c9af")),
+                                                    new Stop(0.50909, Color.web("#56d483")),
+                                                    new Stop(0.72727, Color.web("#9adb49")),
+                                                    new Stop(0.81818, Color.web("#efd750")),
+                                                    new Stop(0.90909, Color.web("#ef9850")),
+                                                    new Stop(1.00000, Color.web("#ef6050")))
+                                     .text("Test")
+                                     .chartData(chartData1, chartData2, chartData3, chartData4,
+                                                chartData5, chartData6, chartData7, chartData8)
+                                     .tooltipText("")
+                                     .animated(true)
+                                     .build();
+
+        radarChartTile2 = TileBuilder.create().skinType(SkinType.RADAR_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .minValue(0)
+                                     .maxValue(50)
+                                     .title("RadarChart Polygon")
+                                     .unit("Unit")
+                                     .radarChartMode(RadarChartMode.POLYGON)
+                                     .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
+                                                    new Stop(0.00001, Color.web("#3552a0")),
+                                                    new Stop(0.09090, Color.web("#456acf")),
+                                                    new Stop(0.27272, Color.web("#45a1cf")),
+                                                    new Stop(0.36363, Color.web("#30c8c9")),
+                                                    new Stop(0.45454, Color.web("#30c9af")),
+                                                    new Stop(0.50909, Color.web("#56d483")),
+                                                    new Stop(0.72727, Color.web("#9adb49")),
+                                                    new Stop(0.81818, Color.web("#efd750")),
+                                                    new Stop(0.90909, Color.web("#ef9850")),
+                                                    new Stop(1.00000, Color.web("#ef6050")))
+                                     .text("Test")
+                                     .chartData(chartData1, chartData2, chartData3, chartData4,
+                                                chartData5, chartData6, chartData7, chartData8)
+                                     .tooltipText("")
+                                     .animated(true)
                                      .build();
 
         smoothAreaChartTile = TileBuilder.create().skinType(SkinType.SMOOTH_AREA_CHART)
@@ -831,10 +884,22 @@ public class Demo extends Application {
 
         ledTile = TileBuilder.create()
                              .skinType(SkinType.LED)
+                             .prefSize(TILE_WIDTH, TILE_HEIGHT)
                              .title("Led Tile")
                              .description("Description")
                              .text("Whatever text")
                              .build();
+
+        countdownTile = TileBuilder.create()
+                                   .skinType(SkinType.COUNTDOWN_TIMER)
+                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                   .title("CountdownTimer Tile")
+                                   .description("Description")
+                                   .text("Text")
+                                   .barColor(Bright.ORANGE_RED)
+                                   .timePeriod(Duration.ofSeconds(30))
+                                   .onAlarm(e -> System.out.println("Alarm"))
+                                   .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -899,6 +964,11 @@ public class Demo extends Application {
 
                     ledTile.setActive(!ledTile.isActive());
 
+                    if (!countdownTile.isRunning()) {
+                        countdownTile.setTimePeriod(Duration.ofSeconds(30));
+                        countdownTile.setRunning(true);
+                    }
+
                     lastTimerCall = now;
                 }
             }
@@ -920,7 +990,7 @@ public class Demo extends Application {
                                              smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
-                                             timelineTile, imageCounterTile, ledTile);//, weatherTile);
+                                             timelineTile, imageCounterTile, ledTile, countdownTile);//, weatherTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

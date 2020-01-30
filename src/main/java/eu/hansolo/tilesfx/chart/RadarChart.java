@@ -127,7 +127,7 @@ public class RadarChart extends Region {
     private              ObjectProperty<Paint>          chartFill;
     private              Color                          _thresholdColor;
     private              ObjectProperty<Color>          thresholdColor;
-    private              RadarChartMode                 _RadarChart_mode;
+    private              RadarChartMode                 _mode;
     private              ObjectProperty<RadarChartMode> mode;
     private              double                         legendScaleFactor;
     private              InvalidationListener           resizeListener;
@@ -145,7 +145,7 @@ public class RadarChart extends Region {
         _unit                 = "";
         _legendVisible        = false;
         _thresholdVisible     = false;
-        _RadarChart_mode      = RadarChartMode.POLYGON;
+        _mode                 = RadarChartMode.POLYGON;
         gradientStops         = FXCollections.observableArrayList();
         decimals              = 0;
         formatString          = new StringBuilder("%.").append(decimals).append("f").toString();
@@ -615,23 +615,23 @@ public class RadarChart extends Region {
         drawText();
     }
 
-    public RadarChartMode getMode() { return null == mode ? _RadarChart_mode : mode.get(); }
-    public void setMode(final RadarChartMode RadarChartMODE) {
+    public RadarChartMode getMode() { return null == mode ? _mode : mode.get(); }
+    public void setMode(final RadarChartMode MODE) {
         if (null == mode) {
-            _RadarChart_mode = RadarChartMODE;
+            _mode = MODE;
             redraw();
         } else {
-            mode.set(RadarChartMODE);
+            mode.set(MODE);
         }
     }
     public ObjectProperty<RadarChartMode> modeProperty() {
         if (null == mode) {
-            mode = new ObjectPropertyBase<RadarChartMode>(_RadarChart_mode) {
+            mode = new ObjectPropertyBase<>(_mode) {
                 @Override protected void invalidated() { redraw(); }
                 @Override public Object getBean() { return RadarChart.this; }
                 @Override public String getName() { return "mode"; }
             };
-            _RadarChart_mode = null;
+            _mode = null;
         }
         return mode;
     }

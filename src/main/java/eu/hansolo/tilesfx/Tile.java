@@ -523,7 +523,7 @@ public class Tile extends Control {
     private ObjectProperty<Axis>           xAxis;
     private Axis                           _yAxis;
     private ObjectProperty<Axis>           yAxis;
-    private RadarChartMode                 _radarChartRadarChartMode;
+    private RadarChartMode                 _radarChartMode;
     private ObjectProperty<RadarChartMode> radarChartMode;
     private Color                          _chartGridColor;
     private ObjectProperty<Color>          chartGridColor;
@@ -922,7 +922,7 @@ public class Tile extends Control {
         tooltip                             = new Tooltip(null);
         _xAxis                              = new CategoryAxis();
         _yAxis                              = new NumberAxis();
-        _radarChartRadarChartMode = RadarChartMode.POLYGON;
+        _radarChartMode                     = RadarChartMode.POLYGON;
         _chartGridColor                     = Tile.GRAY;
         _sortedData                         = true;
         _dataPointsVisible                  = false;
@@ -4862,29 +4862,29 @@ public class Tile extends Control {
      * There are Mode.POLYGON and Mode.SECTOR.
      * @return the mode of the RadarChartTileSkin
      */
-    public RadarChartMode getRadarChartMode() { return null == radarChartMode ? _radarChartRadarChartMode : radarChartMode.get(); }
+    public RadarChartMode getRadarChartMode() { return null == radarChartMode ? _radarChartMode : radarChartMode.get(); }
     /**
      * Defines the mode that is used in the RadarChartTileSkin
      * to visualize the data in the RadarChart.
      * There are Mode.POLYGON and Mode.SECTOR.
-     * @param RadarChartMODE
+     * @param MODE
      */
-    public void setRadarChartMode(final RadarChartMode RadarChartMODE) {
+    public void setRadarChartMode(final RadarChartMode MODE) {
         if (null == radarChartMode) {
-            _radarChartRadarChartMode = RadarChartMODE;
+            _radarChartMode = MODE;
             fireTileEvent(RECALC_EVENT);
         } else {
-            radarChartMode.set(RadarChartMODE);
+            radarChartMode.set(MODE);
         }
     }
     public ObjectProperty<RadarChartMode> radarChartModeProperty() {
         if (null == radarChartMode) {
-            radarChartMode = new ObjectPropertyBase<RadarChartMode>(_radarChartRadarChartMode) {
+            radarChartMode = new ObjectPropertyBase<RadarChartMode>(_radarChartMode) {
                 @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "radarChartMode"; }
             };
-            _radarChartRadarChartMode = null;
+            _radarChartMode = null;
         }
         return radarChartMode;
     }

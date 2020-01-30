@@ -148,7 +148,7 @@ public class ChartData implements Comparable<ChartData> {
             oldValue = value;
             value    = VALUE;
             timeline.stop();
-            KeyValue kv1 = new KeyValue(currentValue, value, Interpolator.EASE_BOTH);
+            KeyValue kv1 = new KeyValue(currentValue, oldValue, Interpolator.EASE_BOTH);
             KeyValue kv2 = new KeyValue(currentValue, VALUE, Interpolator.EASE_BOTH);
             KeyFrame kf1 = new KeyFrame(Duration.ZERO, kv1);
             KeyFrame kf2 = new KeyFrame(Duration.millis(animationDuration), kv2);

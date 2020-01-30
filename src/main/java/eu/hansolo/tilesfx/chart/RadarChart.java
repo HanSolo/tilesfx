@@ -311,7 +311,6 @@ public class RadarChart extends Region {
         if (null == maxValue) {
             _maxValue = clamp(getMinValue(), Double.MAX_VALUE, VALUE);
             setRange(_maxValue - getMinValue());
-            redraw();
         } else {
             maxValue.set(VALUE);
         }
@@ -322,7 +321,6 @@ public class RadarChart extends Region {
                 @Override protected void invalidated() {
                     set(clamp(getMinValue(), Double.MAX_VALUE, get()));
                     setRange(_maxValue - getMinValue());
-                    redraw();
                 }
                 @Override public Object getBean() { return RadarChart.this; }
                 @Override public String getName() { return "maxValue"; }
@@ -355,7 +353,6 @@ public class RadarChart extends Region {
     public void setThreshold(final double VALUE) {
         if (null == threshold) {
             _threshold = clamp(getMinValue(), getMaxValue(), VALUE);
-            setRange(getMaxValue() - VALUE);
             drawOverlay();
         } else {
             threshold.set(VALUE);
@@ -366,7 +363,6 @@ public class RadarChart extends Region {
             threshold = new DoublePropertyBase(_threshold) {
                 @Override protected void invalidated() {
                     set(clamp(getMinValue(), getMaxValue(), get()));
-                    setRange(getMaxValue() - get());
                     drawOverlay();
                 }
                 @Override public Object getBean() { return RadarChart.this; }

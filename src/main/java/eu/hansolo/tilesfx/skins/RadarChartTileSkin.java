@@ -60,6 +60,7 @@ public class RadarChartTileSkin extends TileSkin {
         radarChart.setGradientStops(tile.getGradientStops());
 
         chartEventListener = e -> radarChart.redraw();
+
         tile.getChartData().forEach(chartData -> chartData.addChartDataEventListener(chartEventListener));
 
         chartDataListener  = c -> {

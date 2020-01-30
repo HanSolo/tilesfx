@@ -364,7 +364,6 @@ public class RadarNodeChart extends Region {
     public void setThreshold(final double VALUE) {
         if (null == threshold) {
             _threshold = clamp(getMinValue(), getMaxValue(), VALUE);
-            setRange(getMaxValue() - VALUE);
             drawOverlay();
         } else {
             threshold.set(VALUE);
@@ -375,7 +374,6 @@ public class RadarNodeChart extends Region {
             threshold = new DoublePropertyBase(_threshold) {
                 @Override protected void invalidated() {
                     set(clamp(getMinValue(), getMaxValue(), get()));
-                    setRange(getMaxValue() - get());
                     drawOverlay();
                 }
                 @Override public Object getBean() { return RadarNodeChart.this; }

@@ -346,6 +346,8 @@ public class Tile extends Control {
     private SunburstChart                                 sunburstChart;
 
     // UI related
+    private boolean                        _flatUI;
+    private BooleanProperty                flatUI;
     private SkinType                       skinType;
     private TextSize                       _textSize;
     private ObjectProperty<TextSize>       textSize;
@@ -728,7 +730,8 @@ public class Tile extends Control {
                 @NamedArg(value="timeoutMs", defaultValue="1000") long timeoutMs,
                 @NamedArg(value="numberOfValuesForTrendCalculation", defaultValue="3") int numberOfValuesForTrendCalculation,
                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
-                @NamedArg(value="increment", defaultValue="1") int increment
+                @NamedArg(value="increment", defaultValue="1") int increment,
+                @NamedArg(value="flatUI", defaultValue="true") boolean flatUI
                 ) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         this.skinType = skinType;
@@ -838,7 +841,7 @@ public class Tile extends Control {
         _trackColor                         = TileColor.BLUE;
         _mapProvider                        = MapProvider.BW;
         flipTimeInMS                        = 500;
-
+        _flatUI                             = true;
         _textSize                           = TextSize.NORMAL;
         _roundedCorners                     = true;
         _startFromZero                      = false;
@@ -2232,6 +2235,36 @@ public class Tile extends Control {
         if (null == textColor) { _textColor = COLOR; } else { textColor.set(COLOR); }
         if (null == foregroundColor) { _foregroundColor = COLOR; } else { foregroundColor.set(COLOR); }
         fireTileEvent(REDRAW_EVENT);
+    }
+
+    /**
+     * Returns true if the the UI should be more flat than skeuomorphic
+     * This is mainly used for the LedTileSkin
+     * @return true if the UI should be more flat than skeuomorphic
+     */
+    public boolean isFlatUI() { return null == flatUI ? _flatUI : flatUI.get(); }
+    /**
+     * Defines if the UI should be more flat than skeuomorphic. At the moment only
+     * used in the LedTileSkin
+     * @param FLATUI
+     */
+    public void setFlatUI(final boolean FLATUI) {
+        if (null == flatUI) {
+            _flatUI = FLATUI;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            flatUI.set(FLATUI);
+        }
+    }
+    public BooleanProperty flatUIProperty() {
+        if (null == flatUI) {
+            flatUI = new BooleanPropertyBase(_flatUI) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "flatUI"; }
+            };
+        }
+        return flatUI;
     }
 
     /**

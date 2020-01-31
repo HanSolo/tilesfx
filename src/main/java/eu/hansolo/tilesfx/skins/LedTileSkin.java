@@ -103,38 +103,29 @@ public class LedTileSkin extends TileSkin {
     }
 
     private void updateFills() {
-        borderFill = new LinearGradient(0, 0,
-                           1, 1,
-                           true, CycleMethod.NO_CYCLE,
-                           new Stop(0.0, Color.rgb(20, 20, 20, 0.65)),
-                           new Stop(0.15, Color.rgb(20, 20, 20, 0.65)),
-                           new Stop(0.26, Color.rgb(41, 41, 41, 0.65)),
-                           new Stop(0.26, Color.rgb(41, 41, 41, 0.64)),
-                           new Stop(0.85, Color.rgb(200, 200, 200, 0.41)),
-                           new Stop(1.0, Color.rgb(200, 200, 200, 0.35)));
+        if (tile.isFlatUI()) {
+            borderFill    = Color.rgb(200, 200, 200, 0.5);
+            onFill        = tile.getActiveColor();
+            offFill       = tile.getActiveColor().darker().darker().darker().darker();
+            highlightFill = Color.TRANSPARENT;
+            led.setEffect(null);
+        } else {
+            borderFill = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, new Stop(0.0, Color.rgb(20, 20, 20, 0.65)), new Stop(0.15, Color.rgb(20, 20, 20, 0.65)),
+                                            new Stop(0.26, Color.rgb(41, 41, 41, 0.65)), new Stop(0.26, Color.rgb(41, 41, 41, 0.64)), new Stop(0.85, Color.rgb(200, 200, 200, 0.41)),
+                                            new Stop(1.0, Color.rgb(200, 200, 200, 0.35)));
 
-        final Color ledColor = tile.getActiveColor();
+            final Color ledColor = tile.getActiveColor();
 
-        onFill = new LinearGradient(0, 0,
-                                    1, 1,
-                                    true, CycleMethod.NO_CYCLE,
-                                    new Stop(0.0, ledColor.deriveColor(0d, 1d, 0.77, 1d)),
-                                    new Stop(0.49, ledColor.deriveColor(0d, 1d, 0.5, 1d)),
-                                    new Stop(1.0, ledColor));
+            onFill = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, new Stop(0.0, ledColor.deriveColor(0d, 1d, 0.77, 1d)),
+                                        new Stop(0.49, ledColor.deriveColor(0d, 1d, 0.5, 1d)), new Stop(1.0, ledColor));
 
-        offFill = new LinearGradient(0, 0,
-                                     1, 1,
-                                     true, CycleMethod.NO_CYCLE,
-                                     new Stop(0.0, ledColor.deriveColor(0d, 1d, 0.20, 1d)),
-                                     new Stop(0.49, ledColor.deriveColor(0d, 1d, 0.13, 1d)),
-                                     new Stop(1.0, ledColor.deriveColor(0d, 1d, 0.2, 1d)));
+            offFill = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, new Stop(0.0, ledColor.deriveColor(0d, 1d, 0.20, 1d)),
+                                         new Stop(0.49, ledColor.deriveColor(0d, 1d, 0.13, 1d)), new Stop(1.0, ledColor.deriveColor(0d, 1d, 0.2, 1d)));
 
-        highlightFill = new RadialGradient(0, 0,
-                                           hightlight.getCenterX() - hightlight.getRadius(), hightlight.getCenterY() - hightlight.getRadius(),
-                                           hightlight.getRadius(),
-                                           false, CycleMethod.NO_CYCLE,
-                                           new Stop(0.0, Color.WHITE),
-                                           new Stop(1.0, Color.TRANSPARENT));
+            highlightFill = new RadialGradient(0, 0, hightlight.getCenterX() - hightlight.getRadius(), hightlight.getCenterY() - hightlight.getRadius(), hightlight.getRadius(), false,
+                                               CycleMethod.NO_CYCLE, new Stop(0.0, Color.WHITE), new Stop(1.0, Color.TRANSPARENT));
+            led.setEffect(innerShadow);
+        }
     }
 
 

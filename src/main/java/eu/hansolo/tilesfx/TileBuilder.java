@@ -171,6 +171,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B flatUI(final boolean FLAT_UI) {
+        properties.put("flatUI", new SimpleBooleanProperty(FLAT_UI));
+        return (B)this;
+    }
+
     public final B duration(final LocalTime DURATION) {
         properties.put("duration", new SimpleObjectProperty(DURATION));
         return (B)this;
@@ -1432,6 +1437,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setDescriptionAlignment(((ObjectProperty<Pos>) properties.get(key)).get());
             } else if("unit".equals(key)) {
                 TILE.setUnit(((StringProperty) properties.get(key)).get());
+            } else if ("flatUI".equals(key)) {
+                TILE.setFlatUI(((BooleanProperty) properties.get(key)).get());
             } else if ("selected".equals(key)) {
                 TILE.setActive(((BooleanProperty) properties.get(key)).get());
             } else if("averagingEnabled".equals(key)) {

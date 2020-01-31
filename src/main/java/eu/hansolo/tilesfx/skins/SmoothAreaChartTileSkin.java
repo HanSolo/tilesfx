@@ -275,6 +275,8 @@ public class SmoothAreaChartTileSkin extends TileSkin {
         if (POINTS.isEmpty()) return;
         Point[] points = smoothing ? Helper.subdividePoints(POINTS.toArray(new Point[0]), 8) : POINTS.toArray(new Point[0]);
 
+        if (0 == points.length || null == points[0]) { return; }
+
         fillPath.getElements().clear();
         fillPath.getElements().add(new MoveTo(0, height));
 

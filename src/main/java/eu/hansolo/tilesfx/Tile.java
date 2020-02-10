@@ -1696,7 +1696,10 @@ public class Tile extends Control {
      * defined by averagingPeriod.
      * @return the moving the average over the number of values defined by averagingPeriod
      */
-    public double getAverage() { return movingAverage.getAverage(); }
+    public double getAverage() {
+        if (null == movingAverage) { movingAverage = new MovingAverage(getAveragingPeriod()); }
+        return movingAverage.getAverage();
+    }
     /**
      * Returns the moving average over the given duration.
      * @param DURATION

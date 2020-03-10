@@ -253,7 +253,7 @@ public class SparkLineTileSkin extends TileSkin {
             handleCurrentValue(value);
         } else if (EventType.AVERAGING.name().equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
-
+            dataList.clear();
             // To get smooth lines in the chart we need at least 4 values
             if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
             for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
@@ -266,8 +266,7 @@ public class SparkLineTileSkin extends TileSkin {
             dataList.clear();
             handleCurrentValue(minValue);
         } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
-            double value = clamp(minValue, maxValue, tile.getValue());
-            handleCurrentValue(value);
+
         }
     }
 
@@ -353,7 +352,6 @@ public class SparkLineTileSkin extends TileSkin {
                 LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
                 end.setX(maxX);
                 end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
-
                 dot.setCenterX(maxX);
                 dot.setCenterY(end.getY());
             }
@@ -395,9 +393,9 @@ public class SparkLineTileSkin extends TileSkin {
 
     private void addData(final double VALUE) {
         if (dataList.isEmpty()) { for (int i = 0 ; i < noOfDatapoints ;i ++) { dataList.add(VALUE); } }
-        if (dataList.size() <= noOfDatapoints) {
-            Collections.rotate(dataList, -1);
-            dataList.set((noOfDatapoints - 1), VALUE);
+        if (dataList.size() >= noOfDatapoints) {
+            Collections.rotate(dataList, -1);  // Shift all values 1 entry to the left
+            dataList.set((noOfDatapoints - 1), VALUE); // Add new value on the right
         } else {
             dataList.add(VALUE);
         }

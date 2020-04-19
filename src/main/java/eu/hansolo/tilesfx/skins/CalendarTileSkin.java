@@ -272,6 +272,17 @@ public class CalendarTileSkin extends TileSkin {
     @Override protected void resize() {
         super.resize();
 
+        // Recalculate content bounds because title and text are always visible in this skin
+        double offsetTop    = size * 0.15;
+        double offsetBottom = height - size * 0.15;
+        contentBounds.setX(inset);
+        contentBounds.setY(offsetTop);
+        contentBounds.setWidth(width - doubleInset);
+        contentBounds.setHeight(offsetBottom - offsetTop);
+
+        contentCenterX = contentBounds.getX() + contentBounds.getWidth() * 0.5;
+        contentCenterY = contentBounds.getY() + contentBounds.getHeight() * 0.5;
+
         double cellAreaWidth  = contentBounds.getWidth();
         double cellAreaHeight = contentBounds.getHeight();
 

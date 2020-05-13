@@ -831,7 +831,7 @@ public class Tile extends Control {
         _text                               = "";
         _textAlignment                      = TextAlignment.LEFT;
         _averagingEnabled                   = false;
-        _averagingPeriod                    = 10;
+        _averagingPeriod                    = MovingAverage.DEFAULT_PERIOD;
         _timePeriod                         = DEFAULT_TIME_PERIOD;
         _maxTimePeriod                      = DEFAULT_TIME_PERIOD;
         _timePeriodResolution               = DEFAULT_TIME_PERIOD_RESOLUTION;
@@ -1148,11 +1148,11 @@ public class Tile extends Control {
             if (VALUE > getMaxValue()) { setMaxValue(VALUE); }
             _minValue = clamp(-Double.MAX_VALUE, getMaxValue(), VALUE);
             setRange(getMaxValue() - _minValue);
-            if (Helper.equals(originalMinValue, -Double.MAX_VALUE)) originalMinValue = _minValue;
-            if (isStartFromZero() && _minValue < 0) setValue(0);
+            if (Helper.equals(originalMinValue, -Double.MAX_VALUE)) { originalMinValue = _minValue; }
+            if (isStartFromZero() && _minValue < 0) { setValue(0); }
             if (Helper.equals(originalThreshold, getThreshold())) { setThreshold(clamp(_minValue, getMaxValue(), originalThreshold)); }
             fireTileEvent(RECALC_EVENT);
-            if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
+            if (!valueProperty().isBound() && isShowing()) { Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue())); }
         } else {
             minValue.set(VALUE);
         }

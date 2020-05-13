@@ -388,20 +388,17 @@ public class TimeSection implements Comparable<TimeSection> {
             .toString();
     }
 
-    public JSONObject toJSON() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("start", getStart().toString());
-        jsonObject.put("stop", getStop().toString());
-        jsonObject.put("text", getText());
-        jsonObject.put("color", getColor().toString().replace("0x", "#"));
-        jsonObject.put("highlightColor", getHighlightColor().toString().replace("0x", "#"));
-        jsonObject.put("textColor", getTextColor().toString().replace("0x", "#"));
-        jsonObject.put("active", isActive());
-        return jsonObject;
-    }
-
     public String toJSONString() {
-        return toJSON().toJSONString();
+        return new StringBuilder().append("{")
+                                  .append("\"start\":").append(getStart().toString()).append(",")
+                                  .append("\"stop\":").append(getStop().toString()).append(",")
+                                  .append("\"color\":\"").append(getColor().toString().replace("0x", "#")).append("\",")
+                                  .append("\"highlightColor\":\"").append(getHighlightColor().toString().replace("0x", "#")).append("\",")
+                                  .append("\"active\":").append(isActive()).append(",")
+                                  .append("\"text\":\"").append(getText()).append("\",")
+                                  .append("\"textColor\":").append(getTextColor().toString().replace("0x", "#")).append("\"")
+                                  .append("}")
+                                  .toString();
     }
 
 

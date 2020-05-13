@@ -213,5 +213,18 @@ public class DataPoint {
         return json;
     }
 
-    public String toJsonString() { return toJson().toJSONString().replace("\\",""); }
+    public String toJsonString() {
+        return new StringBuilder().append("{")
+                                  .append("\"date\":").append(DTF.format(ZonedDateTime.of(time, timeZone.toZoneId()))).append(",")
+                                  .append("\"summary\":\"").append(summary).append("\",")
+                                  .append("\"condition\":\"").append(condition.name()).append("\",")
+                                  .append("\"temperature\":").append(temperature).append(",")
+                                  .append("\"pressure\":").append(pressure).append(",")
+                                  .append("\"humidity\":").append(humidity).append(",")
+                                  .append("\"windspeed\":").append(windSpeed).append(",")
+                                  .append("\"tempMin\":").append(temperatureMin).append(",")
+                                  .append("\"tempMax\":").append(temperatureMax)
+                                  .append("}")
+                                  .toString();
+    }
 }

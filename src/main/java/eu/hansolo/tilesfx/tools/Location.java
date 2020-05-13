@@ -20,7 +20,6 @@ import eu.hansolo.tilesfx.Tile.TileColor;
 import eu.hansolo.tilesfx.events.LocationEvent;
 import eu.hansolo.tilesfx.events.LocationEventListener;
 import javafx.scene.paint.Color;
-import org.json.simple.JSONObject;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -279,21 +278,18 @@ public class Location {
         }
     }
 
-    public JSONObject toJSON() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("nam", name);
-        jsonObject.put("tst", timestamp.getEpochSecond());
-        jsonObject.put("lat", latitude);
-        jsonObject.put("lon", longitude);
-        jsonObject.put("alt", altitude);
-        jsonObject.put("inf", info);
-        jsonObject.put("col", color.toString().replace("0x", "#"));
-        jsonObject.put("zml", zoomLevel);
-        return jsonObject;
-    }
-
     public String toJSONString() {
-        return toJSON().toJSONString();
+        return new StringBuilder().append("{")
+                           .append("\"nam\":\"").append(name).append("\",")
+                           .append("\"tst\":").append(timestamp.getEpochSecond()).append(",")
+                           .append("\"lat\":").append(latitude).append(",")
+                           .append("\"lon\":").append(longitude).append(",")
+                           .append("\"alt\":").append(altitude).append(",")
+                           .append("\"inf\":\"").append(info).append("\",")
+                           .append("\"col\":\"").append(color.toString().replace("0x", "#")).append("\",")
+                           .append("\"zml\":").append(zoomLevel).append(",")
+                           .append("}")
+                           .toString();
     }
 
     @Override public String toString() {

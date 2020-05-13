@@ -410,20 +410,17 @@ public class Section implements Comparable<Section> {
             .toString();
     }
 
-    public JSONObject toJSON() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("start", getStart());
-        jsonObject.put("stop", getStop());
-        jsonObject.put("text", getText());
-        jsonObject.put("color", getColor().toString().replace("0x", "#"));
-        jsonObject.put("highlightColor", getHighlightColor().toString().replace("0x", "#"));
-        jsonObject.put("textColor", getTextColor().toString().replace("0x", "#"));
-        jsonObject.put("active", isActive());
-        return jsonObject;
-    }
-
     public String toJSONString() {
-        return toJSON().toJSONString();
+        return new StringBuilder().append("{")
+                           .append("\"start\":").append(getStart()).append(",")
+                           .append("\"stop\":").append(getStop()).append(",")
+                           .append("\"color\":\"").append(getColor().toString().replace("0x", "#")).append("\",")
+                           .append("\"highlightColor\":\"").append(getHighlightColor().toString().replace("0x", "#")).append("\",")
+                           .append("\"active\":").append(isActive()).append(",")
+                           .append("\"text\":\"").append(getText()).append("\",")
+                           .append("\"textColor\":").append(getTextColor().toString().replace("0x", "#")).append("\"")
+                           .append("}")
+                           .toString();
     }
 
 

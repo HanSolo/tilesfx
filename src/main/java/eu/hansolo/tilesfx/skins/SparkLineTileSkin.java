@@ -272,12 +272,14 @@ public class SparkLineTileSkin extends TileSkin {
 
     @Override protected void handleCurrentValue(final double VALUE) {
         addData(VALUE);
-
         low  = Statistics.getMin(dataList);
         high = Statistics.getMax(dataList);
 
+        double statisticsLow  = low;
+        double statisticsHigh = high;
+
         if (Helper.equals(low, high)) {
-            low = minValue;
+            low  = minValue;
             high = maxValue;
         }
         range = high - low;
@@ -298,7 +300,7 @@ public class SparkLineTileSkin extends TileSkin {
             double tickSpacingY     = niceScaleY.getTickSpacing();
             double tickStepY        = tickSpacingY * stepY;
             if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
-            double tickStartY       = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+            double tickStartY       = (maxY - Math.abs(tickLabelOffsetY * tickSpacingY));
 
             double niceMinY = niceScaleY.getNiceMin();
             double niceMaxY = niceScaleY.getNiceMax();
@@ -333,8 +335,13 @@ public class SparkLineTileSkin extends TileSkin {
                 //label.toFront();
             });
 
-            highText.setText(String.format(locale, formatString, high));
-            lowText.setText(String.format(locale, formatString, low));
+            if (Helper.equals(statisticsLow, statisticsHigh)) {
+                highText.setText("-");
+                lowText.setText("-");
+            } else {
+                highText.setText(String.format(locale, formatString, high));
+                lowText.setText(String.format(locale, formatString, low));
+            }
         }
 
         if (!dataList.isEmpty()) {
@@ -343,15 +350,15 @@ public class SparkLineTileSkin extends TileSkin {
             } else {
                 MoveTo begin = (MoveTo) pathElements.get(0);
                 begin.setX(minX);
-                begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+                begin.setY(maxY - Math.abs(low) * stepY - dataList.get(0) * stepY);
                 for (int i = 1; i < (noOfDatapoints - 1); i++) {
                     LineTo lineTo = (LineTo) pathElements.get(i);
                     lineTo.setX(minX + i * stepX);
-                    lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+                    lineTo.setY(maxY - Math.abs(low) * stepY - dataList.get(i) * stepY);
                 }
                 LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
                 end.setX(maxX);
-                end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
+                end.setY(maxY - Math.abs(low) * stepY - dataList.get(noOfDatapoints - 1) * stepY);
                 dot.setCenterX(maxX);
                 dot.setCenterY(end.getY());
             }
@@ -363,7 +370,8 @@ public class SparkLineTileSkin extends TileSkin {
             }
 
             double average  = tile.getAverage();
-            double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
+            //double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
+            double averageY = clamp(minY, maxY, maxY - Math.abs(low) * stepY - average * stepY);
 
             averageLine.setStartX(minX);
             averageLine.setStartY(averageY);
@@ -576,6 +584,9 @@ public class SparkLineTileSkin extends TileSkin {
             low  = Statistics.getMin(dataList);
             high = Statistics.getMax(dataList);
 
+            double statisticsLow  = low;
+            double statisticsHigh = high;
+
             if (Helper.equals(low, high)) {
                 low  = minValue;
                 high = maxValue;
@@ -598,7 +609,7 @@ public class SparkLineTileSkin extends TileSkin {
                 double tickSpacingY     = niceScaleY.getTickSpacing();
                 double tickStepY        = tickSpacingY * stepY;
                 if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
-                double tickStartY       = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
+                double tickStartY       = (maxY - Math.abs(tickLabelOffsetY * tickSpacingY));
 
                 double niceMinY = niceScaleY.getNiceMin();
                 double niceMaxY = niceScaleY.getNiceMax();
@@ -615,7 +626,6 @@ public class SparkLineTileSkin extends TileSkin {
                     } else {
                         label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
                     }
-
                     label.setY(y + graphBounds.getHeight() * 0.03);
                     label.setFill(tickLabelColor);
                     horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
@@ -634,8 +644,13 @@ public class SparkLineTileSkin extends TileSkin {
                     //label.toFront();
                 });
 
-                highText.setText(String.format(locale, formatString, high));
-                lowText.setText(String.format(locale, formatString, low));
+                if (Helper.equals(statisticsLow, statisticsHigh)) {
+                    highText.setText("-");
+                    lowText.setText("-");
+                } else {
+                    highText.setText(String.format(locale, formatString, high));
+                    lowText.setText(String.format(locale, formatString, low));
+                }
             }
 
             if (!dataList.isEmpty()) {
@@ -644,16 +659,15 @@ public class SparkLineTileSkin extends TileSkin {
                 } else {
                     MoveTo begin = (MoveTo) pathElements.get(0);
                     begin.setX(minX);
-                    begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+                    begin.setY(maxY - Math.abs(low) * stepY - dataList.get(0) * stepY);
                     for (int i = 1; i < (noOfDatapoints - 1); i++) {
                         LineTo lineTo = (LineTo) pathElements.get(i);
                         lineTo.setX(minX + i * stepX);
-                        lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+                        lineTo.setY(maxY - Math.abs(low) * stepY - dataList.get(i) * stepY);
                     }
                     LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
                     end.setX(maxX);
-                    end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
-
+                    end.setY(maxY - Math.abs(low) * stepY - dataList.get(noOfDatapoints - 1) * stepY);
                     dot.setCenterX(maxX);
                     dot.setCenterY(end.getY());
                 }
@@ -665,7 +679,7 @@ public class SparkLineTileSkin extends TileSkin {
                 }
 
                 double average  = tile.getAverage();
-                double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
+                double averageY = clamp(minY, maxY, maxY - Math.abs(low) * stepY - average * stepY);
 
                 averageLine.setStartX(minX);
                 averageLine.setStartY(averageY);
@@ -687,6 +701,7 @@ public class SparkLineTileSkin extends TileSkin {
                 timeSpanText.setText(createTimeSpanText());
                 text.setText(timeFormatter.format(movingAverage.getLastEntry().getTimestampAsDateTime(tile.getZoneId())));
             }
+            resizeDynamicText();
 
             lastLow  = low;
             lastHigh = high;

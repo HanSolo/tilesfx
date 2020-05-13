@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 public class MovingAverage {
     public  static final int             MAX_PERIOD     = 2_073_600; // 24h in seconds
-    private static final int             DEFAULT_PERIOD = 10;
+    public  static final int             DEFAULT_PERIOD = 10;
     private        final Queue<TimeData> window;
     private              int             period;
     private              double          sum;
@@ -78,7 +78,7 @@ public class MovingAverage {
     }
 
     public double getAverage() {
-        if (window.isEmpty()) return 0; // technically the average is undefined
+        if (window.isEmpty()) { return 0; } // technically the average is undefined
         return (sum / window.size());
     }
 

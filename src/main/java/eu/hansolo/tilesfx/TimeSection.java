@@ -29,8 +29,6 @@ import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -76,21 +74,6 @@ public class TimeSection implements Comparable<TimeSection> {
      * to check a time against the defined range and fire events in case the
      * value enters or leaves the defined region.
      */
-    public TimeSection(final String JSON_STRING) {
-        Object     obj     = JSONValue.parse(JSON_STRING);
-        JSONObject jsonObj = (JSONObject) obj;
-        _start             = LocalTime.parse(jsonObj.getOrDefault("start", LocalTime.now()).toString());
-        _stop              = LocalTime.parse(jsonObj.getOrDefault("stop", LocalTime.now()).toString());
-        _text              = jsonObj.getOrDefault("text", "").toString();
-        _color             = Color.web(jsonObj.getOrDefault("color", "#00000000").toString());
-        _highlightColor    = Color.web(jsonObj.getOrDefault("highlightColor", "#00000000").toString());
-        _textColor         = Color.web(jsonObj.getOrDefault("textColor", "#00000000").toString());
-        _active            = Boolean.parseBoolean(jsonObj.getOrDefault("active", "false").toString());
-        _icon              = null;
-        checkedValue       = LocalTime.MIN;
-        days               = new HashSet<>(8);
-        days.addAll(Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
-    }
     public TimeSection() {
         this(LocalTime.now(), LocalTime.now(), "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, false, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     }

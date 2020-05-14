@@ -32,8 +32,6 @@ import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 
 /**
@@ -70,20 +68,6 @@ public class Section implements Comparable<Section> {
      * to check a value against the defined range and fire events in case the
      * value enters or leaves the defined region.
      */
-    public Section(final String JSON_STRING) {
-        Object     obj     = JSONValue.parse(JSON_STRING);
-        JSONObject jsonObj = (JSONObject) obj;
-        _start             = Double.parseDouble(jsonObj.getOrDefault("start", "-1").toString());
-        _stop              = Double.parseDouble(jsonObj.getOrDefault("stop", "-1").toString());
-        _text              = jsonObj.getOrDefault("text", "").toString();
-        _color             = Color.web(jsonObj.getOrDefault("color", "#00000000").toString());
-        _highlightColor    = Color.web(jsonObj.getOrDefault("highlightColor", "#00000000").toString());
-        _textColor         = Color.web(jsonObj.getOrDefault("textColor", "#00000000").toString());
-        _active            = Boolean.parseBoolean(jsonObj.getOrDefault("active", "false").toString());
-        _icon              = null;
-        styleClass         = "";
-        checkedValue       = -Double.MAX_VALUE;
-    }
     public Section() {
         this(-1, -1, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, "");
     }

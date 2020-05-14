@@ -24,7 +24,7 @@ apply plugin: 'biz.aQute.bnd.builder'
 sourceCompatibility = '11'
 
 wrapper {
-    gradleVersion = '6.0.1'
+    gradleVersion = '6.4'
 }
 
 description = 'TilesFX is a JavaFX library containing tiles for dashboards'

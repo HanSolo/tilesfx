@@ -210,6 +210,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B fixedYScale(final boolean FIXED_Y_SCALE) {
+        properties.put("fixedYScale", new SimpleBooleanProperty(FIXED_Y_SCALE));
+        return (B)this;
+    }
+
     public final B foregroundBaseColor(final Color COLOR) {
         properties.put("foregroundBaseColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -1441,6 +1446,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setMaxTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
             } else if ("timePeriodResolution".equals(key)) {
                 TILE.setTimePeriodResolution(((ObjectProperty<TimeUnit>) properties.get(key)).get());
+            } else if ("fixedYScale".equals(key)) {
+                TILE.setFixedYScale(((BooleanProperty) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {

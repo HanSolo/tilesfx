@@ -272,15 +272,15 @@ public class SparkLineTileSkin extends TileSkin {
 
     @Override protected void handleCurrentValue(final double VALUE) {
         addData(VALUE);
-        low  = Statistics.getMin(dataList);
-        high = Statistics.getMax(dataList);
+        double statisticsLow  = Statistics.getMin(dataList);
+        double statisticsHigh = Statistics.getMax(dataList);
 
-        double statisticsLow  = low;
-        double statisticsHigh = high;
-
-        if (Helper.equals(low, high)) {
+        if (tile.isFixedYScale() || Helper.equals(low, high)) {
             low  = minValue;
             high = maxValue;
+        } else {
+            low  = statisticsLow;
+            high = statisticsHigh;
         }
         range = high - low;
 
@@ -288,60 +288,59 @@ public class SparkLineTileSkin extends TileSkin {
         double maxX  = minX + graphBounds.getWidth();
         double minY  = graphBounds.getY();
         double maxY  = minY + graphBounds.getHeight();
+
+        if (tile.isFixedYScale()) {
+            niceScaleY.setMinMax(minValue, maxValue);
+        } else {
+            niceScaleY.setMinMax(low, high);
+        }
+        double niceMinY = niceScaleY.getNiceMin();
+        double niceMaxY = niceScaleY.getNiceMax();
+        double rangeY   = niceMaxY - niceMinY;
+
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        boolean loHiChanged = Double.compare(lastLow, low) != 0 || Double.compare(lastHigh, high) != 0;
+        int    lineCountY   = 0;
+        double tickSpacingY = niceScaleY.getTickSpacing();
+        double tickStepY    = tickSpacingY * stepY;
+        double tickStartY   = maxY;
 
-        if (loHiChanged) {
-            niceScaleY.setMinMax(low, high);
-            int    lineCountY       = 0;
-            int    tickLabelOffsetY = 0;
-            double tickSpacingY     = niceScaleY.getTickSpacing();
-            double tickStepY        = tickSpacingY * stepY;
-            if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
-            double tickStartY       = (maxY - Math.abs(tickLabelOffsetY * tickSpacingY));
-
-            double niceMinY = niceScaleY.getNiceMin();
-            double niceMaxY = niceScaleY.getNiceMax();
-            double rangeY   = niceMaxY - niceMinY;
-
-            horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
-            tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
-            horizontalLineOffset = 0;
-            for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
-                Line line  = horizontalTickLines.get(lineCountY);
-                Text label = tickLabelsY.get(lineCountY);
-                if (rangeY <= 4) {
-                    label.setText(String.format(locale, "%.1f", low + lineCountY * tickSpacingY));
-                } else {
-                    label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
-                }
-                label.setY(y + graphBounds.getHeight() * 0.03);
-                label.setFill(tickLabelColor);
-                horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
-
-                line.setStartX(minX);
-                line.setStartY(y);
-                line.setEndY(y);
-                line.setStroke(tickLineColor);
-                lineCountY++;
-                lineCountY = clamp(0, 4, lineCountY);
-            }
-            if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
-            horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-            tickLabelsY.forEach(label -> {
-                label.setX(maxX - label.getLayoutBounds().getWidth());
-                //label.toFront();
-            });
-
-            if (Helper.equals(statisticsLow, statisticsHigh)) {
-                highText.setText("-");
-                lowText.setText("-");
+        horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
+        tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+        horizontalLineOffset = 0;
+        for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
+            Line line  = horizontalTickLines.get(lineCountY);
+            Text label = tickLabelsY.get(lineCountY);
+            if (rangeY <= 4) {
+                label.setText(String.format(locale, "%.1f", low + lineCountY * tickSpacingY));
             } else {
-                highText.setText(String.format(locale, formatString, high));
-                lowText.setText(String.format(locale, formatString, low));
+                label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
             }
+            label.setY(y + graphBounds.getHeight() * 0.03);
+            label.setFill(tickLabelColor);
+            horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
+
+            line.setStartX(minX);
+            line.setStartY(y);
+            line.setEndY(y);
+            line.setStroke(tickLineColor);
+            lineCountY++;
+            lineCountY = clamp(0, 4, lineCountY);
+        }
+        if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
+        horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
+        tickLabelsY.forEach(label -> {
+            label.setX(maxX - label.getLayoutBounds().getWidth());
+            //label.toFront();
+        });
+
+        if (Helper.equals(statisticsLow, statisticsHigh)) {
+            highText.setText("-");
+            lowText.setText("-");
+        } else {
+            highText.setText(String.format(locale, formatString, statisticsHigh));
+            lowText.setText(String.format(locale, formatString, statisticsLow));
         }
 
         if (!dataList.isEmpty()) {
@@ -350,28 +349,27 @@ public class SparkLineTileSkin extends TileSkin {
             } else {
                 MoveTo begin = (MoveTo) pathElements.get(0);
                 begin.setX(minX);
-                begin.setY(maxY - Math.abs(low) * stepY - dataList.get(0) * stepY);
+                begin.setY(maxY - (dataList.get(0) - low) * stepY);
                 for (int i = 1; i < (noOfDatapoints - 1); i++) {
                     LineTo lineTo = (LineTo) pathElements.get(i);
                     lineTo.setX(minX + i * stepX);
-                    lineTo.setY(maxY - Math.abs(low) * stepY - dataList.get(i) * stepY);
+                    lineTo.setY(maxY - (dataList.get(i) - low) * stepY);
                 }
                 LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
                 end.setX(maxX);
-                end.setY(maxY - Math.abs(low) * stepY - dataList.get(noOfDatapoints - 1) * stepY);
+                end.setY(maxY - (dataList.get(noOfDatapoints - 1) - low) * stepY);
                 dot.setCenterX(maxX);
                 dot.setCenterY(end.getY());
             }
 
-            if (tile.isStrokeWithGradient() && loHiChanged) {
+            if (tile.isStrokeWithGradient()) {
                 setupGradient();
                 dot.setFill(gradient);
                 sparkLine.setStroke(gradient);
             }
 
             double average  = tile.getAverage();
-            //double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
-            double averageY = clamp(minY, maxY, maxY - Math.abs(low) * stepY - average * stepY);
+            double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
 
             averageLine.setStartX(minX);
             averageLine.setStartY(averageY);
@@ -581,15 +579,15 @@ public class SparkLineTileSkin extends TileSkin {
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
         { // Update tile chart without affecting data
-            low  = Statistics.getMin(dataList);
-            high = Statistics.getMax(dataList);
+            double statisticsLow  = Statistics.getMin(dataList);
+            double statisticsHigh = Statistics.getMax(dataList);
 
-            double statisticsLow  = low;
-            double statisticsHigh = high;
-
-            if (Helper.equals(low, high)) {
+            if (tile.isFixedYScale() || Helper.equals(low, high)) {
                 low  = minValue;
                 high = maxValue;
+            } else {
+                low  = statisticsLow;
+                high = statisticsHigh;
             }
             range = high - low;
 
@@ -597,60 +595,59 @@ public class SparkLineTileSkin extends TileSkin {
             double maxX  = minX + graphBounds.getWidth();
             double minY  = graphBounds.getY();
             double maxY  = minY + graphBounds.getHeight();
+
+            if (tile.isFixedYScale()) {
+                niceScaleY.setMinMax(minValue, maxValue);
+            } else {
+                niceScaleY.setMinMax(low, high);
+            }
+            double niceMinY = niceScaleY.getNiceMin();
+            double niceMaxY = niceScaleY.getNiceMax();
+            double rangeY   = niceMaxY - niceMinY;
+
             double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
             double stepY = graphBounds.getHeight() / range;
 
-            boolean loHiChanged = Double.compare(lastLow, low) != 0 || Double.compare(lastHigh, high) != 0;
+            int    lineCountY   = 0;
+            double tickSpacingY = niceScaleY.getTickSpacing();
+            double tickStepY    = tickSpacingY * stepY;
+            double tickStartY   = maxY;
 
-            if (loHiChanged) {
-                niceScaleY.setMinMax(low, high);
-                int    lineCountY       = 0;
-                int    tickLabelOffsetY = 0;
-                double tickSpacingY     = niceScaleY.getTickSpacing();
-                double tickStepY        = tickSpacingY * stepY;
-                if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
-                double tickStartY       = (maxY - Math.abs(tickLabelOffsetY * tickSpacingY));
-
-                double niceMinY = niceScaleY.getNiceMin();
-                double niceMaxY = niceScaleY.getNiceMax();
-                double rangeY   = niceMaxY - niceMinY;
-
-                horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
-                tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
-                horizontalLineOffset = 0;
-                for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
-                    Line line  = horizontalTickLines.get(lineCountY);
-                    Text label = tickLabelsY.get(lineCountY);
-                    if (rangeY <= 4) {
-                        label.setText(String.format(locale, "%.1f", low + lineCountY * tickSpacingY));
-                    } else {
-                        label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
-                    }
-                    label.setY(y + graphBounds.getHeight() * 0.03);
-                    label.setFill(tickLabelColor);
-                    horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
-
-                    line.setStartX(minX);
-                    line.setStartY(y);
-                    line.setEndY(y);
-                    line.setStroke(tickLineColor);
-                    lineCountY++;
-                    lineCountY = clamp(0, 4, lineCountY);
-                }
-                if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
-                horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
-                tickLabelsY.forEach(label -> {
-                    label.setX(maxX - label.getLayoutBounds().getWidth());
-                    //label.toFront();
-                });
-
-                if (Helper.equals(statisticsLow, statisticsHigh)) {
-                    highText.setText("-");
-                    lowText.setText("-");
+            horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
+            tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
+            horizontalLineOffset = 0;
+            for (double y = tickStartY; Math.round(y) > minY; y -= tickStepY) {
+                Line line  = horizontalTickLines.get(lineCountY);
+                Text label = tickLabelsY.get(lineCountY);
+                if (rangeY <= 4) {
+                    label.setText(String.format(locale, "%.1f", low + lineCountY * tickSpacingY));
                 } else {
-                    highText.setText(String.format(locale, formatString, high));
-                    lowText.setText(String.format(locale, formatString, low));
+                    label.setText(String.format(locale, "%.0f", low + lineCountY * tickSpacingY));
                 }
+                label.setY(y + graphBounds.getHeight() * 0.03);
+                label.setFill(tickLabelColor);
+                horizontalLineOffset = Math.max(label.getLayoutBounds().getWidth(), horizontalLineOffset);
+
+                line.setStartX(minX);
+                line.setStartY(y);
+                line.setEndY(y);
+                line.setStroke(tickLineColor);
+                lineCountY++;
+                lineCountY = clamp(0, 4, lineCountY);
+            }
+            if (tickLabelFontSize < 6) { horizontalLineOffset = 0; }
+            horizontalTickLines.forEach(line -> line.setEndX(maxX - horizontalLineOffset));
+            tickLabelsY.forEach(label -> {
+                label.setX(maxX - label.getLayoutBounds().getWidth());
+                //label.toFront();
+            });
+
+            if (Helper.equals(statisticsLow, statisticsHigh)) {
+                highText.setText("-");
+                lowText.setText("-");
+            } else {
+                highText.setText(String.format(locale, formatString, statisticsHigh));
+                lowText.setText(String.format(locale, formatString, statisticsLow));
             }
 
             if (!dataList.isEmpty()) {
@@ -659,27 +656,27 @@ public class SparkLineTileSkin extends TileSkin {
                 } else {
                     MoveTo begin = (MoveTo) pathElements.get(0);
                     begin.setX(minX);
-                    begin.setY(maxY - Math.abs(low) * stepY - dataList.get(0) * stepY);
+                    begin.setY(maxY - (dataList.get(0) - low) * stepY);
                     for (int i = 1; i < (noOfDatapoints - 1); i++) {
                         LineTo lineTo = (LineTo) pathElements.get(i);
                         lineTo.setX(minX + i * stepX);
-                        lineTo.setY(maxY - Math.abs(low) * stepY - dataList.get(i) * stepY);
+                        lineTo.setY(maxY - (dataList.get(i) - low) * stepY);
                     }
                     LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
                     end.setX(maxX);
-                    end.setY(maxY - Math.abs(low) * stepY - dataList.get(noOfDatapoints - 1) * stepY);
+                    end.setY(maxY - (dataList.get(noOfDatapoints - 1) - low) * stepY);
                     dot.setCenterX(maxX);
                     dot.setCenterY(end.getY());
                 }
 
-                if (tile.isStrokeWithGradient() && loHiChanged) {
+                if (tile.isStrokeWithGradient()) {
                     setupGradient();
                     dot.setFill(gradient);
                     sparkLine.setStroke(gradient);
                 }
 
                 double average  = tile.getAverage();
-                double averageY = clamp(minY, maxY, maxY - Math.abs(low) * stepY - average * stepY);
+                double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
 
                 averageLine.setStartX(minX);
                 averageLine.setStartY(averageY);

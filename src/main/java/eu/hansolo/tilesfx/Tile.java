@@ -314,6 +314,8 @@ public class Tile extends Control {
     private TimeUnit                                      _timePeriodResolution;
     private ObjectProperty<TimeUnit>                      timePeriodResolution;
     private MovingAverage                                 movingAverage;
+    private boolean                                       _fixedYScale;
+    private BooleanProperty                               fixedYScale;
     private ObservableList<Section>                       sections;
     private ObservableList<TilesFXSeries<String, Number>> series;
     private List<Stop>                                    gradientStops;
@@ -615,6 +617,8 @@ public class Tile extends Control {
                 @NamedArg(value="averagingPeriod", defaultValue="10") int averagingPeriod,
                 @NamedArg(value="timePeriod", defaultValue="java.time.Duration.ofMinutes(1)") java.time.Duration timePeriod,
                 @NamedArg(value="maxTimePeriod", defaultValue="java.time.Duration.ofMinutes(1)") java.time.Duration maxTimePeriod,
+                @NamedArg(value="timePeriodResolution", defaultValue="TimeUnit.SECONDS") java.util.concurrent.TimeUnit timePeriodResolution,
+                @NamedArg(value="fixedYScale", defaultValue="false") boolean _fixedYScale,
                 @NamedArg(value="imageMask", defaultValue="ImageMask.NONE") ImageMask imageMask,
                 @NamedArg(value="trackColor", defaultValue="TileColor.BLUE") Color trackColor,
                 @NamedArg(value="mapProvider", defaultValue="MapProvider.BW") MapProvider mapProvider,
@@ -833,6 +837,7 @@ public class Tile extends Control {
         _timePeriod                         = DEFAULT_TIME_PERIOD;
         _maxTimePeriod                      = DEFAULT_TIME_PERIOD;
         _timePeriodResolution               = DEFAULT_TIME_PERIOD_RESOLUTION;
+        _fixedYScale                        = false;
         _duration                           = LocalTime.of(1, 0);
         _imageMask                          = ImageMask.NONE;
         _currentLocation                    = new Location(0, 0);
@@ -1800,6 +1805,36 @@ public class Tile extends Control {
             _timePeriodResolution = null;
         }
         return timePeriodResolution;
+    }
+
+    /**
+     * Returns true if the y-scale in the SparkLineTileSkin will always be defined by the minValue and maxValue.
+     * If false the y-scale will be defined by the minMeasured and maxMeasured value.
+     * @return true if the y-scale in the SparkLineTileSkin will always be defined by the minValue and maxValue
+     */
+    public boolean isFixedYScale() { return null == fixedYScale ? _fixedYScale : fixedYScale.get(); }
+    /**
+     * Defines how the y-scale will be drawn. If true, the y-scale will always be defined by the minValue and maxValue.
+     * If false the y-scale will be defined by the minMeasured and maxMeasured value.
+     * @param FIXED_Y_SCALE
+     */
+    public void setFixedYScale(final boolean FIXED_Y_SCALE) {
+        if (null == fixedYScale) {
+            _fixedYScale = FIXED_Y_SCALE;
+            fireTileEvent(RESIZE_EVENT);
+        } else {
+            fixedYScale.set(FIXED_Y_SCALE);
+        }
+    }
+    public BooleanProperty fixedYScaleProperty() {
+        if (null == fixedYScale) {
+            fixedYScale = new BooleanPropertyBase(_fixedYScale) {
+                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "fixedYScale"; }
+            };
+        }
+        return fixedYScale;
     }
 
     /**

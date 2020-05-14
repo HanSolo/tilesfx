@@ -3,9 +3,6 @@ module eu.hansolo.tilesfx {
     // Java
     requires java.base;
 
-    // 3rd party
-    requires json.simple;
-
     // Java-FX
     requires transitive javafx.base;
     requires transitive javafx.graphics;
@@ -19,6 +16,5 @@ module eu.hansolo.tilesfx {
     exports eu.hansolo.tilesfx.fonts;
     exports eu.hansolo.tilesfx.skins;
     exports eu.hansolo.tilesfx.tools;
-    exports eu.hansolo.tilesfx.weather;
     exports eu.hansolo.tilesfx.addons;
 }

@@ -35,9 +35,6 @@ import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.TreeNode;
-import eu.hansolo.tilesfx.weather.DarkSky;
-import eu.hansolo.tilesfx.weather.DarkSky.Language;
-import eu.hansolo.tilesfx.weather.DarkSky.Unit;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
@@ -62,11 +59,9 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +119,6 @@ public class Demo extends Application {
     private Tile            sliderTile;
     private Tile            switchTile;
     private Tile            worldTile;
-    private Tile            weatherTile;
     private Tile            timeTile;
     private Tile            barChartTile;
     private Tile            customTile;
@@ -139,7 +133,6 @@ public class Demo extends Application {
     private Tile            radarChartTile2;
     private Tile            smoothAreaChartTile;
     private Tile            countryTile;
-    private Tile            ephemerisTile;
     private Tile            characterTile;
     private Tile            flipTile;
     private Tile            switchSliderTile;
@@ -229,10 +222,6 @@ public class Demo extends Application {
 
         timeSection.setOnTimeSectionEntered(e -> System.out.println("Section ACTIVE"));
         timeSection.setOnTimeSectionLeft(e -> System.out.println("Section INACTIVE"));
-
-        // Weather (You can get a DarkSky API key here: https://darksky.net/dev/ )
-        DarkSky darkSky = new DarkSky("YOUR DARKSKY API KEY", Unit.CA, Language.ENGLISH, 51.911858, 7.632815);
-        //darkSky.update();
 
         // BarChart Items
         barChartItem1 = new BarChartItem("Gerrit", 47, Tile.BLUE);
@@ -413,15 +402,6 @@ public class Demo extends Application {
                                .textVisible(false)
                                .build();
 
-        // Update the weather information by calling weatherTile.updateWeather()
-        weatherTile = TileBuilder.create()
-                                 .skinType(SkinType.WEATHER)
-                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                 .title("YOUR CITY NAME")
-                                 .text("Whatever text")
-                                 .darkSky(darkSky)
-                                 .build();
-
         timeTile = TileBuilder.create()
                               .skinType(SkinType.TIME)
                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
@@ -495,7 +475,6 @@ public class Demo extends Application {
                                           .title("CircularProgress")
                                           .text("Some text")
                                           .unit(Helper.PERCENTAGE)
-                                          //.graphic(new WeatherSymbol(ConditionAndIcon.CLEAR_DAY, 48, Color.WHITE))
                                           .build();
 
         stockTile = TileBuilder.create()
@@ -657,13 +636,6 @@ public class Demo extends Application {
                                           .tooltipText("")
                                           .animated(true)
                                           .build();
-
-        ephemerisTile = TileBuilder.create().skinType(SkinType.EPHEMERIS)
-                                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                            .title("Ephemeris")
-                                            .currentLocation(new Location(51.911515,7.6340026, "Hiltrup"))
-                                            .text("Hiltrup")
-                                            .build();
 
         characterTile = TileBuilder.create().skinType(SkinType.CHARACTER)
                                             .prefSize(TILE_WIDTH, TILE_HEIGHT)
@@ -987,10 +959,10 @@ public class Demo extends Application {
                                              barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
                                              radialChartTile, donutChartTile, circularProgressTile, stockTile,
                                              gaugeSparkLineTile, radarChartTile1, radarChartTile2,
-                                             smoothAreaChartTile, countryTile, ephemerisTile, characterTile,
+                                             smoothAreaChartTile, countryTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
-                                             timelineTile, imageCounterTile, ledTile, countdownTile);//, weatherTile);
+                                             timelineTile, imageCounterTile, ledTile, countdownTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

@@ -41,7 +41,6 @@ import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.SectionComparator;
 import eu.hansolo.tilesfx.tools.TimeData;
 import eu.hansolo.tilesfx.tools.TimeSectionComparator;
-import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -130,12 +129,12 @@ public class Tile extends Control {
                            SPARK_LINE("SparkLineTileSkin"), SWITCH("SwitchTileSkin"),
                            WORLDMAP("WorldMapTileSkin"), TIMER_CONTROL("TimerControlTileSkin"),
                            NUMBER("NumberTileSkin"), TEXT("TextTileSkin"),
-                           WEATHER("WeatherTileSkin"), TIME("TimeTileSkin"),
+                           TIME("TimeTileSkin"),
                            CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChartTileSkin"), DONUT_CHART("DonutChartTileSkin"),
                            CIRCULAR_PROGRESS("CircularProgressTileSkin"), STOCK("StockTileSkin"),
                            GAUGE_SPARK_LINE("GaugeSparkLineTileSkin"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
-                           RADAR_CHART("RadarChartTileSkin"), RADAR_NODE_CHART("RadarNodeChartTileSkin"), COUNTRY("CountryTileSkin"), EPHEMERIS("EphemerisTileSkin"),
+                           RADAR_CHART("RadarChartTileSkin"), RADAR_NODE_CHART("RadarNodeChartTileSkin"), COUNTRY("CountryTileSkin"),
                            CHARACTER("CharacterTileSkin"), FLIP("FlipTileSkin"), SWITCH_SLIDER("SwitchSliderTileSkin"),
                            DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"), MATRIX("MatrixTileSkin"),
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
@@ -517,7 +516,6 @@ public class Tile extends Control {
     private BooleanProperty                strokeWithGradient;
     private boolean                        _fillWithGradient;
     private BooleanProperty                fillWithGradient;
-    private DarkSky                        darkSky;
     private String                         _tooltipText;
     private StringProperty                 tooltipText;
     private Tooltip                        tooltip;
@@ -5303,21 +5301,6 @@ public class Tile extends Control {
         return fillWithGradient;
     }
 
-    public DarkSky getDarkSky() { return darkSky; }
-    public void setDarkSky(final DarkSky DARK_SKY) {
-        darkSky = DARK_SKY;
-        fireTileEvent(REDRAW_EVENT);
-    }
-
-    public void updateWeather() {
-        if (null == darkSky) return;
-        if (darkSky.update()) {
-            fireTileEvent(REDRAW_EVENT);
-        } else {
-            throw new IllegalArgumentException("Do you use a valid DarkSKY API key?");
-        }
-    }
-
     public Color getNotifyRegionBackgroundColor() { return _notifyRegionBackgroundColor; }
     public void setNotifyRegionBackgroundColor(final Color COLOR) {
         _notifyRegionBackgroundColor = COLOR;
@@ -5860,7 +5843,6 @@ public class Tile extends Control {
             case TIMER_CONTROL    : return new TimerControlTileSkin(Tile.this);
             case NUMBER           : return new NumberTileSkin(Tile.this);
             case TEXT             : return new TextTileSkin(Tile.this);
-            case WEATHER          : return new WeatherTileSkin(Tile.this);
             case TIME             : return new TimeTileSkin(Tile.this);
             case CUSTOM           : return new CustomTileSkin(Tile.this);
             case LEADER_BOARD     : return new LeaderBoardTileSkin(Tile.this);
@@ -5874,7 +5856,6 @@ public class Tile extends Control {
             case RADAR_CHART      : return new RadarChartTileSkin(Tile.this);
             case RADAR_NODE_CHART : return new RadarNodeChartTileSkin(Tile.this);
             case COUNTRY          : return new CountryTileSkin(Tile.this);
-            case EPHEMERIS        : return new EphemerisTileSkin(Tile.this);
             case CHARACTER        : return new CharacterTileSkin(Tile.this);
             case FLIP             : return new FlipTileSkin(Tile.this);
             case SWITCH_SLIDER    : return new SwitchSliderTileSkin(Tile.this);
@@ -5955,8 +5936,6 @@ public class Tile extends Control {
                 break;
             case TEXT:
                 break;
-            case WEATHER:
-                break;
             case TIME:
                 break;
             case CUSTOM:
@@ -5997,8 +5976,6 @@ public class Tile extends Control {
             case RADAR_NODE_CHART:
                 break;
             case COUNTRY:
-                break;
-            case EPHEMERIS:
                 break;
             case CHARACTER:
                 break;
@@ -6087,7 +6064,6 @@ public class Tile extends Control {
             case TIMER_CONTROL    : setSkin(new TimerControlTileSkin(Tile.this)); break;
             case NUMBER           : setSkin(new NumberTileSkin(Tile.this)); break;
             case TEXT             : setSkin(new TextTileSkin(Tile.this)); break;
-            case WEATHER          : setSkin(new WeatherTileSkin(Tile.this)); break;
             case TIME             : setSkin(new TimeTileSkin(Tile.this)); break;
             case CUSTOM           : setSkin(new CustomTileSkin(Tile.this)); break;
             case LEADER_BOARD     : setSkin(new LeaderBoardTileSkin(Tile.this)); break;
@@ -6100,7 +6076,6 @@ public class Tile extends Control {
             case RADAR_CHART      : setSkin(new RadarChartTileSkin(Tile.this)); break;
             case RADAR_NODE_CHART : setSkin(new RadarNodeChartTileSkin(Tile.this)); break;
             case COUNTRY          : setSkin(new CountryTileSkin(Tile.this)); break;
-            case EPHEMERIS        : setSkin(new EphemerisTileSkin(Tile.this)); break;
             case CHARACTER        : setSkin(new CharacterTileSkin(Tile.this)); break;
             case FLIP             : setSkin(new FlipTileSkin(Tile.this)); break;
             case SWITCH_SLIDER    : setSkin(new SwitchSliderTileSkin(Tile.this)); break;

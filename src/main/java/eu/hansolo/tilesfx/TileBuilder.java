@@ -38,7 +38,6 @@ import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.TreeNode;
-import eu.hansolo.tilesfx.weather.DarkSky;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -726,11 +725,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B darkSky(final DarkSky DARK_SKY) {
-        properties.put("darkSky", new SimpleObjectProperty(DARK_SKY));
-        return (B)this;
-    }
-
     public final B image(final Image IMAGE) {
         properties.put("image", new SimpleObjectProperty(IMAGE));
         return (B)this;
@@ -1169,8 +1163,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case TEXT:
                     break;
-                case WEATHER:
-                    break;
                 case TIME:
                     break;
                 case CUSTOM:
@@ -1211,8 +1203,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case RADAR_NODE_CHART:
                     break;
                 case COUNTRY:
-                    break;
-                case EPHEMERIS:
                     break;
                 case CHARACTER:
                     break;
@@ -1615,8 +1605,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setIncrement(((DoubleProperty) properties.get(key)).get());
             } else if ("activeColor".equals(key)) {
                 TILE.setActiveColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("darkSky".equals(key)) {
-                TILE.setDarkSky(((ObjectProperty<DarkSky>) properties.get(key)).get());
             } else if ("duration".equals(key)) {
                 TILE.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
             } else if ("strokeWithGradient".equals(key)) {

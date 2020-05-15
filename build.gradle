@@ -176,6 +176,8 @@ bintray {
         vcsUrl                = 'git@github.com:HanSolo/tilesfx.git'
         publicDownloadNumbers = true
         version {
+            name   = project.version
+            vcsTag = project.version
             mavenCentralSync {
                 sync = true
                 user = project.sonatypeUsername

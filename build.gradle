@@ -15,7 +15,7 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'net.nemerosa.versioning' version '2.10.0'
-    id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.jfrog.bintray' version '1.8.5'
     id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
@@ -156,6 +156,9 @@ publishing {
 
 if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
 if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
+if (!project.hasProperty('sonatypeUsername')) ext.sonatypeUsername = ''
+if (!project.hasProperty('sonatypePassword')) ext.sonatypePassword = ''
+
 
 bintray {
     user = project.bintrayUsername
@@ -172,5 +175,13 @@ bintray {
         issueTrackerUrl       = 'https://github.com/HanSolo/tilesfx/issues'
         vcsUrl                = 'git@github.com:HanSolo/tilesfx.git'
         publicDownloadNumbers = true
+        version {
+            mavenCentralSync {
+                sync = true
+                user = project.sonatypeUsername
+                password = project.sonatypePassword
+                close = '1'
+            }
+        }
     }
 }

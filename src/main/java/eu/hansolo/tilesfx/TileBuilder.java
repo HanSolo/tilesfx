@@ -37,6 +37,7 @@ import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.TreeNode;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -919,6 +920,15 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B matrixIcons(final MatrixIcon... MATRIX_ICONS) {
+        properties.put("matrixIconsArray", new SimpleObjectProperty(MATRIX_ICONS));
+        return (B)this;
+    }
+    public final B matrixIcons(final List<MatrixIcon> MATRIX_ICONS) {
+        properties.put("matrixIconsList", new SimpleObjectProperty(MATRIX_ICONS));
+        return (B)this;
+    }
+
     public final B notifyRegionBackgroundColor(final Color COLOR) {
         properties.put("notifyRegionBackgroundColor", new SimpleObjectProperty(COLOR));
         return (B)this;
@@ -1228,6 +1238,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case MATRIX:
                     break;
+                case MATRIX_ICON:
+                    break;
                 case RADIAL_PERCENTAGE:
                     TILE.setBarBackgroundColor(TILE.getBackgroundColor().brighter());
                     TILE.setAnimated(true);
@@ -1352,6 +1364,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
         if (properties.keySet().contains("gradientStopsList")) {
             TILE.setGradientStops(((ObjectProperty<List<Stop>>) properties.get("gradientStopsList")).get());
+        }
+
+        if (properties.keySet().contains("matrixIconsArray")) {
+            TILE.setMatrixIcons(((ObjectProperty<MatrixIcon[]>) properties.get("matrixIconsArray")).get());
+        }
+        if (properties.keySet().contains("matrixIconsList")) {
+            TILE.setMatrixIcons(((ObjectProperty<List<MatrixIcon>>) properties.get("matrixIconsList")).get());
         }
 
         if (properties.keySet().contains("chartDataArray")) {

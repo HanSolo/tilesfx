@@ -37,6 +37,7 @@ import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.SectionComparator;
 import eu.hansolo.tilesfx.tools.TimeData;
@@ -136,7 +137,8 @@ public class Tile extends Control {
                            GAUGE_SPARK_LINE("GaugeSparkLineTileSkin"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
                            RADAR_CHART("RadarChartTileSkin"), RADAR_NODE_CHART("RadarNodeChartTileSkin"), COUNTRY("CountryTileSkin"),
                            CHARACTER("CharacterTileSkin"), FLIP("FlipTileSkin"), SWITCH_SLIDER("SwitchSliderTileSkin"),
-                           DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"), MATRIX("MatrixTileSkin"),
+                           DATE("DateTileSkin"), CALENDAR("CalendarTileSkin"), SUNBURST("SunburstTileSkin"),
+                           MATRIX("MatrixTileSkin"), MATRIX_ICON("MatrixIconTileSkin"),
                            RADIAL_PERCENTAGE("RadialPercentageTileSkin"),
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
                            IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
@@ -254,6 +256,8 @@ public class Tile extends Control {
     private        final TileEvent INFO_REGION_HANDLER_EVENT      = new TileEvent(EventType.INFO_REGION_HANDLER);
     private        final TileEvent CLEAR_DATA_EVENT               = new TileEvent(EventType.CLEAR_DATA);
     private        final TileEvent HIGHLIGHT_SECTIONS             = new TileEvent(EventType.HIGHLIGHT_SECTIONS);
+    private        final TileEvent ANIMATED_ON_EVENT              = new TileEvent(EventType.ANIMATED_ON);
+    private        final TileEvent ANIMATED_OFF_EVENT            = new TileEvent(EventType.ANIMATED_OFF);
 
     private static       String      userAgentStyleSheet;
 
@@ -542,6 +546,7 @@ public class Tile extends Control {
     private int                            _minorTickCount;
     private double                         _majorTickUnit;
     private int[]                          _matrixSize;
+    private ObservableList<MatrixIcon>     matrixIcons;
     private ChartType                      _chartType;
     private double                         _tooltipTimeout;
     private DoubleProperty                 tooltipTimeout;
@@ -936,6 +941,7 @@ public class Tile extends Control {
         _minorTickCount                     = 0;
         _majorTickUnit                      = 1;
         _matrixSize                         = new int[]{ 30, 25 };
+        matrixIcons                         = FXCollections.observableArrayList();
         _chartType                          = ChartType.LINE;
         _tooltipTimeout                     = 2000;
         _notifyRegionBackgroundColor        = Tile.YELLOW;
@@ -2827,6 +2833,7 @@ public class Tile extends Control {
         if (null == animated) {
             _animated = ANIMATED;
             updateChartData();
+            fireTileEvent(ANIMATED ? ANIMATED_ON_EVENT : ANIMATED_OFF_EVENT);
         } else {
             animated.set(ANIMATED);
         }
@@ -2834,7 +2841,10 @@ public class Tile extends Control {
     public BooleanProperty animatedProperty() {
         if (null == animated) {
             animated = new BooleanPropertyBase(_animated) {
-                @Override protected void invalidated() { updateChartData(); }
+                @Override protected void invalidated() {
+                    updateChartData();
+                    fireTileEvent(get() ? ANIMATED_ON_EVENT : ANIMATED_OFF_EVENT);
+                }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "animated"; }
             };
@@ -5130,6 +5140,24 @@ public class Tile extends Control {
         fireTileEvent(RECALC_EVENT);
     }
 
+    public List<MatrixIcon> getMatrixIcons() { return matrixIcons; }
+    public void setMatrixIcons(final MatrixIcon... MATRIX_ICONS) { setMatrixIcons(Arrays.asList(MATRIX_ICONS)); }
+    public void setMatrixIcons(final List<MatrixIcon> MATRIX_ICONS) {
+        matrixIcons.setAll(MATRIX_ICONS);
+        fireTileEvent(REDRAW_EVENT);
+    }
+    public void addMatrixIcon(final MatrixIcon MATRIX_ICON) {
+        if (matrixIcons.contains(MATRIX_ICON)) { return; }
+        matrixIcons.add(MATRIX_ICON);
+        fireTileEvent(REDRAW_EVENT);
+    }
+    public void removeMatrixIcon(final MatrixIcon MATRIX_ICON) {
+        if (matrixIcons.contains(MATRIX_ICON)) {
+            matrixIcons.remove(MATRIX_ICON);
+        }
+        fireTileEvent(REDRAW_EVENT);
+    }
+
     public ChartType getChartType() { return _chartType; }
     public void setChartType(final ChartType TYPE) {
         _chartType = TYPE;
@@ -5898,6 +5926,7 @@ public class Tile extends Control {
             case CALENDAR         : return new CalendarTileSkin(Tile.this);
             case SUNBURST         : return new SunburstChartTileSkin(Tile.this);
             case MATRIX           : return new MatrixTileSkin(Tile.this);
+            case MATRIX_ICON      : return new MatrixIconTileSkin(Tile.this);
             case RADIAL_PERCENTAGE: return new RadialPercentageTileSkin(Tile.this);
             case STATUS           : return new StatusTileSkin(Tile.this);
             case BAR_GAUGE        : return new BarGaugeTileSkin(Tile.this);
@@ -6031,6 +6060,8 @@ public class Tile extends Control {
                 break;
             case MATRIX:
                 break;
+            case MATRIX_ICON:
+                break;
             case RADIAL_PERCENTAGE:
                 setBarBackgroundColor(getBackgroundColor().brighter());
                 setAnimated(true);
@@ -6118,6 +6149,7 @@ public class Tile extends Control {
             case CALENDAR         : setSkin(new CalendarTileSkin(Tile.this)); break;
             case SUNBURST         : setSkin(new SunburstChartTileSkin(Tile.this)); break;
             case MATRIX           : setSkin(new MatrixTileSkin(Tile.this)); break;
+            case MATRIX_ICON      : setSkin(new MatrixIconTileSkin(Tile.this)); break;
             case RADIAL_PERCENTAGE: setSkin(new RadialPercentageTileSkin(Tile.this)); break;
             case STATUS           : setSkin(new StatusTileSkin(Tile.this)); break;
             case BAR_GAUGE        : setSkin(new BarGaugeTileSkin(Tile.this)); break;

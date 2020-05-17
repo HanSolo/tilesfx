@@ -32,7 +32,7 @@ public class TileEvent {
                             FINISHED, SERIES, DATA, GRAPHIC, UPDATE, AVERAGING, TIME_PERIOD, LOCATION, TRACK, MAP_PROVIDER,
                             TOOLTIP_TEXT, VALUE_CHANGING, VALUE_CHANGED, FLIP_START, FLIP_FINISHED,
                             SELECTED_CHART_DATA, BACKGROUND_IMAGE, REGIONS_ON_TOP, INFO_REGION_HANDLER, SVG_PATH_PRESSED,
-                            CLEAR_DATA, HIGHLIGHT_SECTIONS }
+                            CLEAR_DATA, HIGHLIGHT_SECTIONS, ANIMATED_ON, ANIMATED_OFF }
 
     private final EventType EVENT_TYPE;
     private final ChartData DATA;

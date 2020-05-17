@@ -12,7 +12,7 @@ buildscript {
 // TilesFX main build file
 plugins {
     id 'idea'
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
     id 'net.nemerosa.versioning' version '2.10.0'
     id 'com.jfrog.bintray' version '1.8.5'

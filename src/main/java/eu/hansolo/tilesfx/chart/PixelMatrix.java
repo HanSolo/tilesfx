@@ -30,6 +30,8 @@ import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Effect;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -77,6 +79,8 @@ public class PixelMatrix extends Region {
     private              double                                         pixelSizeMinusDoubleSpacer;
     private              double                                         pixelWidthMinusDoubleSpacer;
     private              double                                         pixelHeightMinusDoubleSpacer;
+    private              boolean                                        innerShadowEnabled;
+    private              Effect                                         innerShadow;
     private              InvalidationListener                           sizeListener;
     private              EventHandler<MouseEvent>                       clickHandler;
     private              CopyOnWriteArrayList<PixelMatrixEventListener> listeners;
@@ -107,6 +111,7 @@ public class PixelMatrix extends Region {
         characterWidthMinusOne = characterWidth - 1;
         useSpacer              = true;
         squarePixels           = true;
+        innerShadowEnabled     = false;
         spacerSizeFactor       = DEFAULT_SPACER_SIZE_FACTOR;
         sizeListener           = o -> resize();
         clickHandler           = e -> checkForClick(e);
@@ -357,6 +362,9 @@ public class PixelMatrix extends Region {
         drawMatrix();
     }
 
+    public boolean isInnerShadowEnabled() { return innerShadowEnabled; }
+    public void setInnerShadowEnabled(final boolean ENABLED) { innerShadowEnabled = ENABLED; }
+
     public void drawMatrix() {
         ctx.clearRect(0, 0, width, height);
         switch(pixelShape) {
@@ -365,19 +373,25 @@ public class PixelMatrix extends Region {
                 CtxCornerRadii cornerRadii = new CtxCornerRadii(pixelSize * 0.125);
                 for (int y = 0; y < rows; y++) {
                     for (int x = 0; x < cols; x++) {
+                        ctx.save();
+                        if (innerShadowEnabled) { ctx.setEffect(innerShadow); }
                         ctx.setFill(convertToColor(matrix[x][y]));
                         bounds.setX(x * pixelWidth + spacer);
                         bounds.setY(y * pixelHeight + spacer);
                         Helper.drawRoundedRect(ctx, bounds, cornerRadii);
                         ctx.fill();
+                        ctx.restore();
                     }
                 }
                 break;
             case ROUND:
                 for (int y = 0; y < rows; y++) {
                     for (int x = 0; x < cols; x++) {
+                        ctx.save();
+                        if (innerShadowEnabled) { ctx.setEffect(innerShadow); }
                         ctx.setFill(convertToColor(matrix[x][y]));
                         ctx.fillOval(x * pixelWidth + spacer, y * pixelHeight + spacer, pixelWidthMinusDoubleSpacer, pixelHeightMinusDoubleSpacer);
+                        ctx.restore();
                     }
                 }
                 break;
@@ -385,8 +399,11 @@ public class PixelMatrix extends Region {
             default    :
                 for (int y = 0; y < rows; y++) {
                     for (int x = 0; x < cols; x++) {
+                        ctx.save();
+                        if (innerShadowEnabled) { ctx.setEffect(innerShadow); }
                         ctx.setFill(convertToColor(matrix[x][y]));
                         ctx.fillRect(x * pixelWidth + spacer, y * pixelHeight + spacer, pixelWidthMinusDoubleSpacer, pixelHeightMinusDoubleSpacer);
+                        ctx.restore();
                     }
                 }
                 break;
@@ -443,6 +460,8 @@ public class PixelMatrix extends Region {
         pixelWidthMinusDoubleSpacer  = pixelWidth - spacer * 2;
         pixelHeightMinusDoubleSpacer = pixelHeight - spacer * 2;
 
+        double shadowRadius = pixelSize / 2.0;
+        innerShadow = new InnerShadow(shadowRadius, 0, 0, Color.rgb(0, 0, 0, 0.65));
 
         if (width > 0 && height > 0) {
             if (squarePixels) {

@@ -90,6 +90,11 @@ public class PixelMatrixBuilder<B extends PixelMatrixBuilder<B>> {
         return (B)this;
     }
 
+    public final B innerShadowEnabled(final boolean ENABLED) {
+        properties.put("innerShadowEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
     public final B prefSize(final double WIDTH, final double HEIGHT) {
         properties.put("prefSize", new SimpleObjectProperty<>(new Dimension2D(WIDTH, HEIGHT)));
         return (B)this;
@@ -222,6 +227,8 @@ public class PixelMatrixBuilder<B extends PixelMatrixBuilder<B>> {
                 CONTROL.setSpacerSizeFactor(((DoubleProperty) properties.get(key)).get());
             } else if ("squarePixels".equals(key)) {
                 CONTROL.setSquarePixels(((BooleanProperty) properties.get(key)).get());
+            } else if ("innerShadowEnabled".equals(key)) {
+                CONTROL.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

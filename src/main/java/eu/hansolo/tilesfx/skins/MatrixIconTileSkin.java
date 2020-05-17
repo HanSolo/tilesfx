@@ -56,7 +56,9 @@ public class MatrixIconTileSkin extends TileSkin {
                                    .squarePixels(true)
                                    .colsAndRows(8, 8)
                                    .pixelOnColor(tile.getBarColor())
-                                   .pixelOffColor(Helper.isDark(tile.getBackgroundColor()) ? tile.getBackgroundColor().brighter() : tile.getBackgroundColor().darker())
+                                   //.pixelOffColor(Helper.isDark(tile.getBackgroundColor()) ? tile.getBackgroundColor().brighter() : tile.getBackgroundColor().darker())
+                                   .pixelOffColor(MatrixIcon.BACKGROUND)
+                                   .innerShadowEnabled(true)
                                    .build();
 
         titleText = new Text();
@@ -66,8 +68,6 @@ public class MatrixIconTileSkin extends TileSkin {
         text = new Text(tile.getText());
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
-
-        matrix.setPixelOffColor(MatrixIcon.BACKGROUND);
 
         long updateInterval = tile.getAnimationDuration() * 1_000_000l;
         lastTimerCall       = System.nanoTime();

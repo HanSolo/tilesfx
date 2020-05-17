@@ -34,7 +34,10 @@ public class MatrixIconTileSkin extends TileSkin {
     private Text           text;
     private PixelMatrix    matrix;
     private int            iconCounter;
+    private long           updateInterval;
+    private long           pauseInterval;
     private AnimationTimer timer;
+    private AnimationTimer pauseTimer;
     private long           lastTimerCall;
 
 
@@ -69,13 +72,22 @@ public class MatrixIconTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
 
-        long updateInterval = tile.getAnimationDuration() * 1_000_000l;
+        updateInterval = tile.getAnimationDuration() * 1_000_000l;
         lastTimerCall       = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + updateInterval) {
                     updateMatrix();
                     lastTimerCall = now;
+                }
+            }
+        };
+        pauseInterval = tile.getPauseDuration() * 1_000_000l;
+        pauseTimer = new AnimationTimer() {
+            @Override public void handle(final long now) {
+                if (now > lastTimerCall + pauseInterval) {
+                    pauseTimer.stop();
+                    if (tile.isAnimated()) { timer.start(); }
                 }
             }
         };
@@ -99,6 +111,8 @@ public class MatrixIconTileSkin extends TileSkin {
             matrix.setColsAndRows(tile.getMatrixSize());
             resize();
         } else if (EventType.ANIMATED_ON.name().equals(EVENT_TYPE)) {
+            updateInterval = tile.getAnimationDuration() * 1_000_000l;
+            pauseInterval  = tile.getPauseDuration() * 1_000_000l;
             timer.start();
         } else if (EventType.ANIMATED_OFF.name().equals(EVENT_TYPE)) {
             timer.stop();
@@ -123,6 +137,8 @@ public class MatrixIconTileSkin extends TileSkin {
             iconCounter++;
             if (iconCounter > tile.getMatrixIcons().size() - 1) {
                 iconCounter = 0;
+                timer.stop();
+                pauseTimer.start();
             }
         }
         matrix.drawMatrix();

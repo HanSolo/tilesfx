@@ -389,6 +389,7 @@ public class Tile extends Control {
     private boolean                        _animated;
     private BooleanProperty                animated;
     private long                           animationDuration;
+    private long                           pauseDuration;
     private double                         _startAngle;
     private DoubleProperty                 startAngle;
     private double                         _angleRange;
@@ -868,6 +869,7 @@ public class Tile extends Control {
         _activeColor                        = BLUE;
         _animated                           = false;
         animationDuration                   = 800;
+        pauseDuration                       = 2000;
         _startAngle                         = 0;
         _angleRange                         = 180;
         _angleStep                          = _angleRange / _range;
@@ -2870,6 +2872,24 @@ public class Tile extends Control {
      * @param ANIMATION_DURATION
      */
     public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = clamp(10, 10000, ANIMATION_DURATION); }
+
+    /**
+     * Returns the duration in milliseconds that will be used as pause
+     * between animations in the MatrixIconSkin
+     * clamped in the range of 10ms - 10s.
+     *
+     * @return the duration in milliseconds that will be used as pause
+     */
+    public long getPauseDuration() { return pauseDuration; }
+    /**
+     * Defines the duration in milliseconds that will be used as pause
+     * between animations in the MatrixIconSkin
+     * clamped in the range of 10ms - 10s.
+     *
+     * @param PAUSE_DURATION
+     */
+    public void setPauseDuration(final long PAUSE_DURATION) { pauseDuration = clamp(10, 10000, PAUSE_DURATION); }
+
 
     /**
      * Returns the angle in degree that defines the start of the scale with

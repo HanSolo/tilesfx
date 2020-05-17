@@ -291,6 +291,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B pauseDuration(final long DURATION) {
+        properties.put("pauseDuration", new SimpleLongProperty(DURATION));
+        return (B)this;
+    }
+
     public final B startAngle(final double ANGLE) {
         properties.put("startAngle", new SimpleDoubleProperty(ANGLE));
         return (B)this;
@@ -1493,6 +1498,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setAnimated(((BooleanProperty) properties.get(key)).get());
             } else if("animationDuration".equals(key)) {
                 TILE.setAnimationDuration(((LongProperty) properties.get(key)).get());
+            } else if("pauseDuration".equals(key)) {
+                TILE.setPauseDuration(((LongProperty) properties.get(key)).get());
             } else if("startAngle".equals(key)) {
                 TILE.setStartAngle(((DoubleProperty) properties.get(key)).get());
             } else if("angleRange".equals(key)) {

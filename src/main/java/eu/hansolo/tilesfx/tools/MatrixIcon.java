@@ -42,11 +42,28 @@ public class MatrixIcon {
     public Pixel[][] getMatrix() { return matrix; }
 
     public Pixel getPixelAt(final int X, final int Y) {
-        if (X < 0 || X > 7 || Y < 0 || Y > 7) { throw new IllegalArgumentException("x/y values need to be in the range of 0-7"); }
+        if (!isValid(X) || !isValid(Y)) { throw new IllegalArgumentException("x/y values need to be in the range of 0-7"); }
         return matrix[X][Y];
     }
     public void setPixelAt(final int X, final int Y, final Color COLOR) {
-        if (X < 0 || X > 7 || Y < 0 || Y > 7) { throw new IllegalArgumentException("x/y values need to be in the range of 0-7"); }
+        if (!isValid(X) || !isValid(Y)) { throw new IllegalArgumentException("x/y values need to be in the range of 0-7"); }
         matrix[X][Y].setColor(COLOR);
+    }
+
+    public void fillPixels(final int X_START, final int X_END, final int Y, final Color COLOR) {
+        if (!isValid(X_START) || !isValid(X_END) || !isValid(Y)) { throw new IllegalArgumentException("x/y values need to be in the range of 0-7"); }
+        if (X_START > X_END) { throw new IllegalArgumentException("start x cannot be greater than end x"); }
+        for (int x = X_START ; x <= X_END ; x++) {
+            matrix[x][Y].setColor(COLOR);
+        }
+    }
+
+
+    private boolean isValid(final int VALUE) {
+        if (VALUE < 0 || VALUE > 7) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

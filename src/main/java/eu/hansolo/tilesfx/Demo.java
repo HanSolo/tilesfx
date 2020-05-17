@@ -34,6 +34,7 @@ import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.TreeNode;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -148,6 +149,7 @@ public class Demo extends Application {
     private Tile            imageCounterTile;
     private Tile            ledTile;
     private Tile            countdownTile;
+    private Tile            matrixIconTile;
 
 
     private long            lastTimerCall;
@@ -718,7 +720,7 @@ public class Demo extends Application {
 
         matrixTile = TileBuilder.create().skinType(SkinType.MATRIX)
                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                .title("MatrixTileSkin")
+                                .title("MatrixTile")
                                 .text("Any Text")
                                 .textVisible(false)
                                 .animated(true)
@@ -730,7 +732,7 @@ public class Demo extends Application {
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                           //.backgroundColor(Color.web("#26262D"))
                                           .maxValue(1000)
-                                          .title("RadialPercentageSkin")
+                                          .title("RadialPercentage")
                                           .description("Product 1")
                                           .textVisible(false)
                                           .chartData(chartData1, chartData2, chartData3)
@@ -873,6 +875,141 @@ public class Demo extends Application {
                                    .onAlarm(e -> System.out.println("Alarm"))
                                    .build();
 
+        MatrixIcon matrixIcon1 = new MatrixIcon();
+        matrixIcon1.fillPixels(2, 5, 1, Color.BLACK);
+        matrixIcon1.setPixelAt(1, 2, Color.BLACK);
+        matrixIcon1.fillPixels(2, 5, 2, Color.WHITE);
+        matrixIcon1.setPixelAt(6, 2, Color.BLACK);
+        matrixIcon1.setPixelAt(0, 3, Color.BLACK);
+        matrixIcon1.fillPixels(1, 2, 3, Color.WHITE);
+        matrixIcon1.fillPixels(3, 4, 3, Color.web("#4d79ff"));
+        matrixIcon1.fillPixels(5, 6, 3, Color.WHITE);
+        matrixIcon1.setPixelAt(7, 3, Color.BLACK);
+        matrixIcon1.setPixelAt(0, 4, Color.BLACK);
+        matrixIcon1.fillPixels(1, 2, 4, Color.WHITE);
+        matrixIcon1.fillPixels(3, 4, 4, Color.web("#4d79ff"));
+        matrixIcon1.fillPixels(5, 6, 4, Color.WHITE);
+        matrixIcon1.setPixelAt(7, 4, Color.BLACK);
+        matrixIcon1.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon1.fillPixels(2, 5, 5, Color.WHITE);
+        matrixIcon1.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon1.fillPixels(2, 5, 6, Color.BLACK);
+
+        MatrixIcon matrixIcon2 = new MatrixIcon();
+        matrixIcon2.fillPixels(1, 6, 2, Color.BLACK);
+        matrixIcon2.setPixelAt(0, 3, Color.BLACK);
+        matrixIcon2.fillPixels(1, 2, 3, Color.WHITE);
+        matrixIcon2.fillPixels(3, 4, 3, Color.web("#4d79ff"));
+        matrixIcon2.fillPixels(5, 6, 3, Color.WHITE);
+        matrixIcon2.setPixelAt(7, 3, Color.BLACK);
+        matrixIcon2.setPixelAt(0, 4, Color.BLACK);
+        matrixIcon2.fillPixels(1, 2, 4, Color.WHITE);
+        matrixIcon2.fillPixels(3, 4, 4, Color.web("#4d79ff"));
+        matrixIcon2.fillPixels(5, 6, 4, Color.WHITE);
+        matrixIcon2.setPixelAt(7, 4, Color.BLACK);
+        matrixIcon2.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon2.fillPixels(2, 5, 5, Color.WHITE);
+        matrixIcon2.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon2.fillPixels(2, 5, 6, Color.BLACK);
+
+        MatrixIcon matrixIcon3 = new MatrixIcon();
+        matrixIcon3.fillPixels(0, 7, 3, Color.BLACK);
+        matrixIcon3.setPixelAt(0, 4, Color.BLACK);
+        matrixIcon3.fillPixels(1, 2, 4, Color.WHITE);
+        matrixIcon3.fillPixels(3, 4, 4, Color.web("#4d79ff"));
+        matrixIcon3.fillPixels(5, 6, 4, Color.WHITE);
+        matrixIcon3.setPixelAt(7, 4, Color.BLACK);
+        matrixIcon3.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon3.fillPixels(2, 5, 5, Color.WHITE);
+        matrixIcon3.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon3.fillPixels(2, 5, 6, Color.BLACK);
+
+        MatrixIcon matrixIcon4 = new MatrixIcon();
+        matrixIcon4.setPixelAt(0, 3, Color.BLACK);
+        matrixIcon4.setPixelAt(7, 3, Color.BLACK);
+        matrixIcon4.fillPixels(0, 7, 4, Color.BLACK);
+        matrixIcon4.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon4.fillPixels(2, 5, 5, Color.WHITE);
+        matrixIcon4.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon4.fillPixels(2, 5, 6, Color.BLACK);
+
+        MatrixIcon matrixIcon5 = new MatrixIcon();
+        matrixIcon5.setPixelAt(0, 3, Color.BLACK);
+        matrixIcon5.setPixelAt(7, 3, Color.BLACK);
+        matrixIcon5.setPixelAt(0, 4, Color.BLACK);
+        matrixIcon5.setPixelAt(7, 4, Color.BLACK);
+        matrixIcon5.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon5.fillPixels(2, 5, 5, Color.BLACK);
+        matrixIcon5.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon5.fillPixels(2, 5, 6, Color.BLACK);
+
+        MatrixIcon matrixIcon6 = new MatrixIcon();
+        matrixIcon6.setPixelAt(0, 3, Color.BLACK);
+        matrixIcon6.setPixelAt(7, 3, Color.BLACK);
+        matrixIcon6.fillPixels(0, 7, 4, Color.BLACK);
+        matrixIcon6.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon6.fillPixels(2, 5, 5, Color.WHITE);
+        matrixIcon6.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon6.fillPixels(2, 5, 6, Color.BLACK);
+
+        MatrixIcon matrixIcon7 = new MatrixIcon();
+        matrixIcon7.fillPixels(0, 7, 3, Color.BLACK);
+        matrixIcon7.setPixelAt(0, 4, Color.BLACK);
+        matrixIcon7.fillPixels(1, 2, 4, Color.WHITE);
+        matrixIcon7.fillPixels(3, 4, 4, Color.web("#4d79ff"));
+        matrixIcon7.fillPixels(5, 6, 4, Color.WHITE);
+        matrixIcon7.setPixelAt(7, 4, Color.BLACK);
+        matrixIcon7.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon7.fillPixels(2, 5, 5, Color.WHITE);
+        matrixIcon7.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon7.fillPixels(2, 5, 6, Color.BLACK);
+
+        MatrixIcon matrixIcon8 = new MatrixIcon();
+        matrixIcon8.fillPixels(1, 6, 2, Color.BLACK);
+        matrixIcon8.setPixelAt(0, 3, Color.BLACK);
+        matrixIcon8.fillPixels(1, 2, 3, Color.WHITE);
+        matrixIcon8.fillPixels(3, 4, 3, Color.web("#4d79ff"));
+        matrixIcon8.fillPixels(5, 6, 3, Color.WHITE);
+        matrixIcon8.setPixelAt(7, 3, Color.BLACK);
+        matrixIcon8.setPixelAt(0, 4, Color.BLACK);
+        matrixIcon8.fillPixels(1, 2, 4, Color.WHITE);
+        matrixIcon8.fillPixels(3, 4, 4, Color.web("#4d79ff"));
+        matrixIcon8.fillPixels(5, 6, 4, Color.WHITE);
+        matrixIcon8.setPixelAt(7, 4, Color.BLACK);
+        matrixIcon8.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon8.fillPixels(2, 5, 5, Color.WHITE);
+        matrixIcon8.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon8.fillPixels(2, 5, 6, Color.BLACK);
+
+        MatrixIcon matrixIcon9 = new MatrixIcon();
+        matrixIcon9.fillPixels(2, 5, 1, Color.BLACK);
+        matrixIcon9.setPixelAt(1, 2, Color.BLACK);
+        matrixIcon9.fillPixels(2, 5, 2, Color.WHITE);
+        matrixIcon9.setPixelAt(6, 2, Color.BLACK);
+        matrixIcon9.setPixelAt(0, 3, Color.BLACK);
+        matrixIcon9.fillPixels(1, 2, 3, Color.WHITE);
+        matrixIcon9.fillPixels(3, 4, 3, Color.web("#4d79ff"));
+        matrixIcon9.fillPixels(5, 6, 3, Color.WHITE);
+        matrixIcon9.setPixelAt(7, 3, Color.BLACK);
+        matrixIcon9.setPixelAt(0, 4, Color.BLACK);
+        matrixIcon9.fillPixels(1, 2, 4, Color.WHITE);
+        matrixIcon9.fillPixels(3, 4, 4, Color.web("#4d79ff"));
+        matrixIcon9.fillPixels(5, 6, 4, Color.WHITE);
+        matrixIcon9.setPixelAt(7, 4, Color.BLACK);
+        matrixIcon9.setPixelAt(1, 5, Color.BLACK);
+        matrixIcon9.fillPixels(2, 5, 5, Color.WHITE);
+        matrixIcon9.setPixelAt(6, 5, Color.BLACK);
+        matrixIcon9.fillPixels(2, 5, 6, Color.BLACK);
+
+        matrixIconTile = TileBuilder.create()
+                                    .skinType(SkinType.MATRIX_ICON)
+                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("MatrixIcon")
+                                    .matrixIcons(matrixIcon1, matrixIcon2, matrixIcon3, matrixIcon4, matrixIcon5, matrixIcon6, matrixIcon7, matrixIcon8, matrixIcon9)
+                                    .animationDuration(50)
+                                    .animated(true)
+                                    .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -962,7 +1099,7 @@ public class Demo extends Application {
                                              smoothAreaChartTile, countryTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
-                                             timelineTile, imageCounterTile, ledTile, countdownTile);
+                                             timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

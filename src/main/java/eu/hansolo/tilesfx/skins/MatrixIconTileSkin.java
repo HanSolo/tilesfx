@@ -93,6 +93,8 @@ public class MatrixIconTileSkin extends TileSkin {
         };
 
         getPane().getChildren().addAll(titleText, matrix, text);
+
+        if (tile.isAnimated()) { timer.start(); }
     }
 
     @Override protected void registerListeners() {

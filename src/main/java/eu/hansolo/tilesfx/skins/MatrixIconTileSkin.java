@@ -94,7 +94,7 @@ public class MatrixIconTileSkin extends TileSkin {
 
         getPane().getChildren().addAll(titleText, matrix, text);
 
-        if (tile.isAnimated()) { timer.start(); }
+        if (tile.isAnimated() && tile.getMatrixIcons().size() > 1) { timer.start(); }
     }
 
     @Override protected void registerListeners() {
@@ -115,7 +115,9 @@ public class MatrixIconTileSkin extends TileSkin {
         } else if (EventType.ANIMATED_ON.name().equals(EVENT_TYPE)) {
             updateInterval = tile.getAnimationDuration() * 1_000_000l;
             pauseInterval  = tile.getPauseDuration() * 1_000_000l;
-            timer.start();
+            if (tile.getMatrixIcons().size() > 1) {
+                timer.start();
+            }
         } else if (EventType.ANIMATED_OFF.name().equals(EVENT_TYPE)) {
             timer.stop();
             updateMatrix();

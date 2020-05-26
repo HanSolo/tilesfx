@@ -149,7 +149,8 @@ public class Demo extends Application {
     private Tile            imageCounterTile;
     private Tile            ledTile;
     private Tile            countdownTile;
-    private Tile            matrixIconTile;
+    private Tile matrixIconTile;
+    private Tile cycleStepTile;
 
 
     private long            lastTimerCall;
@@ -443,7 +444,7 @@ public class Demo extends Application {
         mapTile = TileBuilder.create()
                              .skinType(SkinType.MAP)
                              .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                             .title("Map")
+                             .title("Map Tile")
                              .text("Some text")
                              .description("Description")
                              .currentLocation(new Location(51.91178, 7.63379, "Home", TileColor.MAGENTA.color))
@@ -456,7 +457,7 @@ public class Demo extends Application {
         radialChartTile = TileBuilder.create()
                                      .skinType(SkinType.RADIAL_CHART)
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .title("RadialChart")
+                                     .title("RadialChart Tile")
                                      .text("Some text")
                                      .textVisible(false)
                                      .chartData(chartData1, chartData2, chartData3, chartData4)
@@ -465,7 +466,7 @@ public class Demo extends Application {
         donutChartTile = TileBuilder.create()
                                      .skinType(SkinType.DONUT_CHART)
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .title("DonutChart")
+                                     .title("DonutChart Tile")
                                      .text("Some text")
                                      .textVisible(false)
                                      .chartData(chartData1, chartData2, chartData3, chartData4)
@@ -474,7 +475,7 @@ public class Demo extends Application {
         circularProgressTile = TileBuilder.create()
                                           .skinType(SkinType.CIRCULAR_PROGRESS)
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                          .title("CircularProgress")
+                                          .title("CircularProgress Tile")
                                           .text("Some text")
                                           .unit(Helper.PERCENTAGE)
                                           .build();
@@ -482,7 +483,7 @@ public class Demo extends Application {
         stockTile = TileBuilder.create()
                                .skinType(SkinType.STOCK)
                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                               .title("Stock")
+                               .title("Stock Tile")
                                .minValue(0)
                                .maxValue(1000)
                                .averagingPeriod(100)
@@ -491,7 +492,7 @@ public class Demo extends Application {
         gaugeSparkLineTile = TileBuilder.create()
                                         .skinType(SkinType.GAUGE_SPARK_LINE)
                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                        .title("GaugeSparkLine")
+                                        .title("GaugeSparkLine Tile")
                                         .animated(true)
                                         .textVisible(false)
                                         .averagingPeriod(25)
@@ -568,7 +569,7 @@ public class Demo extends Application {
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .minValue(0)
                                      .maxValue(50)
-                                     .title("RadarChart Sector")
+                                     .title("RadarChart Sector Tile")
                                      .unit("Unit")
                                      .radarChartMode(RadarChartMode.SECTOR)
                                      .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
@@ -593,7 +594,7 @@ public class Demo extends Application {
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .minValue(0)
                                      .maxValue(50)
-                                     .title("RadarChart Polygon")
+                                     .title("RadarChart Polygon Tile")
                                      .unit("Unit")
                                      .radarChartMode(RadarChartMode.POLYGON)
                                      .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
@@ -618,7 +619,7 @@ public class Demo extends Application {
                                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                          .minValue(0)
                                          .maxValue(40)
-                                         .title("SmoothAreaChart")
+                                         .title("SmoothAreaChart Tile")
                                          .unit("Unit")
                                          .text("Test")
                                          //.chartType(ChartType.LINE)
@@ -632,7 +633,7 @@ public class Demo extends Application {
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                           .minValue(0)
                                           .maxValue(40)
-                                          .title("Country")
+                                          .title("Country Tile")
                                           .unit("Unit")
                                           .country(Country.DE)
                                           .tooltipText("")
@@ -641,7 +642,7 @@ public class Demo extends Application {
 
         characterTile = TileBuilder.create().skinType(SkinType.CHARACTER)
                                             .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                            .title("Character")
+                                            .title("Character Tile")
                                             .titleAlignment(TextAlignment.CENTER)
                                             .description("G")
                                             .build();
@@ -656,7 +657,7 @@ public class Demo extends Application {
         switchSliderTile = TileBuilder.create()
                           .skinType(SkinType.SWITCH_SLIDER)
                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                          .title("SwitchSlider")
+                          .title("SwitchSlider Tile")
                           .text("Test")
                           .build();
 
@@ -706,7 +707,7 @@ public class Demo extends Application {
 
         sunburstTile = TileBuilder.create().skinType(SkinType.SUNBURST)
                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                  .title("SunburstTile")
+                                  .title("Sunburst Tile")
                                   .textVisible(false)
                                   .sunburstTree(tree)
                                   .sunburstBackgroundColor(Tile.BACKGROUND)
@@ -720,7 +721,7 @@ public class Demo extends Application {
 
         matrixTile = TileBuilder.create().skinType(SkinType.MATRIX)
                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                .title("MatrixTile")
+                                .title("Matrix Tile")
                                 .text("Any Text")
                                 .textVisible(false)
                                 .animated(true)
@@ -732,7 +733,7 @@ public class Demo extends Application {
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                           //.backgroundColor(Color.web("#26262D"))
                                           .maxValue(1000)
-                                          .title("RadialPercentage")
+                                          .title("RadialPercentage Tile")
                                           .description("Product 1")
                                           .textVisible(false)
                                           .chartData(chartData1, chartData2, chartData3)
@@ -1004,11 +1005,20 @@ public class Demo extends Application {
         matrixIconTile = TileBuilder.create()
                                     .skinType(SkinType.MATRIX_ICON)
                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .title("MatrixIcon")
+                                     .title("MatrixIcon Tile")
                                     .matrixIcons(matrixIcon1, matrixIcon2, matrixIcon3, matrixIcon4, matrixIcon5, matrixIcon6, matrixIcon7, matrixIcon8, matrixIcon9)
                                     .animationDuration(50)
                                     .animated(true)
                                     .build();
+
+        cycleStepTile = TileBuilder.create().skinType(SkinType.CYCLE_STEP)
+                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                   .title("CycleStep Tile")
+                                   .textVisible(false)
+                                   .chartData(chartData1, chartData2, chartData3, chartData4, chartData5)
+                                   .animated(true)
+                                   .decimals(1)
+                                   .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -1099,7 +1109,7 @@ public class Demo extends Application {
                                              smoothAreaChartTile, countryTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
-                                             timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile);
+                                             timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile, cycleStepTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

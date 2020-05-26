@@ -264,7 +264,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             //pane.relocate((width - size) * 0.5, (height - size) * 0.5);
 
             double offsetTop    = tile.getTitle().isEmpty() ? inset : size * 0.15;
-            double offsetBottom = tile.getText().isEmpty() ? height - inset : height - size * 0.15;
+            double offsetBottom = (tile.getText().isEmpty() || !tile.isTextVisible()) ? height - inset : height - size * 0.15;
             contentBounds.setX(inset);
             contentBounds.setY(offsetTop);
             contentBounds.setWidth(width - doubleInset);

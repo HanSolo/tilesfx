@@ -68,7 +68,6 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.util.Duration;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -1289,6 +1288,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setBarBackgroundColor(TILE.getBackgroundColor().brighter());
                     TILE.setAnimated(false);
                     TILE.setTimePeriod(java.time.Duration.ofSeconds(60));
+                    break;
+                case CYCLE_STEP:
                     break;
                 default:
                     break;

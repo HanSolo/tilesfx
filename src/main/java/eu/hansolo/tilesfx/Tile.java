@@ -143,7 +143,8 @@ public class Tile extends Control {
                            STATUS("StatusTileSkin"), BAR_GAUGE("BarGaugeTileSkin"),
                            IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
                            TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
-                           LED("LedTileSkin"), COUNTDOWN_TIMER("CountdownTimerTileSkin");
+                           LED("LedTileSkin"), COUNTDOWN_TIMER("CountdownTimerTileSkin"),
+                           CYCLE_STEP("CycleStepTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5956,6 +5957,7 @@ public class Tile extends Control {
             case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
             case LED              : return new LedTileSkin(Tile.this);
             case COUNTDOWN_TIMER  : return new CountdownTimerTileSkin(Tile.this);
+            case CYCLE_STEP: return new CycleStepTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6127,6 +6129,8 @@ public class Tile extends Control {
                 setAnimated(false);
                 setTimePeriod(java.time.Duration.ofSeconds(60));
                 break;
+            case CYCLE_STEP:
+                break;
             default:
                 break;
         }
@@ -6179,6 +6183,7 @@ public class Tile extends Control {
             case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
             case LED              : setSkin(new LedTileSkin(Tile.this)); break;
             case COUNTDOWN_TIMER  : setSkin(new CountdownTimerTileSkin(Tile.this)); break;
+            case CYCLE_STEP: setSkin(new CycleStepTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

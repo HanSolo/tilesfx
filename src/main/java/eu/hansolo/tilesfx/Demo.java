@@ -28,6 +28,7 @@ import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
+import eu.hansolo.tilesfx.icons.Flag;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.tools.Country;
@@ -49,10 +50,16 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -149,8 +156,9 @@ public class Demo extends Application {
     private Tile            imageCounterTile;
     private Tile            ledTile;
     private Tile            countdownTile;
-    private Tile matrixIconTile;
-    private Tile cycleStepTile;
+    private Tile            matrixIconTile;
+    private Tile            cycleStepTile;
+    private Tile            customFlagChartTile;
 
 
     private long            lastTimerCall;
@@ -1011,7 +1019,8 @@ public class Demo extends Application {
                                     .animated(true)
                                     .build();
 
-        cycleStepTile = TileBuilder.create().skinType(SkinType.CYCLE_STEP)
+        cycleStepTile = TileBuilder.create()
+                                   .skinType(SkinType.CYCLE_STEP)
                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                    .title("CycleStep Tile")
                                    .textVisible(false)
@@ -1019,6 +1028,42 @@ public class Demo extends Application {
                                    .animated(true)
                                    .decimals(1)
                                    .build();
+
+        Label     name      = new Label("Name");
+        name.setTextFill(Tile.FOREGROUND);
+        name.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(name, Priority.NEVER);
+
+        Region spacer = new Region();
+        spacer.setPrefSize(5, 5);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label views = new Label("Cases / Deaths");
+        views.setTextFill(Tile.FOREGROUND);
+        views.setAlignment(Pos.CENTER_RIGHT);
+        HBox.setHgrow(views, Priority.NEVER);
+
+        HBox header = new HBox(5, name, spacer, views);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setFillHeight(true);
+
+        HBox usa     = getCountryItem(Flag.UNITED_STATES_OF_AMERICA, "USA", "1.618.757 / 96.909");
+        HBox brazil  = getCountryItem(Flag.BRAZIL, "Brazil", "363.211 / 22.666");
+        HBox uk      = getCountryItem(Flag.UNITED_KINGDOM, "UK", "259.563 / 36.793");
+        HBox spain   = getCountryItem(Flag.SPAIN, "Spain", "235.772 / 28.752");
+        HBox italy   = getCountryItem(Flag.ITALY, "Italy", "229.585 / 32.785");
+        HBox germany = getCountryItem(Flag.GERMANY, "Germany", "178.570 / 8.257");
+        HBox france  = getCountryItem(Flag.FRANCE, "France", "142.204 / 28.315");
+
+        VBox dataTable = new VBox(0, header, usa, brazil, uk, spain, italy, germany, france);
+        dataTable.setFillWidth(true);
+
+        customFlagChartTile = TileBuilder.create()
+                                         .skinType(SkinType.CUSTOM)
+                                         .title("Custom Covid-19 Tile")
+                                         .text("Data from 26.05.2020")
+                                         .graphic(dataTable)
+                                         .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -1109,7 +1154,8 @@ public class Demo extends Application {
                                              smoothAreaChartTile, countryTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
-                                             timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile, cycleStepTile);
+                                             timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
+                                             cycleStepTile, customFlagChartTile);
 
         pane.setHgap(5);
         pane.setVgap(5);
@@ -1152,6 +1198,31 @@ public class Demo extends Application {
         timerControlTile.setRunning(false);
 
         System.exit(0);
+    }
+
+    private HBox getCountryItem(final Flag flag, final String text, final String data) {
+        ImageView imageView = new ImageView(flag.getImage(22));
+        HBox.setHgrow(imageView, Priority.NEVER);
+
+        Label name = new Label(text);
+        name.setTextFill(Tile.FOREGROUND);
+        name.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(name, Priority.NEVER);
+
+        Region spacer = new Region();
+        spacer.setPrefSize(5, 5);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label views = new Label(data);
+        views.setTextFill(Tile.FOREGROUND);
+        views.setAlignment(Pos.CENTER_RIGHT);
+        HBox.setHgrow(views, Priority.NEVER);
+
+        HBox hBox = new HBox(5, imageView, name, spacer, views);
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.setFillHeight(true);
+
+        return hBox;
     }
 
 

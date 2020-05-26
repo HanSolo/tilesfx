@@ -261,8 +261,7 @@ public class ChartData implements Comparable<ChartData> {
         ChartData other = (ChartData) OBJ;
         boolean timestampEquals = (this.timestamp.equals(other.getTimestamp()));
         boolean valueEquals     = (Double.compare(this.value, other.getValue()) == 0);
-        boolean imageEquals     = this.image.equals(other.image);
-        return timestampEquals && valueEquals && imageEquals;
+        return timestampEquals && valueEquals;
     }
 
     @Override public int hashCode() {

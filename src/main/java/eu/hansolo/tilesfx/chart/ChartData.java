@@ -28,6 +28,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.DoublePropertyBase;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
@@ -46,66 +47,71 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 17.02.17.
  */
 public class ChartData implements Comparable<ChartData> {
-    private final ChartDataEvent               UPDATE_EVENT   = new ChartDataEvent(EventType.UPDATE, ChartData.this);
-    private final ChartDataEvent               FINISHED_EVENT = new ChartDataEvent(EventType.FINISHED, ChartData.this);
-    private       String                       name;
-    private       double                       value;
-    private       double                       oldValue;
-    private       Color                        fillColor;
-    private       Color                        strokeColor;
-    private       Color                        textColor;
-    private       Instant                      timestamp;
-    private       Location                     location;
-    private       boolean                      animated;
-    private       long                         animationDuration;
-    private       List<ChartDataEventListener> listenerList = new CopyOnWriteArrayList<>();
-    private       DoubleProperty               currentValue;
-    private       Timeline                     timeline;
-    private       String                       formatString;
-    private       double                       minValue;
-    private       double                       maxValue;
-    private       GradientLookup               gradientLookup;
-    private       boolean                      useChartDataColors;
+    protected final ChartDataEvent               UPDATE_EVENT   = new ChartDataEvent(EventType.UPDATE, ChartData.this);
+    protected final ChartDataEvent               FINISHED_EVENT = new ChartDataEvent(EventType.FINISHED, ChartData.this);
+    protected       Image                        image;
+    protected       String                       name;
+    protected       double                       value;
+    protected       double                       oldValue;
+    protected       Color                        fillColor;
+    protected       Color                        strokeColor;
+    protected       Color                        textColor;
+    protected       Instant                      timestamp;
+    protected       Location                     location;
+    protected       boolean                      animated;
+    protected       long                         animationDuration;
+    protected       List<ChartDataEventListener> listenerList = new CopyOnWriteArrayList<>();
+    protected       DoubleProperty               currentValue;
+    protected       Timeline                     timeline;
+    protected       String                       formatString;
+    protected       double                       minValue;
+    protected       double                       maxValue;
+    protected       GradientLookup               gradientLookup;
+    protected       boolean                      useChartDataColors;
 
 
     // ******************** Constructors **************************************
     public ChartData() {
-        this("", 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
+        this(null, "", 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final String NAME) {
-        this(NAME, 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
+        this(null, NAME, 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(double VALUE) {
-        this("", VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
+        this(null, "", VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final double VALUE, final Instant TIMESTAMP) {
-        this("", VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
+        this(null, "", VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
     }
     public ChartData(final String NAME, final Instant TIMESTAMP) {
-        this(NAME, 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
+        this(null, NAME, 0, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
     }
     public ChartData(final String NAME, final Color FILL_COLOR) {
-        this(NAME, 0, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
+        this(null, NAME, 0, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final String NAME, final double VALUE) {
-        this(NAME, VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
+        this(null, NAME, VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final String NAME, final double VALUE, final Instant TIMESTAMP) {
-        this(NAME, VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
+        this(null, NAME, VALUE, Tile.BLUE, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR) {
-        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
+        this(null, NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, Instant.now(), true, 800);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Instant TIMESTAMP) {
-        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
+        this(null, NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, true, 800);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
-        this(NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
+        this(null, NAME, VALUE, FILL_COLOR, Color.TRANSPARENT, Tile.FOREGROUND, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
-        this(NAME, VALUE, FILL_COLOR, STROKE_COLOR, Tile.FOREGROUND, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
+        this(null, NAME, VALUE, FILL_COLOR, STROKE_COLOR, Tile.FOREGROUND, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
     }
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Color TEXT_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
+        this(null, NAME, VALUE, FILL_COLOR, STROKE_COLOR, TEXT_COLOR, TIMESTAMP, ANIMATED, ANIMATION_DURATION);
+    }
+    public ChartData(final Image IMAGE, final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Color TEXT_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
+        image              = IMAGE;
         name               = NAME;
         value              = VALUE;
         oldValue           = 0;
@@ -135,6 +141,12 @@ public class ChartData implements Comparable<ChartData> {
 
 
     // ******************** Methods *******************************************
+    public Image getImage() { return image; }
+    public void setImage(final Image IMAGE) {
+        image = IMAGE;
+        fireChartDataEvent(UPDATE_EVENT);
+    }
+
     public String getName() { return name; }
     public void setName(final String NAME) {
         name = NAME;
@@ -232,10 +244,10 @@ public class ChartData implements Comparable<ChartData> {
 
     @Override public String toString() {
         return new StringBuilder().append("{\n")
-                                  .append("  \"name\":").append(name).append(",\n")
+                                  .append("  \"name\":\"").append(name).append("\",\n")
                                   .append("  \"value\":").append(value).append(",\n")
-                                  .append("  \"fillColor\":").append(fillColor.toString().replace("0x", "#")).append(",\n")
-                                  .append("  \"strokeColor\":").append(strokeColor.toString().replace("0x", "#")).append(",\n")
+                                  .append("  \"fillColor\":\"").append(fillColor.toString().replace("0x", "#")).append("\",\n")
+                                  .append("  \"strokeColor\":\"").append(strokeColor.toString().replace("0x", "#")).append("\",\n")
                                   .append("  \"timestamp\":").append(timestamp.toEpochMilli()).append(",\n")
                                   .append("}")
                                   .toString();
@@ -249,7 +261,8 @@ public class ChartData implements Comparable<ChartData> {
         ChartData other = (ChartData) OBJ;
         boolean timestampEquals = (this.timestamp.equals(other.getTimestamp()));
         boolean valueEquals     = (Double.compare(this.value, other.getValue()) == 0);
-        return timestampEquals && valueEquals;
+        boolean imageEquals     = this.image.equals(other.image);
+        return timestampEquals && valueEquals && imageEquals;
     }
 
     @Override public int hashCode() {

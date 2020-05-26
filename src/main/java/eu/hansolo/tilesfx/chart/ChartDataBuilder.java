@@ -28,6 +28,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.time.Instant;
@@ -121,7 +122,12 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
         properties.put("onChartDataEvent", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
-    
+
+    public final B image(final Image IMAGE) {
+        properties.put("image", new SimpleObjectProperty<>(IMAGE));
+        return (B)this;
+    }
+
 
     public final ChartData build() {
         final ChartData DATA = new ChartData();
@@ -154,8 +160,11 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
                 DATA.setUseChartDataColors(((BooleanProperty) properties.get(key)).get());
             } else if ("onChartDataEvent".equals(key)) {
                 DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
+            } else if ("image".equals(key)) {
+                DATA.setImage(((ObjectProperty<Image>) properties.get(key)).get());
             }
         }
         return DATA;
     }
+
 }

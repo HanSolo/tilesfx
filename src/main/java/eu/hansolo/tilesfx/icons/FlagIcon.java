@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx.icons;
 
+import eu.hansolo.tilesfx.tools.Helper;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 
@@ -26,21 +27,31 @@ import javafx.scene.layout.Region;
  * Time: 08:26
  */
 public class FlagIcon extends Region {
-    private static final double    PREFERRED_WIDTH  = 30;
-    private static final double    PREFERRED_HEIGHT = 30;
-    private static final double    MINIMUM_WIDTH    = 5;
-    private static final double    MINIMUM_HEIGHT   = 5;
-    private static final double    MAXIMUM_WIDTH    = 1024;
-    private static final double    MAXIMUM_HEIGHT   = 1024;
+    private static final double    PREFERRED_WIDTH   = 30;
+    private static final double    PREFERRED_HEIGHT  = 30;
+    private static final double    MINIMUM_WIDTH     = 5;
+    private static final double    MINIMUM_HEIGHT    = 5;
+    private static final double    MAXIMUM_WIDTH     = 1024;
+    private static final double    MAXIMUM_HEIGHT    = 1024;
+    private static final double    DEFAULT_FLAG_SIZE = 30;
     private              double    size;
     private              double    width;
     private              double    height;
     private              ImageView imageView;
     private              Flag      flag;
+    private              double    flagSize;
 
 
     // ******************** Constructors **************************************
     public FlagIcon() {
+        this(Flag.GERMANY, 30);
+    }
+    public FlagIcon(final Flag FLAG) {
+        this(FLAG, 30);
+    }
+    public FlagIcon(final Flag FLAG, final double FLAG_SIZE) {
+        flag     = FLAG;
+        flagSize = Helper.clamp(5, 1024, FLAG_SIZE);
         initGraphics();
         registerListeners();
     }
@@ -51,22 +62,18 @@ public class FlagIcon extends Region {
         if (Double.compare(getPrefWidth(), 0.0) <= 0 || Double.compare(getPrefHeight(), 0.0) <= 0 || Double.compare(getWidth(), 0.0) <= 0 ||
             Double.compare(getHeight(), 0.0) <= 0) {
             if (getPrefWidth() > 0 && getPrefHeight() > 0) {
-                setPrefSize(getPrefWidth(), getPrefHeight());
+                setPrefSize(flagSize, flagSize);
             } else {
                 setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
-
-        flag      = Flag.GERMANY;
-        imageView = new ImageView(flag.getImage());
+        imageView = new ImageView(flag.getImage(flagSize));
         getChildren().setAll(imageView);
     }
 
     private void registerListeners() {
         widthProperty().addListener(o -> resize());
         heightProperty().addListener(o -> resize());
-        // add listeners to your propertes like
-        //value.addListener(o -> handleControlPropertyChanged("VALUE"));
     }
 
 
@@ -80,10 +87,19 @@ public class FlagIcon extends Region {
 
     public Flag getFlag() { return flag; }
     public void setFlag(final Flag FLAG) {
-        setFlag(FLAG, 30);
+        setFlag(FLAG, flagSize);
     }
-    public void setFlag(final Flag FLAG, final double SIZE) {
-        imageView.setImage(FLAG.getImage(SIZE));
+    public void setFlag(final Flag FLAG, final double FLAG_SIZE) {
+        if (null == FLAG) { throw new IllegalArgumentException("Flag cannot be null"); }
+        flag     = FLAG;
+        flagSize = Helper.clamp(5, 1024, FLAG_SIZE);
+        redraw();
+    }
+
+    public double getFlagSize() { return flagSize; }
+    public void setFlagSize(final double FLAG_SIZE) {
+        flagSize = Helper.clamp(5, 1024, FLAG_SIZE);
+        redraw();
     }
 
 
@@ -104,6 +120,6 @@ public class FlagIcon extends Region {
 
     private void redraw() {
         if (null == flag) { return; }
-        imageView.setImage(flag.getImage());
+        imageView.setImage(flag.getImage(flagSize));
     }
 }

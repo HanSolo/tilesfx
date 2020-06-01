@@ -159,6 +159,7 @@ public class Demo extends Application {
     private Tile            matrixIconTile;
     private Tile            cycleStepTile;
     private Tile            customFlagChartTile;
+    private Tile            colorTile;
 
 
     private long            lastTimerCall;
@@ -1065,6 +1066,13 @@ public class Demo extends Application {
                                          .graphic(dataTable)
                                          .build();
 
+        colorTile = TileBuilder.create().skinType(SkinType.COLOR)
+                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                           .title("ColorTileSkin")
+                           .description("Whatever")
+                           .animated(true)
+                           .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -1133,6 +1141,8 @@ public class Demo extends Application {
                         countdownTile.setRunning(true);
                     }
 
+                    colorTile.setValue(RND.nextDouble() * 100);
+
                     lastTimerCall = now;
                 }
             }
@@ -1155,7 +1165,7 @@ public class Demo extends Application {
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
                                              timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
-                                             cycleStepTile, customFlagChartTile);
+                                             cycleStepTile, customFlagChartTile, colorTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

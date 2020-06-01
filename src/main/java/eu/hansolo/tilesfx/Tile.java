@@ -21,6 +21,7 @@ import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
+import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
@@ -144,7 +145,7 @@ public class Tile extends Control {
                            IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
                            TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
                            LED("LedTileSkin"), COUNTDOWN_TIMER("CountdownTimerTileSkin"),
-                           CYCLE_STEP("CycleStepTileSkin");
+                           CYCLE_STEP("CycleStepTileSkin"), COLOR("ColorTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5957,7 +5958,8 @@ public class Tile extends Control {
             case CLUSTER_MONITOR  : return new ClusterMonitorTileSkin(Tile.this);
             case LED              : return new LedTileSkin(Tile.this);
             case COUNTDOWN_TIMER  : return new CountdownTimerTileSkin(Tile.this);
-            case CYCLE_STEP: return new CycleStepTileSkin(Tile.this);
+            case CYCLE_STEP       : return new CycleStepTileSkin(Tile.this);
+            case COLOR            : return new ColorTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6131,6 +6133,12 @@ public class Tile extends Control {
                 break;
             case CYCLE_STEP:
                 break;
+            case COLOR:
+                setBackgroundColor(ColorSkin.GREEN);
+                setUnit("\u0025");
+                setDecimals(0);
+                setBarBackgroundColor(Tile.BACKGROUND);
+                break;
             default:
                 break;
         }
@@ -6183,7 +6191,8 @@ public class Tile extends Control {
             case CLUSTER_MONITOR  : setSkin(new ClusterMonitorTileSkin(Tile.this)); break;
             case LED              : setSkin(new LedTileSkin(Tile.this)); break;
             case COUNTDOWN_TIMER  : setSkin(new CountdownTimerTileSkin(Tile.this)); break;
-            case CYCLE_STEP: setSkin(new CycleStepTileSkin(Tile.this)); break;
+            case CYCLE_STEP       : setSkin(new CycleStepTileSkin(Tile.this)); break;
+            case COLOR            : setSkin(new ColorTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

@@ -27,6 +27,7 @@ import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
+import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
@@ -1290,6 +1291,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setTimePeriod(java.time.Duration.ofSeconds(60));
                     break;
                 case CYCLE_STEP:
+                    break;
+                case COLOR:
+                    TILE.setBackgroundColor(ColorSkin.GREEN);
+                    TILE.setUnit("\u0025");
+                    TILE.setDecimals(0);
+                    TILE.setBarBackgroundColor(Tile.BACKGROUND);
                     break;
                 default:
                     break;

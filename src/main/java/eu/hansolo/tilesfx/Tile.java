@@ -6134,7 +6134,7 @@ public class Tile extends Control {
             case CYCLE_STEP:
                 break;
             case COLOR:
-                setBackgroundColor(ColorSkin.GREEN);
+                setForegroundColor(Color.WHITE);
                 setUnit("\u0025");
                 setDecimals(0);
                 setBarBackgroundColor(Tile.BACKGROUND);

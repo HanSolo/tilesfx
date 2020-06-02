@@ -16,24 +16,20 @@
 
 package eu.hansolo.tilesfx.skins;
 
+import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.colors.ColorSkin;
-import eu.hansolo.tilesfx.colors.Dark;
-import eu.hansolo.tilesfx.colors.Medium;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.control.Label;
-import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 
 
 public class ColorTileSkin extends TileSkin {
@@ -57,6 +53,14 @@ public class ColorTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        if (tile.getSections().isEmpty()) {
+            tile.setSections(new Section(0.00, 0.25, ColorSkin.GREEN),
+                             new Section(0.25, 0.50, ColorSkin.YELLOW),
+                             new Section(0.50, 0.75, ColorSkin.ORANGE),
+                             new Section(0.75, 1.00, ColorSkin.RED));
+        }
+        tile.setBackgroundColor(tile.getSections().get(0).getColor());
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -106,6 +110,8 @@ public class ColorTileSkin extends TileSkin {
             handleCurrentValue(tile.getCurrentValue());
         } else if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+        } else if (EventType.SECTION.name().equals(EVENT_TYPE)) {
+            redraw();
         }
     }
 
@@ -117,18 +123,11 @@ public class ColorTileSkin extends TileSkin {
             valueText.setText(String.format(locale, formatString, percentage));
         }
 
-        double seventyFive = 0.75;
-        double fifty       = 0.50;
-        double twentyFive  = 0.25;
-
-        if (percentage > seventyFive) {
-            tile.setBackgroundColor(ColorSkin.RED);
-        } else if (percentage > fifty) {
-            tile.setBackgroundColor(ColorSkin.ORANGE);
-        } else if (percentage > twentyFive) {
-            tile.setBackgroundColor(ColorSkin.YELLOW);
-        } else {
-            tile.setBackgroundColor(ColorSkin.GREEN);
+        for (Section section : tile.getSections()) {
+            if (section.contains(percentage)) {
+                tile.setBackgroundColor(section.getColor());
+                break;
+            }
         }
 
         resizeDynamicText();

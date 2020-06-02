@@ -1293,7 +1293,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case CYCLE_STEP:
                     break;
                 case COLOR:
-                    TILE.setBackgroundColor(ColorSkin.GREEN);
+                    TILE.setForegroundColor(Color.WHITE);
                     TILE.setUnit("\u0025");
                     TILE.setDecimals(0);
                     TILE.setBarBackgroundColor(Tile.BACKGROUND);

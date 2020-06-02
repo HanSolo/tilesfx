@@ -22,6 +22,6 @@ import javafx.scene.paint.Color;
 public class ColorSkin implements TileColor {
     public static Color RED    = Color.web("#f94b3d");
     public static Color ORANGE = Color.web("#fa9600");
-    public static Color YELLOW = Color.web("#fbc10e");
+    public static Color YELLOW = Color.web("#E7AE04"); //"#fbc10e");
     public static Color GREEN  = Color.web("#7bc149");
 }

@@ -80,7 +80,7 @@ public class TimeTileSkin extends TileSkin {
         description = new Label(tile.getDescription());
         description.setAlignment(Pos.TOP_RIGHT);
         description.setWrapText(true);
-        description.setTextFill(tile.getTextColor());
+        description.setTextFill(tile.getDescriptionColor());
         Helper.enableNode(description, !tile.getDescription().isEmpty());
 
         getPane().getChildren().addAll(titleText, text, timeText, description);

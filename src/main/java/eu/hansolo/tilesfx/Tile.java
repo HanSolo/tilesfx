@@ -146,7 +146,8 @@ public class Tile extends Control {
                            TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
                            LED("LedTileSkin"), COUNTDOWN_TIMER("CountdownTimerTileSkin"),
                            CYCLE_STEP("CycleStepTileSkin"), COLOR("ColorTileSkin"),
-                           FLUID("FluidTileSkin"), FIRE_SMOKE("FireSmokeTileSkin");
+                           FLUID("FluidTileSkin"), FIRE_SMOKE("FireSmokeTileSkin"),
+                           TURNOVER("TurnoverTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -585,6 +586,10 @@ public class Tile extends Control {
     private BooleanProperty                trendVisible;
     private long                           _timeoutMs;
     private LongProperty                   timeoutMs;
+    private Ranking                        _ranking;
+    private ObjectProperty<Ranking>        ranking;
+    private Color                          _rankingColor;
+    private ObjectProperty<Color>          rankingColor;
     private int                            _numberOfValuesForTrendCalculation;
     private IntegerProperty                numberOfValuesForTrendCalculation;
     private EventHandler<MouseEvent>       infoRegionHandler;
@@ -739,6 +744,7 @@ public class Tile extends Control {
                 @NamedArg(value="rightGraphics", defaultValue="null") Node rightGraphics,
                 @NamedArg(value="trendVisible", defaultValue="true") boolean trendVisible,
                 @NamedArg(value="timeoutMs", defaultValue="1000") long timeoutMs,
+                @NamedArg(value="ranking", defaultValue="Ranking.NONE") Ranking ranking,
                 @NamedArg(value="numberOfValuesForTrendCalculation", defaultValue="3") int numberOfValuesForTrendCalculation,
                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
                 @NamedArg(value="increment", defaultValue="1") int increment,
@@ -969,6 +975,8 @@ public class Tile extends Control {
         _rightGraphics                      = null;
         _trendVisible                       = false;
         _timeoutMs                          = 1000;
+        _ranking                            = Ranking.NONE;
+        _rankingColor                       = Color.TRANSPARENT;
         _numberOfValuesForTrendCalculation  = 3;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
@@ -5680,6 +5688,48 @@ public class Tile extends Control {
     }
 
 
+    public Ranking getRanking() { return null == ranking ? _ranking : ranking.get(); }
+    public void setRanking(final Ranking RANKING) {
+        if (null == ranking) {
+            _ranking = RANKING;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            ranking.set(RANKING);
+        }
+    }
+    public ObjectProperty<Ranking> rankingProperty() {
+        if (null == ranking) {
+            ranking = new ObjectPropertyBase<Ranking>(_ranking) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "ranking"; }
+            };
+            _ranking = null;
+        }
+        return ranking;
+    }
+
+    public Color getRankingColor() { return null == rankingColor ? _rankingColor : rankingColor.get(); }
+    public void setRankingColor(final Color RANKING_COLOR) {
+        if (null == rankingColor) {
+            _rankingColor = RANKING_COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            rankingColor.set(RANKING_COLOR);
+        }
+    }
+    public ObjectProperty<Color> rankingColorProperty() {
+        if (null == rankingColor) {
+            rankingColor = new ObjectPropertyBase<>(_rankingColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "rankingColor"; }
+            };
+            _rankingColor = null;
+        }
+        return rankingColor;
+    }
+
     public int getNumberOfValuesForTrendCalculation() { return null == numberOfValuesForTrendCalculation ? _numberOfValuesForTrendCalculation : numberOfValuesForTrendCalculation.get(); }
     public void setNumberOfValuesForTrendCalculation(final int NUMBER) {
         if (null == numberOfValuesForTrendCalculation) {
@@ -5963,6 +6013,7 @@ public class Tile extends Control {
             case COLOR            : return new ColorTileSkin(Tile.this);
             case FLUID            : return new FluidTileSkin(Tile.this);
             case FIRE_SMOKE       : return new FireSmokeTileSkin(Tile.this);
+            case TURNOVER         : return new TurnoverTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6146,6 +6197,10 @@ public class Tile extends Control {
                 break;
             case FIRE_SMOKE:
                 break;
+            case TURNOVER:
+                setTextAlignment(TextAlignment.CENTER);
+                setImageMask(ImageMask.ROUND);
+                break;
             default:
                 break;
         }
@@ -6202,6 +6257,7 @@ public class Tile extends Control {
             case COLOR            : setSkin(new ColorTileSkin(Tile.this)); break;
             case FLUID            : setSkin(new FluidTileSkin(Tile.this)); break;
             case FIRE_SMOKE       : setSkin(new FireSmokeTileSkin(Tile.this)); break;
+            case TURNOVER         : setSkin(new TurnoverTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

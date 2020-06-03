@@ -1029,13 +1029,23 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B ranking(final Ranking RANKING) {
+        properties.put("ranking", new SimpleObjectProperty<>(RANKING));
+        return (B)this;
+    }
+
+    public final B rankingColor(final Color RANKING_COLOR) {
+        properties.put("rankingColor", new SimpleObjectProperty<>(RANKING_COLOR));
+        return (B)this;
+    }
+
     public final B numberOfValuesForTrendCalculation(final int NUMBER) {
         properties.put("numberOfValuesForTrendCalculation", new SimpleIntegerProperty(NUMBER));
         return (B)this;
     }
 
     public final B backgroundImage(final Image IMAGE) {
-        properties.put("backgroundImage", new SimpleObjectProperty(IMAGE));
+        properties.put("backgroundImage", new SimpleObjectProperty<>(IMAGE));
         return (B)this;
     }
 
@@ -1301,6 +1311,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case FLUID:
                     break;
                 case FIRE_SMOKE:
+                    break;
+                case TURNOVER:
+                    TILE.setTextAlignment(TextAlignment.CENTER);
+                    TILE.setImageMask(ImageMask.ROUND);
                     break;
                 default:
                     break;
@@ -1762,6 +1776,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setTrendVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("timeoutMs".equals(key)) {
                 TILE.setTimeoutMs(((LongProperty) properties.get(key)).get());
+            } else if ("ranking".equals(key)) {
+                TILE.setRanking(((ObjectProperty<Ranking>) properties.get(key)).get());
+            } else if ("rankingColor".equals(key)) {
+                TILE.setRankingColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("numberOfValuesForTrendCalculation".equals(key)) {
                 TILE.setNumberOfValuesForTrendCalculation(((IntegerProperty) properties.get(key)).get());
             } else if ("backgroundImage".equals(key)) {

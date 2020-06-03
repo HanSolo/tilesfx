@@ -586,7 +586,7 @@ public class Helper {
         return DEFAULT_COLOR;
     }
 
-    public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
+    public static final double adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
         final String FONT_NAME          = TEXT.getFont().getName();
         double       adjustableFontSize = FONT_SIZE;
 
@@ -594,6 +594,7 @@ public class Helper {
             adjustableFontSize -= 0.1;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
+        return adjustableFontSize;
     }
     public static final void adjustTextSize(final Label TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
         final String FONT_NAME          = TEXT.getFont().getName();

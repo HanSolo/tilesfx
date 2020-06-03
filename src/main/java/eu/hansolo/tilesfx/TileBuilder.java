@@ -1300,6 +1300,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case FLUID:
                     break;
+                case FIRE_SMOKE:
+                    break;
                 default:
                     break;
             }

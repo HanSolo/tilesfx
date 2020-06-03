@@ -146,7 +146,7 @@ public class Tile extends Control {
                            TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
                            LED("LedTileSkin"), COUNTDOWN_TIMER("CountdownTimerTileSkin"),
                            CYCLE_STEP("CycleStepTileSkin"), COLOR("ColorTileSkin"),
-                           FLUID("FluidTileSkin");
+                           FLUID("FluidTileSkin"), FIRE_SMOKE("FireSmokeTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5962,6 +5962,7 @@ public class Tile extends Control {
             case CYCLE_STEP       : return new CycleStepTileSkin(Tile.this);
             case COLOR            : return new ColorTileSkin(Tile.this);
             case FLUID            : return new FluidTileSkin(Tile.this);
+            case FIRE_SMOKE       : return new FireSmokeTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6143,6 +6144,8 @@ public class Tile extends Control {
                 break;
             case FLUID:
                 break;
+            case FIRE_SMOKE:
+                break;
             default:
                 break;
         }
@@ -6198,6 +6201,7 @@ public class Tile extends Control {
             case CYCLE_STEP       : setSkin(new CycleStepTileSkin(Tile.this)); break;
             case COLOR            : setSkin(new ColorTileSkin(Tile.this)); break;
             case FLUID            : setSkin(new FluidTileSkin(Tile.this)); break;
+            case FIRE_SMOKE       : setSkin(new FireSmokeTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

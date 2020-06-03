@@ -145,7 +145,8 @@ public class Tile extends Control {
                            IMAGE("ImageTileSkin"), IMAGE_COUNTER("ImageCounterTileSkin"),
                            TIMELINE("TimelineTileSkin"), CLUSTER_MONITOR("ClusterMonitorTileSkin"),
                            LED("LedTileSkin"), COUNTDOWN_TIMER("CountdownTimerTileSkin"),
-                           CYCLE_STEP("CycleStepTileSkin"), COLOR("ColorTileSkin");
+                           CYCLE_STEP("CycleStepTileSkin"), COLOR("ColorTileSkin"),
+                           FLUID("FluidTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -5960,6 +5961,7 @@ public class Tile extends Control {
             case COUNTDOWN_TIMER  : return new CountdownTimerTileSkin(Tile.this);
             case CYCLE_STEP       : return new CycleStepTileSkin(Tile.this);
             case COLOR            : return new ColorTileSkin(Tile.this);
+            case FLUID            : return new FluidTileSkin(Tile.this);
             default               : return new TileSkin(Tile.this);
         }
     }
@@ -6139,6 +6141,8 @@ public class Tile extends Control {
                 setDecimals(0);
                 setBarBackgroundColor(Tile.BACKGROUND);
                 break;
+            case FLUID:
+                break;
             default:
                 break;
         }
@@ -6193,6 +6197,7 @@ public class Tile extends Control {
             case COUNTDOWN_TIMER  : setSkin(new CountdownTimerTileSkin(Tile.this)); break;
             case CYCLE_STEP       : setSkin(new CycleStepTileSkin(Tile.this)); break;
             case COLOR            : setSkin(new ColorTileSkin(Tile.this)); break;
+            case FLUID            : setSkin(new FluidTileSkin(Tile.this)); break;
             default               : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

@@ -1298,6 +1298,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setDecimals(0);
                     TILE.setBarBackgroundColor(Tile.BACKGROUND);
                     break;
+                case FLUID:
+                    break;
                 default:
                     break;
             }

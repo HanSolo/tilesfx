@@ -21,6 +21,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -33,15 +34,16 @@ import javafx.scene.text.Text;
 
 
 public class ColorTileSkin extends TileSkin {
-    private Text      titleText;
-    private Text      valueText;
-    private Text      upperUnitText;
-    private Line      fractionLine;
-    private Text      unitText;
-    private VBox      unitFlow;
-    private HBox      valueUnitFlow;
-    private Rectangle barBackground;
-    private Rectangle bar;
+    private Text           titleText;
+    private Text           valueText;
+    private Text           upperUnitText;
+    private Line           fractionLine;
+    private Text           unitText;
+    private VBox           unitFlow;
+    private HBox           valueUnitFlow;
+    private Rectangle      barBackground;
+    private Rectangle      bar;
+    private GradientLookup gradientLookup;
 
 
     // ******************** Constructors **************************************
@@ -53,6 +55,8 @@ public class ColorTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        gradientLookup = new GradientLookup();
 
         if (tile.getSections().isEmpty()) {
             tile.setSections(new Section(0.00, 0.25, ColorSkin.GREEN),
@@ -123,10 +127,14 @@ public class ColorTileSkin extends TileSkin {
             valueText.setText(String.format(locale, formatString, percentage));
         }
 
-        for (Section section : tile.getSections()) {
-            if (section.contains(percentage)) {
-                tile.setBackgroundColor(section.getColor());
-                break;
+        if (tile.isFillWithGradient()) {
+            tile.setBackgroundColor(gradientLookup.getColorAt(percentage));
+        } else {
+            for (Section section : tile.getSections()) {
+                if (section.contains(percentage)) {
+                    tile.setBackgroundColor(section.getColor());
+                    break;
+                }
             }
         }
 
@@ -229,6 +237,10 @@ public class ColorTileSkin extends TileSkin {
         upperUnitText.setFill(tile.getUnitColor());
         fractionLine.setStroke(tile.getUnitColor());
         unitText.setFill(tile.getUnitColor());
+
+        if (tile.isFillWithGradient() && !tile.getGradientStops().isEmpty()) {
+            gradientLookup.setStops(tile.getGradientStops());
+        }
 
         barBackground.setFill(tile.getBarBackgroundColor());
         bar.setFill(tile.getForegroundColor());

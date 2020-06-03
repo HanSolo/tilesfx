@@ -110,12 +110,7 @@ public class FluidTileSkin extends TileSkin {
 
         gradientLookup = new GradientLookup();
 
-        if (tile.getSections().isEmpty()) {
-            tile.setSections(new Section(0.00, 0.25, ColorSkin.GREEN),
-                             new Section(0.25, 0.50, ColorSkin.YELLOW),
-                             new Section(0.50, 0.75, ColorSkin.ORANGE),
-                             new Section(0.75, 1.00, ColorSkin.RED));
-        }
+        ctx.setFill(tile.getValueColor());
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -205,7 +200,20 @@ public class FluidTileSkin extends TileSkin {
         double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
         double fontSize = size * 0.48;
         valueText.setFont(Fonts.latoBold(fontSize));
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
+        double correctedFontSize = fontSize;
+        if (valueText.getLayoutBounds().getWidth() > maxWidth) {
+            correctedFontSize = Helper.adjustTextSize(valueText, maxWidth, fontSize);
+        }
+        double fontFactor = correctedFontSize / fontSize;
+
+        maxWidth = size * 0.275;
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.24 : size * 0.20;
+        upperUnitText.setFont(Fonts.latoRegular(fontSize * fontFactor));
+        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
+
+        fontSize = upperUnitText.getText().isEmpty() ? size * 0.24 : size * 0.20;
+        unitText.setFont(Fonts.latoRegular(fontSize * fontFactor));
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
     }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
@@ -223,15 +231,6 @@ public class FluidTileSkin extends TileSkin {
             case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
-
-        maxWidth = width - (width - size * 0.275);
-        fontSize = upperUnitText.getText().isEmpty() ? size * 0.24 : size * 0.20;
-        upperUnitText.setFont(Fonts.latoRegular(fontSize));
-        if (upperUnitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(upperUnitText, maxWidth, fontSize); }
-
-        fontSize = upperUnitText.getText().isEmpty() ? size * 0.24 : size * 0.20;
-        unitText.setFont(Fonts.latoRegular(fontSize));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
         text.setText(tile.getText());
         text.setFont(font);

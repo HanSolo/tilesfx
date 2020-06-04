@@ -21,7 +21,6 @@ import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
-import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
@@ -40,6 +39,7 @@ import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.MovingAverage;
+import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.SectionComparator;
 import eu.hansolo.tilesfx.tools.TimeData;
 import eu.hansolo.tilesfx.tools.TimeSectionComparator;
@@ -586,10 +586,8 @@ public class Tile extends Control {
     private BooleanProperty                trendVisible;
     private long                           _timeoutMs;
     private LongProperty                   timeoutMs;
-    private Ranking                        _ranking;
-    private ObjectProperty<Ranking>        ranking;
-    private Color                          _rankingColor;
-    private ObjectProperty<Color>          rankingColor;
+    private Rank                           _rank;
+    private ObjectProperty<Rank>           rank;
     private int                            _numberOfValuesForTrendCalculation;
     private IntegerProperty                numberOfValuesForTrendCalculation;
     private EventHandler<MouseEvent>       infoRegionHandler;
@@ -744,7 +742,7 @@ public class Tile extends Control {
                 @NamedArg(value="rightGraphics", defaultValue="null") Node rightGraphics,
                 @NamedArg(value="trendVisible", defaultValue="true") boolean trendVisible,
                 @NamedArg(value="timeoutMs", defaultValue="1000") long timeoutMs,
-                @NamedArg(value="ranking", defaultValue="Ranking.NONE") Ranking ranking,
+                @NamedArg(value="ranking", defaultValue="Rank.DEFAULT") Rank rank,
                 @NamedArg(value="numberOfValuesForTrendCalculation", defaultValue="3") int numberOfValuesForTrendCalculation,
                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
                 @NamedArg(value="increment", defaultValue="1") int increment,
@@ -975,8 +973,7 @@ public class Tile extends Control {
         _rightGraphics                      = null;
         _trendVisible                       = false;
         _timeoutMs                          = 1000;
-        _ranking                            = Ranking.NONE;
-        _rankingColor                       = Color.TRANSPARENT;
+        _rank                               = Rank.DEFAULT;
         _numberOfValuesForTrendCalculation  = 3;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
@@ -5687,47 +5684,25 @@ public class Tile extends Control {
         return timeoutMs;
     }
 
-
-    public Ranking getRanking() { return null == ranking ? _ranking : ranking.get(); }
-    public void setRanking(final Ranking RANKING) {
-        if (null == ranking) {
-            _ranking = RANKING;
+    public Rank getRank() { return null == rank ? _rank : rank.get(); }
+    public void setRank(final Rank RANK) {
+        if (null == rank) {
+            _rank = RANK;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            ranking.set(RANKING);
+            rank.set(RANK);
         }
     }
-    public ObjectProperty<Ranking> rankingProperty() {
-        if (null == ranking) {
-            ranking = new ObjectPropertyBase<Ranking>(_ranking) {
+    public ObjectProperty<Rank> rankProperty() {
+        if (null == rank) {
+            rank = new ObjectPropertyBase<Rank>(_rank) {
                 @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "ranking"; }
             };
-            _ranking = null;
+            _rank = null;
         }
-        return ranking;
-    }
-
-    public Color getRankingColor() { return null == rankingColor ? _rankingColor : rankingColor.get(); }
-    public void setRankingColor(final Color RANKING_COLOR) {
-        if (null == rankingColor) {
-            _rankingColor = RANKING_COLOR;
-            fireTileEvent(REDRAW_EVENT);
-        } else {
-            rankingColor.set(RANKING_COLOR);
-        }
-    }
-    public ObjectProperty<Color> rankingColorProperty() {
-        if (null == rankingColor) {
-            rankingColor = new ObjectPropertyBase<>(_rankingColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
-                @Override public Object getBean() { return Tile.this; }
-                @Override public String getName() { return "rankingColor"; }
-            };
-            _rankingColor = null;
-        }
-        return rankingColor;
+        return rank;
     }
 
     public int getNumberOfValuesForTrendCalculation() { return null == numberOfValuesForTrendCalculation ? _numberOfValuesForTrendCalculation : numberOfValuesForTrendCalculation.get(); }

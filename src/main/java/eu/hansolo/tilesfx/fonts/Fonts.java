@@ -31,7 +31,6 @@ public class Fonts {
     private static String latoRegularName;
     private static String latoBoldName;
 
-
     static {
         try {
             latoLightName              = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/tilesfx/fonts/Lato-Lig.otf"), 10).getName();

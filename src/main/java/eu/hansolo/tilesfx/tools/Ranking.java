@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.hansolo.tilesfx;
+package eu.hansolo.tilesfx.tools;
 
 
 public enum Ranking {
@@ -27,5 +27,5 @@ public enum Ranking {
     }
 
 
-    public int getRank() { return rank; }
+    public int getAsInt() { return rank; }
 }

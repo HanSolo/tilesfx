@@ -110,7 +110,7 @@ public class FluidTileSkin extends TileSkin {
 
         gradientLookup = new GradientLookup();
 
-        ctx.setFill(tile.getValueColor());
+        ctx.setFill(tile.getBarColor());
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -168,16 +168,16 @@ public class FluidTileSkin extends TileSkin {
     @Override protected void handleCurrentValue(final double VALUE) {
         double percentage = VALUE / (tile.getRange());
         if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(percentage));
+            valueText.setText(decimalFormat.format(Helper.clamp(minValue, maxValue, VALUE)));
         } else {
-            valueText.setText(String.format(locale, formatString, percentage));
+            valueText.setText(String.format(locale, formatString, Helper.clamp(minValue, maxValue, VALUE)));
         }
 
         if (tile.isFillWithGradient()) {
             ctx.setFill(gradientLookup.getColorAt(percentage));
         } else {
             for (Section section : tile.getSections()) {
-                if (section.contains(percentage)) {
+                if (section.contains(Helper.clamp(minValue, maxValue, VALUE))) {
                     ctx.setFill(section.getColor());
                     break;
                 }
@@ -214,6 +214,8 @@ public class FluidTileSkin extends TileSkin {
         fontSize = upperUnitText.getText().isEmpty() ? size * 0.24 : size * 0.20;
         unitText.setFont(Fonts.latoRegular(fontSize * fontFactor));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
+
+        valueUnitFlow.relocate(size * 0.05, (height - valueUnitFlow.getLayoutBounds().getHeight()) * 0.5);
     }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
@@ -289,9 +291,9 @@ public class FluidTileSkin extends TileSkin {
         text.setText(tile.getText());
 
         if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+            valueText.setText(decimalFormat.format(Helper.clamp(minValue, maxValue, tile.getCurrentValue())));
         } else {
-            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            valueText.setText(String.format(locale, formatString, Helper.clamp(minValue, maxValue, tile.getCurrentValue())));
         }
         if (tile.getUnit().contains("/")) {
             String[] units = tile.getUnit().split("/");

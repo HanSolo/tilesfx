@@ -16,7 +16,7 @@
 
 package eu.hansolo.tilesfx.skins;
 
-import eu.hansolo.tilesfx.Ranking;
+import eu.hansolo.tilesfx.tools.Ranking;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
@@ -53,6 +53,7 @@ public class TurnoverTileSkin extends TileSkin {
     private StackPane      graphicContainer;
     private Circle         rankingCircle;
     private Text           rankingText;
+    private StackPane      rankingContainer;
     private Circle         roundFrame;
     private Rectangle      rectangularFrame;
     private ChangeListener imageListener;
@@ -107,15 +108,16 @@ public class TurnoverTileSkin extends TileSkin {
         imgView = new ImageView(tile.getImage());
 
         rankingCircle = new Circle();
-        rankingCircle.setFill(tile.getRankingColor());
+        rankingCircle.setFill(tile.getRank().getColor());
 
         rankingText = new Text();
         rankingText.setFill(tile.getBackgroundColor());
         rankingText.setTextOrigin(VPos.CENTER);
         rankingText.setTextAlignment(TextAlignment.CENTER);
-        if (Ranking.NONE == tile.getRanking()) {
-            rankingCircle.setVisible(false);
-            rankingText.setVisible(false);
+
+        rankingContainer = new StackPane(rankingCircle, rankingText);
+        if (Ranking.NONE == tile.getRank().getRanking()) {
+            rankingContainer.setVisible(false);
         }
 
         roundFrame = new Circle();
@@ -130,7 +132,7 @@ public class TurnoverTileSkin extends TileSkin {
         graphicContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
         graphicContainer.getChildren().setAll(roundFrame, rectangularFrame, imgView);
 
-        getPane().getChildren().addAll(rotationEffect, titleText, graphicContainer, rankingCircle, rankingText, valueUnitFlow, fractionLine, text);
+        getPane().getChildren().addAll(rotationEffect, titleText, graphicContainer, rankingContainer, valueUnitFlow, fractionLine, text);
     }
 
     @Override protected void registerListeners() {
@@ -159,7 +161,8 @@ public class TurnoverTileSkin extends TileSkin {
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));
         }
-        if (VALUE > threshold) {
+        if (VALUE > tile.getThreshold()) {
+            System.out.println(tile.getThreshold());
             rotationEffect.setVisible(true);
             rotationEffect.start();
         } else {
@@ -297,12 +300,9 @@ public class TurnoverTileSkin extends TileSkin {
                     }
                 }
             }
-            rankingCircle.setCenterX(width * 0.5);
-            rankingCircle.setCenterY(height * 0.5 - containerSize * 0.4);
             rankingCircle.setRadius(containerSize * 0.075);
-
             rankingText.setFont(Fonts.latoRegular(size * 0.075));
-            rankingText.relocate((width - rankingText.getLayoutBounds().getWidth()) * 0.5, rankingCircle.getCenterY() - rankingText.getLayoutBounds().getHeight() * 0.5);
+            rankingContainer.relocate(width * 0.5 - rankingCircle.getRadius(), height * 0.5 - containerSize * 0.4 - rankingCircle.getRadius());
 
             resizeDynamicText();
             resizeStaticText();
@@ -341,18 +341,19 @@ public class TurnoverTileSkin extends TileSkin {
             unitText.setText(tile.getUnit());
             Helper.enableNode(fractionLine, false);
         }
-        rankingText.setText(Integer.toString(tile.getRanking().getRank()));
+        rankingText.setText(Integer.toString(tile.getRank().getRanking().getAsInt()));
 
         resizeDynamicText();
         resizeStaticText();
 
-        roundFrame.setStroke(Ranking.NONE == tile.getRanking() ? tile.getForegroundColor() : tile.getRankingColor());
-        rectangularFrame.setStroke(Ranking.NONE == tile.getRanking() ? tile.getForegroundColor() : tile.getRankingColor());
+        Ranking ranking   = tile.getRank().getRanking();
+        Color   rankColor = tile.getRank().getColor();
+        roundFrame.setStroke(Ranking.NONE == ranking ? tile.getForegroundColor() : rankColor);
+        rectangularFrame.setStroke(Ranking.NONE == ranking ? tile.getForegroundColor() : rankColor);
 
-        rankingCircle.setFill(tile.getRankingColor());
+        rankingCircle.setFill(rankColor);
         rankingText.setFill(tile.getBackgroundColor());
-        rankingCircle.setVisible(Ranking.NONE == tile.getRanking() ? false : true);
-        rankingText.setVisible(Ranking.NONE == tile.getRanking() ? false : true);
+        rankingContainer.setVisible(Ranking.NONE == ranking ? false : true);
 
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());

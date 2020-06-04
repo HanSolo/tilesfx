@@ -27,7 +27,6 @@ import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
-import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.events.TimeEventListener;
@@ -39,6 +38,7 @@ import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
+import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.TreeNode;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -1029,13 +1029,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B ranking(final Ranking RANKING) {
-        properties.put("ranking", new SimpleObjectProperty<>(RANKING));
-        return (B)this;
-    }
-
-    public final B rankingColor(final Color RANKING_COLOR) {
-        properties.put("rankingColor", new SimpleObjectProperty<>(RANKING_COLOR));
+    public final B rank(final Rank RANK) {
+        properties.put("rank", new SimpleObjectProperty<>(RANK));
         return (B)this;
     }
 
@@ -1776,10 +1771,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setTrendVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("timeoutMs".equals(key)) {
                 TILE.setTimeoutMs(((LongProperty) properties.get(key)).get());
-            } else if ("ranking".equals(key)) {
-                TILE.setRanking(((ObjectProperty<Ranking>) properties.get(key)).get());
-            } else if ("rankingColor".equals(key)) {
-                TILE.setRankingColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("rank".equals(key)) {
+                TILE.setRank(((ObjectProperty<Rank>) properties.get(key)).get());
             } else if ("numberOfValuesForTrendCalculation".equals(key)) {
                 TILE.setNumberOfValuesForTrendCalculation(((IntegerProperty) properties.get(key)).get());
             } else if ("backgroundImage".equals(key)) {

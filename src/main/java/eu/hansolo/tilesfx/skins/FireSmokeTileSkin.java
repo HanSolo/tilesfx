@@ -16,20 +16,14 @@
 
 package eu.hansolo.tilesfx.skins;
 
-import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Fire;
-import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Smoke;
-import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
@@ -37,23 +31,20 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
 
 public class FireSmokeTileSkin extends TileSkin {
-    private Text                      titleText;
-    private Text                      valueText;
-    private Text                      upperUnitText;
-    private Line                      fractionLine;
-    private Text                      unitText;
-    private VBox                      unitFlow;
-    private HBox                      valueUnitFlow;
-    private Text                      text;
-    private Smoke                     smoke;
-    private Fire                      fire;
+    private Text  titleText;
+    private Text  valueText;
+    private Text  upperUnitText;
+    private Line  fractionLine;
+    private Text  unitText;
+    private VBox  unitFlow;
+    private HBox  valueUnitFlow;
+    private Text  text;
+    private Smoke smoke;
+    private Fire  fire;
 
 
     // ******************** Constructors **************************************
@@ -70,10 +61,9 @@ public class FireSmokeTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, ((tile.getValue() - minValue) / range * 100)));
+        valueText = new Text();
         valueText.setFill(tile.getValueColor());
         valueText.setTextOrigin(VPos.BASELINE);
-        valueText.setStroke(tile.getBackgroundColor());
         Helper.enableNode(valueText, tile.isValueVisible());
 
         upperUnitText = new Text("");
@@ -91,7 +81,7 @@ public class FireSmokeTileSkin extends TileSkin {
 
         valueUnitFlow = new HBox(valueText, unitFlow);
         //valueUnitFlow.setAlignment(Pos.CENTER);
-        valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
+        valueUnitFlow.setAlignment(Pos.BOTTOM_CENTER);
         valueUnitFlow.setMouseTransparent(true);
 
         text = new Text(tile.getText());
@@ -125,9 +115,9 @@ public class FireSmokeTileSkin extends TileSkin {
 
     @Override protected void handleCurrentValue(final double VALUE) {
         if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(VALUE));
+            valueText.setText(decimalFormat.format(Helper.clamp(minValue, maxValue, VALUE)));
         } else {
-            valueText.setText(String.format(locale, formatString, VALUE));
+            valueText.setText(String.format(locale, formatString, Helper.clamp(minValue, maxValue, VALUE)));
         }
         resizeDynamicText();
         if (VALUE > tile.getThreshold()) {
@@ -159,6 +149,8 @@ public class FireSmokeTileSkin extends TileSkin {
         fontSize = upperUnitText.getText().isEmpty() ? size * 0.24 : size * 0.20;
         unitText.setFont(Fonts.latoRegular(fontSize * fontFactor));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
+
+        valueUnitFlow.relocate(size * 0.05, (height - valueUnitFlow.getLayoutBounds().getHeight()) * 0.5);
     }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
@@ -231,9 +223,9 @@ public class FireSmokeTileSkin extends TileSkin {
         text.setText(tile.getText());
 
         if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+            valueText.setText(decimalFormat.format(Helper.clamp(minValue, maxValue, tile.getCurrentValue())));
         } else {
-            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            valueText.setText(String.format(locale, formatString, Helper.clamp(minValue, maxValue, tile.getCurrentValue())));
         }
         if (tile.getUnit().contains("/")) {
             String[] units = tile.getUnit().split("/");

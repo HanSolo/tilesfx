@@ -163,6 +163,8 @@ public class ColorTileSkin extends TileSkin {
         fontSize = upperUnitText.getText().isEmpty() ? size * 0.24 : size * 0.20;
         unitText.setFont(Fonts.latoRegular(fontSize * fontFactor));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
+
+        valueUnitFlow.relocate(size * 0.05, (height - valueUnitFlow.getLayoutBounds().getHeight()) * 0.5);
     }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
@@ -218,9 +220,9 @@ public class ColorTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
 
         if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+            valueText.setText(decimalFormat.format(Helper.clamp(minValue, maxValue, tile.getCurrentValue())));
         } else {
-            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            valueText.setText(String.format(locale, formatString, Helper.clamp(minValue, maxValue, tile.getCurrentValue())));
         }
         if (tile.getUnit().contains("/")) {
             String[] units = tile.getUnit().split("/");

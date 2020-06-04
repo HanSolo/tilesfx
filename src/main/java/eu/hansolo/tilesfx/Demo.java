@@ -28,6 +28,7 @@ import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.icons.Flag;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
@@ -36,6 +37,8 @@ import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
+import eu.hansolo.tilesfx.tools.Rank;
+import eu.hansolo.tilesfx.tools.Ranking;
 import eu.hansolo.tilesfx.tools.TreeNode;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -160,6 +163,9 @@ public class Demo extends Application {
     private Tile            cycleStepTile;
     private Tile            customFlagChartTile;
     private Tile            colorTile;
+    private Tile            turnoverTile;
+    private Tile            fluidTile;
+    private Tile            fireSmokeTile;
 
 
     private long            lastTimerCall;
@@ -1014,7 +1020,7 @@ public class Demo extends Application {
         matrixIconTile = TileBuilder.create()
                                     .skinType(SkinType.MATRIX_ICON)
                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .title("MatrixIcon Tile")
+                                    .title("MatrixIcon Tile")
                                     .matrixIcons(matrixIcon1, matrixIcon2, matrixIcon3, matrixIcon4, matrixIcon5, matrixIcon6, matrixIcon7, matrixIcon8, matrixIcon9)
                                     .animationDuration(50)
                                     .animated(true)
@@ -1072,6 +1078,37 @@ public class Demo extends Application {
                            .description("Whatever")
                            .animated(true)
                            .build();
+
+        turnoverTile = TileBuilder.create().skinType(SkinType.TURNOVER)
+                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                  .title("TurnoverTileSkin")
+                                  .text("Gerrit Grunwald")
+                                  .decimals(0)
+                                  .unit("$")
+                                  .image(new Image(Demo.class.getResourceAsStream("HanSolo.png")))
+                                  .animated(true)
+                                  .threshold(70) // triggers the rotation effect
+                                  .build();
+
+        fluidTile = TileBuilder.create().skinType(SkinType.FLUID)
+                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                               .title("FluidTileSkin")
+                               .text("Waterlevel")
+                               .unit("\u0025")
+                               .decimals(0)
+                               .barColor(Tile.BLUE) // defines the fluid color, alternatively use sections or gradientstops
+                               .animated(true)
+                               .build();
+
+        fireSmokeTile = TileBuilder.create().skinType(SkinType.FIRE_SMOKE)
+                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                   .title("FireSmokeTileSkin")
+                                   .text("CPU temp")
+                                   .unit("\u00b0C")
+                                   .threshold(40) // triggers the fire and smoke effect
+                                   .decimals(0)
+                                   .animated(true)
+                                   .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -1143,6 +1180,12 @@ public class Demo extends Application {
 
                     colorTile.setValue(RND.nextDouble() * 100);
 
+                    turnoverTile.setValue(RND.nextDouble() * 100);
+
+                    fluidTile.setValue(RND.nextDouble() * 100);
+
+                    fireSmokeTile.setValue(RND.nextDouble() * 100);
+
                     lastTimerCall = now;
                 }
             }
@@ -1154,7 +1197,7 @@ public class Demo extends Application {
     @Override public void start(Stage stage) {
         long start = System.currentTimeMillis();
 
-        FlowGridPane pane = new FlowGridPane(8, 5,
+        FlowGridPane pane = new FlowGridPane(8, 6,
                                              percentageTile, clockTile, gaugeTile, sparkLineTile, areaChartTile,
                                              lineChartTile, timerControlTile, numberTile, textTile,
                                              highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
@@ -1165,7 +1208,7 @@ public class Demo extends Application {
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
                                              timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
-                                             cycleStepTile, customFlagChartTile, colorTile);
+                                             cycleStepTile, customFlagChartTile, colorTile, turnoverTile, fluidTile, fireSmokeTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

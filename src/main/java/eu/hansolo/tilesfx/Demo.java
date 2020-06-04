@@ -116,6 +116,8 @@ public class Demo extends Application {
     private ChartData       smoothChartData3;
     private ChartData       smoothChartData4;
 
+    private Rank            firstRank;
+
     private Tile            percentageTile;
     private Tile            clockTile;
     private Tile            gaugeTile;
@@ -644,6 +646,8 @@ public class Demo extends Application {
                                          .animated(true)
                                          .build();
 
+        firstRank = new Rank(Ranking.FIRST, Tile.YELLOW_ORANGE);
+
         countryTile = TileBuilder.create().skinType(SkinType.COUNTRY)
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                           .minValue(0)
@@ -1087,6 +1091,18 @@ public class Demo extends Application {
                                   .unit("$")
                                   .image(new Image(Demo.class.getResourceAsStream("HanSolo.png")))
                                   .animated(true)
+                                  .checkThreshold(true)
+                                  .onTileEvent(e -> {
+                                      if (EventType.THRESHOLD_EXCEEDED == e.getEventType()) {
+                                          turnoverTile.setRank(firstRank);
+                                          turnoverTile.setValueColor(firstRank.getColor());
+                                          turnoverTile.setUnitColor(firstRank.getColor());
+                                      } else if (EventType.THRESHOLD_UNDERRUN == e.getEventType()) {
+                                          turnoverTile.setRank(Rank.DEFAULT);
+                                          turnoverTile.setValueColor(Tile.FOREGROUND);
+                                          turnoverTile.setUnitColor(Tile.FOREGROUND);
+                                      }
+                                  })
                                   .threshold(70) // triggers the rotation effect
                                   .build();
 

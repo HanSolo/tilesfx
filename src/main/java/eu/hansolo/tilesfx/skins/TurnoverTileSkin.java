@@ -162,7 +162,6 @@ public class TurnoverTileSkin extends TileSkin {
             valueText.setText(String.format(locale, formatString, VALUE));
         }
         if (VALUE > tile.getThreshold()) {
-            System.out.println(tile.getThreshold());
             rotationEffect.setVisible(true);
             rotationEffect.start();
         } else {

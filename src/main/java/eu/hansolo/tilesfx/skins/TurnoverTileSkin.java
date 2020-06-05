@@ -72,6 +72,7 @@ public class TurnoverTileSkin extends TileSkin {
         imageListener = (o, ov, nv) -> { if (nv != null) { imgView.setImage(tile.getImage()); }};
 
         rotationEffect = new RotationEffect();
+        rotationEffect.setColor(tile.getForegroundColor());
         rotationEffect.setCenterY(0.4);
         rotationEffect.setVisible(false);
 
@@ -344,6 +345,8 @@ public class TurnoverTileSkin extends TileSkin {
 
         resizeDynamicText();
         resizeStaticText();
+
+        rotationEffect.setColor(tile.getForegroundColor());
 
         Ranking ranking   = tile.getRank().getRanking();
         Color   rankColor = tile.getRank().getColor();

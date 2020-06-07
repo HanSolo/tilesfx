@@ -217,7 +217,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         triangle.setRotate(state.angle);
 
         valueText.setText(String.format(locale, formatString, getValue()));
-        valueText.setX((width - size * 0.05) - valueText.getLayoutBounds().getWidth());
+        valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
     }
 
     public int getLastIndex() { return lastIndex; }
@@ -271,9 +271,6 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         }
 
         if (width > 0 && height > 0) {
-            //pane.setMaxSize(width, height);
-            //pane.setPrefSize(width, height);
-            
             pane.setMaxSize(parentWidth, height * 0.12);
             pane.setPrefSize(parentWidth, height * 0.12);
 
@@ -287,8 +284,9 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
             nameText.setY(0);
 
             valueText.setFont(Fonts.latoRegular(size * 0.06));
-            valueText.setX((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth());
-            valueText.setY(0);
+            //valueText.setX((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth());
+            //valueText.setY(0);
+            valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
 
             separator.setStartX(size * 0.05);
             separator.setStartY(size * 0.1);

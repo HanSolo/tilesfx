@@ -259,12 +259,12 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
             valueText.setY(0);
 
             barBackground.setX(size * 0.075);
-            barBackground.setY(size * 0.10333333);
+            barBackground.setY(size * 0.09166667);
             barBackground.setWidth(parentWidth - size * 0.15);
             barBackground.setHeight(size * 0.01);
 
             bar.setX(size * 0.075);
-            bar.setY(size * 0.09666667);
+            bar.setY(size * 0.085);
             bar.setWidth(clamp(0, (parentWidth - size * 0.15), getValue() * stepSize));
             bar.setHeight(size * 0.02333333);
 

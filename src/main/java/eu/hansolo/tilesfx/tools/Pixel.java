@@ -22,12 +22,13 @@ import javafx.scene.paint.Color;
 public class Pixel {
     private Color color;
 
-
+    // ******************** Constructors **************************************
     public Pixel(final Color color) {
         this.color = null == color ? Color.BLACK : color;
     }
 
 
+    // ******************** Methods *******************************************
     public Color getColor() { return color; }
     public void setColor(final Color color) { this.color = null == color ? Color.BLACK : color; }
 }

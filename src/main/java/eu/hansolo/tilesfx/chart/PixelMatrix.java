@@ -143,7 +143,6 @@ public class PixelMatrix extends Region {
         ctx = canvas.getGraphicsContext2D();
 
         getChildren().setAll(canvas);
-        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
     }
 
     private void registerListeners() {
@@ -228,6 +227,9 @@ public class PixelMatrix extends Region {
     public void setPixelWithRedraw(final int X, final int Y, final boolean ON) {
         setPixel(X, Y, ON ? pixelOnColor : pixelOffColor);
         drawMatrix();
+    }
+    public void setPixelWithRedraw(final int X, final int Y, final Color COLOR) {
+        setPixelWithRedraw(X, Y, convertToInt(COLOR));
     }
     public void setPixelWithRedraw(final int X, final int Y, final int COLOR_VALUE) {
         setPixel(X, Y, COLOR_VALUE);
@@ -440,7 +442,7 @@ public class PixelMatrix extends Region {
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
                 if (Helper.isInRectangle(EVT.getX(), EVT.getY(), x * pixelWidth + spacer, y * pixelHeight + spacer, x * pixelWidth + spacerPlusPixelWidthMinusDoubleSpacer, y * pixelHeight + spacerPlusPixelHeightMinusDoubleSpacer)) {
-                    firePixelMatrixEvent(new PixelMatrixEvent(x, y, EVT.getScreenX(), EVT.getScreenY()));
+                    firePixelMatrixEvent(new PixelMatrixEvent(x, y, EVT.getScreenX(), EVT.getScreenY(), EVT.getButton()));
                     break;
                 }
             }

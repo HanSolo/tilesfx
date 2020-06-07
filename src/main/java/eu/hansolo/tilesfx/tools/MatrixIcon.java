@@ -34,11 +34,13 @@ public class MatrixIcon {
                                };
 
 
+    // ******************** Constructors **************************************
     public MatrixIcon() {
 
     }
 
 
+    // ******************** Methods *******************************************
     public Pixel[][] getMatrix() { return matrix; }
 
     public Pixel getPixelAt(final int X, final int Y) {
@@ -58,6 +60,48 @@ public class MatrixIcon {
         }
     }
 
+    public String getCode() {
+        StringBuilder code = new StringBuilder().append("MatrixIcon icon = new MatrixIcon();").append("\n");
+        int startIndex       = -1;
+        int endIndex         = -1;
+        Color lastPixelColor = null;
+        for (int y = 0 ; y < 8 ; y++) {
+            for (int x = 0 ; x < 8 ; x++) {
+                Color currentPixelColor = getPixelAt(x, y).getColor();
+                Color nextPixelColor    = x == 7 ? null : getPixelAt(x + 1, y).getColor();
+                if (currentPixelColor.equals(nextPixelColor)) {
+                    if (startIndex == -1) {
+                        startIndex = x;
+                    }
+                } else if (x == 7) {
+                    if (currentPixelColor.equals(lastPixelColor)) {
+                        if (startIndex > -1) {
+                            endIndex = x;
+                            code.append("icon.fillPixels(").append(startIndex).append(", ").append(endIndex).append(", ").append(y).append(", Color.web(\"").append(currentPixelColor.toString().replace("0x", "#")).append("\"));\n");
+                        } else {
+                            code.append("icon.setPixel(").append(x).append(", ").append(y).append(", Color.web(\"").append(currentPixelColor.toString().replace("0x", "#")).append("\"));\n");
+                        }
+                    } else {
+                        code.append("icon.setPixel(").append(x).append(", ").append(y).append(", Color.web(\"").append(currentPixelColor.toString().replace("0x", "#")).append("\"));\n");
+                    }
+                } else {
+                    endIndex = x;
+                    if (startIndex == -1) {
+                        code.append("icon.setPixel(").append(x).append(", ").append(y).append(", Color.web(\"").append(currentPixelColor.toString().replace("0x", "#")).append("\"));\n");
+                    } else {
+                        code.append("icon.fillPixels(").append(startIndex).append(", ").append(endIndex).append(", ").append(y).append(", Color.web(\"").append(currentPixelColor.toString().replace("0x", "#")).append("\"));\n");
+                        startIndex = -1;
+                        endIndex   = -1;
+                    }
+                }
+                lastPixelColor = currentPixelColor;
+            }
+            startIndex     = -1;
+            endIndex       = -1;
+            lastPixelColor = null;
+        }
+        return code.toString();
+    }
 
     private boolean isValid(final int VALUE) {
         if (VALUE < 0 || VALUE > 7) {

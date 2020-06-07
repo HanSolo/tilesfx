@@ -17,21 +17,24 @@
 package eu.hansolo.tilesfx.events;
 
 import javafx.geometry.Point2D;
+import javafx.scene.input.MouseButton;
 
 
 public class PixelMatrixEvent {
-    private final int    X;
-    private final int    Y;
-    private final double MOUSE_SCREEN_X;
-    private final double MOUSE_SCREEN_Y;
+    private final int         X;
+    private final int         Y;
+    private final double      MOUSE_SCREEN_X;
+    private final double      MOUSE_SCREEN_Y;
+    private final MouseButton BUTTON;
 
 
     // ******************** Constructors **************************************
-    public PixelMatrixEvent(final int X, final int Y, final double MOUSE_X, final double MOUSE_Y) {
-        this.X         = X;
-        this.Y         = Y;
-        MOUSE_SCREEN_X = MOUSE_X;
-        MOUSE_SCREEN_Y = MOUSE_Y;
+    public PixelMatrixEvent(final int X, final int Y, final double MOUSE_X, final double MOUSE_Y, final MouseButton BUTTON) {
+        this.X              = X;
+        this.Y              = Y;
+        this.MOUSE_SCREEN_X = MOUSE_X;
+        this.MOUSE_SCREEN_Y = MOUSE_Y;
+        this.BUTTON         = BUTTON;
     }
 
 
@@ -42,4 +45,6 @@ public class PixelMatrixEvent {
     public double getMouseScreenX() { return MOUSE_SCREEN_X; }
     public double getMouseScreenY() { return MOUSE_SCREEN_Y; }
     public Point2D getMouseScreenPos() { return new Point2D(MOUSE_SCREEN_X, MOUSE_SCREEN_Y); }
+
+    public MouseButton getMouseButton() { return BUTTON; }
 }

@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
@@ -68,9 +69,9 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     private static final double                PREFERRED_WIDTH  = 250;
     private static final double                PREFERRED_HEIGHT = 30;
     private static final double                MINIMUM_WIDTH    = 25;
-    private static final double                MINIMUM_HEIGHT   = 3.6;
+    private static final double                MINIMUM_HEIGHT   = 25;
     private static final double                MAXIMUM_WIDTH    = 1024;
-    private static final double                MAXIMUM_HEIGHT   = 1024;
+    private static final double                MAXIMUM_HEIGHT   = 72;
     private static final double                ASPECT_RATIO     = PREFERRED_HEIGHT / PREFERRED_WIDTH;
     private              double                width;
     private              double                height;
@@ -271,27 +272,29 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         }
 
         if (width > 0 && height > 0) {
-            pane.setMaxSize(parentWidth, height * 0.12);
-            pane.setPrefSize(parentWidth, height * 0.12);
+            double itemHeight = Helper.clamp(MINIMUM_HEIGHT, MAXIMUM_HEIGHT, height * 0.14);
+            pane.setMinSize(parentWidth, itemHeight);
+            pane.setMaxSize(parentWidth, itemHeight);
+            pane.setPrefSize(parentWidth, itemHeight);
 
             drawTriangle();
             
             triangle.setLayoutX(size * 0.05);
             triangle.setLayoutY((height - triangle.getBoundsInLocal().getHeight()) * 0.25);
 
-            nameText.setFont(Fonts.latoRegular(size * 0.06));
+            double fontSize = Helper.clamp(12, MAXIMUM_HEIGHT * 0.5, size * 0.06);
+
+            nameText.setFont(Fonts.latoRegular(fontSize));
             nameText.setX(size * 0.12);
             nameText.setY(0);
 
-            valueText.setFont(Fonts.latoRegular(size * 0.06));
-            //valueText.setX((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth());
-            //valueText.setY(0);
+            valueText.setFont(Fonts.latoRegular(fontSize));
             valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
 
             separator.setStartX(size * 0.05);
-            separator.setStartY(size * 0.1);
+            separator.setStartY(fontSize * 1.5);
             separator.setEndX(parentWidth - size * 0.05);
-            separator.setEndY(size * 0.1);
+            separator.setEndY(fontSize * 1.5);
 
             redraw();
         }

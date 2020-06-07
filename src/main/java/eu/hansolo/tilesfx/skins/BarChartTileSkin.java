@@ -154,12 +154,13 @@ public class BarChartTileSkin extends TileSkin {
             List<BarChartItem> items     = tile.getBarChartItems();
             int                noOfItems = items.size();
             if (noOfItems == 0) { return; }
-            double maxValue = tile.getMaxValue();
-            double maxY     = barChartPane.getLayoutBounds().getMaxY();
+            double maxValue   = tile.getMaxValue();
+            double maxY       = barChartPane.getLayoutBounds().getMaxY();
             double itemHeight = items.get(0).getPrefHeight();
+            double factorY    = Helper.clamp(itemHeight, itemHeight * 1.1, 0.13 * size);
             for (int i = 0 ; i < noOfItems ; i++) {
                 BarChartItem item = items.get(i);
-                double y = i * 0.13 * size;
+                double y = i * factorY;
                 if ((y + itemHeight) < maxY) {
                     item.setMaxValue(maxValue);
                     Helper.enableNode(item, true);
@@ -201,7 +202,7 @@ public class BarChartTileSkin extends TileSkin {
     }
 
     private void resizeItems() {
-        double itemHeight = height * 0.14;
+        double itemHeight = Helper.clamp(30, 72, height * 0.14);
         barChartPane.getChildren().forEach(node -> {
             BarChartItem item = (BarChartItem) node;
             item.setParentSize(width, height);

@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
@@ -53,9 +54,9 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     private static final double                PREFERRED_WIDTH  = 250;
     private static final double                PREFERRED_HEIGHT = 30;
     private static final double                MINIMUM_WIDTH    = 25;
-    private static final double                MINIMUM_HEIGHT   = 3.6;
+    private static final double                MINIMUM_HEIGHT   = 25;
     private static final double                MAXIMUM_WIDTH    = 1024;
-    private static final double                MAXIMUM_HEIGHT   = 1024;
+    private static final double                MAXIMUM_HEIGHT   = 72;
     private static final double                ASPECT_RATIO     = PREFERRED_HEIGHT / PREFERRED_WIDTH;
     private              double                width;
     private              double                height;
@@ -220,7 +221,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
     private void updateBar(final double VALUE) {
         valueText.setText(String.format(locale, formatString, VALUE));
-        valueText.setX((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth());
+        valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
         bar.setWidth(clamp(0, (parentWidth - size * 0.15), VALUE * stepSize));
         bar.setFill(getBarColor());
     }
@@ -246,27 +247,30 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
         if (width > 0 && height > 0) {
             stepSize = (parentWidth - size * 0.15) / maxValue;
+            double itemHeight = Helper.clamp(MINIMUM_HEIGHT, MAXIMUM_HEIGHT, height * 0.14);
+            pane.setMinSize(parentWidth, itemHeight);
+            pane.setMaxSize(parentWidth, itemHeight);
+            pane.setPrefSize(parentWidth, itemHeight);
 
-            pane.setMaxSize(parentWidth, height * 0.12);
-            pane.setPrefSize(parentWidth, height * 0.12);
+            double fontSize = Helper.clamp(12, MAXIMUM_HEIGHT * 0.5, size * 0.06);
 
-            nameText.setFont(Fonts.latoRegular(size * 0.06));
+            nameText.setFont(Fonts.latoRegular(fontSize));
             nameText.setX(size * 0.05);
             nameText.setY(0);
 
-            valueText.setFont(Fonts.latoRegular(size * 0.06));
-            valueText.setX((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth());
-            valueText.setY(0);
+            valueText.setFont(Fonts.latoRegular(fontSize));
+            valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
 
             barBackground.setX(size * 0.075);
-            barBackground.setY(size * 0.09166667);
+            barBackground.setY(fontSize * 1.5);
             barBackground.setWidth(parentWidth - size * 0.15);
             barBackground.setHeight(size * 0.01);
+            barBackground.setHeight(fontSize / 6);
 
             bar.setX(size * 0.075);
-            bar.setY(size * 0.085);
+            bar.setY(fontSize * 1.35);
             bar.setWidth(clamp(0, (parentWidth - size * 0.15), getValue() * stepSize));
-            bar.setHeight(size * 0.02333333);
+            bar.setHeight(fontSize / 2);
 
             redraw();
         }

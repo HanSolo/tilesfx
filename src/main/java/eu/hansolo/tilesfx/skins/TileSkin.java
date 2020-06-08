@@ -160,6 +160,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         enableNode(infoRegion, false);
 
         pane = new Pane(backgroundImageView, notifyRegion, infoRegion);
+        pane.getStyleClass().add("tile");
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(tile.getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
 

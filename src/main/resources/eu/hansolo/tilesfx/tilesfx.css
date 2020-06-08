@@ -15,22 +15,38 @@
  */
 
 .tile {
-    -BACKGROUND      : rgb(42, 42, 42);
-    -FOREGROUND      : rgb(223, 223, 223);
-    -GRAY            : rgb(139,144,146);
-    -RED             : rgb(229, 80, 76);
-    -LIGHT_RED       : rgb(255, 84, 56);
-    -GREEN           : rgb(143, 198, 94);
-    -LIGHT_GREEN     : rgb(132, 228, 50);
-    -BLUE            : rgb(55, 179, 252);
-    -DARK_BLUE       : rgb(55, 94, 252);
-    -ORANGE          : rgb(237, 162, 57);
-    -YELLOW_ORANGE   : rgb(229, 198, 76);
-    -YELLOW          : rgb(229, 229, 76);
-    -MAGENTA         : rgb(198, 75, 232);
-    -PINK            : rgb(233, 14, 139);
+    -BACKGROUND         : rgb(42, 42, 42);
+    -FOREGROUND         : rgb(223, 223, 223);
+    -GRAY               : rgb(139, 144, 146);
+    -RED                : rgb(229, 80, 76);
+    -LIGHT_RED          : rgb(255, 84, 56);
+    -GREEN              : rgb(143, 198, 94);
+    -LIGHT_GREEN        : rgb(132, 228, 50);
+    -BLUE               : rgb(55, 179, 252);
+    -DARK_BLUE          : rgb(55, 94, 252);
+    -ORANGE             : rgb(237, 162, 57);
+    -YELLOW_ORANGE      : rgb(229, 198, 76);
+    -YELLOW             : rgb(229, 229, 76);
+    -MAGENTA            : rgb(198, 75, 232);
+    -PINK               : rgb(233, 14, 139);
 
-    -foreground-color: -FOREGROUND;
+    -BACKGROUND_TRANS   : rgba(42, 42, 42, 0.5);
+    -FOREGROUND_TRANS   : rgba(223, 223, 223, 0.5);
+    -GRAY_TRANS         : rgba(139, 144, 146, 0.5);
+    -RED_TRANS          : rgba(229, 80, 76, 0.5);
+    _LIGHT_RED_TRANS    : rgba(255, 84, 56, 0.5);
+    -GREEN_TRANS        : rgba(143, 198, 94, 0.5);
+    -LIGHT_GREEN_TRANS  : rgba(132, 228, 50, 0.5);
+    -BLUE_TRANS         : rgba(55, 179, 252, 0.5);
+    -DARK_BLUE_TRANS    : rgba(55, 94, 252, 0.5);
+    -ORANGE_TRANS       : rgba(237, 162, 57, 0.5);
+    -YELLOW_ORANGE_TRANS: rgba(229, 198, 76, 0.5);
+    -YELLOW_TRANS       : rgba(229, 229, 76, 0.5);
+    -MAGENTA_TRANS      : rgba(198, 75, 232, 0.5);
+    -PINK_TRANS         : rgba(233, 14, 139, 0.5);
+
+    -foreground-color   : -FOREGROUND;
+    -thumb-color        : -FOREGROUND_TRANS;
 }
 
 .tile .chart {
@@ -146,3 +162,86 @@
 .tile .default-color3.chart-series-area-fill { -fx-fill: linear-gradient(to bottom, -GREEN, transparent); }
 .tile .default-color4.chart-series-area-fill { -fx-fill: linear-gradient(to bottom, -RED, transparent); }
 .tile .default-color5.chart-series-area-fill { -fx-fill: linear-gradient(to bottom, -YELLOW, transparent); }
+
+
+.tile .scroll-pane,
+.tile .scroll-pane.edge-to-edge {
+    -fx-background-color: transparent;
+}
+.tile .scroll-pane > .corner {
+    -fx-background-color: transparent;
+    -fx-border-color    : transparent;
+}
+.tile .scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.tile .scroll-pane > .scroll-bar:horizontal,
+.tile .scroll-pane > .scroll-bar:vertical,
+.tile .scroll-pane > .scroll-bar:focused {
+    -fx-effect           : none;
+    -fx-background-color : transparent;
+    -fx-padding          : 0;
+    -fx-background-insets: 0;
+    -fx-border-color     : transparent;
+    -fx-border-width     : 0;
+}
+
+.tile .scroll-pane > .scroll-bar:horizontal .track-background,
+.tile .scroll-pane > .scroll-bar:vertical .track-background {
+    -fx-background-color : transparent;
+    -fx-background-insets: -1;
+    -fx-padding          : 0;
+    -fx-border-color     : transparent;
+    -fx-border-width     : 0;
+}
+
+.tile .scroll-pane > .scroll-bar:horizontal .track,
+.tile .scroll-pane > .scroll-bar:vertical .track {
+    -fx-background-color  : transparent;
+    -fx-border-color      : transparent;
+    -fx-background-insets : 0;
+    -fx-padding           : 0;
+    -fx-background-radius : 0.0em;
+    -fx-border-radius     : 2.0em;
+}
+
+.tile .scroll-pane > .scroll-bar:horizontal .increment-button ,
+.tile .scroll-pane > .scroll-bar:horizontal .decrement-button {
+    -fx-background-color  : transparent;
+    -fx-background-radius : 0.0em;
+    -fx-padding           : 0.0 0.0 10.0 0.0;
+}
+
+.tile .scroll-pane > .scroll-bar:vertical .increment-button ,
+.tile .scroll-pane > .scroll-bar:vertical .decrement-button {
+    -fx-background-color  : transparent;
+    -fx-background-radius : 0.0em;
+    -fx-padding           : 0.0 10.0 0.0 0.0;
+}
+
+.tile .scroll-pane > .scroll-bar .increment-arrow,
+.tile .scroll-pane > .scroll-bar .decrement-arrow {
+    -fx-shape   :  "";
+    -fx-padding : 0.15em 0.0;
+}
+
+.tile .scroll-pane > .scroll-bar:vertical .increment-arrow,
+.tile .scroll-pane > .scroll-bar:vertical .decrement-arrow {
+    -fx-shape   : "";
+    -fx-padding : 0.0 0.15em;
+}
+
+.tile .scroll-pane > .scroll-bar:horizontal .thumb,
+.tile .scroll-pane > .scroll-bar:vertical .thumb {
+    -fx-background-color  : -thumb-color;
+    -fx-background-insets : 2.0, 0.0, 0.0;
+    -fx-background-radius : 2.0em;
+}
+
+.tile .scroll-pane > .scroll-bar:horizontal .thumb:hover,
+.tile .scroll-pane > .scroll-bar:vertical .thumb:hover {
+    -fx-background-color  : -thumb-color;
+    -fx-background-insets : 2.0, 0.0, 0.0;
+    -fx-background-radius : 2.0em;
+}

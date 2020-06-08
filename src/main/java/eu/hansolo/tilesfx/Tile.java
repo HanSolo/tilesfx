@@ -70,6 +70,10 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.property.StringPropertyBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.SimpleStyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.StyleablePropertyFactory;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
@@ -84,6 +88,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.SVGPath;
@@ -132,7 +137,8 @@ public class Tile extends Control {
                            WORLDMAP("WorldMapTileSkin"), TIMER_CONTROL("TimerControlTileSkin"),
                            NUMBER("NumberTileSkin"), TEXT("TextTileSkin"),
                            TIME("TimeTileSkin"),
-                           CUSTOM("CustomTileSkin"), LEADER_BOARD("LeaderBoardTileSkin"),
+                           CUSTOM("CustomTileSkin"), CUSTOM_SCROLLABLE("CustomScrollableTileSkin"),
+                           LEADER_BOARD("LeaderBoardTileSkin"),
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChartTileSkin"), DONUT_CHART("DonutChartTileSkin"),
                            CIRCULAR_PROGRESS("CircularProgressTileSkin"), STOCK("StockTileSkin"),
                            GAUGE_SPARK_LINE("GaugeSparkLineTileSkin"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
@@ -263,6 +269,9 @@ public class Tile extends Control {
     private        final TileEvent ANIMATED_ON_EVENT              = new TileEvent(EventType.ANIMATED_ON);
     private        final TileEvent ANIMATED_OFF_EVENT            = new TileEvent(EventType.ANIMATED_OFF);
 
+    private static final StyleablePropertyFactory<Tile> FACTORY     = new StyleablePropertyFactory<>(Region.getClassCssMetaData());
+    private static final CssMetaData<Tile, Color>       THUMB_COLOR = FACTORY.createColorCssMetaData("-thumb-color", s -> s.thumbColor, Color.rgb(223, 223, 223, 0.5), false);
+
     private static       String      userAgentStyleSheet;
 
     // Tile events
@@ -355,6 +364,7 @@ public class Tile extends Control {
     private SunburstChart                                 sunburstChart;
 
     // UI related
+    private StyleableProperty<Color>       thumbColor;
     private boolean                        _flatUI;
     private BooleanProperty                flatUI;
     private SkinType                       skinType;
@@ -746,7 +756,8 @@ public class Tile extends Control {
                 @NamedArg(value="numberOfValuesForTrendCalculation", defaultValue="3") int numberOfValuesForTrendCalculation,
                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
                 @NamedArg(value="increment", defaultValue="1") int increment,
-                @NamedArg(value="flatUI", defaultValue="true") boolean flatUI
+                @NamedArg(value="flatUI", defaultValue="true") boolean flatUI,
+                @NamedArg(value="thumbColor", defaultValue="#DFDFDF80") boolean thumbColor
                 ) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         this.skinType = skinType;
@@ -857,6 +868,7 @@ public class Tile extends Control {
         _trackColor                         = TileColor.BLUE;
         _mapProvider                        = MapProvider.BW;
         flipTimeInMS                        = 500;
+        thumbColor                          = new SimpleStyleableObjectProperty<>(THUMB_COLOR, this, "thumbColor");
         _flatUI                             = true;
         _textSize                           = TextSize.NORMAL;
         _roundedCorners                     = true;
@@ -2288,6 +2300,10 @@ public class Tile extends Control {
         if (null == foregroundColor) { _foregroundColor = COLOR; } else { foregroundColor.set(COLOR); }
         fireTileEvent(REDRAW_EVENT);
     }
+
+    public Color getThumbColor() { return thumbColor.getValue(); }
+    public void setThumbColor(final Color THUMB_COLOR) { thumbColor.setValue(THUMB_COLOR); }
+    public ObjectProperty<Color> thumbColorProperty() { return (ObjectProperty<Color>) thumbColor; }
 
     /**
      * Returns true if the the UI should be more flat than skeuomorphic
@@ -5956,6 +5972,7 @@ public class Tile extends Control {
             case TEXT             : return new TextTileSkin(Tile.this);
             case TIME             : return new TimeTileSkin(Tile.this);
             case CUSTOM           : return new CustomTileSkin(Tile.this);
+            case CUSTOM_SCROLLABLE: return new CustomScrollableTileSkin(Tile.this);
             case LEADER_BOARD     : return new LeaderBoardTileSkin(Tile.this);
             case MAP              : return new MapTileSkin(Tile.this);
             case RADIAL_CHART     : return new RadialChartTileSkin(Tile.this);
@@ -6056,6 +6073,8 @@ public class Tile extends Control {
             case TIME:
                 break;
             case CUSTOM:
+                break;
+            case CUSTOM_SCROLLABLE:
                 break;
             case LEADER_BOARD:
                 break;
@@ -6201,6 +6220,7 @@ public class Tile extends Control {
             case TEXT             : setSkin(new TextTileSkin(Tile.this)); break;
             case TIME             : setSkin(new TimeTileSkin(Tile.this)); break;
             case CUSTOM           : setSkin(new CustomTileSkin(Tile.this)); break;
+            case CUSTOM_SCROLLABLE: setSkin(new CustomScrollableTileSkin(Tile.this)); break;
             case LEADER_BOARD     : setSkin(new LeaderBoardTileSkin(Tile.this)); break;
             case RADIAL_CHART     : setSkin(new RadialChartTileSkin(Tile.this)); break;
             case DONUT_CHART      : setSkin(new DonutChartTileSkin(Tile.this)); break;

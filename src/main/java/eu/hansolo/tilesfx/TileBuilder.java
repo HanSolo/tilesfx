@@ -171,6 +171,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B thumbColor(final Color THUMB_COLOR) {
+        properties.put("thumbColor", new SimpleObjectProperty<>(THUMB_COLOR));
+        return (B)this;
+    }
+
     public final B flatUI(final boolean FLAT_UI) {
         properties.put("flatUI", new SimpleBooleanProperty(FLAT_UI));
         return (B)this;
@@ -1192,6 +1197,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case CUSTOM:
                     break;
+                case CUSTOM_SCROLLABLE:
+                    break;
                 case LEADER_BOARD:
                     break;
                 case MAP:
@@ -1477,6 +1484,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setDescriptionAlignment(((ObjectProperty<Pos>) properties.get(key)).get());
             } else if("unit".equals(key)) {
                 TILE.setUnit(((StringProperty) properties.get(key)).get());
+            } else if ("thumbColor".equals(key)) {
+                TILE.setThumbColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("flatUI".equals(key)) {
                 TILE.setFlatUI(((BooleanProperty) properties.get(key)).get());
             } else if ("selected".equals(key)) {

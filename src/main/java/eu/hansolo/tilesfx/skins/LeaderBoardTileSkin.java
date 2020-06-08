@@ -106,10 +106,10 @@ public class LeaderBoardTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (TileEvent.EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
-        } else if ("DATA".equals(EVENT_TYPE)) {
+        } else if (TileEvent.EventType.DATA.name().equals(EVENT_TYPE)) {
             registerItemListeners();
         }
     }
@@ -183,6 +183,8 @@ public class LeaderBoardTileSkin extends TileSkin {
                     Helper.enableNode(item, false);
                 }
             }
+            long noOfVisibleItems = items.stream().filter(item -> item.isVisible()).count();
+            tile.showLowerRightRegion(noOfVisibleItems != noOfItems);
         });
     }
 

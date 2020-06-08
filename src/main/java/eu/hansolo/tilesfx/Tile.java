@@ -237,6 +237,8 @@ public class Tile extends Control {
     private        final TileEvent HIDE_NOTIFY_REGION_EVENT       = new TileEvent(EventType.HIDE_NOTIFY_REGION);
     private        final TileEvent SHOW_INFO_REGION_EVENT         = new TileEvent(EventType.SHOW_INFO_REGION);
     private        final TileEvent HIDE_INFO_REGION_EVENT         = new TileEvent(EventType.HIDE_INFO_REGION);
+    private        final TileEvent SHOW_LOWER_RIGHT_REGION_EVENT  = new TileEvent(EventType.SHOW_LOWER_RIGHT_REGION);
+    private        final TileEvent HIDE_LOWER_RIGHT_REGION_EVENT  = new TileEvent(EventType.HIDE_LOWER_RIGHT_REGION);
     private        final TileEvent EXCEEDED_THRESHOLD_EVENT       = new TileEvent(EventType.THRESHOLD_EXCEEDED);
     private        final TileEvent UNDERRUN_THRESHOLD_EVENT       = new TileEvent(EventType.THRESHOLD_UNDERRUN);
     private        final TileEvent EXCEEDED_LOWER_THRESHOLD_EVENT = new TileEvent(EventType.LOWER_THRESHOLD_EXCEEDED);
@@ -571,6 +573,9 @@ public class Tile extends Control {
     private Color                          _infoRegionBackgroundColor;
     private Color                          _infoRegionForegroundColor;
     private String                         _infoRegionTooltipText;
+    private Color                          _lowerRightRegionBackgroundColor;
+    private Color                          _lowerRightRegionForegroundColor;
+    private String                         _lowerRightRegionTooltipText;
     private Image                          _backgroundImage;
     private double                         _backgroundImageOpacity;
     private boolean                        _backgroundImageKeepAspect;
@@ -735,9 +740,16 @@ public class Tile extends Control {
                 @NamedArg(value="tooltipTimeout", defaultValue="2000") long tooltipTimeout,
                 @NamedArg(value="notifyRegionBackgroundColor", defaultValue="#E5E54C") Color notifyRegionBackgroundColor,
                 @NamedArg(value="notifyRegionForegroundColor", defaultValue="Tile.#2a2a2a") Color notifyRegionForegroundColor,
+                @NamedArg(value="notifyRegionTooltipText", defaultValue="") String notifyRegionTooltipText,
+                @NamedArg(value="showNotifyRegion", defaultValue="false") String showNotifyRegion,
                 @NamedArg(value="infoRegionBackgroundColor", defaultValue="#375EFC") Color infoRegionBackgroundColor,
                 @NamedArg(value="infoRegionForegroundColor", defaultValue="#dfdfdf") Color infoRegionForegroundColor,
                 @NamedArg(value="infoRegionTooltipText", defaultValue="") String infoRegionTooltipText,
+                @NamedArg(value="showInfoRegion", defaultValue="false") String showInfoRegion,
+                @NamedArg(value="lowerRightRegionBackgroundColor", defaultValue="#375EFC") Color lowerRightRegionBackgroundColor,
+                @NamedArg(value="lowerRightRegionForegroundColor", defaultValue="#8B9092") Color lowerRightRegionForegroundColor,
+                @NamedArg(value="lowerRightRegionTooltipText", defaultValue="") String lowerRightRegionTooltipText,
+                @NamedArg(value="showLowerRightRegion", defaultValue="false") String showLowerRightRegion,
                 @NamedArg(value="backgroundImage", defaultValue="null") Image backgroundImage,
                 @NamedArg(value="backgroundImageOpacity", defaultValue="0.2") double backgroundImageOpacity,
                 @NamedArg(value="backgroundImageKeepAspect", defaultValue="true") boolean backgroundImageKeepAspect,
@@ -971,6 +983,9 @@ public class Tile extends Control {
         _infoRegionBackgroundColor          = Tile.DARK_BLUE;
         _infoRegionForegroundColor          = Tile.FOREGROUND;
         _infoRegionTooltipText              = "";
+        _lowerRightRegionBackgroundColor    = Tile.GRAY;
+        _lowerRightRegionForegroundColor    = Tile.BACKGROUND;
+        _lowerRightRegionTooltipText        = "";
         _backgroundImage                    = null;
         _backgroundImageOpacity             = 0.2;
         _backgroundImageKeepAspect          = true;
@@ -5444,6 +5459,24 @@ public class Tile extends Control {
         fireTileEvent(REDRAW_EVENT);
     }
 
+    public Color getLowerRightRegionBackgroundColor() { return _lowerRightRegionBackgroundColor; }
+    public void setLowerRightRegionBackgroundColor(final Color COLOR) {
+        _lowerRightRegionBackgroundColor = COLOR;
+        fireTileEvent(REDRAW_EVENT);
+    }
+
+    public Color getLowerRightRegionForegroundColor() { return _lowerRightRegionForegroundColor; }
+    public void setLowerRightRegionForegroundColor(final Color COLOR) {
+        _lowerRightRegionForegroundColor = COLOR;
+        fireTileEvent(REDRAW_EVENT);
+    }
+
+    public String getLowerRightRegionTooltipText() { return _lowerRightRegionTooltipText; }
+    public void setLowerRightRegionTooltipText(final String TEXT) {
+        _lowerRightRegionTooltipText = TEXT;
+        fireTileEvent(REDRAW_EVENT);
+    }
+    
     public Image getBackgroundImage() { return _backgroundImage; }
     public void setBackgroundImage(final Image IMAGE) {
         _backgroundImage = IMAGE;
@@ -5742,6 +5775,8 @@ public class Tile extends Control {
     public void showNotifyRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFY_REGION_EVENT : HIDE_NOTIFY_REGION_EVENT); }
 
     public void showInfoRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_INFO_REGION_EVENT : HIDE_INFO_REGION_EVENT); }
+
+    public void showLowerRightRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_LOWER_RIGHT_REGION_EVENT : HIDE_LOWER_RIGHT_REGION_EVENT); }
 
     public EventHandler<MouseEvent> getInfoRegionHandler() { return infoRegionHandler; }
     public void setInfoRegionEventHandler(final EventHandler<MouseEvent> HANDLER) {

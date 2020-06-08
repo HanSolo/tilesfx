@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.Tile;
+import javafx.beans.DefaultProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -34,6 +35,7 @@ import javafx.scene.shape.QuadCurveTo;
  * Date: 08.11.17
  * Time: 04:37
  */
+@DefaultProperty("children")
 public class NotifyRegion extends Region {
     private static final double  PREFERRED_WIDTH  = 52;
     private static final double  PREFERRED_HEIGHT = 52;
@@ -91,10 +93,6 @@ public class NotifyRegion extends Region {
 
 
     // ******************** Methods *******************************************
-    @Override public void layoutChildren() {
-        super.layoutChildren();
-    }
-
     @Override protected double computeMinWidth(final double HEIGHT) { return MINIMUM_WIDTH; }
     @Override protected double computeMinHeight(final double WIDTH) { return MINIMUM_HEIGHT; }
     @Override protected double computePrefWidth(final double HEIGHT) { return super.computePrefWidth(HEIGHT); }
@@ -128,7 +126,7 @@ public class NotifyRegion extends Region {
             tooltip.setText(TEXT);
             Tooltip.install(path, tooltip);
         }
-    }    
+    }
 
     @Override public ObservableList<Node> getChildren() { return super.getChildren(); }
 

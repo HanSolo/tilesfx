@@ -150,10 +150,13 @@ public class Test extends Application {
                            .prefSize(WIDTH, HEIGHT)
                            .title("BarChart Tile")
                            .text("Whatever text")
-                           .textVisible(false)
+                           //.textVisible(false)
                            .barChartItems(barChartItem1, barChartItem2, barChartItem3, barChartItem4, barChartItem5,
                                           barChartItem6, barChartItem7, barChartItem8, barChartItem9, barChartItem10)
                            .build();
+
+        tile1.heightProperty().addListener(o1 -> adjustText());
+        tile1.widthProperty().addListener(o1 -> adjustText());
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -164,16 +167,22 @@ public class Test extends Application {
                     //tile1.setValue(value + 20);
                     //System.out.println("No of data in list: " + tile1.getChartData().size());
                     //tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
-                    //tile1.getLeaderBoardItems().get(RND.nextInt(tile1.getLeaderBoardItems().size())).setValue(RND.nextDouble() * 80);
-                    tile2.getBarChartItems().get(RND.nextInt(tile2.getBarChartItems().size())).setValue(RND.nextDouble() * 100);
+                    tile1.getLeaderBoardItems().get(RND.nextInt(tile1.getLeaderBoardItems().size())).setValue(RND.nextDouble() * 80);
+                    //tile2.getBarChartItems().get(RND.nextInt(tile2.getBarChartItems().size())).setValue(RND.nextDouble() * 100);
                     lastTimerCall = now;
                 }
             }
         };
     }
 
+    private void adjustText() {
+        long noOfItems    = tile1.getBarChartItems().size();
+        long visibleItems = tile1.getBarChartItems().stream().filter(item -> item.isVisible()).count();
+        tile1.setText(visibleItems + "/" + noOfItems);
+    }
+
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(tile2);
+        StackPane pane = new StackPane(tile1);
         pane.setBackground(new Background(new BackgroundFill(Tile.BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
         pane.setPadding(new Insets(10));
 

@@ -978,7 +978,28 @@ public class TileBuilder<B extends TileBuilder<B>> {
         properties.put("showInfoRegion", new SimpleBooleanProperty(SHOW));
         return (B)this;
     }
-    
+
+    public final B lowerRightRegionBackgroundColor(final Color COLOR) {
+        properties.put("lowerRightRegionBackgroundColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B lowerRightRegionForegroundColor(final Color COLOR) {
+        properties.put("lowerRightRegionForegroundColor", new SimpleObjectProperty(COLOR));
+        return (B)this;
+    }
+
+    public final B lowerRightRegionTooltipText(final String TEXT) {
+        properties.put("lowerRightRegionTooltipText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
+    public final B showLowerRightRegion(final boolean SHOW) {
+        properties.put("showLowerRightRegion", new SimpleBooleanProperty(SHOW));
+        return (B)this;
+    }
+
+
     public final B leftText(final String TEXT) {
         properties.put("leftText", new SimpleStringProperty(TEXT));
         return (B)this;
@@ -1750,14 +1771,26 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setNotifyRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("notifyRegionForegroundColor".equals(key)) {
                 TILE.setNotifyRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("notifyRegionTooltipText".equals(key)) {
+                TILE.setNotifyRegionTooltipText(((StringProperty) properties.get(key)).get());
             } else if ("showNotifyRegion".equals(key)) {
                 TILE.showNotifyRegion(((BooleanProperty) properties.get(key)).get());
             } else if ("infoRegionBackgroundColor".equals(key)) {
                 TILE.setInfoRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("infoRegionForegroundColor".equals(key)) {
                 TILE.setInfoRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("infoRegionTooltipText".equals(key)) {
+                TILE.setInfoRegionTooltipText(((StringProperty) properties.get(key)).get());
             } else if ("showInfoRegion".equals(key)) {
                 TILE.showInfoRegion(((BooleanProperty) properties.get(key)).get());
+            } else if ("lowerRightRegionBackgroundColor".equals(key)) {
+                TILE.setLowerRightRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("lowerRightRegionForegroundColor".equals(key)) {
+                TILE.setLowerRightRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("lowerRightRegionTooltipText".equals(key)) {
+                TILE.setLowerRightRegionTooltipText(((StringProperty) properties.get(key)).get());
+            } else if ("showLowerRightRegion".equals(key)) {
+                TILE.showLowerRightRegion(((BooleanProperty) properties.get(key)).get());
             } else if ("leftText".equals(key)) {
                 TILE.setLeftText(((StringProperty) properties.get(key)).get());
             } else if ("middleText".equals(key)) {

@@ -166,12 +166,16 @@
 
 .tile .scroll-pane,
 .tile .scroll-pane.edge-to-edge {
-    -fx-background-color: transparent;
+    -fx-background-color : transparent;
+    -fx-background-insets: 0;
+    -fx-padding          : 0;
 }
+
 .tile .scroll-pane > .corner {
     -fx-background-color: transparent;
     -fx-border-color    : transparent;
 }
+
 .tile .scroll-pane > .viewport {
     -fx-background-color: transparent;
 }
@@ -189,6 +193,7 @@
 
 .tile .scroll-pane > .scroll-bar:horizontal .track-background,
 .tile .scroll-pane > .scroll-bar:vertical .track-background {
+    -fx-opacity          : 0;
     -fx-background-color : transparent;
     -fx-background-insets: -1;
     -fx-padding          : 0;
@@ -198,6 +203,7 @@
 
 .tile .scroll-pane > .scroll-bar:horizontal .track,
 .tile .scroll-pane > .scroll-bar:vertical .track {
+    -fx-opacity           : 0;
     -fx-background-color  : transparent;
     -fx-border-color      : transparent;
     -fx-background-insets : 0;
@@ -208,6 +214,7 @@
 
 .tile .scroll-pane > .scroll-bar:horizontal .increment-button ,
 .tile .scroll-pane > .scroll-bar:horizontal .decrement-button {
+    -fx-opacity           : 0;
     -fx-background-color  : transparent;
     -fx-background-radius : 0.0em;
     -fx-padding           : 0.0 0.0 10.0 0.0;

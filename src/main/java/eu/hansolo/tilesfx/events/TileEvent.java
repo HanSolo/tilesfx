@@ -24,7 +24,7 @@ import eu.hansolo.tilesfx.chart.ChartData;
  * Created by hansolo on 19.12.16.
  */
 public class TileEvent {
-    public enum EventType { SHOW_NOTIFY_REGION, HIDE_NOTIFY_REGION, SHOW_INFO_REGION, HIDE_INFO_REGION,
+    public enum EventType { SHOW_NOTIFY_REGION, HIDE_NOTIFY_REGION, SHOW_INFO_REGION, HIDE_INFO_REGION, SHOW_LOWER_RIGHT_REGION, HIDE_LOWER_RIGHT_REGION,
                             RECALC, REDRAW, REFRESH, RESIZE, VISIBILITY, SECTION, ALERT, VALUE,
                             THRESHOLD_EXCEEDED, THRESHOLD_UNDERRUN,
                             LOWER_THRESHOLD_EXCEEDED, LOWER_THRESHOLD_UNDERRUN,

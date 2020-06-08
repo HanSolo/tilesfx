@@ -23,6 +23,7 @@ import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.InfoRegion;
+import eu.hansolo.tilesfx.tools.LowerRightRegion;
 import eu.hansolo.tilesfx.tools.NotifyRegion;
 import javafx.beans.InvalidationListener;
 import javafx.event.EventHandler;
@@ -96,6 +97,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     private                NotifyRegion             notifyRegion;
     private                InfoRegion               infoRegion;
     private                EventHandler<MouseEvent> infoRegionHandler;
+    private                LowerRightRegion         lowerRightRegion;
 
 
     // ******************** Constructors **************************************
@@ -159,7 +161,10 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         infoRegion.setPickOnBounds(false);
         enableNode(infoRegion, false);
 
-        pane = new Pane(backgroundImageView, notifyRegion, infoRegion);
+        lowerRightRegion = new LowerRightRegion();
+        enableNode(lowerRightRegion, false);
+
+        pane = new Pane(backgroundImageView, notifyRegion, infoRegion, lowerRightRegion);
         pane.getStyleClass().add("tile");
         pane.setBorder(new Border(new BorderStroke(tile.getBorderColor(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(tile.getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(tile.getBackgroundColor(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
@@ -213,6 +218,10 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             enableNode(infoRegion, true);
         } else if (EventType.HIDE_INFO_REGION.name().equals(EVENT_TYPE)) {
             enableNode(infoRegion, false);
+        } else if (EventType.SHOW_LOWER_RIGHT_REGION.name().equals(EVENT_TYPE)) {
+            enableNode(lowerRightRegion, true);
+        } else if (EventType.HIDE_LOWER_RIGHT_REGION.name().equals(EVENT_TYPE)) {
+            enableNode(lowerRightRegion, false);
         } else if (EventType.BACKGROUND_IMAGE.name().equals(EVENT_TYPE)) {
             if (null == tile.getBackgroundImage()) {
                 enableNode(backgroundImageView, false);
@@ -297,6 +306,9 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
             infoRegion.setPrefSize(regionSize, regionSize);
             infoRegion.relocate(0, 0);
 
+            lowerRightRegion.setPrefSize(regionSize, regionSize);
+            lowerRightRegion.relocate(width - regionSize, height - regionSize);
+
             resizeStaticText();
             resizeDynamicText();
         }
@@ -318,6 +330,11 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         infoRegion.setBackgroundColor(tile.getInfoRegionBackgroundColor());
         infoRegion.setForegroundColor(tile.getInfoRegionForegroundColor());
         infoRegion.setTooltipText(tile.getInfoRegionTooltipText());
+
+        lowerRightRegion.setRoundedCorner(hasRoundedCorners);
+        lowerRightRegion.setBackgroundColor(tile.getLowerRightRegionBackgroundColor());
+        lowerRightRegion.setForegroundColor(tile.getLowerRightRegionForegroundColor());
+        lowerRightRegion.setTooltipText(tile.getLowerRightRegionTooltipText());
 
         locale                = tile.getLocale();
         if (tile.getCustomDecimalFormatEnabled()) {

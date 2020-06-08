@@ -194,7 +194,8 @@ public class CalendarTileSkin extends TileSkin {
                             label.setTextFill(bkgColor);
                             label.setFont(bldFont);
                         } else {
-                            if (appointments > 0) { label.setBorder(appmntBorder); } else { label.setBorder(null); }
+                            int currentDayCounter = dayCounter;
+                            if (dataList.stream().filter(data -> data.getTimestampAsLocalDate().getDayOfMonth() == currentDayCounter).count() > 0) { label.setBorder(appmntBorder); } else { label.setBorder(null); }
                             label.setTextFill(textColor);
                             label.setFont(regFont);
                         }

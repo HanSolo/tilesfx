@@ -57,6 +57,7 @@ public class CustomScrollableTileSkin extends TileSkin {
         Helper.enableNode(text, tile.isTextVisible());
 
         graphicContainer = new ScrollPane();
+        graphicContainer.getStyleClass().add("edge-to-edge");
         graphicContainer.setMinSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
         graphicContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);
         graphicContainer.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.72 : size * 0.795);

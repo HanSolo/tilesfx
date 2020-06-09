@@ -63,7 +63,6 @@ public class SunburstChartTileSkin extends TileSkin {
         TreeNode<ChartData> tree = tile.getSunburstChart().getTreeNode();
         if (null == tree) { return; }
         tree.setOnTreeNodeEvent(e -> {
-            System.out.println("TreeNodeEvent");
             EventType type = e.getType();
             if (EventType.NODE_SELECTED == type) {
                 TreeNode<ChartData> segment = e.getSource();

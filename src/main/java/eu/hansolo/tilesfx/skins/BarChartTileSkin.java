@@ -130,8 +130,23 @@ public class BarChartTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
         } else if (EventType.DATA.name().equals(EVENT_TYPE)) {
-            updateChart();
+            sortItems();
         }
+    }
+
+    private void sortItems() {
+        switch (tile.getItemSorting()) {
+            case ASCENDING:
+                tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue));
+                break;
+            case DESCENDING:
+                tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());
+                break;
+            case NONE:
+            default:
+                break;
+        }
+        updateChart();
     }
 
     @Override public void dispose() {
@@ -149,9 +164,6 @@ public class BarChartTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     private void updateChart() {
         Platform.runLater(() -> {
-            if (tile.isSortedData()) {
-                tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());
-            }
             List<BarChartItem> items     = tile.getBarChartItems();
             int                noOfItems = items.size();
             if (noOfItems == 0) { return; }

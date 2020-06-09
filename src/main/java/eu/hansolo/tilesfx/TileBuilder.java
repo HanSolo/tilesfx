@@ -18,6 +18,7 @@ package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.ImageMask;
+import eu.hansolo.tilesfx.Tile.ItemSorting;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
@@ -433,6 +434,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B flipText(final String TEXT) {
         properties.put("flipText", new SimpleStringProperty(TEXT));
+        return (B)this;
+    }
+
+    public final B itemSorting(final ItemSorting ITEM_SORTING) {
+        properties.put("itemSorting", new SimpleObjectProperty<>(ITEM_SORTING));
         return (B)this;
     }
 
@@ -853,11 +859,6 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B sortedData(final boolean SORTED) {
-        properties.put("sortedData", new SimpleBooleanProperty(SORTED));
-        return (B)this;
-    }
-
     public final B dataPointsVisible(final boolean VISIBLE) {
         properties.put("dataPointsVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -1167,6 +1168,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case SMOOTHED_CHART:
                     break;
                 case BAR_CHART:
+                    TILE.setItemSorting(ItemSorting.DESCENDING);
                     break;
                 case CLOCK:
                     break;
@@ -1221,6 +1223,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 case CUSTOM_SCROLLABLE:
                     break;
                 case LEADER_BOARD:
+                    TILE.setItemSorting(ItemSorting.DESCENDING);
                     break;
                 case MAP:
                     break;
@@ -1228,6 +1231,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setAnimated(true);
                     break;
                 case DONUT_CHART:
+                    TILE.setItemSorting(ItemSorting.DESCENDING);
                     TILE.setAnimated(true);
                     break;
                 case CIRCULAR_PROGRESS:
@@ -1727,12 +1731,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
             } else if ("countryGroup".equals(key)) {
                 TILE.setCountryGroup(((ObjectProperty<CountryGroup>) properties.get(key)).get());
-            } else if ("sortedData".equals(key)) {
-                TILE.setSortedData(((BooleanProperty) properties.get(key)).get());
             } else if ("flipTimeInMS".equals(key)) {
                 TILE.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
             } else if ("flipText".equals(key)) {
                 TILE.setFlipText(((StringProperty) properties.get(key)).get());
+            } else if ("itemSorting".equals(key)) {
+                TILE.setItemSorting(((ObjectProperty<ItemSorting>) properties.get(key)).get());
             } else if ("dataPointsVisible".equals(key)) {
                 TILE.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sunburstTree".equals(key)) {

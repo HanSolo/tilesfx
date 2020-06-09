@@ -41,7 +41,6 @@ import javafx.scene.text.TextAlignment;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 
 /**
@@ -86,7 +85,7 @@ public class DonutChartTileSkin extends TileSkin {
                     c.getRemoved().forEach(removedItem -> removedItem.removeChartDataEventListener(chartEventListener));
                 }
             }
-            drawChart();
+            sortItems();
             drawLegend();
         };
 
@@ -95,7 +94,7 @@ public class DonutChartTileSkin extends TileSkin {
             double          y          = e.getY();
             double          startAngle = 90;
             double          angle      = 0;
-            List<ChartData> dataList   = tile.isSortedData() ? tile.getChartData().stream().sorted(Comparator.comparingDouble(ChartData::getValue)).collect(Collectors.toList()) : tile.getChartData();
+            List<ChartData> dataList   = tile.getChartData();
             int             noOfItems  = dataList.size();
             double          sum        = dataList.stream().mapToDouble(ChartData::getValue).sum();
             double          stepSize   = 360.0 / sum;
@@ -158,7 +157,7 @@ public class DonutChartTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             double chartCanvasWidth   = width - size * 0.1;
@@ -170,7 +169,19 @@ public class DonutChartTileSkin extends TileSkin {
             chartCanvas.setHeight(chartCanvasSize);
             legendCanvas.setWidth(legendCanvasWidth);
             legendCanvas.setHeight(legendCanvasHeight);
+        } else if (EventType.DATA.name().equals(EVENT_TYPE)) {
+            sortItems();
         }
+    }
+
+    private void sortItems() {
+        switch(tile.getItemSorting()) {
+            case ASCENDING : tile.getChartData().sort(Comparator.comparingDouble(ChartData::getValue)); break;
+            case DESCENDING: tile.getChartData().sort(Comparator.comparingDouble(ChartData::getValue).reversed()); break;
+            case NONE:
+            default: break;
+        }
+        drawChart();
     }
 
     @Override public void dispose() {
@@ -182,7 +193,7 @@ public class DonutChartTileSkin extends TileSkin {
     }
 
     private void drawChart() {
-        List<ChartData> dataList       = tile.isSortedData() ? tile.getChartData().stream().sorted(Comparator.comparingDouble(ChartData::getValue)).collect(Collectors.toList()) : tile.getChartData();
+        List<ChartData> dataList       = tile.getChartData();
         double          canvasSize     = chartCanvas.getWidth();
         int             noOfItems      = dataList.size();
         double          center         = canvasSize * 0.5;
@@ -250,7 +261,6 @@ public class DonutChartTileSkin extends TileSkin {
         double          canvasWidth  = legendCanvas.getWidth();
         double          canvasHeight = legendCanvas.getHeight();
         int             noOfItems    = dataList.size();
-        //List<ChartData> sortedDataList = dataList.stream().sorted(Comparator.comparingDouble(ChartData::getValue).reversed()).collect(Collectors.toList());
         Color           textColor    = tile.getTextColor();
         double          stepSize     = canvasHeight * 0.9 / (noOfItems + 1);
 
@@ -344,7 +354,7 @@ public class DonutChartTileSkin extends TileSkin {
 
         resizeStaticText();
         drawLegend();
-        drawChart();
+        sortItems();
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());

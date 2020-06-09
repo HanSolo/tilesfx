@@ -111,6 +111,7 @@ public class LeaderBoardTileSkin extends TileSkin {
             Helper.enableNode(text, tile.isTextVisible());
         } else if (TileEvent.EventType.DATA.name().equals(EVENT_TYPE)) {
             registerItemListeners();
+            sortItems();
         }
     }
 
@@ -123,7 +124,7 @@ public class LeaderBoardTileSkin extends TileSkin {
             item.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         });
 
-        tile.getLeaderBoardItems().addListener(new WeakListChangeListener<>((ListChangeListener<LeaderBoardItem>) change -> {
+        tile.getLeaderBoardItems().addListener(new WeakListChangeListener<>(change -> {
             while (change.next()) {
                 if (change.wasPermutated()) {
                 } else if (change.wasUpdated()) {
@@ -146,9 +147,13 @@ public class LeaderBoardTileSkin extends TileSkin {
     }
 
     private void sortItems() {
-        List<LeaderBoardItem> items = tile.getLeaderBoardItems();
-        items.sort(Comparator.comparing(LeaderBoardItem::getValue).reversed());
-        items.forEach(i -> i.setIndex(items.indexOf(i)));
+        switch(tile.getItemSorting()) {
+            case ASCENDING : tile.getLeaderBoardItems().sort(Comparator.comparing(LeaderBoardItem::getValue)); break;
+            case DESCENDING: tile.getLeaderBoardItems().sort(Comparator.comparing(LeaderBoardItem::getValue).reversed()); break;
+            case NONE:
+            default: break;
+        }
+        tile.getLeaderBoardItems().forEach(i -> i.setIndex(tile.getLeaderBoardItems().indexOf(i)));
         updateChart();
     }
 

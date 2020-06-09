@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.ImageMask;
+import eu.hansolo.tilesfx.Tile.ItemSorting;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.colors.Medium;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
@@ -141,6 +142,8 @@ public class Test extends Application {
                            .title("LeaderBoard Tile")
                            .text("Whatever text")
                            .textVisible(false)
+                           .sortedData(false)
+                           .itemSorting(ItemSorting.ASCENDING)
                            .leaderBoardItems(leaderBoardItem1, leaderBoardItem2, leaderBoardItem3, leaderBoardItem4, leaderBoardItem5,
                                              leaderBoardItem6, leaderBoardItem7, leaderBoardItem8, leaderBoardItem9, leaderBoardItem10)
                            .build();

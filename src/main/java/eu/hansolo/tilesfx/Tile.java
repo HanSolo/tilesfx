@@ -212,6 +212,9 @@ public class Tile extends Control {
     public enum ImageMask {
         NONE, ROUND, RECTANGULAR
     }
+    public enum ItemSorting {
+        NONE, ASCENDING, DESCENDING
+    }
 
     public  static final Color              BACKGROUND                     = Color.rgb(42, 42, 42); // #2a2a2a
     public  static final Color              FOREGROUND                     = Color.rgb(223, 223, 223); // #dfdfdf
@@ -364,6 +367,8 @@ public class Tile extends Control {
     private List<String>                                  characterList;
     private long                                          flipTimeInMS;
     private SunburstChart                                 sunburstChart;
+    private ItemSorting                                   _itemSorting;
+    private ObjectProperty<ItemSorting>                   itemSorting;
 
     // UI related
     private StyleableProperty<Color>       thumbColor;
@@ -554,8 +559,6 @@ public class Tile extends Control {
     private ObjectProperty<Country>        country;
     private CountryGroup                   _countryGroup;
     private ObjectProperty<CountryGroup>   countryGroup;
-    private boolean                        _sortedData;
-    private BooleanProperty                sortedData;
     private boolean                        _dataPointsVisible;
     private BooleanProperty                dataPointsVisible;
     private boolean                        _snapToTicks;
@@ -650,6 +653,7 @@ public class Tile extends Control {
                 @NamedArg(value="trackColor", defaultValue="TileColor.BLUE") Color trackColor,
                 @NamedArg(value="mapProvider", defaultValue="MapProvider.BW") MapProvider mapProvider,
                 @NamedArg(value="flipTimeInMS", defaultValue="500") long flipTimeInMS,
+                @NamedArg(value="itemSorting", defaultValue="ItemSorting.DESCENDING") ItemSorting itemSorting,
                 @NamedArg(value="textSize", defaultValue="TextSize.NORMAL") TextSize textSize,
                 @NamedArg(value="roundedCorners", defaultValue="true") boolean roundedCorners,
                 @NamedArg(value="startFromZero", defaultValue="false") boolean startFromZero,
@@ -731,7 +735,6 @@ public class Tile extends Control {
                 @NamedArg(value="fillWithGradient", defaultValue="false") boolean fillWithGradient,
                 @NamedArg(value="radarChartMode", defaultValue="RadarChartMode.POLYGON") RadarChartMode radarChartMode,
                 @NamedArg(value="chartGridColor", defaultValue="#8B9092") Color chartGridColor,
-                @NamedArg(value="sortedData", defaultValue="true") boolean sortedData,
                 @NamedArg(value="dataPointsVisible", defaultValue="false") boolean dataPointsVisible,
                 @NamedArg(value="snapToTicks", defaultValue="false") boolean snapToTicks,
                 @NamedArg(value="minorTickCount", defaultValue="0") int minorTickCount,
@@ -880,6 +883,7 @@ public class Tile extends Control {
         _trackColor                         = TileColor.BLUE;
         _mapProvider                        = MapProvider.BW;
         flipTimeInMS                        = 500;
+        _itemSorting                        = ItemSorting.NONE;
         thumbColor                          = new SimpleStyleableObjectProperty<>(THUMB_COLOR, this, "thumbColor");
         _flatUI                             = true;
         _textSize                           = TextSize.NORMAL;
@@ -968,7 +972,6 @@ public class Tile extends Control {
         _yAxis                              = new NumberAxis();
         _radarChartMode                     = RadarChartMode.POLYGON;
         _chartGridColor                     = Tile.GRAY;
-        _sortedData                         = true;
         _dataPointsVisible                  = false;
         _snapToTicks                        = false;
         _minorTickCount                     = 0;
@@ -2274,6 +2277,27 @@ public class Tile extends Control {
 
     public long getFlipTimeInMS() { return flipTimeInMS; }
     public void setFlipTimeInMS(final long FLIP_TIME) { flipTimeInMS = Helper.clamp(0, 2000, FLIP_TIME); }
+
+    public ItemSorting getItemSorting() { return null == itemSorting ? _itemSorting : itemSorting.get(); }
+    public void setItemSorting(final ItemSorting ITEM_SORTING) {
+        if (null == itemSorting) {
+            _itemSorting = ITEM_SORTING;
+            fireTileEvent(DATA_EVENT);
+        } else {
+            itemSorting.set(ITEM_SORTING);
+        }
+    }
+    public ObjectProperty<ItemSorting> itemSortingProperty() {
+        if (null == itemSorting) {
+            itemSorting = new ObjectPropertyBase<ItemSorting>(_itemSorting) {
+                @Override protected void invalidated() { fireTileEvent(DATA_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "itemSorting"; }
+            };
+            _itemSorting = null;
+        }
+        return itemSorting;
+    }
 
     public ObservableList<ChartData> getChartData() {
         if (null == chartDataList) { chartDataList = FXCollections.observableArrayList(); }
@@ -5116,26 +5140,6 @@ public class Tile extends Control {
         return countryGroup;
     }
 
-    public boolean isSortedData() { return null == sortedData ? _sortedData : sortedData.get(); }
-    public void setSortedData(final boolean SORTED) {
-        if (null == sortedData) {
-            _sortedData = SORTED;
-            fireTileEvent(DATA_EVENT);
-        } else {
-            sortedData.set(SORTED);
-        }
-    }
-    public BooleanProperty sortedDataProperty() {
-        if (null == sortedData) {
-            sortedData = new BooleanPropertyBase(_sortedData) {
-                @Override protected void invalidated() { fireTileEvent(DATA_EVENT); }
-                @Override public Object getBean() { return Tile.this; }
-                @Override public String getName() { return "sortedData"; }
-            };
-        }
-        return sortedData;
-    }
-
     public boolean getDataPointsVisible() { return null == dataPointsVisible ? _dataPointsVisible : dataPointsVisible.get(); }
     public void setDataPointsVisible(final boolean VISIBLE) {
         if (null == dataPointsVisible) {
@@ -6056,6 +6060,7 @@ public class Tile extends Control {
             case SMOOTHED_CHART:
                 break;
             case BAR_CHART:
+                setItemSorting(ItemSorting.DESCENDING);
                 break;
             case CLOCK:
                 break;
@@ -6112,6 +6117,7 @@ public class Tile extends Control {
             case CUSTOM_SCROLLABLE:
                 break;
             case LEADER_BOARD:
+                setItemSorting(ItemSorting.DESCENDING);
                 break;
             case MAP:
                 break;
@@ -6119,6 +6125,7 @@ public class Tile extends Control {
                 setAnimated(true);
                 break;
             case DONUT_CHART:
+                setItemSorting(ItemSorting.DESCENDING);
                 setAnimated(true);
                 break;
             case CIRCULAR_PROGRESS:

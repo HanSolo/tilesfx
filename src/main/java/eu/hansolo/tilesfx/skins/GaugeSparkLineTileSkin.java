@@ -18,7 +18,6 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
@@ -27,7 +26,6 @@ import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
 import eu.hansolo.tilesfx.tools.Point;
 import eu.hansolo.tilesfx.tools.Statistics;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.concurrent.Task;
 import javafx.geometry.VPos;
@@ -150,7 +148,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         }
 
         gradientLookup = new GradientLookup(tile.getGradientStops());
-        low            = maxValue;
+        low = maxValue;
         lastLow        = low;
         high           = minValue;
         lastHigh       = high;
@@ -264,10 +262,6 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
-        } else if (EventType.VALUE.equals(EVENT_TYPE)) {
-            if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
-            double value = clamp(minValue, maxValue, tile.getValue());
-            handleCurrentValue(value);
         } else if (EventType.AVERAGING.name().equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
 
@@ -291,39 +285,51 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
             double value = clamp(minValue, maxValue, tile.getValue());
             handleCurrentValue(value);
+            updateSparkline(value);
         }
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
+        setBar(VALUE);
+
+        if (tile.isHighlightSections()) { drawHighLightSections(VALUE); }
+    }
+
+    private void updateSparkline(final double VALUE) {
         addData(VALUE);
+        double statisticsLow  = Statistics.getMin(dataList);
+        double statisticsHigh = Statistics.getMax(dataList);
 
-        low  = Statistics.getMin(dataList);
-        high = Statistics.getMax(dataList);
-
-        if (Helper.equals(low, high)) {
-            low  = minValue;
+        if (tile.isFixedYScale() || Helper.equals(low, high)) {
+            low = minValue;
             high = maxValue;
+        } else {
+            low = statisticsLow;
+            high = statisticsHigh;
         }
         range = high - low;
 
-        double minX  = graphBounds.getX();
-        double maxX  = minX + graphBounds.getWidth();
-        double minY  = graphBounds.getY();
-        double maxY  = minY + graphBounds.getHeight();
-        double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
-        double stepY = graphBounds.getHeight() / range;
+        double minX = graphBounds.getX();
+        double maxX = minX + graphBounds.getWidth();
+        double minY = graphBounds.getY();
+        double maxY = minY + graphBounds.getHeight();
 
-        niceScaleY.setMinMax(low, high);
-        int    lineCountY       = 0;
-        int    tickLabelOffsetY = 0;
-        double tickSpacingY     = niceScaleY.getTickSpacing();
-        double tickStepY        = tickSpacingY * stepY;
-        if (tickSpacingY < low) { tickLabelOffsetY = (int) (low / tickSpacingY) + 1; }
-        double tickStartY       = maxY - (tickLabelOffsetY * tickSpacingY - low) * stepY;
-
+        if (tile.isFixedYScale()) {
+            niceScaleY.setMinMax(minValue, maxValue);
+        } else {
+            niceScaleY.setMinMax(low, high);
+        }
         double niceMinY = niceScaleY.getNiceMin();
         double niceMaxY = niceScaleY.getNiceMax();
         double rangeY   = niceMaxY - niceMinY;
+
+        double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
+        double stepY = graphBounds.getHeight() / range;
+
+        int    lineCountY   = 0;
+        double tickSpacingY = niceScaleY.getTickSpacing();
+        double tickStepY    = tickSpacingY * stepY;
+        double tickStartY   = maxY;
 
         horizontalTickLines.forEach(line -> line.setStroke(Color.TRANSPARENT));
         tickLabelsY.forEach(label -> label.setFill(Color.TRANSPARENT));
@@ -360,16 +366,15 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             } else {
                 MoveTo begin = (MoveTo) pathElements.get(0);
                 begin.setX(minX);
-                begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+                begin.setY(maxY - (dataList.get(0) - low) * stepY);
                 for (int i = 1; i < (noOfDatapoints - 1); i++) {
                     LineTo lineTo = (LineTo) pathElements.get(i);
                     lineTo.setX(minX + i * stepX);
-                    lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+                    lineTo.setY(maxY - (dataList.get(i) - low) * stepY);
                 }
                 LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
                 end.setX(maxX);
-                end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
-
+                end.setY(maxY - (dataList.get(noOfDatapoints - 1) - low) * stepY);
                 dot.setCenterX(maxX);
                 dot.setCenterY(end.getY());
             }
@@ -394,9 +399,9 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             averageText.setText(String.format(locale, formatString, average));
         }
         if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+            valueText.setText(decimalFormat.format(VALUE));
         } else {
-            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            valueText.setText(String.format(locale, formatString, VALUE));
         }
 
         if (!tile.isTextVisible() && null != movingAverage.getTimeSpan()) {
@@ -405,12 +410,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         }
         resizeDynamicText();
 
-        lastLow  = low;
+        lastLow = low;
         lastHigh = high;
-
-        setBar(VALUE);
-        
-        if (tile.isHighlightSections()) { drawHighLightSections(VALUE); }
     }
 
     private void setBar(final double VALUE) {
@@ -722,11 +723,11 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
         { // Update tile chart without affecting data
-            low  = Statistics.getMin(dataList);
+            low = Statistics.getMin(dataList);
             high = Statistics.getMax(dataList);
 
             if (Helper.equals(low, high)) {
-                low  = minValue;
+                low = minValue;
                 high = maxValue;
             }
             range = high - low;

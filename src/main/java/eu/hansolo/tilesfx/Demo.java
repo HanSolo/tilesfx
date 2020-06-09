@@ -522,6 +522,7 @@ public class Demo extends Application {
                                         .sectionsVisible(true)
                                         .highlightSections(true)
                                         .strokeWithGradient(true)
+                                        .fixedYScale(true)
                                         .gradientStops(new Stop(0.0, Tile.LIGHT_GREEN),
                                                        new Stop(0.33, Tile.LIGHT_GREEN),
                                                        new Stop(0.33,Tile.YELLOW),

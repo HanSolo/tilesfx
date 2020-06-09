@@ -19,6 +19,8 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
+import eu.hansolo.tilesfx.events.BoundsEvent;
+import eu.hansolo.tilesfx.events.BoundsEventListener;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.events.TileEventListener;
 import eu.hansolo.tilesfx.tools.CtxBounds;
@@ -26,6 +28,7 @@ import eu.hansolo.tilesfx.tools.InfoRegion;
 import eu.hansolo.tilesfx.tools.LowerRightRegion;
 import eu.hansolo.tilesfx.tools.NotifyRegion;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.ObjectProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
@@ -57,47 +60,47 @@ import static eu.hansolo.tilesfx.tools.Helper.enableNode;
  * Created by hansolo on 19.12.16.
  */
 public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
-    protected static final double                   PREFERRED_WIDTH  = 250;
-    protected static final double                   PREFERRED_HEIGHT = 250;
-    protected static final double                   MINIMUM_WIDTH    = 50;
-    protected static final double                   MINIMUM_HEIGHT   = 50;
-    protected static final double                   MAXIMUM_WIDTH    = 1024;
-    protected static final double                   MAXIMUM_HEIGHT   = 1024;
-    protected              double                   width;
-    protected              double                   height;
-    protected              double                   size;
-    protected              double                   inset;
-    protected              double                   doubleInset;
-    protected              CtxBounds                contentBounds;
-    protected              double                   contentCenterX;
-    protected              double                   contentCenterY;
-    protected              Pane                     pane;
-    protected              double                   minValue;
-    protected              double                   maxValue;
-    protected              double                   range;
-    protected              double                   threshold;
-    protected              double                   stepSize;
-    protected              double                   angleRange;
-    protected              double                   angleStep;
-    protected              boolean                  highlightSections;
-    protected              String                   formatString;
-    protected              DecimalFormat            decimalFormat;
-    protected              String                   tickLabelFormatString;
-    protected              Locale                   locale;
-    protected              List<Section>            sections;
-    protected              boolean                  sectionsVisible;
-    protected              TextSize                 textSize;
-    protected              DropShadow               shadow;
-    protected              InvalidationListener     sizeListener;
-    protected              TileEventListener        tileEventListener;
-    protected              InvalidationListener     currentValueListener;
-    protected              InvalidationListener     timeListener;
-    protected              Tile                     tile;
-    private                ImageView                backgroundImageView;
-    private                NotifyRegion             notifyRegion;
-    private                InfoRegion               infoRegion;
-    private                EventHandler<MouseEvent> infoRegionHandler;
-    private                LowerRightRegion         lowerRightRegion;
+    protected static final double                    PREFERRED_WIDTH  = 250;
+    protected static final double                    PREFERRED_HEIGHT = 250;
+    protected static final double                    MINIMUM_WIDTH    = 50;
+    protected static final double                    MINIMUM_HEIGHT   = 50;
+    protected static final double                    MAXIMUM_WIDTH    = 1024;
+    protected static final double                    MAXIMUM_HEIGHT   = 1024;
+    protected              double                    width;
+    protected              double                    height;
+    protected              double                    size;
+    protected              double                    inset;
+    protected              double                    doubleInset;
+    protected              CtxBounds                 contentBounds;
+    protected              double                    contentCenterX;
+    protected              double                    contentCenterY;
+    protected              Pane                      pane;
+    protected              double                    minValue;
+    protected              double                    maxValue;
+    protected              double                    range;
+    protected              double                    threshold;
+    protected              double                    stepSize;
+    protected              double                    angleRange;
+    protected              double                    angleStep;
+    protected              boolean                   highlightSections;
+    protected              String                    formatString;
+    protected              DecimalFormat             decimalFormat;
+    protected              String                    tickLabelFormatString;
+    protected              Locale                    locale;
+    protected              List<Section>             sections;
+    protected              boolean                   sectionsVisible;
+    protected              TextSize                  textSize;
+    protected              DropShadow                shadow;
+    protected              InvalidationListener      sizeListener;
+    protected              TileEventListener         tileEventListener;
+    protected              InvalidationListener      currentValueListener;
+    protected              InvalidationListener      timeListener;
+    protected              Tile                      tile;
+    private                ImageView                 backgroundImageView;
+    private                NotifyRegion              notifyRegion;
+    private                InfoRegion                infoRegion;
+    private                EventHandler<MouseEvent>  infoRegionHandler;
+    private                LowerRightRegion          lowerRightRegion;
 
 
     // ******************** Constructors **************************************
@@ -245,7 +248,25 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
 
     protected void handleCurrentValue(final double VALUE) {}
 
+    /**
+     * Returns the bounds of the content area. Keep in mind that
+     * the skin property of the Tile has to be set before you can
+     * get the content bounds. As long as getSkin() == null you get
+     * null as return value here.
+     * @return the bounds of the content area.
+     */
+    public CtxBounds getContentBounds() { return contentBounds; }
+
+    /**
+     * Adds a listener to the content bounds area.
+     * Keep in mind that you can only add a listener to the bounds if the skin property is set
+     * in the control.
+     */
+    public void setOnContentBoundsChanged(final BoundsEventListener LISTENER) { contentBounds.setOnBoundsEvent(LISTENER); }
+    public void removeOnContentBoundsChanged(final BoundsEventListener LISTENER) { contentBounds.removeBoundsEventListener(LISTENER); }
+
     @Override public void dispose() {
+        contentBounds.removeAllListeners();
         tile.widthProperty().removeListener(sizeListener);
         tile.heightProperty().removeListener(sizeListener);
         tile.removeTileEventListener(tileEventListener);

@@ -23,6 +23,7 @@ import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.events.AlarmEvent;
 import eu.hansolo.tilesfx.events.AlarmEventListener;
+import eu.hansolo.tilesfx.events.BoundsEventListener;
 import eu.hansolo.tilesfx.events.SwitchEvent;
 import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
@@ -35,6 +36,7 @@ import eu.hansolo.tilesfx.skins.*;
 import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
+import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
@@ -68,6 +70,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.StringPropertyBase;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
@@ -283,10 +286,11 @@ public class Tile extends Control {
     private static       String      userAgentStyleSheet;
 
     // Tile events
-    private              Queue<TileEvent>         tileEventQueue      = new LinkedBlockingQueue<>();
-    private              List<TileEventListener>  tileEventListeners  = new CopyOnWriteArrayList<>();
-    private              List<AlarmEventListener> alarmEventListeners = new CopyOnWriteArrayList<>();
-    private              List<TimeEventListener>  timeEventListeners  = new CopyOnWriteArrayList<>();
+    private              Queue<TileEvent>             tileEventQueue      = new LinkedBlockingQueue<>();
+    private              List<TileEventListener>      tileEventListeners  = new CopyOnWriteArrayList<>();
+    private              List<AlarmEventListener>     alarmEventListeners = new CopyOnWriteArrayList<>();
+    private              List<TimeEventListener>      timeEventListeners  = new CopyOnWriteArrayList<>();
+    private              List<BoundsEventListener>    boundsListeners     = new CopyOnWriteArrayList<>();
 
     private              BooleanBinding                                showing;
 
@@ -5998,6 +6002,17 @@ public class Tile extends Control {
     public void setOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
     public void removeOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
 
+    public void setOnContentSizeChanged(final BoundsEventListener LISTENER) {
+        if (null == getSkin()) {
+            if (!boundsListeners.contains(LISTENER)) { boundsListeners.add(LISTENER); }
+        } else {
+            ((TileSkin) (getSkin())).setOnContentBoundsChanged(LISTENER);
+        }
+    }
+    public void removeOnContentSizeChanged(final BoundsEventListener LISTENER) {
+        if (boundsListeners.contains(LISTENER)) { boundsListeners.remove(LISTENER); }
+    }
+
     private void setupBinding() {
         showing = Bindings.createBooleanBinding(() -> {
             if (getScene() != null && getScene().getWindow() != null) {
@@ -6014,6 +6029,10 @@ public class Tile extends Control {
                     for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }
                 }
             }
+
+            boundsListeners.forEach(listener -> ((TileSkin) (getSkin())).setOnContentBoundsChanged(listener));
+            ((TileSkin) (getSkin())).getContentBounds().fireBoundsEvent();
+
             fireTileEvent(REGIONS_ON_TOP_EVENT);
             fireTileEvent(RESIZE_EVENT);
         });

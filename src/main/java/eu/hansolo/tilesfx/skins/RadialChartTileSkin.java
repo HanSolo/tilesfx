@@ -81,7 +81,6 @@ public class RadialChartTileSkin extends TileSkin {
         };
 
         clickHandler = e -> {
-            System.out.println("clicked");
             double          x           = e.getX();
             double          y           = e.getY();
             double          startAngle  = 90;

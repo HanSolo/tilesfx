@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.ItemSorting;
+import eu.hansolo.tilesfx.Tile.ItemSortingTopic;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TextSize;
@@ -439,6 +440,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B itemSorting(final ItemSorting ITEM_SORTING) {
         properties.put("itemSorting", new SimpleObjectProperty<>(ITEM_SORTING));
+        return (B)this;
+    }
+
+    public final B itemSortingTopic(final ItemSortingTopic ITEM_SORTING_TOPIC) {
+        properties.put("itemSortingTopic", new SimpleObjectProperty<>(ITEM_SORTING_TOPIC));
         return (B)this;
     }
 
@@ -1737,6 +1743,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setFlipText(((StringProperty) properties.get(key)).get());
             } else if ("itemSorting".equals(key)) {
                 TILE.setItemSorting(((ObjectProperty<ItemSorting>) properties.get(key)).get());
+            } else if ("itemSortingTopic".equals(key)) {
+                TILE.setItemSortingTopic(((ObjectProperty<ItemSortingTopic>) properties.get(key)).get());
             } else if ("dataPointsVisible".equals(key)) {
                 TILE.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sunburstTree".equals(key)) {

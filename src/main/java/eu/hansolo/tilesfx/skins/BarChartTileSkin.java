@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
@@ -61,13 +62,15 @@ public class BarChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateHandler    = e -> updateChart();
+        updateHandler    = e -> {
+            final ChartDataEvent.EventType TYPE = e.getType();
+            switch (TYPE) {
+                case UPDATE  : updateChart(); break;
+                case FINISHED: sortItems(); break;
+            }
+        };
         paneSizeListener = o -> resizeItems();
         handlerMap       = new HashMap<>();
-
-        List<BarChartItem> barChartItems = tile.getBarChartItems().stream()
-                                                         .sorted(Comparator.comparing(BarChartItem::getValue).reversed())
-                                                         .collect(Collectors.toList());
 
         tile.getBarChartItems().forEach(item -> {
             item.addChartDataEventListener(updateHandler);
@@ -80,7 +83,9 @@ public class BarChartTileSkin extends TileSkin {
             }
         });
         barChartPane = new Pane();
-        barChartPane.getChildren().addAll(barChartItems);
+        barChartPane.getChildren().addAll(tile.getBarChartItems());
+
+        sortItems();
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -136,12 +141,8 @@ public class BarChartTileSkin extends TileSkin {
 
     private void sortItems() {
         switch (tile.getItemSorting()) {
-            case ASCENDING:
-                tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue));
-                break;
-            case DESCENDING:
-                tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());
-                break;
+            case ASCENDING : tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue)); break;
+            case DESCENDING: tile.getBarChartItems().sort(Comparator.comparing(BarChartItem::getValue).reversed());break;
             case NONE:
             default:
                 break;

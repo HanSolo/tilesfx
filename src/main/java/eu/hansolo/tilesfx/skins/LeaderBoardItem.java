@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.ItemSortingTopic;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
@@ -43,6 +44,11 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.text.Text;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 
@@ -89,42 +95,63 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     private              ObjectProperty<Color> separatorColor;
     private              State                 state;
     private              String                formatString;
+    private              String                durationFormatString;
+    private              DateTimeFormatter     timestampFormatter;
     private              Locale                locale;
     private              int                   index;
     private              int                   lastIndex;
+    private              ItemSortingTopic      itemSortingTopic;
 
 
 
     // ******************** Constructors **************************************
     public LeaderBoardItem() {
-        this("", 0);
+        this("", 0, Instant.now(), Duration.ZERO);
     }
     public LeaderBoardItem(final String NAME) {
-        this(NAME, 0);
+        this(NAME, 0, Instant.now(), Duration.ZERO);
     }
     public LeaderBoardItem(final String NAME, final double VALUE) {
-        chartData      = new ChartData(NAME, VALUE);
-        nameColor      = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
+        this(NAME, VALUE, Instant.now(), Duration.ZERO);
+    }
+    public LeaderBoardItem(final String NAME, final Instant TIMESTAMP) {
+        this(NAME, 0, TIMESTAMP, Duration.ZERO);
+    }
+    public LeaderBoardItem(final String NAME, final Duration DURATION) {
+        this(NAME, 0, Instant.now(), DURATION);
+    }
+    public LeaderBoardItem(final String NAME, final double VALUE, final Instant TIMESTAMP) {
+        this(NAME, VALUE, TIMESTAMP, Duration.ZERO);
+    }
+    public LeaderBoardItem(final String NAME, final double VALUE, final Duration DURATION) {
+        this(NAME, VALUE, Instant.now(), DURATION);
+    }
+    public LeaderBoardItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION) {
+        chartData            = new ChartData(NAME, VALUE, TIMESTAMP, DURATION);
+        nameColor            = new ObjectPropertyBase<>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
             @Override public Object getBean() { return LeaderBoardItem.this; }
             @Override public String getName() { return "nameColor"; }
         };
-        valueColor     = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
+        valueColor           = new ObjectPropertyBase<>(Tile.FOREGROUND) {
             @Override protected void invalidated() {  valueText.setFill(get()); }
             @Override public Object getBean() { return LeaderBoardItem.this; }
             @Override public String getName() { return "valueColor"; }
         };
-        separatorColor = new ObjectPropertyBase<Color>(Color.rgb(72, 72, 72)) {
+        separatorColor       = new ObjectPropertyBase<>(Color.rgb(72, 72, 72)) {
             @Override protected void invalidated() { separator.setStroke(get()); }
             @Override public Object getBean() { return LeaderBoardItem.this; }
             @Override public String getName() { return "separatorColor"; }
         };
-        formatString   = "%.0f";
-        locale         = Locale.US;
-        index          = 1024;
-        lastIndex      = 1024;
-        parentWidth    = 250;
-        parentHeight   = 250;
+        itemSortingTopic     = ItemSortingTopic.VALUE;
+        formatString         = "%.0f";
+        durationFormatString = "%d:%02d:%02d";
+        timestampFormatter   = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss");
+        locale               = Locale.US;
+        index                = 1024;
+        lastIndex            = 1024;
+        parentWidth          = 250;
+        parentHeight         = 250;
 
         initGraphics();
         registerListeners();
@@ -152,8 +179,9 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         nameText = new Text(getName());
         nameText.setTextOrigin(VPos.TOP);
 
-        valueText = new Text(String.format(locale, formatString, getValue()));
+        valueText = new Text();
         valueText.setTextOrigin(VPos.TOP);
+        updateValueText();
 
         separator = new Line();
 
@@ -184,6 +212,12 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
 
     public double getValue() { return chartData.getValue(); }
     public void setValue(final double VALUE) { chartData.setValue(VALUE); }
+
+    public Instant getTimestamp() { return chartData.getTimestamp(); }
+    public void setTimestamp(final Instant TIMESTAMP) { chartData.setTimestamp(TIMESTAMP); }
+
+    public Duration getDuration() { return chartData.getDuration(); }
+    public void setDuration(final Duration DURATION) { chartData.setDuration(DURATION); }
 
     public Color getNameColor() { return nameColor.get(); }
     public void setNameColor(final Color COLOR) { nameColor.set(COLOR); }
@@ -217,7 +251,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         triangle.setFill(state.color);
         triangle.setRotate(state.angle);
 
-        valueText.setText(String.format(locale, formatString, getValue()));
+        updateValueText();
         valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
     }
 
@@ -225,16 +259,38 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
 
     public State getState() { return state; }
 
-    @Override public int compareTo(final LeaderBoardItem SEGMENT) { return Double.compare(getValue(), SEGMENT.getValue()); }
+    @Override public int compareTo(final LeaderBoardItem ITEM) {
+        switch(itemSortingTopic) {
+            case DURATION : return Long.compare(getDuration().toMillis(), ITEM.getDuration().toMillis());
+            case TIMESTAMP: return Long.compare(getTimestamp().toEpochMilli(), ITEM.getTimestamp().toEpochMilli());
+            case VALUE    :
+            default       : return Double.compare(getValue(), ITEM.getValue());
+        }
+    }
 
     public void setLocale(final Locale LOCALE) {
         locale = LOCALE;
-        valueText.setText(String.format(locale, formatString, getValue()));
+        updateValueText();
+    }
+
+    public void setItemSortingTopic(final ItemSortingTopic ITEM_SORTING_TOPIC) {
+        itemSortingTopic = ITEM_SORTING_TOPIC;
+        updateValueText();
     }
 
     public void setFormatString(final String FORMAT_STRING) {
         formatString = FORMAT_STRING;
-        valueText.setText(String.format(locale, formatString, getValue()));
+        updateValueText();
+    }
+
+    public void setDurationFormatString(final String DURATION_FORMAT_STRING) {
+        durationFormatString = DURATION_FORMAT_STRING;
+        updateValueText();
+    }
+
+    public void setTimestampFormatter(final DateTimeFormatter TIMESTAMP_FORMATTER) {
+        timestampFormatter = TIMESTAMP_FORMATTER;
+        updateValueText();
     }
 
     protected void setParentSize(final double WIDTH, final double HEIGHT) {
@@ -250,6 +306,19 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         LineTo    lineTo3   = new LineTo(0, 0.028 * size);
         ClosePath closePath = new ClosePath();
         triangle.getElements().setAll(moveTo, lineTo1, lineTo2, lineTo3, closePath);
+    }
+
+    private void updateValueText() {
+        switch (itemSortingTopic) {
+            case DURATION:
+                long seconds = chartData.getDuration().getSeconds();
+                long absSeconds = Math.abs(seconds);
+                valueText.setText(String.format(locale, durationFormatString, absSeconds / 3600, (absSeconds % 3600) / 60, absSeconds % 60));
+                break;
+            case TIMESTAMP: valueText.setText(timestampFormatter.format(ZonedDateTime.ofInstant(getTimestamp(), ZoneId.systemDefault()))); break;
+            case VALUE    :
+            default       : valueText.setText(String.format(locale, formatString, getValue())); break;
+        }
     }
 
 

@@ -64,25 +64,21 @@ public class LeaderBoardTileSkin extends TileSkin {
         updateHandler    = e -> {
             final EventType TYPE = e.getType();
             switch (TYPE) {
-                case UPDATE:
-                    updateChart();
-                    break;
-                case FINISHED:
-                    sortItems();
-                    break;
+                case UPDATE  : updateChart(); break;
+                case FINISHED: sortItems(); break;
             }
         };
         paneSizeListener = o -> resizeItems();
         handlerMap       = new HashMap<>();
 
-        List<LeaderBoardItem> leaderBoardItems = tile.getLeaderBoardItems().stream()
-                                                               .sorted(Comparator.comparing(LeaderBoardItem::getValue).reversed())
-                                                               .collect(Collectors.toList());
-
         registerItemListeners();
 
+        tile.getLeaderBoardItems().forEach(item -> item.setItemSortingTopic(tile.getItemSortingTopic()));
+
         leaderBoardPane = new Pane();
-        leaderBoardPane.getChildren().addAll(leaderBoardItems);
+        leaderBoardPane.getChildren().addAll(tile.getLeaderBoardItems());
+
+        sortItems();
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -111,7 +107,6 @@ public class LeaderBoardTileSkin extends TileSkin {
             Helper.enableNode(text, tile.isTextVisible());
         } else if (TileEvent.EventType.DATA.name().equals(EVENT_TYPE)) {
             registerItemListeners();
-            sortItems();
         }
     }
 
@@ -132,28 +127,48 @@ public class LeaderBoardTileSkin extends TileSkin {
                     change.getAddedSubList().forEach(addedItem -> {
                         addedItem.setFormatString(formatString);
                         addedItem.addChartDataEventListener(updateHandler);
+                        addedItem.setItemSortingTopic(tile.getItemSortingTopic());
                         EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
                         handlerMap.put(addedItem, clickHandler);
                         addedItem.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+                        leaderBoardPane.getChildren().add(addedItem);
                     });
                 } else if (change.wasRemoved()) {
                     change.getRemoved().forEach(removedItem -> {
                         removedItem.removeChartDataEventListener(updateHandler);
                         removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
+                        leaderBoardPane.getChildren().remove(removedItem);
                     });
                 }
             }
+            updateChart();
+            resizeItems();
         }));
     }
 
     private void sortItems() {
+        List<LeaderBoardItem> items = tile.getLeaderBoardItems();
         switch(tile.getItemSorting()) {
-            case ASCENDING : tile.getLeaderBoardItems().sort(Comparator.comparing(LeaderBoardItem::getValue)); break;
-            case DESCENDING: tile.getLeaderBoardItems().sort(Comparator.comparing(LeaderBoardItem::getValue).reversed()); break;
+            case ASCENDING :
+                switch(tile.getItemSortingTopic()) {
+                    case TIMESTAMP: items.sort(Comparator.comparing(LeaderBoardItem::getTimestamp)); break;
+                    case DURATION : items.sort(Comparator.comparing(LeaderBoardItem::getDuration)); break;
+                    case VALUE    :
+                    default       : items.sort(Comparator.comparing(LeaderBoardItem::getValue)); break;
+                }
+                break;
+            case DESCENDING:
+                switch(tile.getItemSortingTopic()) {
+                    case TIMESTAMP: items.sort(Comparator.comparing(LeaderBoardItem::getTimestamp).reversed()); break;
+                    case DURATION : items.sort(Comparator.comparing(LeaderBoardItem::getDuration).reversed()); break;
+                    case VALUE    :
+                    default       : items.sort(Comparator.comparing(LeaderBoardItem::getValue).reversed()); break;
+                }
+                break;
             case NONE:
             default: break;
         }
-        tile.getLeaderBoardItems().forEach(i -> i.setIndex(tile.getLeaderBoardItems().indexOf(i)));
+        items.forEach(i -> i.setIndex(items.indexOf(i)));
         updateChart();
     }
 

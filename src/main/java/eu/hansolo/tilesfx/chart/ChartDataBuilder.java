@@ -60,16 +60,21 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
     }
 
     public final B timestamp(final Instant TIMESTAMP) {
-        properties.put("timestamp", new SimpleObjectProperty(TIMESTAMP));
+        properties.put("timestamp", new SimpleObjectProperty<>(TIMESTAMP));
         return (B)this;
     }
     public final B timestamp(final ZonedDateTime TIMESTAMP) {
-        properties.put("timestamp", new SimpleObjectProperty(TIMESTAMP.toInstant()));
+        properties.put("timestamp", new SimpleObjectProperty<>(TIMESTAMP.toInstant()));
+        return (B)this;
+    }
+
+    public final B duration(final java.time.Duration DURATION) {
+        properties.put("duration", new SimpleObjectProperty<>(DURATION));
         return (B)this;
     }
 
     public final B location(final Location LOCATION) {
-        properties.put("location", new SimpleObjectProperty(LOCATION));
+        properties.put("location", new SimpleObjectProperty<>(LOCATION));
         return (B)this;
     }
 
@@ -138,6 +143,8 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
                 DATA.setValue(((DoubleProperty) properties.get(key)).get());
             } else if ("timestamp".equals(key)) {
                 DATA.setTimestamp(((ObjectProperty<Instant>) properties.get(key)).get());
+            } else if ("duration".equals(key)) {
+                DATA.setDuration(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
             } else if ("location".equals(key)) {
                 DATA.setLocation(((ObjectProperty<Location>) properties.get(key)).get());
             } else if ("fillColor".equals(key)) {

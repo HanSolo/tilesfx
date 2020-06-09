@@ -17,6 +17,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.ItemSortingTopic;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
@@ -39,6 +40,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Locale;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
@@ -80,15 +83,30 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
     // ******************** Constructors **************************************
     public BarChartItem() {
-        this("", 0, Tile.BLUE);
+        this("", 0, Instant.now(), Duration.ZERO, Tile.BLUE);
     }
     public BarChartItem(final String NAME) {
-        this(NAME, 0, Tile.BLUE);
+        this(NAME, 0, Instant.now(), Duration.ZERO, Tile.BLUE);
     }
     public BarChartItem(final String NAME, final double VALUE) {
-        this(NAME, VALUE, Tile.BLUE);
+        this(NAME, VALUE, Instant.now(), Duration.ZERO, Tile.BLUE);
+    }
+    public BarChartItem(final String NAME, final Instant TIMESTAMP) {
+        this(NAME, 0, TIMESTAMP, Duration.ZERO, Tile.BLUE);
+    }
+    public BarChartItem(final String NAME, final Duration DURATION) {
+        this(NAME, 0, Instant.now(), DURATION, Tile.BLUE);
     }
     public BarChartItem(final String NAME, final double VALUE, final Color COLOR) {
+        this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR);
+    }
+    public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Color COLOR) {
+        this(NAME, VALUE, TIMESTAMP, Duration.ZERO, COLOR);
+    }
+    public BarChartItem(final String NAME, final double VALUE, final Duration DURATION, final Color COLOR) {
+        this(NAME, VALUE, Instant.now(), DURATION, COLOR);
+    }
+    public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION, final Color COLOR) {
         nameColor          = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
             @Override public Object getBean() { return BarChartItem.this; }
@@ -107,7 +125,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         formatString       = "%.0f";
         locale             = Locale.US;
         maxValue           = 100;
-        chartData          = new ChartData(NAME, VALUE, COLOR);
+        chartData          = new ChartData(NAME, VALUE, TIMESTAMP, DURATION, COLOR);
         stepSize           = PREFERRED_WIDTH * 0.85 / maxValue;
         parentWidth        = 250;
         parentHeight       = 250;
@@ -167,6 +185,12 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
     public double getValue() { return chartData.getValue(); }
     public void setValue(final double VALUE) { chartData.setValue(VALUE); }
+
+    public Instant getTimestamp() { return chartData.getTimestamp(); }
+    public void setTimestamp(final Instant TIMESTAMP) { chartData.setTimestamp(TIMESTAMP); }
+
+    public Duration getDuration() { return chartData.getDuration(); }
+    public void setDuration(final Duration DURATION) { chartData.setDuration(DURATION); }
 
     public Color getNameColor() { return nameColor.get(); }
     public void setNameColor(final Color COLOR) { nameColor.set(COLOR); }

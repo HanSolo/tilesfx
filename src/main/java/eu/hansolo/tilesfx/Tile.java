@@ -215,6 +215,9 @@ public class Tile extends Control {
     public enum ItemSorting {
         NONE, ASCENDING, DESCENDING
     }
+    public enum ItemSortingTopic {
+        VALUE, TIMESTAMP, DURATION
+    }
 
     public  static final Color              BACKGROUND                     = Color.rgb(42, 42, 42); // #2a2a2a
     public  static final Color              FOREGROUND                     = Color.rgb(223, 223, 223); // #dfdfdf
@@ -369,6 +372,8 @@ public class Tile extends Control {
     private SunburstChart                                 sunburstChart;
     private ItemSorting                                   _itemSorting;
     private ObjectProperty<ItemSorting>                   itemSorting;
+    private ItemSortingTopic                              _itemSortingTopic;
+    private ObjectProperty<ItemSortingTopic>              itemSortingTopic;
 
     // UI related
     private StyleableProperty<Color>       thumbColor;
@@ -654,6 +659,7 @@ public class Tile extends Control {
                 @NamedArg(value="mapProvider", defaultValue="MapProvider.BW") MapProvider mapProvider,
                 @NamedArg(value="flipTimeInMS", defaultValue="500") long flipTimeInMS,
                 @NamedArg(value="itemSorting", defaultValue="ItemSorting.DESCENDING") ItemSorting itemSorting,
+                @NamedArg(value="itemSortingTopic", defaultValue="ItemSortingTopic.VALUE") ItemSortingTopic itemSortingTopic,
                 @NamedArg(value="textSize", defaultValue="TextSize.NORMAL") TextSize textSize,
                 @NamedArg(value="roundedCorners", defaultValue="true") boolean roundedCorners,
                 @NamedArg(value="startFromZero", defaultValue="false") boolean startFromZero,
@@ -884,6 +890,7 @@ public class Tile extends Control {
         _mapProvider                        = MapProvider.BW;
         flipTimeInMS                        = 500;
         _itemSorting                        = ItemSorting.NONE;
+        _itemSortingTopic                   = ItemSortingTopic.VALUE;
         thumbColor                          = new SimpleStyleableObjectProperty<>(THUMB_COLOR, this, "thumbColor");
         _flatUI                             = true;
         _textSize                           = TextSize.NORMAL;
@@ -2297,6 +2304,27 @@ public class Tile extends Control {
             _itemSorting = null;
         }
         return itemSorting;
+    }
+
+    public ItemSortingTopic getItemSortingTopic() { return null == itemSortingTopic ? _itemSortingTopic : itemSortingTopic.get(); }
+    public void setItemSortingTopic(final ItemSortingTopic ITEM_SORTING_TOPIC) {
+        if (null == itemSortingTopic) {
+            _itemSortingTopic = ITEM_SORTING_TOPIC;
+            fireTileEvent(DATA_EVENT);
+        } else {
+            itemSortingTopic.set(ITEM_SORTING_TOPIC);
+        }
+    }
+    public ObjectProperty<ItemSortingTopic> itemSortingTopicProperty() {
+        if (null == itemSortingTopic) {
+            itemSortingTopic = new ObjectPropertyBase<ItemSortingTopic>(_itemSortingTopic) {
+                @Override protected void invalidated() { fireTileEvent(DATA_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "itemSortingTopic"; }
+            };
+            _itemSortingTopic = null;
+        }
+        return itemSortingTopic;
     }
 
     public ObservableList<ChartData> getChartData() {
@@ -6116,7 +6144,7 @@ public class Tile extends Control {
                 break;
             case CUSTOM_SCROLLABLE:
                 break;
-            case LEADER_BOARD:
+            case LEADER_BOARD: //TODO:
                 setItemSorting(ItemSorting.DESCENDING);
                 break;
             case MAP:

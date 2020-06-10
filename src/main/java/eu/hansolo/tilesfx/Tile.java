@@ -38,9 +38,12 @@ import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.InfoRegion;
 import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.tilesfx.tools.LowerRightRegion;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.MovingAverage;
+import eu.hansolo.tilesfx.tools.NotifyRegion;
 import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.SectionComparator;
 import eu.hansolo.tilesfx.tools.TimeData;
@@ -5459,6 +5462,16 @@ public class Tile extends Control {
         return fillWithGradient;
     }
 
+    /**
+     * Returns the notify region.
+     * Only if the getSkin() != null
+     * @return the notify region
+     */
+    public NotifyRegion getNotifyRegion() {
+        if (null == getSkin()) { return null; }
+        return ((TileSkin) getSkin()).getNotifyRegion();
+    }
+
     public Color getNotifyRegionBackgroundColor() { return _notifyRegionBackgroundColor; }
     public void setNotifyRegionBackgroundColor(final Color COLOR) {
         _notifyRegionBackgroundColor = COLOR;
@@ -5475,7 +5488,17 @@ public class Tile extends Control {
     public void setNotifyRegionTooltipText(final String TEXT) {
         _notifyRegionTooltipText = TEXT;
         fireTileEvent(REDRAW_EVENT);
-    }    
+    }
+
+    /**
+     * Returns the info region.
+     * Only if the getSkin() != null
+     * @return the info region
+     */
+    public InfoRegion getInfoRegion() {
+        if (null == getSkin()) { return null; }
+        return ((TileSkin) getSkin()).getInfoRegion();
+    }
 
     public Color getInfoRegionBackgroundColor() { return _infoRegionBackgroundColor; }
     public void setInfoRegionBackgroundColor(final Color COLOR) {
@@ -5493,6 +5516,16 @@ public class Tile extends Control {
     public void setInfoRegionTooltipText(final String TEXT) {
         _infoRegionTooltipText = TEXT;
         fireTileEvent(REDRAW_EVENT);
+    }
+
+    /**
+     * Returns the lower right region.
+     * Only if the getSkin() != null
+     * @return the lower right region
+     */
+    public LowerRightRegion getLowerRightRegion() {
+        if (null == getSkin()) { return null; }
+        return ((TileSkin) getSkin()).getLowerRightRegion();
     }
 
     public Color getLowerRightRegionBackgroundColor() { return _lowerRightRegionBackgroundColor; }

@@ -211,7 +211,11 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     public void setName(final String NAME) { chartData.setName(NAME); }
 
     public double getValue() { return chartData.getValue(); }
-    public void setValue(final double VALUE) { chartData.setValue(VALUE); }
+    public void setValue(final double VALUE) {
+        chartData.setValue(VALUE);
+        if (null == getParent()) { return; }
+        updateValueText();
+    }
 
     public Instant getTimestamp() { return chartData.getTimestamp(); }
     public void setTimestamp(final Instant TIMESTAMP) { chartData.setTimestamp(TIMESTAMP); }
@@ -293,7 +297,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         updateValueText();
     }
 
-    protected void setParentSize(final double WIDTH, final double HEIGHT) {
+    public void setParentSize(final double WIDTH, final double HEIGHT) {
         parentWidth  = WIDTH;
         parentHeight = HEIGHT;
         resize();
@@ -319,6 +323,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
             case VALUE    :
             default       : valueText.setText(String.format(locale, formatString, getValue())); break;
         }
+        valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
     }
 
 

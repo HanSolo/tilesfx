@@ -20,7 +20,9 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
@@ -34,6 +36,8 @@ public class CustomScrollableTileSkin extends TileSkin {
     private Text           text;
     private ScrollPane     graphicContainer;
     private ChangeListener graphicListener;
+    private ScrollBar      verticalScrollBar;
+    private double         scrollBarWidth;
 
 
     // ******************** Constructors **************************************
@@ -47,6 +51,8 @@ public class CustomScrollableTileSkin extends TileSkin {
         super.initGraphics();
 
         graphicListener = (o, ov, nv) -> { if (nv != null) { graphicContainer.setContent(tile.getGraphic()); }};
+
+        scrollBarWidth = 0;
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -134,6 +140,28 @@ public class CustomScrollableTileSkin extends TileSkin {
 
         double containerWidth  = contentBounds.getWidth();
         double containerHeight = contentBounds.getHeight();
+        if (null == verticalScrollBar) {
+            for (Node n : graphicContainer.lookupAll(".scroll-bar")) {
+                if (n instanceof ScrollBar) {
+                    ScrollBar bar = (ScrollBar) n;
+                    if (bar.getOrientation().equals(Orientation.VERTICAL)) {
+                        verticalScrollBar = bar;
+                        verticalScrollBar.visibleProperty().addListener((o, ov, nv) -> {
+                            if (nv) {
+                                scrollBarWidth = verticalScrollBar.getLayoutBounds().getWidth();
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+        } else {
+            if (verticalScrollBar.isVisible()) {
+                contentBounds.setWidth(contentBounds.getWidth() - scrollBarWidth);
+            } else {
+                contentBounds.setWidth(contentBounds.getWidth() + scrollBarWidth);
+            }
+        }
 
         if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);

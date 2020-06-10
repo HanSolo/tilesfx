@@ -99,8 +99,8 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     private                ImageView                 backgroundImageView;
     private                NotifyRegion              notifyRegion;
     private                InfoRegion                infoRegion;
-    private                EventHandler<MouseEvent>  infoRegionHandler;
     private                LowerRightRegion          lowerRightRegion;
+    private                EventHandler<MouseEvent>  infoRegionHandler;
 
 
     // ******************** Constructors **************************************
@@ -264,6 +264,12 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
      */
     public void setOnContentBoundsChanged(final BoundsEventListener LISTENER) { contentBounds.setOnBoundsEvent(LISTENER); }
     public void removeOnContentBoundsChanged(final BoundsEventListener LISTENER) { contentBounds.removeBoundsEventListener(LISTENER); }
+
+    public NotifyRegion getNotifyRegion() { return notifyRegion; }
+
+    public InfoRegion getInfoRegion() { return infoRegion; }
+
+    public LowerRightRegion getLowerRightRegion() { return lowerRightRegion; }
 
     @Override public void dispose() {
         contentBounds.removeAllListeners();

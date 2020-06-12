@@ -10,11 +10,12 @@ module eu.hansolo.tilesfx {
     requires transitive javafx.web;
 
     exports eu.hansolo.tilesfx;
+    exports eu.hansolo.tilesfx.addons;
     exports eu.hansolo.tilesfx.chart;
     exports eu.hansolo.tilesfx.colors;
     exports eu.hansolo.tilesfx.events;
     exports eu.hansolo.tilesfx.fonts;
+    exports eu.hansolo.tilesfx.icons;
     exports eu.hansolo.tilesfx.skins;
     exports eu.hansolo.tilesfx.tools;
-    exports eu.hansolo.tilesfx.addons;
 }

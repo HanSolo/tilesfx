@@ -67,7 +67,7 @@ jar {
                 'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
                 'Bundle-Description': description,
                 'Bundle-SymbolicName': 'eu.hansolo.tilesfx',
-                'Export-Package': 'eu.hansolo.tilesfx,eu.hansolo.tilesfx.chart,eu.hansolo.tilesfx.colors,eu.hansolo.tilesfx.events,eu.hansolo.tilesfx.fonts,eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools'
+                'Export-Package': 'eu.hansolo.tilesfx, eu.hansolo.tilesfx.chart, eu.hansolo.tilesfx.colors, eu.hansolo.tilesfx.events, eu.hansolo.tilesfx.fonts, eu.hansolo.tilesfx.icons, eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools'
         )
     }
 }

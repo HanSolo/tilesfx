@@ -136,7 +136,7 @@ import static eu.hansolo.tilesfx.tools.MovingAverage.MAX_PERIOD;
  */
 public class Tile extends Control {
     public enum SkinType { SMOOTHED_CHART("ChartTileSkin"), BAR_CHART("BarChartTileSkin"),
-                           CLOCK("ClockTileSkin"), GAUGE("GaugeTileSkin"),
+                           CLOCK("ClockTileSkin"), GAUGE("GaugeTileSkin"), GAUGE2("Gauge2TileSkin"),
                            HIGH_LOW("HighLowTileSkin)"), PERCENTAGE("PercentageTileSkin"),
                            PLUS_MINUS("PlusMinusTileSkin"), SLIDER("SliderTileSkin"),
                            SPARK_LINE("SparkLineTileSkin"), SWITCH("SwitchTileSkin"),
@@ -445,6 +445,10 @@ public class Tile extends Control {
     private BooleanProperty                tickLabelsXVisible;
     private boolean                        _tickLabelsYVisible;
     private BooleanProperty                tickLabelsYVisible;
+    private boolean                        _minValueVisible;
+    private BooleanProperty                minValueVisible;
+    private boolean                        _maxValueVisible;
+    private BooleanProperty                maxValueVisible;
     private Color                          _needleColor;
     private ObjectProperty<Color>          needleColor;
     private Color                          _barColor;
@@ -697,6 +701,10 @@ public class Tile extends Control {
                 @NamedArg(value="numberFormat", defaultValue="NumberFormat.getInstance(Locale.US)") NumberFormat numberFormat,
                 @NamedArg(value="decimals", defaultValue="1") int decimals,
                 @NamedArg(value="tickLabelDecimals", defaultValue="1") int tickLabelDecimals,
+                @NamedArg(value="tickLabelsXVisible", defaultValue="true") boolean tickLabelsXVisible,
+                @NamedArg(value="tickLabelsYVisible", defaultValue="true") boolean tickLabelsYVisible,
+                @NamedArg(value="minValueVisible", defaultValue="true") boolean minValueVisible,
+                @NamedArg(value="maxValueVisible", defaultValue="true") boolean maxValueVisible,
                 @NamedArg(value="needleColor", defaultValue="#dfdfdf") Color needleColor,
                 @NamedArg(value="hourColor", defaultValue="#dfdfdf") Color hourColor,
                 @NamedArg(value="minuteColor", defaultValue="#dfdfdf") Color minuteColor,
@@ -934,6 +942,8 @@ public class Tile extends Control {
         _tickLabelDecimals                  = 1;
         _tickLabelsXVisible                 = true;
         _tickLabelsYVisible                 = true;
+        _minValueVisible                    = true;
+        _maxValueVisible                    = true;
         _needleColor                        = FOREGROUND;
         _hourColor                          = FOREGROUND;
         _minuteColor                        = FOREGROUND;
@@ -1245,7 +1255,7 @@ public class Tile extends Control {
         }
         return minValue;
     }
-
+    
     /**
      * Returns the maximum value of the scale. This value represents the upper limit
      * of the visible tile values.
@@ -3338,7 +3348,7 @@ public class Tile extends Control {
     public void setTickLabelsXVisible(final boolean VISIBLE) {
         if (null == this.tickLabelsXVisible) {
             _tickLabelsXVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvent(VISIBILITY_EVENT);
         } else {
             tickLabelsXVisible.set(VISIBLE);
         }
@@ -3346,7 +3356,7 @@ public class Tile extends Control {
     public BooleanProperty tickLabelsXVisibleProperty() {
         if (null == tickLabelsXVisible) {
             tickLabelsXVisible = new BooleanPropertyBase(_tickLabelsXVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }  
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }  
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "tickLabelsXVisible"; }
             };
@@ -3358,7 +3368,7 @@ public class Tile extends Control {
     public void setTickLabelsYVisible(final boolean VISIBLE) {
         if (null == this.tickLabelsYVisible) {
             _tickLabelsYVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvent(VISIBILITY_EVENT);
         } else {
             tickLabelsYVisible.set(VISIBLE);
         }
@@ -3366,12 +3376,52 @@ public class Tile extends Control {
     public BooleanProperty tickLabelsYVisibleProperty() {
         if (null == tickLabelsYVisible) {
             tickLabelsYVisible = new BooleanPropertyBase(_tickLabelsYVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "tickLabelsYVisible"; }
             };
         }
         return tickLabelsYVisible;
+    }
+    
+    public boolean getMinValueVisible() { return null == minValueVisible ? _minValueVisible : minValueVisible.get(); }
+    public void setMinValueVisible(final boolean VISIBLE) {
+        if (null == this.minValueVisible) {
+            _minValueVisible = VISIBLE;
+            fireTileEvent(VISIBILITY_EVENT);
+        } else {
+            minValueVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty minValueVisibleProperty() {
+        if (null == minValueVisible) {
+            minValueVisible = new BooleanPropertyBase(_minValueVisible) {
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "minValueVisible"; }
+            };
+        }
+        return minValueVisible;
+    }
+
+    public boolean getMaxValueVisible() { return null == maxValueVisible ? _maxValueVisible : maxValueVisible.get(); }
+    public void setMaxValueVisible(final boolean VISIBLE) {
+        if (null == this.maxValueVisible) {
+            _maxValueVisible = VISIBLE;
+            fireTileEvent(VISIBILITY_EVENT);
+        } else {
+            maxValueVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty maxValueVisibleProperty() {
+        if (null == maxValueVisible) {
+            maxValueVisible = new BooleanPropertyBase(_maxValueVisible) {
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "maxValueVisible"; }
+            };
+        }
+        return maxValueVisible;
     }
     
     /**
@@ -6125,6 +6175,7 @@ public class Tile extends Control {
             case BAR_CHART        : return new BarChartTileSkin(Tile.this);
             case CLOCK            : return new ClockTileSkin(Tile.this);
             case GAUGE            : return new GaugeTileSkin(Tile.this);
+            case GAUGE2           : return new Gauge2TileSkin(Tile.this);
             case HIGH_LOW         : return new HighLowTileSkin(Tile.this);
             case PERCENTAGE       : return new PercentageTileSkin(Tile.this);
             case PLUS_MINUS       : return new PlusMinusTileSkin(Tile.this);
@@ -6196,6 +6247,14 @@ public class Tile extends Control {
                 setBarColor(FOREGROUND);
                 setThresholdColor(Tile.BLUE);
                 setThresholdVisible(true);
+                break;
+            case GAUGE2:
+                setStartAngle(330);
+                setAngleRange(240);
+                setAnimated(true);
+                setTickLabelDecimals(0);
+                setBarColor(Tile.BLUE);
+                setBarBackgroundColor(BACKGROUND.brighter());
                 break;
             case HIGH_LOW:
                 setMaxValue(Double.MAX_VALUE);
@@ -6269,6 +6328,7 @@ public class Tile extends Control {
                 break;
             case GAUGE_SPARK_LINE:
                 setBarColor(Tile.BLUE);
+                setBarBackgroundColor(Tile.BACKGROUND.brighter());
                 setAngleRange(270);
                 break;
             case SMOOTH_AREA_CHART:
@@ -6376,6 +6436,7 @@ public class Tile extends Control {
             case BAR_CHART        : setSkin(new BarChartTileSkin(Tile.this)); break;
             case CLOCK            : setSkin(new ClockTileSkin(Tile.this)); break;
             case GAUGE            : setSkin(new GaugeTileSkin(Tile.this)); break;
+            case GAUGE2           : setSkin(new Gauge2TileSkin(Tile.this)); break;
             case HIGH_LOW         : setSkin(new HighLowTileSkin(Tile.this)); break;
             case PERCENTAGE       : setSkin(new PercentageTileSkin(Tile.this)); break;
             case PLUS_MINUS       : setSkin(new PlusMinusTileSkin(Tile.this)); break;

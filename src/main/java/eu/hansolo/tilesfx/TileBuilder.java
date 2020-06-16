@@ -158,6 +158,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B minValueVisible(final boolean VISIBLE) {
+        properties.put("minValueVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B maxValueVisible(final boolean VISIBLE) {
+        properties.put("maxValueVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B title(final String TITLE) {
         properties.put("title", new SimpleStringProperty(TITLE));
         return (B)this;
@@ -1195,6 +1205,14 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setThresholdColor(Tile.BLUE);
                     TILE.setThresholdVisible(true);
                     break;
+                case GAUGE2:
+                    TILE.setAngleRange(240);
+                    TILE.setStartAngle(330);
+                    TILE.setAnimated(true);
+                    TILE.setTickLabelDecimals(0);
+                    TILE.setBarColor(Tile.BLUE);
+                    TILE.setBarBackgroundColor(Tile.BACKGROUND.brighter());
+                    break;
                 case HIGH_LOW:
                     TILE.setMaxValue(Double.MAX_VALUE);
                     TILE.setDecimals(2);
@@ -1264,6 +1282,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setTextVisible(false);
                     break;
                 case GAUGE_SPARK_LINE:
+                    TILE.setBarBackgroundColor(Tile.BACKGROUND.brighter());
                     TILE.setBarColor(Tile.BLUE);
                     TILE.setAngleRange(270);
                     break;
@@ -1519,6 +1538,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setTickLabelsXVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("tickLabelsYVisible".equals(key)) {
                 TILE.setTickLabelsYVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("minValueVisible".equals(key)) {
+                TILE.setMinValueVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("maxValueVisible".equals(key)) {
+                TILE.setMaxValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if("title".equals(key)) {
                 TILE.setTitle(((StringProperty) properties.get(key)).get());
             } else if("titleAlignment".equals(key)) {

@@ -59,7 +59,10 @@ public class SmoothedChartTileSkin extends TileSkin {
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
         xAxis = tile.getXAxis();
+        xAxis.setTickLabelsVisible(tile.getTickLabelsXVisible());
+
         yAxis = tile.getYAxis();
+        yAxis.setTickLabelsVisible(tile.getTickLabelsYVisible());
 
         chart = new SmoothedChart<>(xAxis, yAxis);
         chart.setSmoothed(tile.isSmoothing());
@@ -69,8 +72,6 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setCreateSymbols(false);
         chart.setSnapToTicks(tile.isSnapToTicks());
         chart.setSymbolsVisible(tile.getDataPointsVisible());
-        chart.getXAxis().setTickLabelsVisible(tile.getTickLabelsXVisible());
-        chart.getYAxis().setTickLabelsVisible(tile.getTickLabelsYVisible());
 
         switch(tile.getChartType()) {
             case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
@@ -109,9 +110,11 @@ public class SmoothedChartTileSkin extends TileSkin {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             chart.setSymbolsVisible(tile.getDataPointsVisible());
-        } else if ("SERIES".equals(EVENT_TYPE)) {
+            xAxis.setTickLabelsVisible(tile.getTickLabelsXVisible());
+            yAxis.setTickLabelsVisible(tile.getTickLabelsYVisible());
+        } else if (EventType.SERIES.name().equals(EVENT_TYPE)) {
             switch(tile.getChartType()) {
                 case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
                 default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
@@ -173,8 +176,6 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setAnimated(tile.isAnimated());
         chart.setTooltipTimeout(tile.getTooltipTimeout());
         chart.setSymbolsVisible(tile.getDataPointsVisible());
-        chart.getXAxis().setTickLabelsVisible(tile.getTickLabelsXVisible());
-        chart.getYAxis().setTickLabelsVisible(tile.getTickLabelsYVisible());
 
         titleText.setFill(tile.getTitleColor());
 

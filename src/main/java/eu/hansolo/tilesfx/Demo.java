@@ -21,6 +21,8 @@ import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.MapProvider;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.Tile.TileColor;
+import eu.hansolo.tilesfx.addons.HappinessIndicator;
+import eu.hansolo.tilesfx.addons.HappinessIndicator.Happiness;
 import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChartMode;
@@ -168,6 +170,8 @@ public class Demo extends Application {
     private Tile            turnoverTile;
     private Tile            fluidTile;
     private Tile            fireSmokeTile;
+    private Tile            gauge2Tile;
+    private Tile            happinessTile;
 
 
     private long            lastTimerCall;
@@ -530,12 +534,12 @@ public class Demo extends Application {
                                                        new Stop(0.67, Tile.LIGHT_RED),
                                                        new Stop(1.0, Tile.LIGHT_RED))
                                         .build();
-        /*
+        
         radarChartTile1 = TileBuilder.create().skinType(SkinType.RADAR_CHART)
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .minValue(0)
                                      .maxValue(50)
-                                     .title("RadarChart Sector")
+                                     .title("RadarChartTileSkin Sector")
                                      .unit("Unit")
                                      .radarChartMode(RadarChartMode.SECTOR)
                                      .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
@@ -560,59 +564,7 @@ public class Demo extends Application {
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .minValue(0)
                                      .maxValue(50)
-                                     .title("RadarChart Polygon")
-                                     .unit("Unit")
-                                     .radarChartMode(RadarChartMode.POLYGON)
-                                     .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
-                                                    new Stop(0.00001, Color.web("#3552a0")),
-                                                    new Stop(0.09090, Color.web("#456acf")),
-                                                    new Stop(0.27272, Color.web("#45a1cf")),
-                                                    new Stop(0.36363, Color.web("#30c8c9")),
-                                                    new Stop(0.45454, Color.web("#30c9af")),
-                                                    new Stop(0.50909, Color.web("#56d483")),
-                                                    new Stop(0.72727, Color.web("#9adb49")),
-                                                    new Stop(0.81818, Color.web("#efd750")),
-                                                    new Stop(0.90909, Color.web("#ef9850")),
-                                                    new Stop(1.00000, Color.web("#ef6050")))
-                                     .text("Test")
-                                     .chartData(chartData1, chartData2, chartData3, chartData4,
-                                                chartData5, chartData6, chartData7, chartData8)
-                                     .tooltipText("")
-                                     .animated(true)
-                                     //.smoothing(true)
-                                     .build();
-        */
-
-        radarChartTile1 = TileBuilder.create().skinType(SkinType.RADAR_CHART)
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .minValue(0)
-                                     .maxValue(50)
-                                     .title("RadarChart Sector Tile")
-                                     .unit("Unit")
-                                     .radarChartMode(RadarChartMode.SECTOR)
-                                     .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
-                                                    new Stop(0.00001, Color.web("#3552a0")),
-                                                    new Stop(0.09090, Color.web("#456acf")),
-                                                    new Stop(0.27272, Color.web("#45a1cf")),
-                                                    new Stop(0.36363, Color.web("#30c8c9")),
-                                                    new Stop(0.45454, Color.web("#30c9af")),
-                                                    new Stop(0.50909, Color.web("#56d483")),
-                                                    new Stop(0.72727, Color.web("#9adb49")),
-                                                    new Stop(0.81818, Color.web("#efd750")),
-                                                    new Stop(0.90909, Color.web("#ef9850")),
-                                                    new Stop(1.00000, Color.web("#ef6050")))
-                                     .text("Test")
-                                     .chartData(chartData1, chartData2, chartData3, chartData4,
-                                                chartData5, chartData6, chartData7, chartData8)
-                                     .tooltipText("")
-                                     .animated(true)
-                                     .build();
-
-        radarChartTile2 = TileBuilder.create().skinType(SkinType.RADAR_CHART)
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .minValue(0)
-                                     .maxValue(50)
-                                     .title("RadarChart Polygon Tile")
+                                     .title("RadarChartTileSkin Polygon")
                                      .unit("Unit")
                                      .radarChartMode(RadarChartMode.POLYGON)
                                      .gradientStops(new Stop(0.00000, Color.TRANSPARENT),
@@ -1072,21 +1024,21 @@ public class Demo extends Application {
 
         customFlagChartTile = TileBuilder.create()
                                          .skinType(SkinType.CUSTOM)
-                                         .title("Custom Covid-19 Tile")
+                                         .title("Custom Tile Covid-19")
                                          .text("Data from 26.05.2020")
                                          .graphic(dataTable)
                                          .build();
 
         colorTile = TileBuilder.create().skinType(SkinType.COLOR)
                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                           .title("ColorTileSkin")
+                           .title("Color Tile")
                            .description("Whatever")
                            .animated(true)
                            .build();
 
         turnoverTile = TileBuilder.create().skinType(SkinType.TURNOVER)
                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                  .title("TurnoverTileSkin")
+                                  .title("Turnover Tile")
                                   .text("Gerrit Grunwald")
                                   .decimals(0)
                                   .unit("$")
@@ -1109,7 +1061,7 @@ public class Demo extends Application {
 
         fluidTile = TileBuilder.create().skinType(SkinType.FLUID)
                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                               .title("FluidTileSkin")
+                               .title("Fluid Tile")
                                .text("Waterlevel")
                                .unit("\u0025")
                                .decimals(0)
@@ -1119,11 +1071,50 @@ public class Demo extends Application {
 
         fireSmokeTile = TileBuilder.create().skinType(SkinType.FIRE_SMOKE)
                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                   .title("FireSmokeTileSkin")
+                                   .title("FireSmoke Tile")
                                    .text("CPU temp")
                                    .unit("\u00b0C")
                                    .threshold(40) // triggers the fire and smoke effect
                                    .decimals(0)
+                                   .animated(true)
+                                   .build();
+
+        gauge2Tile = TileBuilder.create()
+                                .skinType(SkinType.GAUGE2)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                .title("Gauge2 Tile")
+                                .text("Whatever")
+                                .unit("Unit")
+                                .textVisible(true)
+                                .value(0)
+                                .gradientStops(new Stop(0, Tile.BLUE),
+                                               new Stop(0.25, Tile.GREEN),
+                                               new Stop(0.5, Tile.YELLOW),
+                                               new Stop(0.75, Tile.ORANGE),
+                                               new Stop(1, Tile.RED))
+                                .strokeWithGradient(true)
+                                .animated(true)
+                                .build();
+
+        HappinessIndicator happy   = new HappinessIndicator(Happiness.HAPPY, 0.67);
+        HappinessIndicator neutral = new HappinessIndicator(Happiness.NEUTRAL, 0.25);
+        HappinessIndicator unhappy = new HappinessIndicator(Happiness.UNHAPPY, 0.08);
+
+        HBox happiness = new HBox(unhappy, neutral, happy);
+        happiness.setFillHeight(true);
+
+        HBox.setHgrow(happy, Priority.ALWAYS);
+        HBox.setHgrow(neutral, Priority.ALWAYS);
+        HBox.setHgrow(unhappy, Priority.ALWAYS);
+
+        happinessTile = TileBuilder.create()
+                                   .skinType(SkinType.CUSTOM)
+                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                   .title("Custom Tile Happiness")
+                                   .text("Whatever")
+                                   .textVisible(true)
+                                   .graphic(happiness)
+                                   .value(0)
                                    .animated(true)
                                    .build();
 
@@ -1133,6 +1124,7 @@ public class Demo extends Application {
                 if (now > lastTimerCall + 3_500_000_000L) {
                     percentageTile.setValue(RND.nextDouble() * percentageTile.getRange() * 1.5 + percentageTile.getMinValue());
                     gaugeTile.setValue(RND.nextDouble() * gaugeTile.getRange() * 1.5 + gaugeTile.getMinValue());
+                    gauge2Tile.setValue(RND.nextDouble() * gaugeTile.getRange() + gaugeTile.getMinValue());
 
                     sparkLineTile.setValue(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
                     //value.set(RND.nextDouble() * sparkLineTile.getRange() * 1.5 + sparkLineTile.getMinValue());
@@ -1225,7 +1217,8 @@ public class Demo extends Application {
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
                                              timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
-                                             cycleStepTile, customFlagChartTile, colorTile, turnoverTile, fluidTile, fireSmokeTile);
+                                             cycleStepTile, customFlagChartTile, colorTile, turnoverTile, fluidTile, fireSmokeTile,
+                                             gauge2Tile, happinessTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

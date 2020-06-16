@@ -234,7 +234,10 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         bar.setFill(null);
 
         minValueText = new Text();
+        Helper.enableNode(minValueText, tile.getMinValueVisible());
+
         maxValueText = new Text();
+        Helper.enableNode(maxValueText, tile.getMaxValueVisible());
 
         getPane().getChildren().addAll(sectionCanvas, highlightSectionCanvas, barBackground, bar, minValueText, maxValueText, titleText, valueUnitFlow, stdDeviationArea, averageLine, sparkLine, dot, averageText, timeSpanText, text);
         getPane().getChildren().addAll(horizontalTickLines);
@@ -256,11 +259,13 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
-            Helper.enableNode(unitText, !tile.getUnit().isEmpty());
+            Helper.enableNode(valueUnitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(timeSpanText, !tile.isTextVisible());
             Helper.enableNode(averageLine, tile.isAverageVisible());
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
+            Helper.enableNode(minValueText, tile.getMinValueVisible());
+            Helper.enableNode(maxValueText, tile.getMaxValueVisible());
             redraw();
         } else if (EventType.AVERAGING.name().equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
@@ -638,8 +643,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
 
-        maxWidth = width - size * 0.275;
-        fontSize = size * 0.12;
+        maxWidth = width - (width - size * 0.275);
+        fontSize = size * 0.06;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
 
@@ -883,7 +888,6 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         drawBackground();
         setBar(tile.getCurrentValue());
         titleText.setText(tile.getTitle());
-        text.setText(tile.getText());
         unitText.setText(tile.getUnit());
         if (!tile.getDescription().isEmpty()) { text.setText(tile.getDescription()); }
 
@@ -899,6 +903,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());
         text.setFill(tile.getTextColor());
+        unitText.setFill(tile.getUnitColor());
         timeSpanText.setFill(tile.getTextColor());
         minValueText.setFill(tile.getTextColor());
         maxValueText.setFill(tile.getTextColor());

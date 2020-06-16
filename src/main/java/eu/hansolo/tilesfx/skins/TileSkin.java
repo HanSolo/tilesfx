@@ -112,7 +112,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         range                 = tile.getRange();
         threshold             = tile.getThreshold();
         stepSize              = PREFERRED_WIDTH / range;
-        angleRange            = clamp(90.0, 180.0, tile.getAngleRange());
+        angleRange            = tile.getAngleRange();
         angleStep             = angleRange / range;
         formatString          = new StringBuilder("%.").append(tile.getDecimals()).append("f").toString();
         tickLabelFormatString = new StringBuilder("%.").append(tile.getTickLabelDecimals()).append("f").toString();;

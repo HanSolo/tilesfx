@@ -45,6 +45,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 
 import java.time.Duration;
@@ -67,6 +68,7 @@ public class Test extends Application {
     private static final double          HEIGHT    = 400;
     private static       int             noOfNodes = 0;
     private              Tile            tile1;
+    private              Tile            tile2;
     private              DoubleProperty  value;
     private              long            lastTimerCall;
     private AnimationTimer               timer;
@@ -83,18 +85,36 @@ public class Test extends Application {
         HBox happiness = new HBox(unhappy, neutral, happy);
         happiness.setFillHeight(true);
 
-
         HBox.setHgrow(happy, Priority.ALWAYS);
         HBox.setHgrow(neutral, Priority.ALWAYS);
         HBox.setHgrow(unhappy, Priority.ALWAYS);
 
         tile1 = TileBuilder.create()
+                           .skinType(SkinType.GAUGE2)
+                           .prefSize(WIDTH, HEIGHT)
+                           .title("Gauge2 Tile")
+                           .text("Whatever")
+                           .unit("Unit")
+                           .textVisible(true)
+                           .value(0)
+                           .gradientStops(new Stop(0, Tile.BLUE),
+                                          new Stop(0.25, Tile.GREEN),
+                                          new Stop(0.5, Tile.YELLOW),
+                                          new Stop(0.75, Tile.ORANGE),
+                                          new Stop(1, Tile.RED))
+                           .strokeWithGradient(true)
+                           .animated(true)
+                           .build();
+
+        tile2 = TileBuilder.create()
                            .skinType(SkinType.CUSTOM)
                            .prefSize(WIDTH, HEIGHT)
                            .title("Customer Satisfaction")
                            .text("Product A")
                            .textVisible(true)
                            .graphic(happiness)
+                           .value(0)
+                           .animated(true)
                            .build();
 
 
@@ -103,7 +123,8 @@ public class Test extends Application {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 5_000_000_000l) {
                     //double value = RND.nextDouble() * tile1.getRange() + tile1.getMinValue();
-                    //tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
+                    tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
+                    tile2.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -111,7 +132,8 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(tile1);
+        //StackPane pane = new StackPane(tile1);
+        HBox pane = new HBox(20, tile1, tile2);
         pane.setBackground(new Background(new BackgroundFill(Tile.BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
         pane.setPadding(new Insets(10));
 

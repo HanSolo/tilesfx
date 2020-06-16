@@ -6242,7 +6242,7 @@ public class Tile extends Control {
                 break;
             case CUSTOM_SCROLLABLE:
                 break;
-            case LEADER_BOARD: //TODO:
+            case LEADER_BOARD:
                 setItemSorting(ItemSorting.DESCENDING);
                 break;
             case MAP:

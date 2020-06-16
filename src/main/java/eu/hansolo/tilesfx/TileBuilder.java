@@ -148,6 +148,16 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B tickLabelsXVisible(final boolean VISIBLE) {
+        properties.put("tickLabelsXVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B tickLabelsYVisible(final boolean VISIBLE) {
+        properties.put("tickLabelsYVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B title(final String TITLE) {
         properties.put("title", new SimpleStringProperty(TITLE));
         return (B)this;
@@ -1505,6 +1515,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setDecimals(((IntegerProperty) properties.get(key)).get());
             } else if("tickLabelDecimals".equals(key)) {
                 TILE.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
+            } else if ("tickLabelsXVisible".equals(key)) {
+                TILE.setTickLabelsXVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("tickLabelsYVisible".equals(key)) {
+                TILE.setTickLabelsYVisible(((BooleanProperty) properties.get(key)).get());
             } else if("title".equals(key)) {
                 TILE.setTitle(((StringProperty) properties.get(key)).get());
             } else if("titleAlignment".equals(key)) {

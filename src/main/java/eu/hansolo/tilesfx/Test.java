@@ -16,6 +16,7 @@
 
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.ItemSorting;
 import eu.hansolo.tilesfx.Tile.ItemSortingTopic;
 import eu.hansolo.tilesfx.Tile.SkinType;
@@ -30,6 +31,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.XYChart;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -95,10 +97,30 @@ public class Test extends Application {
                            .itemSortingTopic(ItemSortingTopic.DURATION)
                            .leaderBoardItems(leaderBoardItem1, leaderBoardItem2, leaderBoardItem3, leaderBoardItem4, leaderBoardItem5,
                                              leaderBoardItem6, leaderBoardItem7, leaderBoardItem8, leaderBoardItem9, leaderBoardItem10)
-
                            .build();
 
-        tile1.getLeaderBoardItems().forEach(item -> item.setTimestampFormatter(DateTimeFormatter.ofPattern("hh:mm:ss")));
+        XYChart.Series<String, Number> series1 = new XYChart.Series();
+        series1.setName("Whatever");
+        series1.getData().add(new XYChart.Data("MO", 23));
+        series1.getData().add(new XYChart.Data("TU", 21));
+        series1.getData().add(new XYChart.Data("WE", 20));
+        series1.getData().add(new XYChart.Data("TH", 22));
+        series1.getData().add(new XYChart.Data("FR", 24));
+        series1.getData().add(new XYChart.Data("SA", 22));
+        series1.getData().add(new XYChart.Data("SU", 20));
+
+        tile1 = TileBuilder.create()
+                           .skinType(SkinType.SMOOTHED_CHART)
+                           .chartType(ChartType.LINE)
+                           .prefSize(WIDTH, HEIGHT)
+                           .textVisible(false)
+                           .title("LineChart Tile")
+                           .series(series1)
+                           .animated(false)
+                           .tickLabelsXVisible(false)
+                           .build();
+
+        //tile1.getLeaderBoardItems().forEach(item -> item.setTimestampFormatter(DateTimeFormatter.ofPattern("hh:mm:ss")));
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -110,7 +132,7 @@ public class Test extends Application {
                     //System.out.println("No of data in list: " + tile1.getChartData().size());
                     //tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
                     //tile1.getLeaderBoardItems().get(RND.nextInt(tile1.getLeaderBoardItems().size())).setValue(RND.nextDouble() * 80);
-                    tile1.getLeaderBoardItems().get(RND.nextInt(tile1.getLeaderBoardItems().size())).setDuration(Duration.ofSeconds(RND.nextInt(1000)));
+                    //tile1.getLeaderBoardItems().get(RND.nextInt(tile1.getLeaderBoardItems().size())).setDuration(Duration.ofSeconds(RND.nextInt(1000)));
                     lastTimerCall = now;
                 }
             }

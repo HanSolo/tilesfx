@@ -441,6 +441,10 @@ public class Tile extends Control {
     private IntegerProperty                decimals;
     private int                            _tickLabelDecimals;
     private IntegerProperty                tickLabelDecimals;
+    private boolean                        _tickLabelsXVisible;
+    private BooleanProperty                tickLabelsXVisible;
+    private boolean                        _tickLabelsYVisible;
+    private BooleanProperty                tickLabelsYVisible;
     private Color                          _needleColor;
     private ObjectProperty<Color>          needleColor;
     private Color                          _barColor;
@@ -928,6 +932,8 @@ public class Tile extends Control {
         _numberFormat                       = NumberFormat.getInstance(_locale);
         _decimals                           = 1;
         _tickLabelDecimals                  = 1;
+        _tickLabelsXVisible                 = true;
+        _tickLabelsYVisible                 = true;
         _needleColor                        = FOREGROUND;
         _hourColor                          = FOREGROUND;
         _minuteColor                        = FOREGROUND;
@@ -3326,6 +3332,46 @@ public class Tile extends Control {
             };
         }
         return tickLabelDecimals;
+    }
+    
+    public boolean getTickLabelsXVisible() { return null == tickLabelsXVisible ? _tickLabelsXVisible : tickLabelsXVisible.get(); }
+    public void setTickLabelsXVisible(final boolean VISIBLE) {
+        if (null == this.tickLabelsXVisible) {
+            _tickLabelsXVisible = VISIBLE;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            tickLabelsXVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty tickLabelsXVisibleProperty() {
+        if (null == tickLabelsXVisible) {
+            tickLabelsXVisible = new BooleanPropertyBase(_tickLabelsXVisible) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }  
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "tickLabelsXVisible"; }
+            };
+        }
+        return tickLabelsXVisible;
+    }
+
+    public boolean getTickLabelsYVisible() { return null == tickLabelsYVisible ? _tickLabelsYVisible : tickLabelsYVisible.get(); }
+    public void setTickLabelsYVisible(final boolean VISIBLE) {
+        if (null == this.tickLabelsYVisible) {
+            _tickLabelsYVisible = VISIBLE;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            tickLabelsYVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty tickLabelsYVisibleProperty() {
+        if (null == tickLabelsYVisible) {
+            tickLabelsYVisible = new BooleanPropertyBase(_tickLabelsYVisible) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "tickLabelsYVisible"; }
+            };
+        }
+        return tickLabelsYVisible;
     }
     
     /**

@@ -69,6 +69,8 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setCreateSymbols(false);
         chart.setSnapToTicks(tile.isSnapToTicks());
         chart.setSymbolsVisible(tile.getDataPointsVisible());
+        chart.getXAxis().setTickLabelsVisible(tile.getTickLabelsXVisible());
+        chart.getYAxis().setTickLabelsVisible(tile.getTickLabelsYVisible());
 
         switch(tile.getChartType()) {
             case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
@@ -171,6 +173,8 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setAnimated(tile.isAnimated());
         chart.setTooltipTimeout(tile.getTooltipTimeout());
         chart.setSymbolsVisible(tile.getDataPointsVisible());
+        chart.getXAxis().setTickLabelsVisible(tile.getTickLabelsXVisible());
+        chart.getYAxis().setTickLabelsVisible(tile.getTickLabelsYVisible());
 
         titleText.setFill(tile.getTitleColor());
 

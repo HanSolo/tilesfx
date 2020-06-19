@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.Tile.ItemSortingTopic;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.addons.HappinessIndicator;
 import eu.hansolo.tilesfx.addons.HappinessIndicator.Happiness;
+import eu.hansolo.tilesfx.addons.YearChart;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import javafx.animation.AnimationTimer;
@@ -69,6 +70,7 @@ public class Test extends Application {
     private static       int             noOfNodes = 0;
     private              Tile            tile1;
     private              Tile            tile2;
+    private              VBox            yearBox;
     private              DoubleProperty  value;
     private              long            lastTimerCall;
     private AnimationTimer               timer;
@@ -117,14 +119,28 @@ public class Test extends Application {
                            .animated(true)
                            .build();
 
+        yearBox = new VBox();
+        for (int year = 2010 ; year < 2021 ; year++) {
+            YearChart yearChart = new YearChart(Integer.toString(year), Color.WHITE, true, true);
+            for (int i = 1 ; i < 13 ; i++) {
+                yearChart.set(i, RND.nextDouble() * 2.18 - 0.8);
+            }
+            Label yearLabel = new Label(yearChart.getText());
+            yearLabel.setAlignment(Pos.CENTER_LEFT);
+            yearLabel.setPrefWidth(40);
+            HBox hBox = new HBox(5, yearLabel, yearChart);
+            hBox.setAlignment(Pos.CENTER_LEFT);
+            yearBox.getChildren().add(hBox);
+        }
+
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 5_000_000_000l) {
                     //double value = RND.nextDouble() * tile1.getRange() + tile1.getMinValue();
-                    tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
-                    tile2.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
+                    //tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
+                    //tile2.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -132,9 +148,8 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        //StackPane pane = new StackPane(tile1);
-        HBox pane = new HBox(20, tile1, tile2);
-        pane.setBackground(new Background(new BackgroundFill(Tile.BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+        StackPane pane = new StackPane(yearBox);
+        //HBox pane = new HBox(20, tile1, tile2);
         pane.setPadding(new Insets(10));
 
         Scene scene = new Scene(pane);
@@ -147,7 +162,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        timer.start();
+        //timer.start();
     }
 
     @Override public void stop() {

@@ -47,8 +47,6 @@ if (JavaVersion.current().isJava8Compatible()) {
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
-    withJavadocJar()
-    withSourcesJar()
 }
 
 javafx {
@@ -93,7 +91,7 @@ task Test(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-/* create one jar for the javadoc
+//create one jar for the javadoc
 task javadocJar(type: Jar, dependsOn: javadoc) {
     archiveClassifier = 'javadoc'
     from javadoc.destinationDir
@@ -104,7 +102,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
-*/
 
 artifacts {
     archives jar

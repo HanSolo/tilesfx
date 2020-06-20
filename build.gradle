@@ -14,12 +14,11 @@ plugins {
     id 'idea'
     id 'java-library'
     id 'maven-publish'
-    id 'net.nemerosa.versioning' version '2.10.0'
+    id 'net.nemerosa.versioning' version '2.13.2'
     id 'com.jfrog.bintray' version '1.8.5'
     id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'biz.aQute.bnd.builder' version '5.1.1'
 }
-
-apply plugin: 'biz.aQute.bnd.builder'
 
 wrapper {
     gradleVersion = '6.5'
@@ -43,6 +42,13 @@ if (JavaVersion.current().isJava8Compatible()) {
             options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    withJavadocJar()
+    withSourcesJar()
 }
 
 javafx {
@@ -87,7 +93,7 @@ task Test(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-// create one jar for the javadoc
+/* create one jar for the javadoc
 task javadocJar(type: Jar, dependsOn: javadoc) {
     archiveClassifier = 'javadoc'
     from javadoc.destinationDir
@@ -98,6 +104,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
+*/
 
 artifacts {
     archives jar

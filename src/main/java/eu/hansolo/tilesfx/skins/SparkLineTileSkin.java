@@ -267,7 +267,10 @@ public class SparkLineTileSkin extends TileSkin {
             dataList.clear();
             handleCurrentValue(minValue);
         } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
-
+            if(tile.isAnimated()) { tile.setAnimated(false); }
+            if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
+            double value = clamp(minValue, maxValue, tile.getValue());
+            handleCurrentValue(value);
         }
     }
 

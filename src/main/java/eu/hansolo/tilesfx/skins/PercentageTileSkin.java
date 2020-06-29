@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.geometry.Insets;
@@ -108,12 +109,15 @@ public class PercentageTileSkin extends TileSkin {
 
         maxValueRect = new Rectangle();
         maxValueRect.setFill(tile.getThresholdColor());
+        Helper.enableNode(maxValueRect, tile.getMaxValueVisible());
 
         maxValueText = new Text();
         maxValueText.setFill(tile.getBackgroundColor());
+        Helper.enableNode(maxValueText, tile.getMaxValueVisible());
 
         maxValueUnitText = new Text(tile.getUnit());
         maxValueUnitText.setFill(tile.getBackgroundColor());
+        Helper.enableNode(maxValueUnitText, tile.getMaxValueVisible());
 
         getPane().getChildren().addAll(barBackground, bar, titleText, valueUnitFlow, description, percentageText, percentageUnitText, maxValueRect, maxValueText, maxValueUnitText);
     }
@@ -127,11 +131,14 @@ public class PercentageTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(unitText, !tile.getUnit().isEmpty());
             Helper.enableNode(description, !tile.getDescription().isEmpty());
+            Helper.enableNode(maxValueRect, tile.getMaxValueVisible());
+            Helper.enableNode(maxValueText, tile.getMaxValueVisible());
+            Helper.enableNode(maxValueUnitText, tile.getMaxValueVisible());
         }
     }
 
@@ -289,5 +296,6 @@ public class PercentageTileSkin extends TileSkin {
         maxValueRect.setFill(Double.compare(tile.getCurrentValue(), maxValue) >= 0 ? barColor : tile.getThresholdColor());
         valueText.setFill(tile.getValueColor());
         unitText.setFill(tile.getUnitColor());
+
     }
 }

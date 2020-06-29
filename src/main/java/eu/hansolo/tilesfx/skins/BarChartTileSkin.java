@@ -72,7 +72,7 @@ public class BarChartTileSkin extends TileSkin {
         };
         paneSizeListener = o -> resizeItems();
         handlerMap       = new HashMap<>();
-
+        
         tile.getBarChartItems().forEach(item -> {
             item.addChartDataEventListener(updateHandler);
             EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, item.getChartData()));
@@ -137,6 +137,10 @@ public class BarChartTileSkin extends TileSkin {
             Helper.enableNode(text, tile.isTextVisible());
         } else if (EventType.DATA.name().equals(EVENT_TYPE)) {
             sortItems();
+        } else if (EventType.ANIMATED_ON.name().equals(EVENT_TYPE)) {
+            tile.getBarChartItems().forEach(item -> item.getChartData().setAnimated(true));
+        } else if (EventType.ANIMATED_OFF.name().equals(EVENT_TYPE)) {
+            tile.getBarChartItems().forEach(item -> item.getChartData().setAnimated(false));
         }
     }
 

@@ -1196,6 +1196,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case BAR_CHART:
                     TILE.setItemSorting(ItemSorting.DESCENDING);
+                    TILE.setAnimated(false);
                     break;
                 case CLOCK:
                     break;
@@ -1440,10 +1441,18 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
 
         if (properties.keySet().contains("barChartItemsArray")) {
-            TILE.setBarChartItems(((ObjectProperty<BarChartItem[]>) properties.get("barChartItemsArray")).get());
+            BarChartItem[] items = ((ObjectProperty<BarChartItem[]>) properties.get("barChartItemsArray")).get();
+            for (BarChartItem item : items) {
+                item.getChartData().setAnimated(TILE.isAnimated());
+            }
+            TILE.setBarChartItems(items);
         }
         if(properties.keySet().contains("barChartItemsList")) {
-            TILE.setBarChartItems(((ObjectProperty<List<BarChartItem>>) properties.get("barChartItemsList")).get());
+            List<BarChartItem> items = ((ObjectProperty<List<BarChartItem>>) properties.get("barChartItemsList")).get();
+            for (BarChartItem item : items) {
+                item.getChartData().setAnimated(TILE.isAnimated());
+            }
+            TILE.setBarChartItems(items);
         }
 
         if (properties.keySet().contains("leaderBoardItemsArray")) {

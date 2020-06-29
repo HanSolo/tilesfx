@@ -64,6 +64,7 @@ public class SwitchTileSkin extends TileSkin {
         super.initGraphics();
 
         mouseEventHandler = e -> {
+            if (!tile.isInteractive()) { return; }
             final EventType TYPE = e.getEventType();
             if (MouseEvent.MOUSE_PRESSED == TYPE) {
                 tile.setActive(!tile.isActive());

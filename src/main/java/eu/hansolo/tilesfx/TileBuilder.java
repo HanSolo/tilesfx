@@ -1088,6 +1088,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B interactive(final boolean INTERACTIVE) {
+        properties.put("interactive", new SimpleBooleanProperty(INTERACTIVE));
+        return (B)this;
+    }
+
     public final B numberOfValuesForTrendCalculation(final int NUMBER) {
         properties.put("numberOfValuesForTrendCalculation", new SimpleIntegerProperty(NUMBER));
         return (B)this;
@@ -1874,6 +1879,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setTimeoutMs(((LongProperty) properties.get(key)).get());
             } else if ("rank".equals(key)) {
                 TILE.setRank(((ObjectProperty<Rank>) properties.get(key)).get());
+            } else if ("interactive".equals(key)) {
+                TILE.setInteractive(((BooleanProperty) properties.get(key)).get());
             } else if ("numberOfValuesForTrendCalculation".equals(key)) {
                 TILE.setNumberOfValuesForTrendCalculation(((IntegerProperty) properties.get(key)).get());
             } else if ("backgroundImage".equals(key)) {

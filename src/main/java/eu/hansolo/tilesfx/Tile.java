@@ -627,6 +627,8 @@ public class Tile extends Control {
     private LongProperty                   timeoutMs;
     private Rank                           _rank;
     private ObjectProperty<Rank>           rank;
+    private boolean                        _interactive;
+    private BooleanProperty                interactive;
     private int                            _numberOfValuesForTrendCalculation;
     private IntegerProperty                numberOfValuesForTrendCalculation;
     private EventHandler<MouseEvent>       infoRegionHandler;
@@ -794,6 +796,7 @@ public class Tile extends Control {
                 @NamedArg(value="trendVisible", defaultValue="true") boolean trendVisible,
                 @NamedArg(value="timeoutMs", defaultValue="1000") long timeoutMs,
                 @NamedArg(value="ranking", defaultValue="Rank.DEFAULT") Rank rank,
+                @NamedArg(value="interactive", defaultValue="true") boolean interactive,
                 @NamedArg(value="numberOfValuesForTrendCalculation", defaultValue="3") int numberOfValuesForTrendCalculation,
                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
                 @NamedArg(value="increment", defaultValue="1") int increment,
@@ -1035,6 +1038,7 @@ public class Tile extends Control {
         _trendVisible                       = false;
         _timeoutMs                          = 1000;
         _rank                               = Rank.DEFAULT;
+        _interactive                        = true;
         _numberOfValuesForTrendCalculation  = 3;
         updateInterval                      = LONG_INTERVAL;
         increment                           = 1;
@@ -5918,6 +5922,24 @@ public class Tile extends Control {
             _rank = null;
         }
         return rank;
+    }
+
+    public boolean isInteractive() { return null == interactive ? _interactive : interactive.get(); }
+    public void setInteractive(final boolean INTERACTIVE) {
+        if (null == interactive) {
+            _interactive = INTERACTIVE;
+        } else {
+            interactive.set(INTERACTIVE);
+        }
+    }
+    public BooleanProperty interactiveProperty() {
+        if (null == interactive) {
+            interactive = new BooleanPropertyBase() {
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "interactive"; }
+            };
+        }
+        return interactive;
     }
 
     public int getNumberOfValuesForTrendCalculation() { return null == numberOfValuesForTrendCalculation ? _numberOfValuesForTrendCalculation : numberOfValuesForTrendCalculation.get(); }

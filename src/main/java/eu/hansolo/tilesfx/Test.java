@@ -24,6 +24,7 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.addons.HappinessIndicator;
 import eu.hansolo.tilesfx.addons.HappinessIndicator.Happiness;
 import eu.hansolo.tilesfx.addons.YearChart;
+import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import javafx.animation.AnimationTimer;
@@ -70,7 +71,6 @@ public class Test extends Application {
     private static final double          HEIGHT    = 400;
     private static       int             noOfNodes = 0;
     private              Tile            tile1;
-    private              Tile            tile2;
     private              VBox            yearBox;
     private              DoubleProperty  value;
     private              long            lastTimerCall;
@@ -93,30 +93,22 @@ public class Test extends Application {
         HBox.setHgrow(unhappy, Priority.ALWAYS);
 
         tile1 = TileBuilder.create()
-                           .skinType(SkinType.GAUGE2)
+                           .skinType(SkinType.COLOR)
                            .prefSize(WIDTH, HEIGHT)
-                           .title("Gauge2 Tile")
+                           .title("Glucose Anton")
                            .text("Whatever")
-                           .unit("Unit")
+                           .unit("mg/dl")
                            .textVisible(true)
                            .value(0)
-                           .gradientStops(new Stop(0, Tile.BLUE),
-                                          new Stop(0.25, Tile.GREEN),
-                                          new Stop(0.5, Tile.YELLOW),
-                                          new Stop(0.75, Tile.ORANGE),
-                                          new Stop(1, Tile.RED))
-                           .strokeWithGradient(true)
-                           .animated(true)
-                           .build();
-
-        tile2 = TileBuilder.create()
-                           .skinType(SkinType.CUSTOM)
-                           .prefSize(WIDTH, HEIGHT)
-                           .title("Customer Satisfaction")
-                           .text("Product A")
-                           .textVisible(true)
-                           .graphic(happiness)
-                           .value(0)
+                           .minValue(0)
+                           .maxValue(401)
+                           .sections(new Section(0, 0.13715710723192, Color.RED),
+                                     new Section(0.13715710723192, 0.162094763092269, ColorSkin.ORANGE),
+                                     new Section(0.162094763092269, 0.174563591022444, ColorSkin.YELLOW),
+                                     new Section(0.174563591022444, 0.349127182044888, ColorSkin.GREEN),
+                                     new Section(0.349127182044888, 0.623441396508728, ColorSkin.YELLOW),
+                                     new Section(0.623441396508728, 0.872817955112219, ColorSkin.ORANGE),
+                                     new Section(0.872817955112219, 1.0, Color.RED))
                            .animated(true)
                            .build();
 
@@ -140,7 +132,7 @@ public class Test extends Application {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 5_000_000_000l) {
                     //double value = RND.nextDouble() * tile1.getRange() + tile1.getMinValue();
-                    //tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
+                    tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
                     //tile2.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
                     lastTimerCall = now;
                 }
@@ -149,8 +141,8 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(yearBox);
-        //HBox pane = new HBox(20, tile1, tile2);
+        //StackPane pane = new StackPane(yearBox);
+        HBox pane = new HBox(20, tile1);
         pane.setPadding(new Insets(10));
 
         Scene scene = new Scene(pane);
@@ -163,7 +155,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {

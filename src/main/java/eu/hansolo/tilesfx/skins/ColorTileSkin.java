@@ -24,6 +24,7 @@ import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.layout.HBox;
@@ -86,7 +87,7 @@ public class ColorTileSkin extends TileSkin {
         unitText.setFill(tile.getUnitColor());
         Helper.enableNode(unitText, !tile.getUnit().isEmpty());
 
-        unitFlow = new VBox(upperUnitText, unitText);
+        unitFlow = new VBox(upperUnitText, fractionLine, unitText);
         unitFlow.setAlignment(Pos.CENTER_RIGHT);
 
         valueUnitFlow = new HBox(valueText, unitFlow);
@@ -99,7 +100,7 @@ public class ColorTileSkin extends TileSkin {
         bar = new Rectangle();
         bar.setFill(tile.getForegroundColor());
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, barBackground, bar);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, /*fractionLine,*/ barBackground, bar);
     }
 
     @Override protected void registerListeners() {
@@ -147,7 +148,7 @@ public class ColorTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
+        double maxWidth = unitText.isVisible() ? width - size * 0.3 : width - size * 0.1;
         double fontSize = size * 0.48;
         valueText.setFont(Fonts.latoBold(fontSize));
         double correctedFontSize = fontSize;
@@ -195,10 +196,10 @@ public class ColorTileSkin extends TileSkin {
         valueUnitFlow.relocate(size * 0.05, (height - valueUnitFlow.getLayoutBounds().getHeight()) * 0.5);
         valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
 
-        fractionLine.setStartX(width - 0.17 * size);
-        fractionLine.setStartY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
-        fractionLine.setEndX(width - 0.05 * size);
-        fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
+        fractionLine.setStartX(unitFlow.getWidth() * 0.1);
+        fractionLine.setStartY(unitFlow.getLayoutBounds().getHeight() * 0.5);
+        fractionLine.setEndX(unitFlow.getWidth() * 0.8);
+        fractionLine.setEndY(unitFlow.getLayoutBounds().getHeight() * 0.5);
         fractionLine.setStroke(tile.getUnitColor());
         fractionLine.setStrokeWidth(size * 0.005);
 

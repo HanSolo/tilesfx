@@ -96,7 +96,6 @@ public class Test extends Application {
                            .skinType(SkinType.COLOR)
                            .prefSize(WIDTH, HEIGHT)
                            .title("Glucose Anton")
-                           .text("Whatever")
                            .unit("mg/dl")
                            .textVisible(true)
                            .value(0)

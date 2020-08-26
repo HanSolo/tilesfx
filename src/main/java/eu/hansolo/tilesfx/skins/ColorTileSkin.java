@@ -147,6 +147,11 @@ public class ColorTileSkin extends TileSkin {
 
 
     // ******************** Resizing ******************************************
+    @Override public void layoutChildren(final double X, final double Y, final double W, final double H) {
+        super.layoutChildren(X, Y, W, H);
+        resize();
+    }
+
     @Override protected void resizeDynamicText() {
         double maxWidth = unitText.isVisible() ? width - size * 0.3 : width - size * 0.1;
         double fontSize = size * 0.48;

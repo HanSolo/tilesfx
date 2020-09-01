@@ -17,16 +17,11 @@
  */
 package eu.hansolo.tilesfx;
 
-import eu.hansolo.tilesfx.Tile.ChartType;
-import eu.hansolo.tilesfx.Tile.ItemSorting;
-import eu.hansolo.tilesfx.Tile.ItemSortingTopic;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.addons.HappinessIndicator;
 import eu.hansolo.tilesfx.addons.HappinessIndicator.Happiness;
 import eu.hansolo.tilesfx.addons.YearChart;
 import eu.hansolo.tilesfx.colors.ColorSkin;
-import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -38,23 +33,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Random;
 
 

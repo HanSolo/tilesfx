@@ -21,10 +21,10 @@ pluginManagement {
         gradlePluginPortal()
     }
     plugins {
-        id 'com.gradle.enterprise'           version '3.3.1'
-        id 'org.kordamp.gradle.java-project' version '0.38.0'
-        id 'org.openjfx.javafxplugin'        version '0.0.8'
-        id 'biz.aQute.bnd.builder'           version '5.1.1'
+        id 'com.gradle.enterprise'           version '3.4.1'
+        id 'org.kordamp.gradle.java-project' version '0.39.0'
+        id 'org.openjfx.javafxplugin'        version '0.0.9'
+        id 'biz.aQute.bnd.builder'           version '5.1.2'
     }
 }
 

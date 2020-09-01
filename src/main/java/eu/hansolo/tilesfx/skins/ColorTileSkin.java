@@ -43,6 +43,7 @@ public class ColorTileSkin extends TileSkin {
     private Text           unitText;
     private VBox           unitFlow;
     private HBox           valueUnitFlow;
+    private Text           text;
     private Rectangle      barBackground;
     private Rectangle      bar;
     private GradientLookup gradientLookup;
@@ -94,13 +95,17 @@ public class ColorTileSkin extends TileSkin {
         valueUnitFlow.setAlignment(Pos.CENTER);
         valueUnitFlow.setMouseTransparent(true);
 
+        text = new Text(tile.getText());
+        text.setTextOrigin(VPos.TOP);
+        text.setFill(tile.getTextColor());
+
         barBackground = new Rectangle();
         barBackground.setFill(tile.getBarBackgroundColor());
 
         bar = new Rectangle();
         bar.setFill(tile.getForegroundColor());
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, /*fractionLine,*/ barBackground, bar);
+        getPane().getChildren().addAll(titleText, valueUnitFlow, text, barBackground, bar);
     }
 
     @Override protected void registerListeners() {
@@ -112,10 +117,10 @@ public class ColorTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (EventType.VALUE.name().equals(EVENT_TYPE)) {
-            handleCurrentValue(tile.getCurrentValue());
-        } else if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
+            Helper.enableNode(valueUnitFlow, !tile.getUnit().isEmpty());
+            Helper.enableNode(text, tile.isTextVisible());
         } else if (EventType.SECTION.name().equals(EVENT_TYPE)) {
             redraw();
         }
@@ -189,6 +194,19 @@ public class ColorTileSkin extends TileSkin {
             case CENTER: titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.05); break;
             case RIGHT : titleText.relocate(width - (size * 0.05) - titleText.getLayoutBounds().getWidth(), size * 0.05); break;
         }
+
+        fontSize = size * 0.06;
+
+        text.setText(tile.getText());
+        text.setFont(font);
+        if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
+        switch(tile.getTextAlignment()) {
+            default    :
+            case LEFT  : text.setX(size * 0.05); break;
+            case CENTER: text.setX((width - text.getLayoutBounds().getWidth()) * 0.5); break;
+            case RIGHT : text.setX(width - (size * 0.05) - text.getLayoutBounds().getWidth()); break;
+        }
+        text.setY(height - size * 0.1);
     }
 
     @Override protected void resize() {
@@ -220,6 +238,7 @@ public class ColorTileSkin extends TileSkin {
         bar.setHeight(size * 0.02);
         bar.setArcWidth(size * 0.02);
         bar.setArcHeight(size * 0.02);
+        bar.setWidth(size * 0.9 * tile.getCurrentValue() / tile.getRange());
     }
 
     @Override protected void redraw() {

@@ -1385,6 +1385,13 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setTextAlignment(TextAlignment.CENTER);
                     TILE.setImageMask(ImageMask.ROUND);
                     break;
+                case RADIAL_DISTRIBUTION:
+                    TILE.setStartAngle(330);
+                    TILE.setAngleRange(240);
+                    TILE.setAnimated(false);
+                    TILE.setTickLabelDecimals(0);
+                    TILE.setBarBackgroundColor(Tile.BACKGROUND.brighter());
+                    break;
                 default:
                     break;
             }

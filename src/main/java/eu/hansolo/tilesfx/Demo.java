@@ -30,6 +30,7 @@ import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
+import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.icons.Flag;
@@ -173,6 +174,7 @@ public class Demo extends Application {
     private Tile            fireSmokeTile;
     private Tile            gauge2Tile;
     private Tile            happinessTile;
+    private Tile            radialDistributionTile;
 
 
     private long            lastTimerCall;
@@ -1034,7 +1036,7 @@ public class Demo extends Application {
                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
                            .title("Color Tile")
                            .description("Whatever")
-                           .animated(true)
+                           .animated(false)
                            .build();
 
         turnoverTile = TileBuilder.create().skinType(SkinType.TURNOVER)
@@ -1097,6 +1099,7 @@ public class Demo extends Application {
                                 .animated(true)
                                 .build();
 
+
         HappinessIndicator happy   = new HappinessIndicator(Happiness.HAPPY, 0.67);
         HappinessIndicator neutral = new HappinessIndicator(Happiness.NEUTRAL, 0.25);
         HappinessIndicator unhappy = new HappinessIndicator(Happiness.UNHAPPY, 0.08);
@@ -1118,6 +1121,39 @@ public class Demo extends Application {
                                    .value(0)
                                    .animated(true)
                                    .build();
+
+        List<ChartData> glucoseData = new ArrayList<>();
+        for (int i = 0 ; i < 288; i++) {
+            glucoseData.add(new ChartData("", RND.nextDouble() * 300 + 50));
+        }
+
+        radialDistributionTile = TileBuilder.create()
+                                            .skinType(SkinType.RADIAL_DISTRIBUTION)
+                                            .title("Glucose in range")
+                                            .unit("not used")
+                                            //.text("text")
+                                            .description("LAST 24h")
+                                            .minValue(0)
+                                            .maxValue(400)
+                                            .lowerThreshold(70)
+                                            .threshold(140)
+                                            .tickLabelDecimals(0)
+                                            .decimals(0)
+                                            .chartData(glucoseData)
+                                            .barColor(Color.rgb(254, 1, 154))
+                                            .gradientStops(new Stop(0, Helper.getColorWithOpacity(Color.RED, 0.1)),
+                                                           new Stop(0.1375, Helper.getColorWithOpacity(Color.RED, 0.1)),
+                                                           new Stop(0.15625, Helper.getColorWithOpacity(Color.web("#FA711F"), 0.1)),
+                                                           new Stop(0.175, Helper.getColorWithOpacity(ColorSkin.GREEN, 0.1)),
+                                                           new Stop(0.2625, Helper.getColorWithOpacity(ColorSkin.GREEN, 0.1)),
+                                                           new Stop(0.35, Helper.getColorWithOpacity(ColorSkin.GREEN, 0.1)),
+                                                           new Stop(0.3501, Helper.getColorWithOpacity(ColorSkin.YELLOW, 0.1)),
+                                                           new Stop(0.45, Helper.getColorWithOpacity(Color.web("#FA711F"), 0.1)),
+                                                           new Stop(0.6625, Helper.getColorWithOpacity(Color.web("#FA711F"), 0.1)),
+                                                           new Stop(0.875, Helper.getColorWithOpacity(Color.RED, 0.1)),
+                                                           new Stop(1.0, Helper.getColorWithOpacity(Color.RED, 0.1)))
+                                            .strokeWithGradient(true)
+                                            .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -1219,7 +1255,7 @@ public class Demo extends Application {
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
                                              timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
                                              cycleStepTile, customFlagChartTile, colorTile, turnoverTile, fluidTile, fireSmokeTile,
-                                             gauge2Tile, happinessTile);
+                                             gauge2Tile, happinessTile, radialDistributionTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

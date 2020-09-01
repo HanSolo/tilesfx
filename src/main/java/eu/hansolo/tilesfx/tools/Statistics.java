@@ -19,8 +19,14 @@ package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.chart.ChartData;
 
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -75,5 +81,30 @@ public class Statistics {
     }
     public static final double getAverage(final List<Double> DATA) {
         return DATA.stream().mapToDouble(data -> data.doubleValue()).average().orElse(-1);
+    }
+
+    public static final Map<LocalTime, DataPoint> analyze(final List<ChartData> entries) {
+        if (entries.isEmpty()) { return new HashMap(); }
+        final Map<LocalTime, DataPoint> dataMap = new HashMap<>();
+        final Instant                 now     = Instant.now();
+
+        for (int hour = 0 ; hour < 24 ; hour++) {
+            for (int bucket = 0 ; bucket < 60 ; bucket += 10) {
+                final int h = hour;
+                final int m = bucket;
+                List<ChartData> bucketEntries = entries.stream().filter(entry -> entry.getTimestamp().atZone(ZoneOffset.systemDefault()).getHour() == h &&
+                    entry.getTimestamp().atZone(ZoneOffset.systemDefault()).getMinute() <= m).collect(Collectors.toList());
+                final double minBucketValue = bucketEntries.stream().min(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+                final double maxBucketValue = bucketEntries.stream().max(Comparator.comparingDouble(ChartData::getValue)).get().getValue();
+                final double avgBucketValue = minBucketValue + (maxBucketValue - minBucketValue) / 2.0;
+
+                final LocalTime key   = LocalTime.of(h, m, 0);
+                final DataPoint value = new DataPoint(minBucketValue, maxBucketValue, avgBucketValue);
+
+                dataMap.put(key, value);
+            }
+        }
+
+        return dataMap;
     }
 }

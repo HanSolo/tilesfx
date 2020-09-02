@@ -83,6 +83,12 @@ public class Statistics {
         return DATA.stream().mapToDouble(data -> data.doubleValue()).average().orElse(-1);
     }
 
+    public static final double percentile(List<Double> entries, double percentile) {
+        Collections.sort(entries);
+        int index = (int) Math.ceil(percentile / 100.0 * entries.size());
+        return entries.get(index-1);
+    }
+
     public static final Map<LocalTime, DataPoint> analyze(final List<ChartData> entries) {
         if (entries.isEmpty()) { return new HashMap(); }
         final Map<LocalTime, DataPoint> dataMap = new HashMap<>();

@@ -1129,10 +1129,9 @@ public class Demo extends Application {
 
         radialDistributionTile = TileBuilder.create()
                                             .skinType(SkinType.RADIAL_DISTRIBUTION)
-                                            .title("Glucose in range")
-                                            .unit("not used")
-                                            //.text("text")
-                                            .description("LAST 24h")
+                                            .title("RadialDistribution Tile")
+                                            .text("Whatever")
+                                            .description("Description")
                                             .minValue(0)
                                             .maxValue(400)
                                             .lowerThreshold(70)

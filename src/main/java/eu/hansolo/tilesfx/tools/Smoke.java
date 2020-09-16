@@ -35,9 +35,9 @@ public class Smoke extends Canvas {
     private static final double              HALF_HEIGHT     = IMAGE.getHeight() * 0.5;
     private static final long                GENERATION_RATE = 1_000_000_000l / 50;
     private static final int                 NO_OF_PARTICLES = 150;
-    private static       double              width;
-    private static       double              height;
-    private static       boolean             running;
+    private              double              width;
+    private              double              height;
+    private              boolean             running;
     private              GraphicsContext     ctx;
     private              List<ImageParticle> particles;
     private              long                lastTimerCall;

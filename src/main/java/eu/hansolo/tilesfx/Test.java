@@ -56,6 +56,7 @@ public class Test extends Application {
     private static final double          HEIGHT    = 400;
     private static       int             noOfNodes = 0;
     private              Tile            tile1;
+    private              Tile            tile2;
     private              VBox            yearBox;
     private              DoubleProperty  value;
     private              long            lastTimerCall;
@@ -66,34 +67,20 @@ public class Test extends Application {
     @Override public void init() {
         value = new SimpleDoubleProperty();
 
-        HappinessIndicator happy   = new HappinessIndicator(Happiness.HAPPY, 0.67);
-        HappinessIndicator neutral = new HappinessIndicator(Happiness.NEUTRAL, 0.25);
-        HappinessIndicator unhappy = new HappinessIndicator(Happiness.UNHAPPY, 0.08);
-
-        HBox happiness = new HBox(unhappy, neutral, happy);
-        happiness.setFillHeight(true);
-
-        HBox.setHgrow(happy, Priority.ALWAYS);
-        HBox.setHgrow(neutral, Priority.ALWAYS);
-        HBox.setHgrow(unhappy, Priority.ALWAYS);
-
         tile1 = TileBuilder.create()
-                           .skinType(SkinType.COLOR)
+                           .skinType(SkinType.FIRE_SMOKE)
                            .prefSize(WIDTH, HEIGHT)
-                           .title("Glucose Anton")
-                           .unit("mg/dl")
-                           .textVisible(true)
-                           .value(0)
-                           .minValue(0)
-                           .maxValue(401)
-                           .sections(new Section(0, 0.13715710723192, Color.RED),
-                                     new Section(0.13715710723192, 0.162094763092269, ColorSkin.ORANGE),
-                                     new Section(0.162094763092269, 0.174563591022444, ColorSkin.YELLOW),
-                                     new Section(0.174563591022444, 0.349127182044888, ColorSkin.GREEN),
-                                     new Section(0.349127182044888, 0.623441396508728, ColorSkin.YELLOW),
-                                     new Section(0.623441396508728, 0.872817955112219, ColorSkin.ORANGE),
-                                     new Section(0.872817955112219, 1.0, Color.RED))
-                           .animated(true)
+                           .title("Tile 1")
+                           .threshold(40)
+                           .animated(false)
+                           .build();
+
+        tile2 = TileBuilder.create()
+                           .skinType(SkinType.FIRE_SMOKE)
+                           .prefSize(WIDTH, HEIGHT)
+                           .title("Tile 2")
+                           .threshold(40)
+                           .animated(false)
                            .build();
 
         yearBox = new VBox();
@@ -115,9 +102,8 @@ public class Test extends Application {
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 5_000_000_000l) {
-                    //double value = RND.nextDouble() * tile1.getRange() + tile1.getMinValue();
                     tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
-                    //tile2.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
+                    tile2.setValue(RND.nextDouble() * tile2.getRange() + tile2.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -126,7 +112,7 @@ public class Test extends Application {
 
     @Override public void start(Stage stage) {
         //StackPane pane = new StackPane(yearBox);
-        HBox pane = new HBox(20, tile1);
+        HBox pane = new HBox(20, tile1, tile2);
         pane.setPadding(new Insets(10));
 
         Scene scene = new Scene(pane);

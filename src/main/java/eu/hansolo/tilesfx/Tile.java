@@ -1171,7 +1171,11 @@ public class Tile extends Control {
      *
      * @param VALUE
      */
-    public void setValue(final double VALUE) { value.set(VALUE); }
+    public void setValue(final double VALUE) {
+        if (!value.isBound()) {
+            value.set(VALUE);
+        }
+    }
     public DoubleProperty valueProperty() { return value; }
 
     /**
@@ -1238,7 +1242,9 @@ public class Tile extends Control {
             fireTileEvent(RECALC_EVENT);
             if (!valueProperty().isBound() && isShowing()) { Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue())); }
         } else {
-            minValue.set(VALUE);
+            if (!minValue.isBound()) {
+                minValue.set(VALUE);
+            }
         }
     }
     public DoubleProperty minValueProperty() {
@@ -1284,7 +1290,9 @@ public class Tile extends Control {
             fireTileEvent(RECALC_EVENT);
             if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
         } else {
-            maxValue.set(VALUE);
+            if (!maxValue.isBound()) {
+                maxValue.set(VALUE);
+            }
         }
     }
     public DoubleProperty maxValueProperty() {
@@ -1360,10 +1368,12 @@ public class Tile extends Control {
             _threshold = clamp(getMinValue(), getMaxValue(), THRESHOLD);
             fireTileEvent(RESIZE_EVENT);
         } else {
-            threshold.set(THRESHOLD);
+            if (!threshold.isBound()) {
+                threshold.set(THRESHOLD);
+            }
         }
     }
-    public DoubleProperty tresholdProperty() {
+    public DoubleProperty thresholdProperty() {
         if (null == threshold) {
             threshold = new DoublePropertyBase(_threshold) {
                 @Override protected void invalidated() {
@@ -1384,7 +1394,9 @@ public class Tile extends Control {
             _lowerThreshold = clamp(getMinValue(), getMaxValue(), THRESHOLD);
             fireTileEvent(RESIZE_EVENT);
         } else {
-            lowerThreshold.set(THRESHOLD);
+            if (!lowerThreshold.isBound()) {
+                lowerThreshold.set(THRESHOLD);
+            }
         }
     }
     public DoubleProperty lowerThresholdProperty() {
@@ -1417,7 +1429,9 @@ public class Tile extends Control {
             _referenceValue = VALUE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            referenceValue.set(VALUE);
+            if (!referenceValue.isBound()) {
+                referenceValue.set(VALUE);
+            }
         }
     }
     public DoubleProperty referenceValueProperty() {
@@ -1481,7 +1495,9 @@ public class Tile extends Control {
             fireTileEvent(VISIBILITY_EVENT);
             fireTileEvent(REDRAW_EVENT);
         } else {
-            title.set(TITLE);
+            if (!title.isBound()) {
+                title.set(TITLE);
+            }
         }
     }
     public StringProperty titleProperty() {
@@ -1518,7 +1534,9 @@ public class Tile extends Control {
             _titleAlignment = ALIGNMENT;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            titleAlignment.set(ALIGNMENT);
+            if (!titleAlignment.isBound()) {
+                titleAlignment.set(ALIGNMENT);
+            }
         }
     }
     public ObjectProperty<TextAlignment> titleAlignmentProperty() {
@@ -1552,7 +1570,9 @@ public class Tile extends Control {
             fireTileEvent(VISIBILITY_EVENT);
             fireTileEvent(REDRAW_EVENT);
         } else {
-            description.set(DESCRIPTION);
+            if (!description.isBound()) {
+                description.set(DESCRIPTION);
+            }
         }
     }
     public StringProperty descriptionProperty() {
@@ -1585,7 +1605,9 @@ public class Tile extends Control {
             _descriptionAlignment = ALIGNMENT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            descriptionAlignment.set(ALIGNMENT);
+            if (!descriptionAlignment.isBound()) {
+                descriptionAlignment.set(ALIGNMENT);
+            }
         }
     }
     public ObjectProperty<Pos> descriptionAlignmentProperty() {
@@ -1619,7 +1641,9 @@ public class Tile extends Control {
             fireTileEvent(VISIBILITY_EVENT);
             fireTileEvent(REDRAW_EVENT);
         } else {
-            unit.set(UNIT);
+            if (!unit.isBound()) {
+                unit.set(UNIT);
+            }
         }
     }
     public StringProperty unitProperty() {
@@ -1649,7 +1673,9 @@ public class Tile extends Control {
             if (!oldFlipText.equals(_flipText)) { fireTileEvent(FLIP_START_EVENT); }
             oldFlipText = _flipText;
         } else {
-            flipText.set(TEXT);
+            if (!flipText.isBound()) {
+                flipText.set(TEXT);
+            }
         }
     }
     public StringProperty flipTextProperty() {
@@ -1681,7 +1707,9 @@ public class Tile extends Control {
             _active = SELECTED;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            active.set(SELECTED);
+            if (!active.isBound()) {
+                active.set(SELECTED);
+            }
         }
     }
     public BooleanProperty activeProperty() {
@@ -1717,7 +1745,9 @@ public class Tile extends Control {
             _averagingEnabled = ENABLED;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            averagingEnabled.set(ENABLED);
+            if (!averagingEnabled.isBound()) {
+                averagingEnabled.set(ENABLED);
+            }
         }
     }
     public BooleanProperty averagingEnabledProperty() {
@@ -1751,7 +1781,9 @@ public class Tile extends Control {
             if (null == showing) return;
             fireTileEvent(AVERAGING_EVENT);
         } else {
-            averagingPeriod.set(Helper.clamp(0, MAX_PERIOD, PERIOD));
+            if (!averagingPeriod.isBound()) {
+                averagingPeriod.set(Helper.clamp(0, MAX_PERIOD, PERIOD));
+            }
         }
     }
     public IntegerProperty averagingPeriodProperty() {
@@ -1808,7 +1840,9 @@ public class Tile extends Control {
             }
             fireTileEvent(TIME_PERIOD_EVENT);
         } else {
-            timePeriod.set(PERIOD);
+            if (!timePeriod.isBound()) {
+                timePeriod.set(PERIOD);
+            }
         }
     }
     public ObjectProperty<java.time.Duration> timePeriodProperty() {
@@ -1846,7 +1880,9 @@ public class Tile extends Control {
                 fireTileEvent(TIME_PERIOD_EVENT);
             }
         } else {
-            maxTimePeriod.set(MAX_PERIOD);
+            if (!maxTimePeriod.isBound()) {
+                maxTimePeriod.set(MAX_PERIOD);
+            }
         }
     }
     public ObjectProperty<java.time.Duration> maxTimePeriodProperty() {
@@ -1873,7 +1909,9 @@ public class Tile extends Control {
             _timePeriodResolution = RESOLUTION;
             fireTileEvent(TIME_PERIOD_EVENT);
         } else {
-            timePeriodResolution.set(RESOLUTION);
+            if (!timePeriodResolution.isBound()) {
+                timePeriodResolution.set(RESOLUTION);
+            }
         }
     }
     public ObjectProperty<TimeUnit> timePeriodResolutionProperty() {
@@ -1904,7 +1942,9 @@ public class Tile extends Control {
             _fixedYScale = FIXED_Y_SCALE;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            fixedYScale.set(FIXED_Y_SCALE);
+            if (!fixedYScale.isBound()) {
+                fixedYScale.set(FIXED_Y_SCALE);
+            }
         }
     }
     public BooleanProperty fixedYScaleProperty() {
@@ -1932,7 +1972,9 @@ public class Tile extends Control {
             _duration = DURATION;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            duration.set(DURATION);
+            if (!duration.isBound()) {
+                duration.set(DURATION);
+            }
         }
     }
     public ObjectProperty<LocalTime> durationProperty() {
@@ -2121,7 +2163,11 @@ public class Tile extends Control {
     }
 
     public Image getImage() { return null == image ? null : image.get(); }
-    public void setImage(final Image IMAGE) { imageProperty().set(IMAGE); }
+    public void setImage(final Image IMAGE) {
+        if (!imageProperty().isBound()) {
+            imageProperty().set(IMAGE);
+        }
+    }
     public ObjectProperty<Image> imageProperty() {
         if (null == image) {
             image = new ObjectPropertyBase<Image>() {
@@ -2139,7 +2185,9 @@ public class Tile extends Control {
             _imageMask = MASK;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            imageMask.set(MASK);
+            if (!imageMask.isBound()) {
+                imageMask.set(MASK);
+            }
         }
     }
     public ObjectProperty<ImageMask> imageMaskProperty() {
@@ -2165,7 +2213,11 @@ public class Tile extends Control {
      * CustomTileSkin.
      * @param GRAPHIC
      */
-    public void setGraphic(final Node GRAPHIC) { graphicProperty().set(GRAPHIC); }
+    public void setGraphic(final Node GRAPHIC) {
+        if (!graphicProperty().isBound()) {
+            graphicProperty().set(GRAPHIC);
+        }
+    }
     public ObjectProperty<Node> graphicProperty() {
         if (null == graphic) {
             graphic = new ObjectPropertyBase<>() {
@@ -2181,7 +2233,11 @@ public class Tile extends Control {
     }
 
     public SVGPath getSVGPath() { return null == svgPath ? null : svgPath.get(); }
-    public void setSVGPath(final SVGPath SVG_PATH) { svgPathProperty().set(SVG_PATH); }
+    public void setSVGPath(final SVGPath SVG_PATH) {
+        if (!svgPathProperty().isBound()) {
+            svgPathProperty().set(SVG_PATH);
+        }
+    }
     public ObjectProperty<SVGPath> svgPathProperty() {
         if (null == svgPath) {
             svgPath = new ObjectPropertyBase<>() {
@@ -2201,7 +2257,9 @@ public class Tile extends Control {
             _currentLocation = LOCATION;
             fireTileEvent(LOCATION_EVENT);
         } else {
-            currentLocation.set(LOCATION);
+            if (!currentLocation.isBound()) {
+                currentLocation.set(LOCATION);
+            }
         }
     }
     public ObjectProperty<Location> currentLocationProperty() {
@@ -2262,7 +2320,9 @@ public class Tile extends Control {
             _trackColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            trackColor.set(COLOR);
+            if (!trackColor.isBound()) {
+                trackColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<TileColor> trackColorProperty() {
@@ -2283,7 +2343,9 @@ public class Tile extends Control {
             _mapProvider = PROVIDER;
             fireTileEvent(MAP_PROVIDER_EVENT);
         } else {
-            mapProvider.set(PROVIDER);
+            if (!mapProvider.isBound()) {
+                mapProvider.set(PROVIDER);
+            }
         }
     }
     public ObjectProperty<MapProvider> mapProviderProperty() {
@@ -2319,7 +2381,9 @@ public class Tile extends Control {
             _itemSorting = ITEM_SORTING;
             fireTileEvent(DATA_EVENT);
         } else {
-            itemSorting.set(ITEM_SORTING);
+            if (!itemSorting.isBound()) {
+                itemSorting.set(ITEM_SORTING);
+            }
         }
     }
     public ObjectProperty<ItemSorting> itemSortingProperty() {
@@ -2340,7 +2404,9 @@ public class Tile extends Control {
             _itemSortingTopic = ITEM_SORTING_TOPIC;
             fireTileEvent(DATA_EVENT);
         } else {
-            itemSortingTopic.set(ITEM_SORTING_TOPIC);
+            if (!itemSortingTopic.isBound()) {
+                itemSortingTopic.set(ITEM_SORTING_TOPIC);
+            }
         }
     }
     public ObjectProperty<ItemSortingTopic> itemSortingTopicProperty() {
@@ -2416,7 +2482,9 @@ public class Tile extends Control {
             _flatUI = FLATUI;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            flatUI.set(FLATUI);
+            if (!flatUI.isBound()) {
+                flatUI.set(FLATUI);
+            }
         }
     }
     public BooleanProperty flatUIProperty() {
@@ -2448,7 +2516,9 @@ public class Tile extends Control {
             _textSize = SIZE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            textSize.set(SIZE);
+            if (!textSize.isBound()) {
+                textSize.set(SIZE);
+            }
         }
     }
     public ObjectProperty<TextSize> textSizeProperty() {
@@ -2476,7 +2546,9 @@ public class Tile extends Control {
             _roundedCorners = ROUNDED;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            roundedCorners.set(ROUNDED);
+            if (!roundedCorners.isBound()) {
+                roundedCorners.set(ROUNDED);
+            }
         }
     }
     public BooleanProperty roundedCornersProperty() {
@@ -2511,7 +2583,9 @@ public class Tile extends Control {
             setValue(IS_TRUE && getMinValue() < 0 ? 0 : getMinValue());
             fireTileEvent(REDRAW_EVENT);
         } else {
-            startFromZero.set(IS_TRUE);
+            if (!startFromZero.isBound()) {
+                startFromZero.set(IS_TRUE);
+            }
         }
     }
     public BooleanProperty startFromZeroProperty() {
@@ -2549,7 +2623,9 @@ public class Tile extends Control {
             _returnToZero = Double.compare(getMinValue(), 0.0) <= 0 && IS_TRUE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            returnToZero.set(IS_TRUE);
+            if (!returnToZero.isBound()) {
+                returnToZero.set(IS_TRUE);
+            }
         }
     }
     public BooleanProperty returnToZeroProperty() {
@@ -2582,7 +2658,9 @@ public class Tile extends Control {
         if (null == minMeasuredValue) {
             _minMeasuredValue = MIN_MEASURED_VALUE;
         } else {
-            minMeasuredValue.set(MIN_MEASURED_VALUE);
+            if (!minMeasuredValue.isBound()) {
+                minMeasuredValue.set(MIN_MEASURED_VALUE);
+            }
         }
     }
     public ReadOnlyDoubleProperty minMeasuredValueProperty() {
@@ -2608,7 +2686,9 @@ public class Tile extends Control {
         if (null == maxMeasuredValue) {
             _maxMeasuredValue = MAX_MEASURED_VALUE;
         } else {
-            maxMeasuredValue.set(MAX_MEASURED_VALUE);
+            if (!maxMeasuredValue.isBound()) {
+                maxMeasuredValue.set(MAX_MEASURED_VALUE);
+            }
         }
     }
     public ReadOnlyDoubleProperty maxMeasuredValueProperty() {
@@ -2640,7 +2720,9 @@ public class Tile extends Control {
             _minMeasuredValueVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            minMeasuredValueVisible.set(VISIBLE);
+            if (!minMeasuredValueVisible.isBound()) {
+                minMeasuredValueVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty minMeasuredValueVisibleProperty() {
@@ -2670,7 +2752,9 @@ public class Tile extends Control {
             _maxMeasuredValueVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            maxMeasuredValueVisible.set(VISIBLE);
+            if (!maxMeasuredValueVisible.isBound()) {
+                maxMeasuredValueVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty maxMeasuredValueVisibleProperty() {
@@ -2700,7 +2784,9 @@ public class Tile extends Control {
             _oldValueVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            oldValueVisible.set(VISIBLE);
+            if (!oldValueVisible.isBound()) {
+                oldValueVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty oldValueVisibleProperty() {
@@ -2731,7 +2817,9 @@ public class Tile extends Control {
             _valueVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            valueVisible.set(VISIBLE);
+            if (!valueVisible.isBound()) {
+                valueVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty valueVisibleProperty() {
@@ -2762,12 +2850,14 @@ public class Tile extends Control {
             _foregroundColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            foregroundColor.set(COLOR);
+            if (!foregroundColor.isBound()) {
+                foregroundColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> foregroundColorProperty() {
         if (null == foregroundColor) {
-            foregroundColor = new ObjectPropertyBase<Color>(_foregroundColor) {
+            foregroundColor = new ObjectPropertyBase<>(_foregroundColor) {
                 @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "foregroundColor"; }
@@ -2794,7 +2884,9 @@ public class Tile extends Control {
             _backgroundColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            backgroundColor.set(COLOR);
+            if (!backgroundColor.isBound()) {
+                backgroundColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> backgroundColorProperty() {
@@ -2826,7 +2918,9 @@ public class Tile extends Control {
             _borderColor = PAINT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            borderColor.set(PAINT);
+            if (!borderColor.isBound()) {
+                borderColor.set(PAINT);
+            }
         }
     }
     public ObjectProperty<Color> borderColorProperty() {
@@ -2859,7 +2953,9 @@ public class Tile extends Control {
             _borderWidth = clamp(0.0, 50.0, WIDTH);
             fireTileEvent(REDRAW_EVENT);
         } else {
-            borderWidth.set(WIDTH);
+            if (!borderWidth.isBound()) {
+                borderWidth.set(WIDTH);
+            }
         }
     }
     public DoubleProperty borderWidthProperty() {
@@ -2895,7 +2991,9 @@ public class Tile extends Control {
             _knobColor = COLOR;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            knobColor.set(COLOR);
+            if (!knobColor.isBound()) {
+                knobColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> knobColorProperty() {
@@ -2916,7 +3014,9 @@ public class Tile extends Control {
             _activeColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            activeColor.set(COLOR);
+            if (!activeColor.isBound()) {
+                activeColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> activeColorProperty() {
@@ -2956,7 +3056,9 @@ public class Tile extends Control {
             updateChartData();
             fireTileEvent(ANIMATED ? ANIMATED_ON_EVENT : ANIMATED_OFF_EVENT);
         } else {
-            animated.set(ANIMATED);
+            if (!animated.isBound()) {
+                animated.set(ANIMATED);
+            }
         }
     }
     public BooleanProperty animatedProperty() {
@@ -3036,7 +3138,9 @@ public class Tile extends Control {
             _startAngle = clamp(0.0, 360.0, ANGLE);
             fireTileEvent(RECALC_EVENT);
         } else {
-            startAngle.set(ANGLE);
+            if (!startAngle.isBound()) {
+                startAngle.set(ANGLE);
+            }
         }
     }
     public DoubleProperty startAngleProperty() {
@@ -3079,7 +3183,9 @@ public class Tile extends Control {
             if (isAutoScale()) { calcAutoScale(); }
             fireTileEvent(RECALC_EVENT);
         } else {
-            angleRange.set(tmpAngleRange);
+            if (!angleRange.isBound()) {
+                angleRange.set(tmpAngleRange);
+            }
         }
     }
     public DoubleProperty angleRangeProperty() {
@@ -3117,7 +3223,9 @@ public class Tile extends Control {
         if (null == angleStep) {
             _angleStep = STEP;
         } else {
-            angleStep.set(STEP);
+            if (!angleStep.isBound()) {
+                angleStep.set(STEP);
+            }
         }
     }
     public ReadOnlyDoubleProperty angleStepProperty() {
@@ -3157,7 +3265,9 @@ public class Tile extends Control {
             }
             fireTileEvent(RECALC_EVENT);
         } else {
-            autoScale.set(AUTO_SCALE);
+            if (!autoScale.isBound()) {
+                autoScale.set(AUTO_SCALE);
+            }
         }
     }
     public BooleanProperty autoScaleProperty() {
@@ -3199,7 +3309,9 @@ public class Tile extends Control {
             _shadowsEnabled = ENABLED;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            shadowsEnabled.set(ENABLED);
+            if (!shadowsEnabled.isBound()) {
+                shadowsEnabled.set(ENABLED);
+            }
         }
     }
     public BooleanProperty shadowsEnabledProperty() {
@@ -3219,7 +3331,9 @@ public class Tile extends Control {
             _locale = null == LOCALE ? Locale.US : LOCALE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            locale.set(LOCALE);
+            if (!locale.isBound()) {
+                locale.set(LOCALE);
+            }
         }
     }
     public ObjectProperty<Locale> localeProperty() {
@@ -3255,7 +3369,9 @@ public class Tile extends Control {
             _numberFormat = null == FORMAT ? NumberFormat.getInstance(getLocale()) : FORMAT;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            numberFormat.set(FORMAT);
+            if (!numberFormat.isBound()) {
+                numberFormat.set(FORMAT);
+            }
         }
     }
     public ObjectProperty<NumberFormat> numberFormatProperty() {
@@ -3293,7 +3409,9 @@ public class Tile extends Control {
             _decimals = clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
             fireTileEvent(REDRAW_EVENT);
         } else {
-            decimals.set(DECIMALS);
+            if (!decimals.isBound()) {
+                decimals.set(DECIMALS);
+            }
         }
     }
     public IntegerProperty decimalsProperty() {
@@ -3331,7 +3449,9 @@ public class Tile extends Control {
             _tickLabelDecimals = clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
             fireTileEvent(REDRAW_EVENT);
         } else {
-            tickLabelDecimals.set(DECIMALS);
+            if (!tickLabelDecimals.isBound()) {
+                tickLabelDecimals.set(DECIMALS);
+            }
         }
     }
     public IntegerProperty tickLabelDecimalsProperty() {
@@ -3355,7 +3475,9 @@ public class Tile extends Control {
             _tickLabelsXVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            tickLabelsXVisible.set(VISIBLE);
+            if (!tickLabelsXVisible.isBound()) {
+                tickLabelsXVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty tickLabelsXVisibleProperty() {
@@ -3375,7 +3497,9 @@ public class Tile extends Control {
             _tickLabelsYVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            tickLabelsYVisible.set(VISIBLE);
+            if (!tickLabelsYVisible.isBound()) {
+                tickLabelsYVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty tickLabelsYVisibleProperty() {
@@ -3395,7 +3519,9 @@ public class Tile extends Control {
             _minValueVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            minValueVisible.set(VISIBLE);
+            if (!minValueVisible.isBound()) {
+                minValueVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty minValueVisibleProperty() {
@@ -3415,7 +3541,9 @@ public class Tile extends Control {
             _maxValueVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            maxValueVisible.set(VISIBLE);
+            if (!maxValueVisible.isBound()) {
+                maxValueVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty maxValueVisibleProperty() {
@@ -3447,7 +3575,9 @@ public class Tile extends Control {
             _needleColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            needleColor.set(COLOR);
+            if (!needleColor.isBound()) {
+                needleColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> needleColorProperty() {
@@ -3480,7 +3610,9 @@ public class Tile extends Control {
             _barColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            barColor.set(COLOR);
+            if (!barColor.isBound()) {
+                barColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> barColorProperty() {
@@ -3513,7 +3645,9 @@ public class Tile extends Control {
             _barBackgroundColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            barBackgroundColor.set(COLOR);
+            if (!barBackgroundColor.isBound()) {
+                barBackgroundColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> barBackgroundColorProperty() {
@@ -3546,7 +3680,9 @@ public class Tile extends Control {
             _titleColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            titleColor.set(COLOR);
+            if (!titleColor.isBound()) {
+                titleColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> titleColorProperty() {
@@ -3579,7 +3715,9 @@ public class Tile extends Control {
             _descriptionColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            descriptionColor.set(COLOR);
+            if (!descriptionColor.isBound()) {
+                descriptionColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> descriptionColorProperty() {
@@ -3612,7 +3750,9 @@ public class Tile extends Control {
             _unitColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            unitColor.set(COLOR);
+            if (!unitColor.isBound()) {
+                unitColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> unitColorProperty() {
@@ -3645,7 +3785,9 @@ public class Tile extends Control {
             _valueColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            valueColor.set(COLOR);
+            if (!valueColor.isBound()) {
+                valueColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> valueColorProperty() {
@@ -3678,7 +3820,9 @@ public class Tile extends Control {
             _thresholdColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            thresholdColor.set(COLOR);
+            if (!thresholdColor.isBound()) {
+                thresholdColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> thresholdColorProperty() {
@@ -3699,7 +3843,9 @@ public class Tile extends Control {
             _lowerThresholdColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            lowerThresholdColor.set(COLOR);
+            if (!lowerThresholdColor.isBound()) {
+                lowerThresholdColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> lowerThresholdColorProperty() {
@@ -3732,7 +3878,13 @@ public class Tile extends Control {
      * @param CHECK
      */
     public void setCheckSectionsForValue(final boolean CHECK) {
-        if (null == checkSectionsForValue) { _checkSectionsForValue = CHECK; } else { checkSectionsForValue.set(CHECK); }
+        if (null == checkSectionsForValue) {
+            _checkSectionsForValue = CHECK;
+        } else {
+            if (!checkSectionsForValue.isBound()) {
+                checkSectionsForValue.set(CHECK);
+            }
+        }
     }
     public BooleanProperty checkSectionsForValueProperty() {
         if (null == checkSectionsForValue) { checkSectionsForValue = new SimpleBooleanProperty(Tile.this, "checkSectionsForValue", _checkSectionsForValue); }
@@ -3756,7 +3908,9 @@ public class Tile extends Control {
         if (null == checkThreshold) {
             _checkThreshold = CHECK;
         } else {
-            checkThreshold.set(CHECK);
+            if (!checkThreshold.isBound()) {
+                checkThreshold.set(CHECK);
+            }
         }
     }
     public BooleanProperty checkThresholdProperty() {
@@ -3781,7 +3935,9 @@ public class Tile extends Control {
         if (null == checkLowerThreshold) {
             _checkLowerThreshold = CHECK;
         } else {
-            checkLowerThreshold.set(CHECK);
+            if (!checkLowerThreshold.isBound()) {
+                checkLowerThreshold.set(CHECK);
+            }
         }
     }
     public BooleanProperty checkLowerThresholdProperty() {
@@ -3807,7 +3963,9 @@ public class Tile extends Control {
             _innerShadowEnabled = ENABLED;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            innerShadowEnabled.set(ENABLED);
+            if (!innerShadowEnabled.isBound()) {
+                innerShadowEnabled.set(ENABLED);
+            }
         }
     }
     public BooleanProperty innerShadowEnabledProperty() {
@@ -3837,7 +3995,9 @@ public class Tile extends Control {
             _thresholdVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            thresholdVisible.set(VISIBLE);
+            if (!thresholdVisible.isBound()) {
+                thresholdVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty thresholdVisibleProperty() {
@@ -3867,7 +4027,9 @@ public class Tile extends Control {
             _lowerThresholdVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            lowerThresholdVisible.set(VISIBLE);
+            if (!lowerThresholdVisible.isBound()) {
+                lowerThresholdVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty lowerThresholdVisibleProperty() {
@@ -3897,7 +4059,9 @@ public class Tile extends Control {
             _averageVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            averageVisible.set(VISIBLE);
+            if (!averageVisible.isBound()) {
+                averageVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty averageVisibleProperty() {
@@ -3927,7 +4091,9 @@ public class Tile extends Control {
             _sectionsVisible = VISIBLE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            sectionsVisible.set(VISIBLE);
+            if (!sectionsVisible.isBound()) {
+                sectionsVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty sectionsVisibleProperty() {
@@ -3957,7 +4123,9 @@ public class Tile extends Control {
             _sectionsAlwaysVisible = VISIBLE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            sectionsAlwaysVisible.set(VISIBLE);
+            if (!sectionsAlwaysVisible.isBound()) {
+                sectionsAlwaysVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty sectionsAlwaysVisibleProperty() {
@@ -3989,7 +4157,9 @@ public class Tile extends Control {
             _sectionTextVisible = VISIBLE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            sectionTextVisible.set(VISIBLE);
+            if (!sectionTextVisible.isBound()) {
+                sectionTextVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty sectionTextVisibleProperty() {
@@ -4021,7 +4191,9 @@ public class Tile extends Control {
             _sectionIconsVisible = VISIBLE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            sectionIconsVisible.set(VISIBLE);
+            if (!sectionIconsVisible.isBound()) {
+                sectionIconsVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty sectionIconsVisibleProperty() {
@@ -4054,7 +4226,9 @@ public class Tile extends Control {
             //fireTileEvent(REDRAW_EVENT);
             fireTileEvent(HIGHLIGHT_SECTIONS);
         } else {
-            highlightSections.set(HIGHLIGHT);
+            if (!highlightSections.isBound()) {
+                highlightSections.set(HIGHLIGHT);
+            }
         }
     }
     public BooleanProperty highlightSectionsProperty() {
@@ -4088,7 +4262,9 @@ public class Tile extends Control {
             _orientation = ORIENTATION;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            orientation.set(ORIENTATION);
+            if (!orientation.isBound()) {
+                orientation.set(ORIENTATION);
+            }
         }
     }
     public ObjectProperty<Orientation> orientationProperty() {
@@ -4122,7 +4298,9 @@ public class Tile extends Control {
         if (null == keepAspect) {
             _keepAspect = KEEP;
         } else {
-            keepAspect.set(KEEP);
+            if (!keepAspect.isBound()) {
+                keepAspect.set(KEEP);
+            }
         }
     }
     public BooleanProperty keepAspectProperty() {
@@ -4148,7 +4326,9 @@ public class Tile extends Control {
             _alert = ALERT;
             fireTileEvent(ALERT_EVENT);
         } else {
-            alert.set(ALERT);
+            if (!alert.isBound()) {
+                alert.set(ALERT);
+            }
         }
     }
     public BooleanProperty alertProperty() {
@@ -4178,7 +4358,9 @@ public class Tile extends Control {
             _alertMessage = MESSAGE;
             fireTileEvent(ALERT_EVENT);
         } else {
-            alertMessage.set(MESSAGE);
+            if (!alertMessage.isBound()) {
+                alertMessage.set(MESSAGE);
+            }
         }
     }
     public StringProperty alertMessageProperty() {
@@ -4211,7 +4393,9 @@ public class Tile extends Control {
             _smoothing = SMOOTHING;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            smoothing.set(SMOOTHING);
+            if (!smoothing.isBound()) {
+                smoothing.set(SMOOTHING);
+            }
         }
     }
     public BooleanProperty smoothingProperty() {
@@ -4278,7 +4462,9 @@ public class Tile extends Control {
         time.set(TIME);
     }
     public void setTime(final long EPOCH_SECONDS) {
-        time.set(ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), getZoneId()));
+        if (!time.isBound()) {
+            time.set(ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), getZoneId()));
+        }
     }
     public ObjectProperty<ZonedDateTime> timeProperty() { return time; }
 
@@ -4311,7 +4497,9 @@ public class Tile extends Control {
             _text = TEXT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            text.set(TEXT);
+            if (!text.isBound()) {
+                text.set(TEXT);
+            }
         }
     }
     public StringProperty textProperty() {
@@ -4344,7 +4532,9 @@ public class Tile extends Control {
             _textAlignment = ALIGNMENT;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            textAlignment.set(ALIGNMENT);
+            if (!textAlignment.isBound()) {
+                textAlignment.set(ALIGNMENT);
+            }
         }
     }
     public ObjectProperty<TextAlignment> textAlignmentProperty() {
@@ -4442,7 +4632,9 @@ public class Tile extends Control {
             if (isAnimated()) return;
             scheduleTickTask();
         } else {
-            discreteSeconds.set(DISCRETE);
+            if (!discreteSeconds.isBound()) {
+                discreteSeconds.set(DISCRETE);
+            }
         }
     }
     public BooleanProperty discreteSecondsProperty() {
@@ -4480,7 +4672,9 @@ public class Tile extends Control {
             if (isAnimated()) return;
             scheduleTickTask();
         } else {
-            discreteMinutes.set(DISCRETE);
+            if (!discreteMinutes.isBound()) {
+                discreteMinutes.set(DISCRETE);
+            }
         }
     }
     public BooleanProperty discreteMinutesProperty() {
@@ -4517,7 +4711,9 @@ public class Tile extends Control {
         if (null == discreteHours) {
             _discreteHours = DISCRETE;
         } else {
-            discreteHours.set(DISCRETE);
+            if (!discreteHours.isBound()) {
+                discreteHours.set(DISCRETE);
+            }
         }
     }
     public BooleanProperty discreteHoursProperty() {
@@ -4539,7 +4735,9 @@ public class Tile extends Control {
             _secondsVisible = VISIBLE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            secondsVisible.set(VISIBLE);
+            if (!secondsVisible.isBound()) {
+                secondsVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty secondsVisibleProperty() {
@@ -4567,7 +4765,9 @@ public class Tile extends Control {
             _textVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            textVisible.set(VISIBLE);
+            if (!textVisible.isBound()) {
+                textVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty textVisibleProperty() {
@@ -4595,7 +4795,9 @@ public class Tile extends Control {
             _dateVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            dateVisible.set(VISIBLE);
+            if (!dateVisible.isBound()){
+                dateVisible.set(VISIBLE);
+            }
         }
 
     }
@@ -4626,7 +4828,9 @@ public class Tile extends Control {
             _running = RUNNING;
             if (RUNNING && !isAnimated()) { scheduleTickTask(); } else { stopTask(periodicTickTask); }
         } else {
-            running.set(RUNNING);
+            if (!running.isBound()) {
+                running.set(RUNNING);
+            }
         }
     }
     public BooleanProperty runningProperty() {
@@ -4655,7 +4859,9 @@ public class Tile extends Control {
             _textColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            textColor.set(COLOR);
+            if (!textColor.isBound()) {
+                textColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> textColorProperty() {
@@ -4684,7 +4890,9 @@ public class Tile extends Control {
             _dateColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            dateColor.set(COLOR);
+            if (!dateColor.isBound()) {
+                dateColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> dateColorProperty() {
@@ -4713,7 +4921,9 @@ public class Tile extends Control {
             _hourTickMarkColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            hourTickMarkColor.set(COLOR);
+            if (!hourTickMarkColor.isBound()) {
+                hourTickMarkColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> hourTickMarkColorProperty() {
@@ -4742,7 +4952,9 @@ public class Tile extends Control {
             _minuteTickMarkColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            minuteTickMarkColor.set(COLOR);
+            if (!minuteTickMarkColor.isBound()) {
+                minuteTickMarkColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> minuteTickMarkColorProperty() {
@@ -4771,7 +4983,9 @@ public class Tile extends Control {
             _alarmColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            alarmColor.set(COLOR);
+            if (!alarmColor.isBound()) {
+                alarmColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> alarmColorProperty() {
@@ -4796,7 +5010,9 @@ public class Tile extends Control {
             _tickLabelColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            tickLabelColor.set(COLOR);
+            if (!tickLabelColor.isBound()) {
+                tickLabelColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> tickLabelColorProperty() {
@@ -4821,7 +5037,9 @@ public class Tile extends Control {
             _tickMarkColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            tickMarkColor.set(COLOR);
+            if (!tickMarkColor.isBound()) {
+                tickMarkColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> tickMarkColorProperty() {
@@ -4850,7 +5068,9 @@ public class Tile extends Control {
             _hourTickMarksVisible = VISIBLE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            hourTickMarksVisible.set(VISIBLE);
+            if (!hourTickMarksVisible.isBound()) {
+                hourTickMarksVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty hourTickMarksVisibleProperty() {
@@ -4878,7 +5098,9 @@ public class Tile extends Control {
             _minuteTickMarksVisible = VISIBLE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            minuteTickMarksVisible.set(VISIBLE);
+            if (!minuteTickMarksVisible.isBound()) {
+                minuteTickMarksVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty minuteTickMarksVisibleProperty() {
@@ -4906,7 +5128,9 @@ public class Tile extends Control {
             _hourColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            hourColor.set(COLOR);
+            if (!hourColor.isBound()) {
+                hourColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> hourColorProperty() {
@@ -4935,7 +5159,9 @@ public class Tile extends Control {
             _minuteColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            minuteColor.set(COLOR);
+            if (!minuteColor.isBound()) {
+                minuteColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> minuteColorProperty() {
@@ -4964,7 +5190,9 @@ public class Tile extends Control {
             _secondColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            secondColor.set(COLOR);
+            if (!secondColor.isBound()) {
+                secondColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> secondColorProperty() {
@@ -4995,7 +5223,9 @@ public class Tile extends Control {
             _alarmsEnabled = CHECK;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            alarmsEnabled.set(CHECK);
+            if (!alarmsEnabled.isBound()) {
+                alarmsEnabled.set(CHECK);
+            }
         }
     }
     public BooleanProperty alarmsEnabledProperty() {
@@ -5023,7 +5253,9 @@ public class Tile extends Control {
             _alarmsVisible = VISIBLE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            alarmsVisible.set(VISIBLE);
+            if (!alarmsVisible.isBound()) {
+                alarmsVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty alarmsVisibleProperty() {
@@ -5088,7 +5320,9 @@ public class Tile extends Control {
                 setTooltip(tooltip);
             }
         } else {
-            tooltipText.set(TEXT);
+            if (!tooltipText.isBound()) {
+                tooltipText.set(TEXT);
+            }
         }
 
     }
@@ -5117,7 +5351,9 @@ public class Tile extends Control {
             _xAxis = AXIS;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            xAxis.set(AXIS);
+            if (!xAxis.isBound()) {
+                xAxis.set(AXIS);
+            }
         }
     }
     public ObjectProperty<Axis> xAxisProperty() {
@@ -5140,7 +5376,9 @@ public class Tile extends Control {
             _yAxis = AXIS;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            yAxis.set(AXIS);
+            if (!yAxis.isBound()) {
+                yAxis.set(AXIS);
+            }
         }
     }
     public ObjectProperty<Axis> yAxisProperty() {
@@ -5172,7 +5410,9 @@ public class Tile extends Control {
             _radarChartMode = MODE;
             fireTileEvent(RECALC_EVENT);
         } else {
-            radarChartMode.set(MODE);
+            if (!radarChartMode.isBound()) {
+                radarChartMode.set(MODE);
+            }
         }
     }
     public ObjectProperty<RadarChartMode> radarChartModeProperty() {
@@ -5203,7 +5443,9 @@ public class Tile extends Control {
             _chartGridColor = COLOR;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            chartGridColor.set(COLOR);
+            if (!chartGridColor.isBound()) {
+                chartGridColor.set(COLOR);
+            }
         }
     }
     public ObjectProperty<Color> chartGridColorProperty() {
@@ -5237,7 +5479,9 @@ public class Tile extends Control {
             _country = COUNTRY;
             fireTileEvent(RECALC_EVENT);
         } else {
-            country.set(COUNTRY);
+            if (!country.isBound()) {
+                country.set(COUNTRY);
+            }
         }
     }
     public ObjectProperty<Country> countryProperty() {
@@ -5261,7 +5505,9 @@ public class Tile extends Control {
             _countryGroup = GROUP;
             fireTileEvent(RECALC_EVENT);
         } else {
-            countryGroup.set(GROUP);
+            if (!countryGroup.isBound()) {
+                countryGroup.set(GROUP);
+            }
         }
     }
     public ObjectProperty<CountryGroup> countryGroupProperty() {
@@ -5282,7 +5528,9 @@ public class Tile extends Control {
             _dataPointsVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            dataPointsVisible.set(VISIBLE);
+            if (!dataPointsVisible.isBound()) {
+                dataPointsVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty dataPointsVisibleProperty() {
@@ -5302,7 +5550,9 @@ public class Tile extends Control {
             _snapToTicks = SNAP;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            snapToTicks.set(SNAP);
+            if (!snapToTicks.isBound()) {
+                snapToTicks.set(SNAP);
+            }
         }
     }
     public BooleanProperty snapToTicksProperty() {
@@ -5369,7 +5619,9 @@ public class Tile extends Control {
             _tooltipTimeout = Helper.clamp(0, 10000, TIMEOUT);
             fireTileEvent(REDRAW_EVENT);
         } else {
-            tooltipTimeout.set(TIMEOUT);
+            if (!tooltipTimeout.isBound()) {
+                tooltipTimeout.set(TIMEOUT);
+            }
         }
     }
     public DoubleProperty tooltipTimeoutProperty() {
@@ -5407,7 +5659,9 @@ public class Tile extends Control {
             _customFontEnabled = ENABLED;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            customFontEnabled.set(ENABLED);
+            if (!customFontEnabled.isBound()) {
+                customFontEnabled.set(ENABLED);
+            }
         }
     }
     public BooleanProperty customFontEnabledProperty() {
@@ -5439,7 +5693,9 @@ public class Tile extends Control {
             _customFont = FONT;
             fireTileEvent(RESIZE_EVENT);
         } else {
-            customFont.set(FONT);
+            if (!customFont.isBound()) {
+                customFont.set(FONT);
+            }
         }
     }
     public ObjectProperty<Font> customFontProperty() {
@@ -5460,7 +5716,9 @@ public class Tile extends Control {
             _customDecimalFormatEnabled = ENABLED;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            customDecimalFormatEnabled.set(ENABLED);
+            if (!customDecimalFormatEnabled.isBound()) {
+                customDecimalFormatEnabled.set(ENABLED);
+            }
         }
     }
     public BooleanProperty customDecimalFormatEnabledProperty() {
@@ -5480,7 +5738,9 @@ public class Tile extends Control {
             _customDecimalFormat = DECIMAL_FORMAT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            customDecimalFormat.set(DECIMAL_FORMAT);
+            if (!customDecimalFormat.isBound()) {
+                customDecimalFormat.set(DECIMAL_FORMAT);
+            }
         }
     }
     public ObjectProperty<DecimalFormat> customDecimalFormatProperty() {
@@ -5519,7 +5779,9 @@ public class Tile extends Control {
             _strokeWithGradient = STROKE_WITH_GRADIENT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            strokeWithGradient.set(STROKE_WITH_GRADIENT);
+            if (!strokeWithGradient.isBound()) {
+                strokeWithGradient.set(STROKE_WITH_GRADIENT);
+            }
         }
     }
     public BooleanProperty strokeWithGradientProperty() {
@@ -5549,7 +5811,9 @@ public class Tile extends Control {
             _fillWithGradient = FILL_WITH_GRADIENT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            fillWithGradient.set(FILL_WITH_GRADIENT);
+            if (!fillWithGradient.isBound()) {
+                fillWithGradient.set(FILL_WITH_GRADIENT);
+            }
         }
     }
     public BooleanProperty fillWithGradientProperty() {
@@ -5672,7 +5936,9 @@ public class Tile extends Control {
             _leftText = TEXT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            leftText.set(TEXT);
+            if (!leftText.isBound()) {
+                leftText.set(TEXT);
+            }
         }
     }
     public StringProperty leftTextProperty() {
@@ -5693,7 +5959,9 @@ public class Tile extends Control {
             _middleText = TEXT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            middleText.set(TEXT);
+            if (!middleText.isBound()) {
+                middleText.set(TEXT);
+            }
         }
     }
     public StringProperty middleTextProperty() {
@@ -5714,7 +5982,9 @@ public class Tile extends Control {
             _rightText = TEXT;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            rightText.set(TEXT);
+            if (!rightText.isBound()) {
+                rightText.set(TEXT);
+            }
         }
     }
     public StringProperty rightTextProperty() {
@@ -5735,7 +6005,9 @@ public class Tile extends Control {
             _leftValue = VALUE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            leftValue.set(VALUE);
+            if (!leftValue.isBound()) {
+                leftValue.set(VALUE);
+            }
         }
     }
     public DoubleProperty leftValueProperty() {
@@ -5755,7 +6027,9 @@ public class Tile extends Control {
             _middleValue = VALUE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            middleValue.set(VALUE);
+            if (!middleValue.isBound()) {
+                middleValue.set(VALUE);
+            }
         }
     }
     public DoubleProperty middleValueProperty() {
@@ -5775,7 +6049,9 @@ public class Tile extends Control {
             _rightValue = VALUE;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            rightValue.set(VALUE);
+            if (!rightValue.isBound()) {
+                rightValue.set(VALUE);
+            }
         }
     }
     public DoubleProperty rightValueProperty() {
@@ -5795,7 +6071,9 @@ public class Tile extends Control {
             _leftGraphics = NODE;
             fireTileEvent(RECALC_EVENT);
         } else {
-            leftGraphics.set(NODE);
+            if (!leftGraphics.isBound()) {
+                leftGraphics.set(NODE);
+            }
         }
     }
     public ObjectProperty<Node> leftGraphicsProperty() {
@@ -5816,7 +6094,9 @@ public class Tile extends Control {
             _middleGraphics = NODE;
             fireTileEvent(RECALC_EVENT);
         } else {
-            middleGraphics.set(NODE);
+            if (!middleGraphics.isBound()) {
+                middleGraphics.set(NODE);
+            }
         }
     }
     public ObjectProperty<Node> middleGraphicsProperty() {
@@ -5837,7 +6117,9 @@ public class Tile extends Control {
             _rightGraphics = NODE;
             fireTileEvent(RECALC_EVENT);
         } else {
-            rightGraphics.set(NODE);
+            if (!rightGraphics.isBound()) {
+                rightGraphics.set(NODE);
+            }
         }
     }
     public ObjectProperty<Node> rightGraphicsProperty() {
@@ -5866,7 +6148,9 @@ public class Tile extends Control {
             _trendVisible = VISIBLE;
             fireTileEvent(VISIBILITY_EVENT);
         } else {
-            trendVisible.set(VISIBLE);
+            if (!trendVisible.isBound()) {
+                trendVisible.set(VISIBLE);
+            }
         }
     }
     public BooleanProperty trendVisibleProperty() {
@@ -5890,7 +6174,9 @@ public class Tile extends Control {
             _timeoutMs = TIMEOUT_MS;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            timeoutMs.set(TIMEOUT_MS);
+            if (!timeoutMs.isBound()) {
+                timeoutMs.set(TIMEOUT_MS);
+            }
         }
     }
     public LongProperty timeoutMsProperty() {
@@ -5909,7 +6195,9 @@ public class Tile extends Control {
             _rank = RANK;
             fireTileEvent(REDRAW_EVENT);
         } else {
-            rank.set(RANK);
+            if (!rank.isBound()) {
+                rank.set(RANK);
+            }
         }
     }
     public ObjectProperty<Rank> rankProperty() {
@@ -5929,7 +6217,9 @@ public class Tile extends Control {
         if (null == interactive) {
             _interactive = INTERACTIVE;
         } else {
-            interactive.set(INTERACTIVE);
+            if (!interactive.isBound()) {
+                interactive.set(INTERACTIVE);
+            }
         }
     }
     public BooleanProperty interactiveProperty() {
@@ -5947,7 +6237,9 @@ public class Tile extends Control {
         if (null == numberOfValuesForTrendCalculation) {
             _numberOfValuesForTrendCalculation = NUMBER;
         } else {
-            numberOfValuesForTrendCalculation.set(NUMBER);
+            if (!numberOfValuesForTrendCalculation.isBound()) {
+                numberOfValuesForTrendCalculation.set(NUMBER);
+            }
         }
     }
     public IntegerProperty numberOfValuesForTrendCalculationProperty() {

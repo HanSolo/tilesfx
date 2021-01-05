@@ -13,6 +13,9 @@ e.g. [Medusa](https://github.com/HanSolo/Medusa)
 You can also check my [blog](https://harmoniccode.blogspot.com/search/label/tilesfx)
 where you will find additional information about certain tiles. 
 
+## Demo
+To run the demo you simply can start it using the command "./gradlew Demo" on the command line in the project folder.
+
 ## Overview
 ![Overview](https://raw.githubusercontent.com/HanSolo/tilesfx/master/TilesFX.png)
 

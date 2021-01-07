@@ -1378,7 +1378,9 @@ public class Tile extends Control {
             threshold = new DoublePropertyBase(_threshold) {
                 @Override protected void invalidated() {
                     final double THRESHOLD = get();
-                    if (THRESHOLD < getMinValue() || THRESHOLD > getMaxValue()) set(clamp(getMinValue(), getMaxValue(), THRESHOLD));
+                    if (!isBound() && (THRESHOLD < getMinValue() || THRESHOLD > getMaxValue())) {
+                        set(clamp(getMinValue(), getMaxValue(), THRESHOLD));
+                    }
                     fireTileEvent(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }

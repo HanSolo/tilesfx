@@ -20,6 +20,8 @@ package eu.hansolo.tilesfx;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventType;
 import javafx.scene.Node;
@@ -46,6 +48,8 @@ public class TilesFXTest extends Application {
     private AnimationTimer timer;
 
     @Override public void init() {
+        DoubleProperty testTresholdProperty = new SimpleDoubleProperty(0);
+
         tile = TileBuilder.create()
                           .skinType(SkinType.GAUGE)
                           .prefSize(400, 400)
@@ -65,6 +69,7 @@ public class TilesFXTest extends Application {
 
         tile.showNotifyRegion(true);
         tile.showInfoRegion(true);
+        tile.thresholdProperty().bind(testTresholdProperty);
 
         /*
         tile = TileBuilder.create()
@@ -82,6 +87,7 @@ public class TilesFXTest extends Application {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 1_000_000_000l) {
                     tile.setValue(RND.nextDouble() * 25 + 5);
+                    testTresholdProperty.set(RND.nextDouble() * 100);
                     lastTimerCall = now;
                 }
             }

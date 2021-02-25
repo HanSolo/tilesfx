@@ -307,18 +307,18 @@ import static eu.hansolo.tilesfx.tools.Country.ZW;
  * Created by hansolo on 11.12.15.
  */
 public class Helper {
-    private static final double                         EPSILON                  = 1E-6;
-    private static final String                         HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
-    private static final String                         LORES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/lowres.properties";
-    private static       Properties                     hiresCountryProperties;
-    private static       Properties                     loresCountryProperties;
+    private static final double     EPSILON                  = 1E-6;
+    private static final String     HIRES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/highres.properties";
+    private static final String     LORES_COUNTRY_PROPERTIES = "eu/hansolo/tilesfx/lowres.properties";
+    private static       Properties hiresCountryProperties;
+    private static       Properties loresCountryProperties;
 
-    public static final double   MAP_WIDTH         = 1009.1149817705154 - 1.154000163078308;
-    public static final double   MAP_HEIGHT        = 665.2420043945312;
-    public static final double   MAP_OFFSET_X      = -MAP_WIDTH * 0.0285;
-    public static final double   MAP_OFFSET_Y      = MAP_HEIGHT * 0.195;
+    public  static final double     MAP_WIDTH    = 1009.1149817705154 - 1.154000163078308;
+    public  static final double     MAP_HEIGHT   = 665.2420043945312;
+    public  static final double     MAP_OFFSET_X = -MAP_WIDTH * 0.0285;
+    public  static final double     MAP_OFFSET_Y = MAP_HEIGHT * 0.195;
 
-    public static final double   MIN_FONT_SIZE     = 5;
+    public static final double   MIN_FONT_SIZE   = 5;
 
     public static final CountryGroup AMERICAS = new CountryGroup("AMERICAS", AI, AG, AR, AW, BS, BB, BZ, BM, BO, BR, CA, KY, CL, CO, CR, CU, DM, DO, EC, SV, GF, GD, GP, GT, GY, HT, HN, JM, MQ, MX, MS, NI, PA, PY, PE, PR, BL, KN, LC, MF, PM, VC, SR, TT, TC, US, UY, VE, VG, VI);
     public static final CountryGroup APAC     = new CountryGroup("APAC", AS, AU, BD, BN, BT, CC, CK, CN, CX, FJ, FM, GU, HK, ID, IN, IO, JP, KH, KI, KP, KR, LA, LK, MH, MM, MN, MO, MP, MV, MY, NC, NF, NP, NR, NU, NZ, PF, PG, PH, PK, PN, PW, SB, SG, TH, TK, TL, TO, TV, TW, VN, VU, WF, WS);

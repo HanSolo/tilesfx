@@ -22,6 +22,8 @@ import eu.hansolo.tilesfx.addons.HappinessIndicator;
 import eu.hansolo.tilesfx.addons.HappinessIndicator.Happiness;
 import eu.hansolo.tilesfx.addons.YearChart;
 import eu.hansolo.tilesfx.colors.ColorSkin;
+import eu.hansolo.tilesfx.skins.BarChartItem;
+import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -36,10 +38,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
@@ -55,9 +60,7 @@ public class Test extends Application {
     private static final double          WIDTH     = 400;
     private static final double          HEIGHT    = 400;
     private static       int             noOfNodes = 0;
-    private              Tile            tile1;
-    private              Tile            tile2;
-    private              VBox            yearBox;
+    private              Tile            tile;
     private              DoubleProperty  value;
     private              long            lastTimerCall;
     private AnimationTimer               timer;
@@ -67,43 +70,21 @@ public class Test extends Application {
     @Override public void init() {
         value = new SimpleDoubleProperty();
 
-        tile1 = TileBuilder.create()
-                           .skinType(SkinType.FIRE_SMOKE)
-                           .prefSize(WIDTH, HEIGHT)
-                           .title("Tile 1")
-                           .threshold(40)
-                           .animated(false)
-                           .build();
+        tile = TileBuilder.create()
+                          .skinType(SkinType.BAR_CHART)
+                          .prefSize(WIDTH, HEIGHT)
+                          .title("Tile 1")
+                          .animated(false)
+                          .build();
 
-        tile2 = TileBuilder.create()
-                           .skinType(SkinType.FIRE_SMOKE)
-                           .prefSize(WIDTH, HEIGHT)
-                           .title("Tile 2")
-                           .threshold(40)
-                           .animated(false)
-                           .build();
 
-        yearBox = new VBox();
-        for (int year = 2010 ; year < 2021 ; year++) {
-            YearChart yearChart = new YearChart(Integer.toString(year), Color.WHITE, true, true);
-            for (int i = 1 ; i < 13 ; i++) {
-                yearChart.set(i, RND.nextDouble() * 2.18 - 0.8);
-            }
-            Label yearLabel = new Label(yearChart.getText());
-            yearLabel.setAlignment(Pos.CENTER_LEFT);
-            yearLabel.setPrefWidth(40);
-            HBox hBox = new HBox(5, yearLabel, yearChart);
-            hBox.setAlignment(Pos.CENTER_LEFT);
-            yearBox.getChildren().add(hBox);
-        }
 
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 5_000_000_000l) {
-                    tile1.setValue(RND.nextDouble() * tile1.getRange() + tile1.getMinValue());
-                    tile2.setValue(RND.nextDouble() * tile2.getRange() + tile2.getMinValue());
+                    tile.setValue(RND.nextDouble() * tile.getRange() + tile.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -111,8 +92,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        //StackPane pane = new StackPane(yearBox);
-        HBox pane = new HBox(20, tile1, tile2);
+        StackPane pane = new StackPane(tile);
         pane.setPadding(new Insets(10));
 
         Scene scene = new Scene(pane);
@@ -121,11 +101,19 @@ public class Test extends Application {
         stage.setScene(scene);
         stage.show();
 
+        List<BarChartItem> items = new ArrayList<>();
+        items.add(new BarChartItem("JDK17", 14, Tile.BLUE));
+        items.add(new BarChartItem("JDK11", 23, Tile.BLUE));
+        items.add(new BarChartItem("JDK8", 10, Tile.BLUE));
+        Platform.runLater(() -> {
+            tile.setBarChartItems(items);
+        });
+
         // Calculate number of nodes
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        timer.start();
+        //timer.start();
     }
 
     @Override public void stop() {

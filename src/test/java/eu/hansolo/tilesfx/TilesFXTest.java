@@ -18,6 +18,7 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
+import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
@@ -28,6 +29,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
@@ -67,9 +69,9 @@ public class TilesFXTest extends Application {
                           .infoRegionTooltipText("Info Region")
                           .build();
 
-        tile.showNotifyRegion(true);
-        tile.showInfoRegion(true);
-        tile.thresholdProperty().bind(testTresholdProperty);
+        this.tile.showNotifyRegion(true);
+        this.tile.showInfoRegion(true);
+        this.tile.thresholdProperty().bind(testTresholdProperty);
 
         /*
         tile = TileBuilder.create()
@@ -86,7 +88,7 @@ public class TilesFXTest extends Application {
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 1_000_000_000l) {
-                    tile.setValue(RND.nextDouble() * 25 + 5);
+                    TilesFXTest.this.tile.setValue(RND.nextDouble() * 25 + 5);
                     testTresholdProperty.set(RND.nextDouble() * 100);
                     lastTimerCall = now;
                 }

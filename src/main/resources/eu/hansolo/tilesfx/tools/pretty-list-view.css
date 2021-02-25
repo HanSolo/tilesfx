@@ -1,0 +1,64 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2016-2021 Gerrit Grunwald.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-padding         : 0;
+}
+
+.pretty-list-view {
+    -fx-background-color: transparent;
+    -fx-padding         : 0;
+}
+
+.pretty-list-view > .virtual-flow > .scroll-bar,
+.pretty-list-view > .virtual-flow > .scroll-bar .decrement-arrow,
+.pretty-list-view > .virtual-flow > .scroll-bar .increment-arrow,
+.pretty-list-view > .virtual-flow > .scroll-bar .decrement-button,
+.pretty-list-view > .virtual-flow > .scroll-bar .increment-button {
+    -fx-pref-width : 0;
+    -fx-pref-height: 0;
+}
+
+.pretty-list-view .pretty-scroll-bar:vertical .thumb {
+    -fx-background-insets: 0 2 0 0;
+}
+
+.pretty-list-view .pretty-scroll-bar:horizontal .thumb {
+    -fx-background-insets: 0 0 2 0;
+}
+
+.pretty-list-view .pretty-scroll-bar .decrement-arrow,
+.pretty-list-view .pretty-scroll-bar .increment-arrow {
+    -fx-pref-width : 0;
+    -fx-pref-height: 0;
+}
+
+.pretty-list-view .pretty-scroll-bar {
+    -fx-background-color: transparent;
+    -fx-pref-width : 12;
+    -fx-pref-height: 12;
+    -fx-padding    : 2;
+}
+
+.pretty-list-view .pretty-scroll-bar .thumb {
+    -fx-background-color : rgba(0, 0, 0, .2);
+    -fx-background-radius: 1000;
+    -fx-pref-width       : 12;
+    -fx-pref-height      : 12;
+}

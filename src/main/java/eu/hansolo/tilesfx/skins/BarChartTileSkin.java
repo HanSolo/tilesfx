@@ -24,6 +24,7 @@ import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.tilesfx.tools.PrettyListView;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.WeakListChangeListener;
@@ -34,6 +35,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +49,7 @@ import java.util.stream.Collectors;
 public class BarChartTileSkin extends TileSkin {
     private Text                                        titleText;
     private Text                                        text;
-    private Pane                                        barChartPane;
+    private PrettyListView<BarChartItem>                barChartPane;
     private ChartDataEventListener                      updateHandler;
     private InvalidationListener                        paneSizeListener;
     private Map<BarChartItem, EventHandler<MouseEvent>> handlerMap;
@@ -83,8 +85,8 @@ public class BarChartTileSkin extends TileSkin {
                 item.setFormatString(formatString);
             }
         });
-        barChartPane = new Pane();
-        barChartPane.getChildren().addAll(tile.getBarChartItems());
+        barChartPane = new PrettyListView<>();
+        barChartPane.getItems().addAll(tile.getBarChartItems());
 
         sortItems();
 
@@ -105,7 +107,7 @@ public class BarChartTileSkin extends TileSkin {
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(addedItem -> {
-                        barChartPane.getChildren().add(addedItem);
+                        barChartPane.getItems().add(addedItem);
                         addedItem.addChartDataEventListener(updateHandler);
                         EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
                         handlerMap.put(addedItem, clickHandler);
@@ -116,7 +118,7 @@ public class BarChartTileSkin extends TileSkin {
                     change.getRemoved().forEach(removedItem -> {
                         removedItem.removeChartDataEventListener(updateHandler);
                         removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
-                        barChartPane.getChildren().remove(removedItem);
+                        barChartPane.getItems().remove(removedItem);
                     });
                     updateChart();
                 }
@@ -169,28 +171,7 @@ public class BarChartTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     private void updateChart() {
-        Platform.runLater(() -> {
-            List<BarChartItem> items     = tile.getBarChartItems();
-            int                noOfItems = items.size();
-            if (noOfItems == 0) { return; }
-            double maxValue   = tile.getMaxValue();
-            double maxY       = barChartPane.getLayoutBounds().getMaxY();
-            double itemHeight = items.get(0).getPrefHeight();
-            double factorY    = Helper.clamp(itemHeight, itemHeight * 1.1, 0.13 * size);
-            for (int i = 0 ; i < noOfItems ; i++) {
-                BarChartItem item = items.get(i);
-                double y = i * factorY;
-                if ((y + itemHeight) < maxY) {
-                    item.setMaxValue(maxValue);
-                    Helper.enableNode(item, true);
-                    item.relocate(0, y);
-                } else {
-                    Helper.enableNode(item, false);
-                }
-            }
-            long noOfVisibleItems = items.stream().filter(item -> item.isVisible()).count();
-            tile.showLowerRightRegion(noOfVisibleItems != noOfItems);
-        });
+        Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue).reversed());
     }
 
     @Override protected void resizeStaticText() {
@@ -224,8 +205,7 @@ public class BarChartTileSkin extends TileSkin {
 
     private void resizeItems() {
         double itemHeight = Helper.clamp(30, 72, height * 0.14);
-        barChartPane.getChildren().forEach(node -> {
-            BarChartItem item = (BarChartItem) node;
+        barChartPane.getItems().forEach(item -> {
             item.setParentSize(width, height);
             item.setPrefSize(width, itemHeight);
             item.setMaxSize(width, itemHeight);

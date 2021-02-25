@@ -1,4 +1,4 @@
-/*
+/**
  * SPDX-License-Identifier: Apache-2.0
  *
  * Copyright 2016-2021 Gerrit Grunwald.
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 .list-cell {
     -fx-background-color: transparent;
     -fx-padding         : 0;

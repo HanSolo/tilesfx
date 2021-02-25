@@ -21,8 +21,8 @@ jobs:
         run: ./gradlew build
       - uses: actions/upload-artifact@v2
         with:
-          name: tilesfx
-          path: ./build/libs/tilesfx-11.48.jar
+          name: tilesfx.jar
+          path: ./build/libs/tilesfx-11.[0-9][0-9].jar
   
   test:
     runs-on: ${{ matrix.os }}

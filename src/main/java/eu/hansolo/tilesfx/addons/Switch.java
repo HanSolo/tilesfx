@@ -82,7 +82,6 @@ public class Switch extends Region {
 
     // ******************** Constructors **************************************
     public Switch() {
-        getStylesheets().add(Switch.class.getResource("switch.css").toExternalForm());
         aspectRatio      = PREFERRED_HEIGHT / PREFERRED_WIDTH;
         _active          = false;
         _activeColor     = Tile.BLUE;
@@ -117,8 +116,6 @@ public class Switch extends Region {
                 setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
-
-        getStyleClass().add("switch");
 
         shadow = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 3, 0, 0, 0);
 

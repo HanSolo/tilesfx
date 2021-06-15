@@ -75,7 +75,6 @@ public class Indicator extends Region {
         this(Tile.FOREGROUND, DOT_ON_COLOR, DOT_OFF_COLOR);
     }
     public Indicator(final Color RING_COLOR, final Color DOT_ON_COLOR, final Color DOT_OFF_COLOR) {
-        getStylesheets().add(Indicator.class.getResource("indicator.css").toExternalForm());
         _ringColor   = RING_COLOR;
         _dotOnColor  = DOT_ON_COLOR;
         _dotOffColor = DOT_OFF_COLOR;
@@ -95,8 +94,6 @@ public class Indicator extends Region {
                 setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
-
-        getStyleClass().add("indicator");
 
         ring = new Circle(PREFERRED_WIDTH * 0.5);
         ring.setStrokeType(StrokeType.INSIDE);

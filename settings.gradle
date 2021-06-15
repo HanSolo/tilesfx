@@ -15,17 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-pluginManagement {
-    repositories {
-        jcenter()
-        gradlePluginPortal()
-    }
-    plugins {
-        id 'com.gradle.enterprise'           version '3.5'
-        id 'org.kordamp.gradle.java-project' version '0.42.1'
-        id 'org.openjfx.javafxplugin'        version '0.0.9'
-        id 'biz.aQute.bnd.builder'           version '5.2.0'
-    }
+
+plugins {
+    id 'com.gradle.enterprise' version '3.6'
 }
 
 rootProject.name = 'tilesfx'

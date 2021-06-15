@@ -18,46 +18,21 @@
 // TilesFX main build file
 import java.text.SimpleDateFormat
 
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:5.3.0'
-        classpath 'com.google.gradle:osdetector-gradle-plugin:1.7.0'
-        classpath 'org.javamodularity:moduleplugin:1.8.7'
-        classpath 'org.beryx:badass-jlink-plugin:2.23.2'
-    }
-}
-
 plugins {
     id 'idea'
     id 'java-library'
-    id 'com.google.osdetector' version '1.7.0'
-    id 'org.javamodularity.moduleplugin' version '1.8.7'
-    id 'org.beryx.jlink' version '2.23.2'
     id 'maven-publish'
     id 'signing'
-    id 'net.nemerosa.versioning' version '2.14.0'
+    id 'com.google.osdetector'           version '1.7.0'
+    id 'org.javamodularity.moduleplugin' version '1.8.7'
+    id 'org.beryx.jlink'                 version '2.23.2'
+    id 'net.nemerosa.versioning'         version '2.14.0'
+    id 'biz.aQute.bnd.builder'           version '5.3.0'
 }
 
 apply plugin: 'biz.aQute.bnd.builder'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
-
-
-wrapper {
-    gradleVersion = '7.1'
-}
-
-normalization {
-    runtimeClasspath {
-        ignore('/META-INF/MANIFEST.MF')
-    }
-}
 
 description = 'TilesFX is a JavaFX library containing tiles for dashboards'
 mainClassName = "$moduleName/eu.hansolo.tilesfx.Demo"
@@ -105,23 +80,15 @@ jar {
 
 // start the demo from gradle
 task Demo(type: JavaExec) {
-    main = "eu.hansolo.tilesfx.DemoLauncher"
+    mainClass = "eu.hansolo.tilesfx.DemoLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
 // Only used for internal test
 task Test(type: JavaExec) {
-    main = "eu.hansolo.tilesfx.TestLauncher"
+    mainClass = "eu.hansolo.tilesfx.TestLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
-
-// Fix problems with loading resources
-sourceSets {
-    main {
-        output.setResourcesDir(java.outputDir)
-    }
-}
-
 
 
 // create one jar for the javadoc
@@ -152,11 +119,19 @@ publishing {
         mavenCustom(MavenPublication) {
             group = 'eu.hansolo'
             artifactId = 'tilesfx'
-            version = '16.0.0'
+            version = "${version}"
 
             from components.java
             artifact sourcesJar
             artifact javadocJar
+
+            pom.withXml {
+                asNode().dependencies.'*'.findAll {
+                    it.groupId.text() == 'org.openjfx'
+                }.each {
+                    it.remove(it.classifier)
+                }
+            }
 
             pom {
                 name = 'TilesFX'

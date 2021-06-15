@@ -18,12 +18,7 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
-import eu.hansolo.tilesfx.addons.HappinessIndicator;
-import eu.hansolo.tilesfx.addons.HappinessIndicator.Happiness;
-import eu.hansolo.tilesfx.addons.YearChart;
-import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.skins.BarChartItem;
-import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -31,16 +26,10 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;

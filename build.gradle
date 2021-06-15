@@ -34,7 +34,7 @@ apply plugin: 'biz.aQute.bnd.builder'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-description = 'TilesFX is a JavaFX library containing tiles for dashboards'
+description   = 'TilesFX is a JavaFX library containing tiles for dashboards'
 mainClassName = "$moduleName/eu.hansolo.tilesfx.Demo"
 
 Date buildTimeAndDate = new Date()
@@ -55,6 +55,7 @@ dependencies {
     implementation "org.openjfx:javafx-controls:16:$platform"
     implementation "org.openjfx:javafx-swing:16:$platform"
     implementation "org.openjfx:javafx-web:16:$platform"
+    implementation "org.openjfx:javafx-media:16:$platform"
 }
 
 jar {
@@ -170,3 +171,4 @@ publishing {
         }
     }
 }
+

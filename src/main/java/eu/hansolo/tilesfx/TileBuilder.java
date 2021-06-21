@@ -1392,6 +1392,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setTickLabelDecimals(0);
                     TILE.setBarBackgroundColor(Tile.BACKGROUND.brighter());
                     break;
+                case SPINNER:
+                    break;
                 default:
                     break;
             }

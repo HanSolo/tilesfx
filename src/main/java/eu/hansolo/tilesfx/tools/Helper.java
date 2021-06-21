@@ -58,6 +58,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static eu.hansolo.tilesfx.tools.Country.AD;
 import static eu.hansolo.tilesfx.tools.Country.AE;
@@ -1300,6 +1301,14 @@ public class Helper {
     private static final <T extends Point> int pointLocation(final T P1, final T P2, final T P3) {
         double cp1 = (P2.getX() - P1.getX()) * (P3.getY() - P1.getY()) - (P2.getY() - P1.getY()) * (P3.getX() - P1.getX());
         return cp1 > 0 ? 1 : Double.compare(cp1, 0) == 0 ? 0 : -1;
+    }
+
+    public static final List<Character> splitStringInCharacters(final String text) {
+        return text.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
+    }
+
+    public static final List<Character> splitNumberInDigits(final double number) {
+        return splitStringInCharacters(Double.toString(number));
     }
 
     public static final String padLeft(final String text, final String filler, final int n) {

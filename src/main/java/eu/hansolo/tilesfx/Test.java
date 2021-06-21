@@ -18,7 +18,10 @@
 package eu.hansolo.tilesfx;
 
 import eu.hansolo.tilesfx.Tile.SkinType;
-import eu.hansolo.tilesfx.skins.BarChartItem;
+import eu.hansolo.tilesfx.addons.ImageSpinner;
+import eu.hansolo.tilesfx.addons.SpinnerBuilder;
+import eu.hansolo.tilesfx.addons.SpinnerType;
+import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -29,11 +32,15 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 
@@ -60,20 +67,35 @@ public class Test extends Application {
         value = new SimpleDoubleProperty();
 
         tile = TileBuilder.create()
-                          .skinType(SkinType.BAR_CHART)
+                          .skinType(SkinType.SPINNER)
                           .prefSize(WIDTH, HEIGHT)
-                          .title("Tile 1")
+                          .title("SpinnerTile")
+                          .minValue(-50)
+                          .maxValue(10)
+                          .value(0)
+                          .decimals(2)
+                          //.unit("€")
+                          .text("Animated number spinner")
                           .animated(false)
                           .build();
 
-
-
+        /*
+        tile.currentValueProperty().addListener((o, ov, nv) -> {
+            if (nv.doubleValue() < 0) {
+                tile.setValueColor(Tile.RED);
+            } else {
+                tile.setValueColor(Tile.FOREGROUND);
+            }
+        });
+        */
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 5_000_000_000l) {
-                    tile.setValue(RND.nextDouble() * tile.getRange() + tile.getMinValue());
+                    double v = RND.nextDouble() * tile.getRange() + tile.getMinValue();
+                    tile.setValue(v);
+                    System.out.println(v);
                     lastTimerCall = now;
                 }
             }
@@ -90,19 +112,12 @@ public class Test extends Application {
         stage.setScene(scene);
         stage.show();
 
-        List<BarChartItem> items = new ArrayList<>();
-        items.add(new BarChartItem("JDK17", 14, Tile.BLUE));
-        items.add(new BarChartItem("JDK11", 23, Tile.BLUE));
-        items.add(new BarChartItem("JDK8", 10, Tile.BLUE));
-        Platform.runLater(() -> {
-            tile.setBarChartItems(items);
-        });
 
         // Calculate number of nodes
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {

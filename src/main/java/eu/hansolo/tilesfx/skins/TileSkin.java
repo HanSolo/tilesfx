@@ -364,7 +364,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         lowerRightRegion.setForegroundColor(tile.getLowerRightRegionForegroundColor());
         lowerRightRegion.setTooltipText(tile.getLowerRightRegionTooltipText());
 
-        locale                = tile.getLocale();
+        locale = tile.getLocale();
         if (tile.getCustomDecimalFormatEnabled()) {
             decimalFormat = tile.getCustomDecimalFormat();
         } else {

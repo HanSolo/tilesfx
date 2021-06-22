@@ -18,7 +18,10 @@
 package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.ValueObject;
+import eu.hansolo.tilesfx.icons.Flag;
 import javafx.scene.paint.Color;
+
+import java.util.Arrays;
 
 
 /**
@@ -312,4 +315,8 @@ public enum Country {
     public void setColor(final Color COLOR) { color = COLOR; }
 
     public String getDisplayName() { return displayName; }
+
+    public static final Country iso2(final String iso2) {
+        return Arrays.asList(values()).stream().filter(country -> country.name().equalsIgnoreCase(iso2)).findFirst().orElse(null);
+    }
 }

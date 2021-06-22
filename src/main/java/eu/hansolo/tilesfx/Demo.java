@@ -175,6 +175,7 @@ public class Demo extends Application {
     private Tile            gauge2Tile;
     private Tile            happinessTile;
     private Tile            radialDistributionTile;
+    private Tile            spinnerTile;
 
 
     private long            lastTimerCall;
@@ -1129,6 +1130,7 @@ public class Demo extends Application {
 
         radialDistributionTile = TileBuilder.create()
                                             .skinType(SkinType.RADIAL_DISTRIBUTION)
+                                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                             .title("RadialDistribution Tile")
                                             .text("Whatever")
                                             .description("Description")
@@ -1153,6 +1155,19 @@ public class Demo extends Application {
                                                            new Stop(1.0, Helper.getColorWithOpacity(Color.RED, 0.1)))
                                             .strokeWithGradient(true)
                                             .build();
+
+        spinnerTile = TileBuilder.create()
+                                 .skinType(SkinType.SPINNER)
+                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                 .title("Spinner Tile")
+                                 .minValue(-50)
+                                 .maxValue(50)
+                                 .value(0)
+                                 .decimals(2)
+                                 .text("Animated number spinner")
+                                 .animated(false)
+                                 .build();
+        spinnerTile.currentValueProperty().addListener((o, ov, nv) -> spinnerTile.setValueColor(nv.doubleValue() < 0 ? Tile.RED : Tile.FOREGROUND));
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -1231,6 +1246,8 @@ public class Demo extends Application {
 
                     fireSmokeTile.setValue(RND.nextDouble() * 100);
 
+                    spinnerTile.setValue(RND.nextDouble() * spinnerTile.getRange() + spinnerTile.getMinValue());
+
                     lastTimerCall = now;
                 }
             }
@@ -1254,7 +1271,7 @@ public class Demo extends Application {
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
                                              timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
                                              cycleStepTile, customFlagChartTile, colorTile, turnoverTile, fluidTile, fireSmokeTile,
-                                             gauge2Tile, happinessTile, radialDistributionTile);
+                                             gauge2Tile, happinessTile, radialDistributionTile, spinnerTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

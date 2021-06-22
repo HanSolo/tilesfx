@@ -71,7 +71,7 @@ public class Test extends Application {
                           .prefSize(WIDTH, HEIGHT)
                           .title("SpinnerTile")
                           .minValue(-50)
-                          .maxValue(10)
+                          .maxValue(50)
                           .value(0)
                           .decimals(2)
                           //.unit("€")
@@ -79,7 +79,7 @@ public class Test extends Application {
                           .animated(false)
                           .build();
 
-        /*
+
         tile.currentValueProperty().addListener((o, ov, nv) -> {
             if (nv.doubleValue() < 0) {
                 tile.setValueColor(Tile.RED);
@@ -87,7 +87,7 @@ public class Test extends Application {
                 tile.setValueColor(Tile.FOREGROUND);
             }
         });
-        */
+
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -95,7 +95,6 @@ public class Test extends Application {
                 if (now > lastTimerCall + 5_000_000_000l) {
                     double v = RND.nextDouble() * tile.getRange() + tile.getMinValue();
                     tile.setValue(v);
-                    System.out.println(v);
                     lastTimerCall = now;
                 }
             }

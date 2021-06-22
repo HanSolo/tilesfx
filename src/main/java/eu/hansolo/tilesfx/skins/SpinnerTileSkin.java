@@ -315,15 +315,13 @@ public class SpinnerTileSkin extends TileSkin {
         resizeDynamicText();
         resizeStaticText();
 
-        double fontSize = size * 0.1;
-
         final double spinnerHeight = spinners.get(0).getSpinnerHeight() - 2;
         clip.setX(0);
         clip.setY((144 - spinnerHeight) * 0.5);
         clip.setWidth(width);
         clip.setHeight(spinnerHeight);
         spinnerBox.setPrefWidth(width - size * 0.1);
-        spinnerBox.relocate(size * 0.05,  (contentBounds.getHeight() - fontSize) * 0.5);
+        spinnerBox.relocate(size * 0.05,  contentBounds.getMinY() + (contentBounds.getHeight() - spinnerBox.getHeight()) * 0.5);
 
         double translateY = spinners.isEmpty() ? 0 : (spinnerHeight - spinners.get(0).getDigitHeight()) * 1.1;
         unitText.setTranslateY(translateY);

@@ -283,7 +283,8 @@ public enum Flag {
     UNITED_KINGDOM("GB", "GBR", "260-united-kingdom.png"),
     KIRIBATI("KI", "KIR", "261-kiribati.png"),
     HAWAII("", "", "262-hawaii.png"),
-    UNITED_STATES_OF_AMERICA("US", "USA", "263-united-states-of-america.png");
+    UNITED_STATES_OF_AMERICA("US", "USA", "263-united-states-of-america.png"),
+    NOT_FOUND("", "", "");
 
 
     private final String imageFileName;
@@ -311,10 +312,10 @@ public enum Flag {
     public final String getIso3() { return iso3; }
 
     public static final Flag iso2(final String iso2) {
-        return Arrays.asList(values()).stream().filter(flag -> flag.iso2.equals(iso2)).findFirst().orElse(null);
+        return Arrays.asList(values()).stream().filter(flag -> !flag.iso2.isEmpty()).filter(flag -> flag.iso2.equals(iso2)).findFirst().orElse(NOT_FOUND);
     }
 
     public static final Flag iso3(final String iso3) {
-        return Arrays.asList(values()).stream().filter(flag -> flag.iso3.equals(iso3)).findFirst().orElse(null);
+        return Arrays.asList(values()).stream().filter(flag -> !flag.iso3.isEmpty()).filter(flag -> flag.iso3.equals(iso3)).findFirst().orElse(NOT_FOUND);
     }
 }

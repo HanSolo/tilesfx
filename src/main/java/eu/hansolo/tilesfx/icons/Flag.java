@@ -153,7 +153,7 @@ public enum Flag {
     OSSETIA("", "", "129-ossetia.png"),
     SICILY("", "", "130-sicily.png"),
     CHILE("CL", "CHL", "131-chile.png"),
-    BOSNIA_AND_HERZEGOVINA("BA", "BIH", "132-bosina-and-herzegovina.png"),
+    BOSNIA_AND_HERZEGOVINA("BA", "BIH", "132-bosnia-and-herzegovina.png"),
     SAUDI_ARABIA("SA", "SAU", "133-saudi-arabia.png"),
     LIECHTENSTEIN("LI", "LIE", "134-liechtenstein.png"),
     BELARUS("BY", "BLR", "135-belarus.png"),

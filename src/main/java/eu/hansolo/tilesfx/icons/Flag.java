@@ -170,7 +170,7 @@ public enum Flag {
     GAMBIA("GM", "GMB", "146-gambia.png"),
     BANGLADESH("BD", "BGD", "147-bangladesh.png"),
     MADEIRA("", "", "148-madeira.png"),
-    CZECH_REPBULIC("CZ", "CZE", "149-czech-repbublic.png"),
+    CZECH_REPBULIC("CZ", "CZE", "149-czech-republic.png"),
     BOLIVIA("BO", "BOL", "150-bolivia.png"),
     UNITED_ARAB_EMIRATES("AE", "ARE", "151-united-arab-emirates.png"),
     KYRGYZSTAN("KG", "KGZ", "152-kyrgyzstan.png"),

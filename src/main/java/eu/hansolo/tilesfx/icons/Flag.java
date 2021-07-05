@@ -92,7 +92,7 @@ public enum Flag {
     DJIBOUTI("DJ", "DJI", "068-djibouti.png"),
     BRITISH_INDIAN_OCEAN_TERRITORY("IO", "IOT", "069-british-indian-ocean-territory.png"),
     TUVALU_1("TV", "TUV", "070-tuvalu-1.png"),
-    SERBIA("RS", "SRB", "071-serbia-png"),
+    SERBIA("RS", "SRB", "071-serbia.png"),
     BONAIRE("BQ", "BES", "072-bonaire.png"),
     TOGO("TG", "TGO", "073-togo.png"),
     KAZAKHSTAN("KZ", "KAZ", "074-kazakhstan.png"),
@@ -139,7 +139,7 @@ public enum Flag {
     HUNGARY("HU", "HUN", "115-hungary.png"),
     CURACAO("CW", "CUW", "116-curacao.png"),
     ANGOLA("AO", "AGO", "117-angola.png"),
-    MALAYSIA("MY", "MYS", "118-malaysia.png"),
+    MALAYSIA("MY", "MYS", "118-malasya.png"),
     BRUNEI("BN", "BRN", "119-brunei.png"),
     BAHAMAS("BS", "BHS", "120-bahamas.png"),
     NEW_ZEALAND("NZ", "NZL", "121-new-zealand.png"),
@@ -223,7 +223,7 @@ public enum Flag {
     SUDAN("SD", "SDN", "199-sudan.png"),
     SOUTH_AFRICA("ZA", "ZAF", "200-south-africa.png"),
     MARTINIQUE("MQ", "MTQ", "201-martinique.png"),
-    TAWAIN("TW", "TWN", "202-tawain.png"),
+    TAIWAN("TW", "TWN", "202-taiwan.png"),
     SAHRAWI_ARAB_DEMOCRATIC_REPUBLIC("", "", "203-sahrawi-arab-democratic-republic.png"),
     GUERNSEY("GG", "GGY", "204-guernsey.png"),
     SWITZERLAND("CH", "CHE", "205-switzerland.png"),
@@ -284,7 +284,7 @@ public enum Flag {
     KIRIBATI("KI", "KIR", "261-kiribati.png"),
     HAWAII("", "", "262-hawaii.png"),
     UNITED_STATES_OF_AMERICA("US", "USA", "263-united-states-of-america.png"),
-    NOT_FOUND("", "", "");
+    NOT_FOUND("--", "---", "999-not-found.png");
 
 
     private final String imageFileName;

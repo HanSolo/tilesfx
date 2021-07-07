@@ -489,13 +489,14 @@ public class Demo extends Application {
                                      .build();
 
         donutChartTile = TileBuilder.create()
-                                     .skinType(SkinType.DONUT_CHART)
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .title("DonutChart Tile")
-                                     .text("Some text")
-                                     .textVisible(false)
-                                     .chartData(chartData1, chartData2, chartData3, chartData4)
-                                     .build();
+                                    .skinType(SkinType.DONUT_CHART)
+                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                    .title("DonutChart Tile")
+                                    .text("Some text")
+                                    .textVisible(false)
+                                    //.percentageVisible(false)
+                                    .chartData(chartData1, chartData2, chartData3, chartData4)
+                                    .build();
 
         circularProgressTile = TileBuilder.create()
                                           .skinType(SkinType.CIRCULAR_PROGRESS)

@@ -17,7 +17,7 @@ where you will find additional information about certain tiles.
 To run the demo you simply can start it using the command "./gradlew Demo" on the command line in the project folder.
 
 ## Overview
-![Overview](https://raw.githubusercontent.com/HanSolo/tilesfx/master/TilesFX.png)
+![Overview](https://raw.githubusercontent.com/HanSolo/tilesfx/jdk16/TilesFX.png)
 
 
 ## Credits

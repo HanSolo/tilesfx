@@ -664,6 +664,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B percentageVisible(final boolean VISIBLE) {
+        properties.put("percentageVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B running(final boolean RUNNING) {
         properties.put("running", new SimpleBooleanProperty(RUNNING));
         return (B)this;
@@ -1720,6 +1725,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setTextVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("dateVisible".equals(key)) {
                 TILE.setDateVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("percentageVisible".equals(key)) {
+                TILE.setPercentageVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("textColor".equals(key)) {
                 TILE.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("dateColor".equals(key)) {

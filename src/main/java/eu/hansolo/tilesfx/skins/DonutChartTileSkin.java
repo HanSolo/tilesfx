@@ -245,12 +245,14 @@ public class DonutChartTileSkin extends TileSkin {
             double cosValue = Math.cos(radValue);
             double sinValue = Math.sin(radValue);
 
-            // Percentage
             double x = innerRadius * cosValue;
             double y = -innerRadius * sinValue;
-            chartCtx.setFill(textColor);
-            chartCtx.fillText(String.format(Locale.US, "%.0f%%", (value / sum * 100.0)), center + x, center + y, barWidth);
 
+            // Percentage
+            if (tile.isPercentageVisible()) {
+                chartCtx.setFill(textColor);
+                chartCtx.fillText(String.format(Locale.US, "%.0f%%", (value / sum * 100.0)), center + x, center + y, barWidth);
+            }
             // Value
             if (angle > 10) {
                 x = outerRadius * cosValue;

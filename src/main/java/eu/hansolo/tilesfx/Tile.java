@@ -529,6 +529,8 @@ public class Tile extends Control {
     private BooleanProperty                               textVisible;
     private boolean                                       _dateVisible;
     private BooleanProperty                               dateVisible;
+    private boolean                                       _percentageVisible;
+    private BooleanProperty                               percentageVisible;
     private boolean                                       _running;
     private BooleanProperty                               running;
     private Color                                         _textColor;
@@ -754,6 +756,7 @@ public class Tile extends Control {
                 @NamedArg(value="discreteHours", defaultValue="false") boolean discreteHours,
                 @NamedArg(value="textVisible", defaultValue="true") boolean textVisible,
                 @NamedArg(value="dateVisible", defaultValue="false") boolean dateVisible,
+                @NamedArg(value="percentageVisible", defaultValue="true") boolean percentageVisible,
                 @NamedArg(value="running", defaultValue="false") boolean running,
                 @NamedArg(value="hourTickMarksVisible", defaultValue="true") boolean hourTickMarksVisible,
                 @NamedArg(value="minuteTickMarksVisible", defaultValue="true") boolean minuteTickMarksVisible,
@@ -994,6 +997,7 @@ public class Tile extends Control {
         _discreteHours                      = false;
         _textVisible                        = true;
         _dateVisible                        = false;
+        _percentageVisible                  = true;
         _running                            = false;
         _hourTickMarksVisible               = true;
         _minuteTickMarksVisible             = true;
@@ -4812,6 +4816,36 @@ public class Tile extends Control {
             };
         }
         return dateVisible;
+    }
+
+    /**
+     * Returns true if percentage values are visible.
+     * This property is currently only used in the DonutChartTileSkin to be able to hide the
+     * percentage values on in the inside of the ring.
+     * @return true if percentage values are visible
+     */
+    public boolean isPercentageVisible() { return null == percentageVisible ? _percentageVisible : percentageVisible.get(); }
+    /**
+     * Defines the visibility of percentage values. Currently only used in the DonutChartTileSkin
+     * @param VISIBLE
+     */
+    public void setPercentageVisible(final boolean VISIBLE) {
+        if (null == percentageVisible) {
+            _percentageVisible = VISIBLE;
+            fireTileEvent((VISIBILITY_EVENT));
+        } else {
+            percentageVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty percentageVisibleProperty() {
+        if (null == percentageVisible) {
+            percentageVisible = new BooleanPropertyBase(_percentageVisible) {
+                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Tile.this;}
+                @Override public String getName() { return "percentageVisible"; }
+            };
+        }
+        return percentageVisible;
     }
 
     /**

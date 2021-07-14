@@ -120,12 +120,13 @@ public class SmoothedChartTileSkin extends TileSkin {
                 case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
                 default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
             }
-            if (chart.getData().isEmpty()) {
+// always set data in chart, to make sure data is updated from tile TilesFXSeries on any change (also when adding a new serie)
+//            if (chart.getData().isEmpty()) {
                 chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
                 tile.getTilesFXSeries()
                     .stream()
                     .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
-            }
+//            }
         }
     }
 

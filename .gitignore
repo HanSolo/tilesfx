@@ -10,3 +10,4 @@
 /classes
 /src/main/java/eu/hansolo/tilesfx/skins/TestTileSkin.java
 /tilesfx.iml
+target/

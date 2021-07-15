@@ -469,6 +469,21 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
+    public final B autoItemTextColor(final boolean AUTO) {
+        properties.put("autoItemTextColor", new SimpleBooleanProperty(AUTO));
+        return (B)this;
+    }
+
+    public final B autoItemDarkTextColor(final Color COLOR) {
+        properties.put("autoItemDarkTextColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B autoItemBrightTextColor(final Color COLOR) {
+        properties.put("autoItemBrightTextColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B titleColor(final Color COLOR) {
         properties.put("titleColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -1813,6 +1828,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setItemSorting(((ObjectProperty<ItemSorting>) properties.get(key)).get());
             } else if ("itemSortingTopic".equals(key)) {
                 TILE.setItemSortingTopic(((ObjectProperty<ItemSortingTopic>) properties.get(key)).get());
+            } else if ("autoItemTextColor".equals(key)) {
+                TILE.setAutoItemTextColor(((BooleanProperty) properties.get(key)).get());
+            } else if ("autoItemDarkTextColor".equals(key)) {
+                TILE.setAutoItemDarkTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("autoItemBrightTextColor".equals(key)) {
+                TILE.setAutoItemBrightTextColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("dataPointsVisible".equals(key)) {
                 TILE.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sunburstTree".equals(key)) {

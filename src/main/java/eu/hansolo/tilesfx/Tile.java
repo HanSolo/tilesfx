@@ -382,6 +382,12 @@ public class Tile extends Control {
     private ObjectProperty<ItemSorting>                   itemSorting;
     private ItemSortingTopic                              _itemSortingTopic;
     private ObjectProperty<ItemSortingTopic>              itemSortingTopic;
+    private boolean                                       _autoItemTextColor;
+    private BooleanProperty                               autoItemTextColor;
+    private Color                                         _autoItemDarkTextColor;
+    private ObjectProperty<Color>                         autoItemDarkTextColor;
+    private Color                                         _autoItemBrightTextColor;
+    private ObjectProperty<Color>                         autoItemBrightTextColor;
 
     // UI related
     private StyleableProperty<Color>                      thumbColor;
@@ -680,6 +686,9 @@ public class Tile extends Control {
                 @NamedArg(value="flipTimeInMS", defaultValue="500") long flipTimeInMS,
                 @NamedArg(value="itemSorting", defaultValue="ItemSorting.DESCENDING") ItemSorting itemSorting,
                 @NamedArg(value="itemSortingTopic", defaultValue="ItemSortingTopic.VALUE") ItemSortingTopic itemSortingTopic,
+                @NamedArg(value="autoItemTextColor", defaultValue="false") boolean autoItemTextColor,
+                @NamedArg(value="autoItemDarkTextColor", defaultValue="Tile.FOREGROUND") Color autoItemDarkTextColor,
+                @NamedArg(value="autoItemBrightTextColor", defaultValue="Tile.BACKGROUND") Color autoItemBrightTextColor,
                 @NamedArg(value="textSize", defaultValue="TextSize.NORMAL") TextSize textSize,
                 @NamedArg(value="roundedCorners", defaultValue="true") boolean roundedCorners,
                 @NamedArg(value="startFromZero", defaultValue="false") boolean startFromZero,
@@ -917,6 +926,9 @@ public class Tile extends Control {
         flipTimeInMS                        = 500;
         _itemSorting                        = ItemSorting.NONE;
         _itemSortingTopic                   = ItemSortingTopic.VALUE;
+        _autoItemTextColor                  = false;
+        _autoItemDarkTextColor              = Tile.BACKGROUND;
+        _autoItemBrightTextColor            = Tile.FOREGROUND;
         thumbColor                          = new SimpleStyleableObjectProperty<>(THUMB_COLOR, this, "thumbColor");
         _flatUI                             = true;
         _textSize                           = TextSize.NORMAL;
@@ -2427,6 +2439,102 @@ public class Tile extends Control {
         return itemSortingTopic;
     }
 
+    /**
+     * Returns true if the text color of items should be set automatically dependend on their background color
+     * Currently only used in CycleStepTileSkin
+     * @return true if the text color of items should be set automatically dependend on their background color
+     */
+    public boolean getAutoItemTextColor() { return null == autoItemTextColor ? _autoItemTextColor : autoItemTextColor.get(); }
+    /**
+     * Defines if the text color of items should be set automatically dependend on their background color
+     * Currently only used in CycleStepTileSkin
+     * @param AUTO the text color of items should be set automatically dependend on their background color
+     */
+    public void setAutoItemTextColor(final boolean AUTO) {
+        if (null == autoItemTextColor) {
+            _autoItemTextColor = AUTO;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            autoItemTextColor.set(AUTO);
+        }
+    }
+    public BooleanProperty autoItemTextColorProperty() {
+        if (null == autoItemTextColor) {
+            autoItemTextColor = new BooleanPropertyBase(_autoItemTextColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "autoItemTextColor"; }
+            };
+        }
+        return autoItemTextColor;
+    }
+
+    /**
+     * Returns the color that will be used if autoItemTextColor == true and the background of the items is bright
+     * Currently only used in CycleStepTileSkin
+     * @return the color that will be used if autoItemTextColor == true and the background of the items is bright
+     */
+    public Color getAutoItemDarkTextColor() { return null == autoItemDarkTextColor ? _autoItemDarkTextColor : autoItemDarkTextColor.get(); }
+    /**
+     * Defines the color that will be used if autoItemTextColor == true and the background of the items is bright
+     * Currently only used in CycleStepTileSkin
+     * @param COLOR the color that will be used if autoItemTextColor == true and the background of the items is bright
+     */
+    public void setAutoItemDarkTextColor(final Color COLOR) {
+        if (null == autoItemDarkTextColor) {
+            _autoItemDarkTextColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            autoItemDarkTextColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> autoItemDarkTextColor() {
+        if (null == autoItemDarkTextColor) {
+            autoItemDarkTextColor = new ObjectPropertyBase<>(_autoItemDarkTextColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() {
+                    return "autoItemDarkTextColor";
+                }
+            };
+            _autoItemDarkTextColor = null;
+        }
+        return autoItemDarkTextColor;
+    }
+
+    /**
+     * Returns the color that will be used if autoItemTextColor == true and the background of the items is dark
+     * Currently only used in CycleStepTileSkin
+     * @return the color that will be used if autoItemTextColor == true and the background of the items is dark
+     */
+    public Color getAutoItemBrightTextColor() { return null == autoItemBrightTextColor ? _autoItemBrightTextColor : autoItemBrightTextColor.get(); }
+    /**
+     * Defines the color that will be used if autoItemTextColor == true and the background of the items is dark
+     * Currently only used in CycleStepTileSkin
+     * @param COLOR the color that will be used if autoItemTextColor == true and the background of the items is dark
+     */
+    public void setAutoItemBrightTextColor(final Color COLOR) {
+        if (null == autoItemBrightTextColor) {
+            _autoItemBrightTextColor = COLOR;
+            fireTileEvent(REDRAW_EVENT);
+        } else {
+            autoItemBrightTextColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> autoItemBrightTextColor() {
+        if (null == autoItemBrightTextColor) {
+            autoItemBrightTextColor = new ObjectPropertyBase<>(_autoItemBrightTextColor) {
+                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() {
+                    return "autoItemBrightTextColor";
+                }
+            };
+            _autoItemBrightTextColor = null;
+        }
+        return autoItemBrightTextColor;
+    }
+    
     public ObservableList<ChartData> getChartData() {
         if (null == chartDataList) { chartDataList = FXCollections.observableArrayList(); }
         return chartDataList;

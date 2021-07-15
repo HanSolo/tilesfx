@@ -21,6 +21,7 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.addons.ImageSpinner;
 import eu.hansolo.tilesfx.addons.SpinnerBuilder;
 import eu.hansolo.tilesfx.addons.SpinnerType;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.AnimationTimer;
@@ -66,13 +67,14 @@ public class Test extends Application {
 
     @Override public void init() {
         tile = TileBuilder.create()
-                          .skinType(SkinType.BAR_CHART)
+                          .skinType(SkinType.CYCLE_STEP)
                           .prefSize(WIDTH, HEIGHT)
-                          .title("BarChart Tile")
-                          .text("Whatever text")
-                          .maxValue(1700)
-                          //.barChartItems(barChartItem1, barChartItem2, barChartItem3, barChartItem4)
-                          .decimals(0)
+                          .title("CycleStep Tile")
+                          .textVisible(false)
+                          //.chartData(chartData1, chartData2, chartData3, chartData4, chartData5)
+                          .animated(true)
+                          .decimals(1)
+                          .autoItemTextColor(true)
                           .build();
 
 
@@ -99,15 +101,20 @@ public class Test extends Application {
         stage.show();
 
 
-        BarChartItem barChartItem1 = new BarChartItem("Item 1", 500, Tile.BLUE);
-        BarChartItem barChartItem2 = new BarChartItem("Item 2", 250, Tile.RED);
-        BarChartItem barChartItem3 = new BarChartItem("Item 3", 100, Tile.GREEN);
-        BarChartItem barChartItem4 = new BarChartItem("Item 4", 50, Tile.ORANGE);
+        ChartData chartData1 = new ChartData("Item 1", 24.0, Tile.GREEN);
+        ChartData chartData2 = new ChartData("Item 2", 10.0, Tile.BLUE);
+        ChartData chartData3 = new ChartData("Item 3", 12.0, Tile.RED);
+        ChartData chartData4 = new ChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
+        List<ChartData> items1 = List.of(chartData1, chartData2, chartData3, chartData4);
 
-        List<BarChartItem> items = List.of(barChartItem4, barChartItem2, barChartItem1, barChartItem3);
-        items.forEach(item -> tile.getBarChartItems().add(item));
-        //tile.getBarChartItems().addAll(barChartItem4, barChartItem2, barChartItem1, barChartItem3);
+        ChartData chartData5 = new ChartData("Item 5", 13.0, Tile.BLUE);
+        ChartData chartData6 = new ChartData("Item 6", 13.0, Tile.BLUE);
+        ChartData chartData7 = new ChartData("Item 7", 13.0, Tile.BLUE);
+        ChartData chartData8 = new ChartData("Item 8", 13.0, Tile.BLUE);
+        List<ChartData> items2 = List.of(chartData5, chartData6, chartData7, chartData8);
 
+        tile.getChartData().setAll(items1);
+        tile.getChartData().addAll(items2);
 
         // Calculate number of nodes
         calcNoOfNodes(pane);

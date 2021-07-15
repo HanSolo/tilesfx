@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.FontMetrix;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -31,6 +32,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -58,21 +60,10 @@ public class CycleStepTileSkin extends TileSkin {
         super.initGraphics();
 
         chartDataListener = change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    double sum = tile.getChartData().stream().mapToDouble(chartData -> chartData.getValue()).sum();
-                    change.getAddedSubList().forEach(chartData -> chartBox.getChildren().add(new ChartItem(chartData, sum)));
-                    updateChart();
-                } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedItem -> {
-                        Node itemToRemove = chartBox.getChildren().stream().filter(item -> item.equals(removedItem)).findFirst().get();
-                        if (null != itemToRemove) {
-                            chartBox.getChildren().remove(itemToRemove);
-                        }
-                    });
-                    updateChart();
-                }
-            }
+            chartBox.getChildren().clear();
+            double sum = tile.getChartData().stream().mapToDouble(chartData -> chartData.getValue()).sum();
+            tile.getChartData().forEach(chartData -> chartBox.getChildren().add(new ChartItem(chartData, sum)));
+            updateChart();
         };
 
         chartItems = new ArrayList<>();
@@ -271,14 +262,28 @@ public class CycleStepTileSkin extends TileSkin {
         }
 
         private void redraw() {
-            double value        = chartData.getValue();
-            String formatString = "%." + tile.getDecimals() + "f";
-            double maxTextWidth = width * 0.4;
-            double barStartX    = maxTextWidth + 5;
-            double barStartY    = height * 0.2;
-            double maxBarWidth  = width - barStartX;
-            double barWidth     = value / sum * maxBarWidth;
-            double barHeight    = height * 0.6;
+            double     value              = chartData.getValue();
+            String     formatString       = "%." + tile.getDecimals() + "f";
+            double     maxTextWidth       = width * 0.4;
+            double     barStartX          = maxTextWidth + 5;
+            double     barStartY          = height * 0.2;
+            double     maxBarWidth        = width - barStartX;
+            double     barWidth           = value / sum * maxBarWidth;
+            double     barHeight          = height * 0.6;
+            Color      barBackgroundColor = Helper.getColorWithOpacity(tile.getForegroundColor(), 0.1);
+            Color      barColor           = chartData.getFillColor();
+            boolean    autoItemTextColor  = tile.getAutoItemTextColor();
+            Color      textColor          = tile.getForegroundColor();
+            Font       valueFont          = Fonts.latoRegular(height * 0.3);
+            FontMetrix fontMetrix         = new FontMetrix(valueFont);
+            String     valueText          = String.format(tile.getLocale(), formatString, value);
+            if (autoItemTextColor) {
+                if (fontMetrix.computeStringWidth(valueText) > barWidth) {
+                    textColor = Helper.isDark(tile.getBackgroundColor()) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
+                } else {
+                    textColor = Helper.isDark(barColor) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
+                }
+            }
 
             ctx.setTextBaseline(VPos.CENTER);
             ctx.setFont(Fonts.latoRegular(height * 0.4));
@@ -286,14 +291,14 @@ public class CycleStepTileSkin extends TileSkin {
             ctx.clearRect(0, 0, width, height);
             ctx.setFill(tile.getForegroundColor());
             ctx.fillText(chartData.getName(), 0, height / 2, maxTextWidth);
-            ctx.setFill(Helper.getColorWithOpacity(tile.getForegroundColor(), 0.1));
+            ctx.setFill(barBackgroundColor);
             ctx.fillRect(barStartX, barStartY, maxBarWidth, barHeight);
-            ctx.setFill(chartData.getFillColor());
+            ctx.setFill(barColor);
             ctx.fillRect(barStartX + factorX * maxBarWidth, barStartY, barWidth, barHeight);
-            ctx.setFill(tile.getForegroundColor());
-            ctx.setFont(Fonts.latoRegular(height * 0.3));
+            ctx.setFill(textColor);
+            ctx.setFont(valueFont);
             ctx.setTextAlign(TextAlignment.CENTER);
-            ctx.fillText(String.format(tile.getLocale(), formatString, value), barStartX + factorX * maxBarWidth + barWidth * 0.5, height * 0.5, maxTextWidth);
+            ctx.fillText(valueText, barStartX + factorX * maxBarWidth + barWidth * 0.5, height * 0.5, maxTextWidth);
         }
 
         @Override public void onChartDataEvent(final ChartDataEvent EVENT) {

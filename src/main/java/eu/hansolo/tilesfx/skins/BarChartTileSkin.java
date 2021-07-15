@@ -27,6 +27,7 @@ import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.PrettyListView;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
@@ -53,6 +54,7 @@ public class BarChartTileSkin extends TileSkin {
     private ChartDataEventListener                      updateHandler;
     private InvalidationListener                        paneSizeListener;
     private Map<BarChartItem, EventHandler<MouseEvent>> handlerMap;
+    private ListChangeListener<BarChartItem>            barChartItemListener;
 
 
     // ******************** Constructors **************************************
@@ -65,16 +67,39 @@ public class BarChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateHandler    = e -> {
+        updateHandler        = e -> {
             final ChartDataEvent.EventType TYPE = e.getType();
             switch (TYPE) {
                 case UPDATE  : updateChart(); break;
                 case FINISHED: sortItems(); break;
             }
         };
-        paneSizeListener = o -> resizeItems();
-        handlerMap       = new HashMap<>();
-        
+        paneSizeListener     = o -> resizeItems();
+        handlerMap           = new HashMap<>();
+        barChartItemListener = change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(addedItem -> {
+                        barChartPane.getItems().add(addedItem);
+                        addedItem.addChartDataEventListener(updateHandler);
+                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
+                        handlerMap.put(addedItem, clickHandler);
+                        addedItem.setOnMousePressed(clickHandler);
+                    });
+                    resize();
+                    updateChart();
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().forEach(removedItem -> {
+                        removedItem.removeChartDataEventListener(updateHandler);
+                        removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
+                        barChartPane.getItems().remove(removedItem);
+                    });
+                    resize();
+                    updateChart();
+                }
+            }
+        };
+
         tile.getBarChartItems().forEach(item -> {
             item.addChartDataEventListener(updateHandler);
             EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, item.getChartData()));
@@ -103,28 +128,7 @@ public class BarChartTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.getBarChartItems().addListener(new WeakListChangeListener<>(change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(addedItem -> {
-                        barChartPane.getItems().add(addedItem);
-                        addedItem.addChartDataEventListener(updateHandler);
-                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
-                        handlerMap.put(addedItem, clickHandler);
-                        addedItem.setOnMousePressed(clickHandler);
-                    });
-                    updateChart();
-                } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedItem -> {
-                        removedItem.removeChartDataEventListener(updateHandler);
-                        removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
-                        barChartPane.getItems().remove(removedItem);
-                    });
-                    updateChart();
-                }
-            }
-        }));
-
+        tile.getBarChartItems().addListener(barChartItemListener);
         pane.widthProperty().addListener(paneSizeListener);
         pane.heightProperty().addListener(paneSizeListener);
     }
@@ -160,6 +164,7 @@ public class BarChartTileSkin extends TileSkin {
     @Override public void dispose() {
         pane.widthProperty().removeListener(paneSizeListener);
         pane.heightProperty().removeListener(paneSizeListener);
+        tile.getBarChartItems().removeListener(barChartItemListener);
         tile.getBarChartItems().forEach(item -> {
             item.removeChartDataEventListener(updateHandler);
             item.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(item));

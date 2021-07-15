@@ -26,7 +26,7 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.beans.InvalidationListener;
-import javafx.collections.WeakListChangeListener;
+import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -56,16 +56,17 @@ import java.util.Map;
  * Time: 03:12
  */
 public class ClusterMonitorTileSkin extends TileSkin {
-    private static final double                    MIN_HEIGHT        = 100;
-    private        final TileEvent                 SVG_PRESSED_EVENT = new TileEvent(EventType.SVG_PATH_PRESSED);
-    private              Text                      titleText;
-    private              Text                      text;
-    private              VBox                      chartPane;
-    private              ChartDataEventListener    updateHandler;
-    private              InvalidationListener      paneSizeListener;
-    private              Map<ChartData, ChartItem> dataItemMap;
-    private              Region                    graphicRegion;
-    private              EventHandler<MouseEvent>  svgPathPressedHandler;
+    private static final double                        MIN_HEIGHT        = 100;
+    private final        TileEvent                     SVG_PRESSED_EVENT = new TileEvent(EventType.SVG_PATH_PRESSED);
+    private              Text                          titleText;
+    private              Text                          text;
+    private              VBox                          chartPane;
+    private              ChartDataEventListener        updateHandler;
+    private              InvalidationListener          paneSizeListener;
+    private              Map<ChartData, ChartItem>     dataItemMap;
+    private              Region                        graphicRegion;
+    private              EventHandler<MouseEvent>      svgPathPressedHandler;
+    private              ListChangeListener<ChartData> chartDataListener;
 
 
     // ******************** Constructors **************************************
@@ -78,14 +79,32 @@ public class ClusterMonitorTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateHandler    = e -> {
+        updateHandler     = e -> {
             switch(e.getType()) {
                 case UPDATE  : updateChart(); break;
                 case FINISHED: updateChart(); break;
             }
         };
-        paneSizeListener = e -> updateChart();
-        dataItemMap      = new HashMap<>();
+        paneSizeListener  = e -> updateChart();
+        dataItemMap       = new HashMap<>();
+        chartDataListener = change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(addedData -> {
+                        addedData.addChartDataEventListener(updateHandler);
+                        dataItemMap.put(addedData, new ChartItem(addedData, contentBounds));
+                    });
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().forEach(removedData -> {
+                        removedData.removeChartDataEventListener(updateHandler);
+                        dataItemMap.remove(removedData);
+                    });
+                }
+            }
+            chartPane.getChildren().clear();
+            dataItemMap.entrySet().forEach(entry -> chartPane.getChildren().add(entry.getValue()));
+            updateChart();
+        };
 
         chartPane = new VBox();
 
@@ -117,24 +136,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.getChartData().addListener(new WeakListChangeListener<>(change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(addedData -> {
-                        addedData.addChartDataEventListener(updateHandler);
-                        dataItemMap.put(addedData, new ChartItem(addedData, contentBounds));
-                    });
-                } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedData -> {
-                        removedData.removeChartDataEventListener(updateHandler);
-                        dataItemMap.remove(removedData);
-                    });
-                }
-            }
-            chartPane.getChildren().clear();
-            dataItemMap.entrySet().forEach(entry -> chartPane.getChildren().add(entry.getValue()));
-            updateChart();
-        }));
+        tile.getChartData().addListener(chartDataListener);
         if (null != tile.getSVGPath()) { graphicRegion.addEventHandler(MouseEvent.MOUSE_PRESSED, svgPathPressedHandler); }
 
         pane.widthProperty().addListener(paneSizeListener);
@@ -159,6 +161,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
         pane.widthProperty().removeListener(paneSizeListener);
         pane.heightProperty().removeListener(paneSizeListener);
         tile.getBarChartItems().forEach(item -> item.removeChartDataEventListener(updateHandler));
+        tile.getChartData().removeListener(chartDataListener);
         if (null != tile.getSVGPath()) { graphicRegion.removeEventHandler(MouseEvent.MOUSE_PRESSED, svgPathPressedHandler); }
         dataItemMap.clear();
         super.dispose();

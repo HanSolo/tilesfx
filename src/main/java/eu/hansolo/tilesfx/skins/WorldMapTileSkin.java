@@ -17,8 +17,6 @@
  */
 package eu.hansolo.tilesfx.skins;
 
-import eu.hansolo.tilesfx.tools.Country;
-import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.chart.ChartData;
@@ -26,12 +24,13 @@ import eu.hansolo.tilesfx.events.LocationEvent;
 import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
+import eu.hansolo.tilesfx.tools.Country;
+import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
-import javafx.collections.WeakListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
@@ -91,7 +90,7 @@ public class WorldMapTileSkin extends TileSkin {
 
         String formatString = new StringBuilder("%.").append(tile.getDecimals()).append("f").toString();
 
-        poiListener = new WeakListChangeListener<>(change -> {
+        poiListener = change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(addedPoi -> {
@@ -116,8 +115,9 @@ public class WorldMapTileSkin extends TileSkin {
                 }
             }
             resize();
-        });
-        chartDataListener = new WeakListChangeListener<>(change -> {
+        };
+
+        chartDataListener = change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(addedData -> {
@@ -142,7 +142,7 @@ public class WorldMapTileSkin extends TileSkin {
                 }
             }
             resize();
-        });
+        };
 
         tile.getPoiList()
             .forEach(poi -> {

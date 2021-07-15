@@ -24,7 +24,7 @@ import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.application.Platform;
-import javafx.collections.WeakListChangeListener;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -40,10 +40,11 @@ import java.util.List;
 
 
 public class CycleStepTileSkin extends TileSkin {
-    private Text            titleText;
-    private Text            text;
-    private List<ChartItem> chartItems;
-    private VBox            chartBox;
+    private Text                          titleText;
+    private Text                          text;
+    private List<ChartItem>               chartItems;
+    private VBox                          chartBox;
+    private ListChangeListener<ChartData> chartDataListener;
 
 
     // ******************** Constructors **************************************
@@ -55,6 +56,24 @@ public class CycleStepTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
+
+        chartDataListener = change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    double sum = tile.getChartData().stream().mapToDouble(chartData -> chartData.getValue()).sum();
+                    change.getAddedSubList().forEach(chartData -> chartBox.getChildren().add(new ChartItem(chartData, sum)));
+                    updateChart();
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().forEach(removedItem -> {
+                        Node itemToRemove = chartBox.getChildren().stream().filter(item -> item.equals(removedItem)).findFirst().get();
+                        if (null != itemToRemove) {
+                            chartBox.getChildren().remove(itemToRemove);
+                        }
+                    });
+                    updateChart();
+                }
+            }
+        };
 
         chartItems = new ArrayList<>();
         double sum = tile.getChartData().stream().mapToDouble(chartData -> chartData.getValue()).sum();
@@ -77,23 +96,7 @@ public class CycleStepTileSkin extends TileSkin {
 
     @Override protected void registerListeners() {
         super.registerListeners();
-        tile.getChartData().addListener(new WeakListChangeListener<>(change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    double sum = tile.getChartData().stream().mapToDouble(chartData -> chartData.getValue()).sum();
-                    change.getAddedSubList().forEach(chartData -> chartBox.getChildren().add(new ChartItem(chartData, sum)));
-                    updateChart();
-                } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedItem -> {
-                        Node itemToRemove = chartBox.getChildren().stream().filter(item -> item.equals(removedItem)).findFirst().get();
-                        if (null != itemToRemove) {
-                            chartBox.getChildren().remove(itemToRemove);
-                        }
-                    });
-                    updateChart();
-                }
-            }
-        }));
+        tile.getChartData().addListener(chartDataListener);
     }
 
 
@@ -110,6 +113,7 @@ public class CycleStepTileSkin extends TileSkin {
     }
 
     @Override public void dispose() {
+        tile.getChartData().removeListener(chartDataListener);
         super.dispose();
     }
 

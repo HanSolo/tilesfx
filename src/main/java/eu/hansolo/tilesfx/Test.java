@@ -70,6 +70,7 @@ public class Test extends Application {
                           .prefSize(WIDTH, HEIGHT)
                           .title("BarChart Tile")
                           .text("Whatever text")
+                          .maxValue(1700)
                           //.barChartItems(barChartItem1, barChartItem2, barChartItem3, barChartItem4)
                           .decimals(0)
                           .build();
@@ -98,10 +99,10 @@ public class Test extends Application {
         stage.show();
 
 
-        BarChartItem barChartItem1 = new BarChartItem("Item 1", 47, Tile.BLUE);
-        BarChartItem barChartItem2 = new BarChartItem("Item 2", 43, Tile.RED);
-        BarChartItem barChartItem3 = new BarChartItem("Item 3", 12, Tile.GREEN);
-        BarChartItem barChartItem4 = new BarChartItem("Item 4", 8, Tile.ORANGE);
+        BarChartItem barChartItem1 = new BarChartItem("Item 1", 500, Tile.BLUE);
+        BarChartItem barChartItem2 = new BarChartItem("Item 2", 250, Tile.RED);
+        BarChartItem barChartItem3 = new BarChartItem("Item 3", 100, Tile.GREEN);
+        BarChartItem barChartItem4 = new BarChartItem("Item 4", 50, Tile.ORANGE);
 
         List<BarChartItem> items = List.of(barChartItem4, barChartItem2, barChartItem1, barChartItem3);
         items.forEach(item -> tile.getBarChartItems().add(item));

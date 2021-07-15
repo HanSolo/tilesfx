@@ -85,6 +85,10 @@ public class BarChartTileSkin extends TileSkin {
                         EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
                         handlerMap.put(addedItem, clickHandler);
                         addedItem.setOnMousePressed(clickHandler);
+                        addedItem.setMaxValue(tile.getMaxValue());
+                        if (null == addedItem.getFormatString() || addedItem.getFormatString().isEmpty()) {
+                            addedItem.setFormatString(formatString);
+                        }
                     });
                     resize();
                     updateChart();

@@ -115,6 +115,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -265,6 +266,9 @@ public class Tile extends Control {
     private final        TileEvent                      VISIBILITY_EVENT               = new TileEvent(EventType.VISIBILITY);
     private final        TileEvent                      SECTION_EVENT                  = new TileEvent(EventType.SECTION);
     private final        TileEvent                      SERIES_EVENT                   = new TileEvent(EventType.SERIES);
+    private final        TileEvent                      SERIES_SET_EVENT               = new TileEvent(EventType.SERIES_SET);
+    private final        TileEvent                      SERIES_ADD_EVENT               = new TileEvent(EventType.SERIES_ADD);
+    private final        TileEvent                      SERIES_REMOVE_EVENT            = new TileEvent(EventType.SERIES_REMOVE);
     private final        TileEvent                      DATA_EVENT                     = new TileEvent(EventType.DATA);
     private final        TileEvent                      ALERT_EVENT                    = new TileEvent(EventType.ALERT);
     private final        TileEvent                      VALUE_EVENT                    = new TileEvent(EventType.VALUE);
@@ -2077,19 +2081,34 @@ public class Tile extends Control {
     public ObservableList<Series<String, Number>> getSeries() {
         return getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toCollection(FXCollections::observableArrayList));
     }
-    public void setSeries(final List<Series<String, Number>> SERIES) {
-        SERIES.forEach(series -> addTilesFXSeries(new TilesFXSeries<String, Number>(series)));
-    }
     public void setSeries(final Series<String, Number>... SERIES) {
         setSeries(Arrays.asList(SERIES));
     }
-    public void addSeries(final Series<String, Number> SERIES) {
-        addTilesFXSeries(new TilesFXSeries<String, Number>(SERIES));
+    public void setSeries(final List<Series<String, Number>> SERIES) {
+        setTilesFXSeries(SERIES.stream().map(series -> new TilesFXSeries<>(series)).collect(Collectors.toList()));
     }
-    public void removeSeries(final Series<String, Number> SERIES) {
-        TilesFXSeries<String, Number> seriesToRemove = series.stream().filter(tilesFxSeries -> tilesFxSeries.getSeries().equals(SERIES)).findFirst().orElse(null);
-        if (null == seriesToRemove) return;
+    public void addSeries(final Series<String, Number>... SERIES) {
+        addTilesFXSeries(Arrays.stream(SERIES).map(series -> new TilesFXSeries<>(series)).collect(Collectors.toList()));
+    }
+    public void addSeries(final List<Series<String, Number>> SERIES) {
+        addTilesFXSeries(SERIES.stream().map(series -> new TilesFXSeries<>(series)).collect(Collectors.toList()));
+    }
+    public void removeSeries(final Series<String, Number>... SERIES) {
+        removeSeries(Arrays.asList(SERIES));
+    }
+    public void removeSeries(final List<Series<String, Number>> SERIES) {
+        if (null == SERIES || SERIES.isEmpty()) { return; }
+        List<TilesFXSeries<String, Number>> seriesToRemove = new ArrayList<>();
+        for (Series<String, Number> series : SERIES) {
+            TilesFXSeries<String, Number> str = this.series.stream()
+                                                           .filter(tfxSeries -> tfxSeries.getSeries().equals(series))
+                                                           .findFirst()
+                                                           .orElse(null);
+            if (null == str) { continue; }
+            seriesToRemove.add(str);
+        }
         series.removeAll(seriesToRemove);
+        fireTileEvent(SERIES_REMOVE_EVENT);
     }
     public void clearSeries() { clearTilesFXSeries(); }
 
@@ -2097,26 +2116,33 @@ public class Tile extends Control {
         if (null == series) { series = FXCollections.observableArrayList(); }
         return series;
     }
-    public void setTilesFXSeries(final List<TilesFXSeries<String, Number>> SERIES) {
-        getTilesFXSeries().setAll(SERIES);
-        fireTileEvent(SERIES_EVENT);
+    public void setTilesFXSeries(final TilesFXSeries<String, Number>... TILESFX_SERIES) { setTilesFXSeries(Arrays.asList(TILESFX_SERIES)); }
+    public void setTilesFXSeries(final List<TilesFXSeries<String, Number>> TILESFX_SERIES) {
+        getTilesFXSeries().setAll(TILESFX_SERIES);
+        fireTileEvent(SERIES_SET_EVENT);
     }
-    public void setTilesFXSeries(final TilesFXSeries<String, Number>... SERIES) { setTilesFXSeries(Arrays.asList(SERIES)); }
-    public void addTilesFXSeries(final TilesFXSeries<String, Number> SERIES) {
-        if (null == SERIES) return;
-        getTilesFXSeries().add(SERIES);
-        fireTileEvent(SERIES_EVENT);
+    public void addTilesFXSeries(final TilesFXSeries<String, Number>... TILESFX_SERIES) {
+        if (null == TILESFX_SERIES || TILESFX_SERIES.length == 0) return;
+        addTilesFXSeries(Arrays.asList(TILESFX_SERIES));
+    }
+    public void addTilesFXSeries(final List<TilesFXSeries<String, Number>> TILESFX_SERIES) {
+        if (null == TILESFX_SERIES || TILESFX_SERIES.isEmpty()) { return; }
+        getTilesFXSeries().addAll(TILESFX_SERIES.stream()
+                                        .filter(tfxs0 -> getTilesFXSeries().stream()
+                                                                           .noneMatch(tfxs1 -> tfxs1.getSeries().equals(tfxs0.getSeries())))
+                                        .collect(Collectors.toList()));
+        fireTileEvent(SERIES_ADD_EVENT);
     }
     public void removeTilesFXSeries(final TilesFXSeries<String, Number> SERIES) {
         if (null == SERIES) return;
         if (getTilesFXSeries().contains(SERIES)) {
             getTilesFXSeries().remove(SERIES);
-            fireTileEvent(SERIES_EVENT);
+            fireTileEvent(SERIES_REMOVE_EVENT);
         }
     }
     public void clearTilesFXSeries() {
         getTilesFXSeries().clear();
-        fireTileEvent(SERIES_EVENT);
+        fireTileEvent(SERIES_REMOVE_EVENT);
     }
 
     public ObservableList<BarChartItem> getBarChartItems() {

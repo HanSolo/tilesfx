@@ -25,7 +25,7 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.PrettyListView;
 import javafx.beans.InvalidationListener;
-import javafx.collections.WeakListChangeListener;
+import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
@@ -48,6 +48,7 @@ public class LeaderBoardTileSkin extends TileSkin {
     private ChartDataEventListener                         updateHandler;
     private InvalidationListener                           paneSizeListener;
     private Map<LeaderBoardItem, EventHandler<MouseEvent>> handlerMap;
+    private ListChangeListener<LeaderBoardItem>            leaderBoardItemListener;
 
 
     // ******************** Constructors **************************************
@@ -60,15 +61,40 @@ public class LeaderBoardTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        updateHandler    = e -> {
+        updateHandler           = e -> {
             final EventType TYPE = e.getType();
             switch (TYPE) {
                 case UPDATE  : updateChart(); break;
                 case FINISHED: sortItems(); break;
             }
         };
-        paneSizeListener = o -> resizeItems();
-        handlerMap       = new HashMap<>();
+        paneSizeListener        = o -> resizeItems();
+        handlerMap              = new HashMap<>();
+        leaderBoardItemListener = change -> {
+            while (change.next()) {
+                if (change.wasPermutated()) {
+                } else if (change.wasUpdated()) {
+                } else if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(addedItem -> {
+                        addedItem.setFormatString(formatString);
+                        addedItem.addChartDataEventListener(updateHandler);
+                        addedItem.setItemSortingTopic(tile.getItemSortingTopic());
+                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
+                        handlerMap.put(addedItem, clickHandler);
+                        addedItem.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+                        leaderBoardPane.getItems().add(addedItem);
+                    });
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().forEach(removedItem -> {
+                        removedItem.removeChartDataEventListener(updateHandler);
+                        removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
+                        leaderBoardPane.getItems().remove(removedItem);
+                    });
+                }
+            }
+            updateChart();
+            resizeItems();
+        };
 
         registerItemListeners();
 
@@ -118,31 +144,7 @@ public class LeaderBoardTileSkin extends TileSkin {
             item.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         });
 
-        tile.getLeaderBoardItems().addListener(new WeakListChangeListener<>(change -> {
-            while (change.next()) {
-                if (change.wasPermutated()) {
-                } else if (change.wasUpdated()) {
-                } else if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(addedItem -> {
-                        addedItem.setFormatString(formatString);
-                        addedItem.addChartDataEventListener(updateHandler);
-                        addedItem.setItemSortingTopic(tile.getItemSortingTopic());
-                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
-                        handlerMap.put(addedItem, clickHandler);
-                        addedItem.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
-                        leaderBoardPane.getItems().add(addedItem);
-                    });
-                } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedItem -> {
-                        removedItem.removeChartDataEventListener(updateHandler);
-                        removedItem.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(removedItem));
-                        leaderBoardPane.getItems().remove(removedItem);
-                    });
-                }
-            }
-            updateChart();
-            resizeItems();
-        }));
+        tile.getLeaderBoardItems().addListener(leaderBoardItemListener);
     }
 
     private void sortItems() {
@@ -178,6 +180,7 @@ public class LeaderBoardTileSkin extends TileSkin {
             item.removeChartDataEventListener(updateHandler);
             item.removeEventHandler(MouseEvent.MOUSE_PRESSED, handlerMap.get(item));
         });
+        tile.getLeaderBoardItems().removeListener(leaderBoardItemListener);
         handlerMap.clear();
         super.dispose();
     }

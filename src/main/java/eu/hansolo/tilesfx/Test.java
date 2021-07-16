@@ -21,6 +21,8 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.addons.ImageSpinner;
 import eu.hansolo.tilesfx.addons.SpinnerBuilder;
 import eu.hansolo.tilesfx.addons.SpinnerType;
+import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -41,6 +43,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.List;
 import java.util.Random;
 
 
@@ -57,36 +60,22 @@ public class Test extends Application {
     private static final double          HEIGHT    = 400;
     private static       int             noOfNodes = 0;
     private              Tile            tile;
-    private              DoubleProperty  value;
     private              long            lastTimerCall;
     private AnimationTimer               timer;
 
 
 
     @Override public void init() {
-        value = new SimpleDoubleProperty();
-
         tile = TileBuilder.create()
-                          .skinType(SkinType.SPINNER)
+                          .skinType(SkinType.CYCLE_STEP)
                           .prefSize(WIDTH, HEIGHT)
-                          .title("SpinnerTile")
-                          .minValue(-50)
-                          .maxValue(50)
-                          .value(0)
-                          .decimals(2)
-                          //.unit("€")
-                          .text("Animated number spinner")
-                          .animated(false)
+                          .title("CycleStep Tile")
+                          .textVisible(false)
+                          //.chartData(chartData1, chartData2, chartData3, chartData4, chartData5)
+                          .animated(true)
+                          .decimals(1)
+                          .autoItemTextColor(true)
                           .build();
-
-
-        tile.currentValueProperty().addListener((o, ov, nv) -> {
-            if (nv.doubleValue() < 0) {
-                tile.setValueColor(Tile.RED);
-            } else {
-                tile.setValueColor(Tile.FOREGROUND);
-            }
-        });
 
 
         lastTimerCall = System.nanoTime();
@@ -111,6 +100,21 @@ public class Test extends Application {
         stage.setScene(scene);
         stage.show();
 
+
+        ChartData chartData1 = new ChartData("Item 1", 24.0, Tile.GREEN);
+        ChartData chartData2 = new ChartData("Item 2", 10.0, Tile.BLUE);
+        ChartData chartData3 = new ChartData("Item 3", 12.0, Tile.RED);
+        ChartData chartData4 = new ChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
+        List<ChartData> items1 = List.of(chartData1, chartData2, chartData3, chartData4);
+
+        ChartData chartData5 = new ChartData("Item 5", 13.0, Tile.BLUE);
+        ChartData chartData6 = new ChartData("Item 6", 13.0, Tile.BLUE);
+        ChartData chartData7 = new ChartData("Item 7", 13.0, Tile.BLUE);
+        ChartData chartData8 = new ChartData("Item 8", 13.0, Tile.BLUE);
+        List<ChartData> items2 = List.of(chartData5, chartData6, chartData7, chartData8);
+
+        tile.getChartData().setAll(items1);
+        tile.getChartData().addAll(items2);
 
         // Calculate number of nodes
         calcNoOfNodes(pane);

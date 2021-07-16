@@ -20,6 +20,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.SmoothedChart;
+import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.events.SmoothedChartEvent;
 import eu.hansolo.tilesfx.events.TileEvent;
 import eu.hansolo.tilesfx.events.TileEvent.EventType;
@@ -29,9 +30,12 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -120,10 +124,25 @@ public class SmoothedChartTileSkin extends TileSkin {
                 case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
                 default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
             }
+        } else if (EventType.SERIES_SET.name().equals(EVENT_TYPE)) {
             chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
             tile.getTilesFXSeries()
                 .stream()
                 .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
+        } else if (EventType.SERIES_ADD.name().equals(EVENT_TYPE)) {
+            List<Series<String, Number>> seriesToAdd = tile.getTilesFXSeries()
+                                                           .stream()
+                                                           .map(tilesFxSeries -> tilesFxSeries.getSeries())
+                                                           .collect(Collectors.toList());
+            chart.getData().addAll(seriesToAdd.stream().filter(s -> !chart.getData().contains(s)).collect(Collectors.toList()));
+        } else if (EventType.SERIES_REMOVE.name().equals(EVENT_TYPE)) {
+            List<Series<String, Number>> seriesToRemove = new ArrayList<>();
+            for (Series<String, Number> series : chart.getData()) {
+                TilesFXSeries<String, Number> tfxs = tile.getTilesFXSeries().stream().filter(tfxSeries -> tfxSeries.getSeries().equals(series)).findFirst().orElse(null);
+                if (null != tfxs) { continue; }
+                seriesToRemove.add(series);
+            }
+            chart.getData().removeAll(seriesToRemove);
         }
     }
 

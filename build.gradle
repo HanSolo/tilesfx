@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -15,9 +17,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// TilesFX main build file
-import java.text.SimpleDateFormat
 
+// TilesFX main build file
 plugins {
     id 'idea'
     id 'java-library'
@@ -41,11 +42,12 @@ Date buildTimeAndDate = new Date()
 ext {
     buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
     buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+    platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
+    ciOssrhUsername = System.getenv('OSSRH_USERNAME')
+    ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
+    gpgkey          = System.getenv("GPG_PRIVATE_KEY")
+    gpgpassphrase   = System.getenv("PASSPHRASE")
 }
-
-ext.platform = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
-ext.ciOssrhUsername = System.getenv('OSSRH_USERNAME')
-ext.ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
 
 repositories {
     mavenCentral()
@@ -83,16 +85,15 @@ jar {
 
 // start the demo from gradle
 task Demo(type: JavaExec) {
-    mainClass = "eu.hansolo.tilesfx.DemoLauncher"
+    main = "eu.hansolo.tilesfx.DemoLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
 // Only used for internal test
 task Test(type: JavaExec) {
-    mainClass = "eu.hansolo.tilesfx.TestLauncher"
+    main = "eu.hansolo.tilesfx.TestLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
-
 
 // create one jar for the javadoc
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -113,6 +114,10 @@ artifacts {
 }
 
 signing {
+    if (gpgkey && gpgpassphrase) {
+        useInMemoryPgpKeys(gpgkey, gpgpassphrase)
+    }
+
     sign configurations.archives
     sign publishing.publications
 }
@@ -169,6 +174,14 @@ publishing {
             credentials {
                 username = null == ciOssrhUsername ? ossrhUsername : ciOssrhUsername
                 password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
+            }
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/HanSolo/Medusa"
+            credentials {
+                username = System.getenv("GH_USER")
+                password = System.getenv("GH_TOKEN")
             }
         }
     }

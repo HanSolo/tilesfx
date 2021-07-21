@@ -1267,6 +1267,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case WORLDMAP:
                     TILE.setPrefSize(380, 250);
+                    TILE.setDataPointsVisible(true);
                     break;
                 case TIMER_CONTROL:
                     TILE.setSectionsVisible(true);

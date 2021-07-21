@@ -130,6 +130,7 @@ public class WorldMapTileSkin extends TileSkin {
                         circleHandlerMap.put(circle, handler);
                         chartDataLocations.put(addedData.getLocation(), circle);
                         circle.setOnMousePressed(handler);
+                        circle.setVisible(tile.getDataPointsVisible());
                         getPane().getChildren().add(circle);
                     });
                 } else if (change.wasRemoved()) {
@@ -155,18 +156,13 @@ public class WorldMapTileSkin extends TileSkin {
                 poiLocations.put(poi, circle);
             });
 
-        tile.getChartData()
-            .stream()
-            .filter(chartData -> chartData.getLocation() != null)
-            .forEach(chartData -> {
-                String tooltipText = new StringBuilder(chartData.getName()).append("\n")
-                                                                           .append(String.format(Locale.US, formatString, chartData.getValue()))
-                                                                           .toString();
-                Circle circle = new Circle(3, chartData.getLocation().getColor());
-                circle.setOnMousePressed(e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, chartData)));
-                Tooltip.install(circle, new Tooltip(tooltipText));
-                chartDataLocations.put(chartData.getLocation(), circle);
-            });
+        tile.getChartData().stream().filter(chartData -> chartData.getLocation() != null).forEach(chartData -> {
+            String tooltipText = new StringBuilder(chartData.getName()).append("\n").append(String.format(Locale.US, formatString, chartData.getValue())).toString();
+            Circle circle = new Circle(3, null == chartData.getLocation().getColor() ? Color.TRANSPARENT : chartData.getLocation().getColor());
+            circle.setOnMousePressed(e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, chartData)));
+            Tooltip.install(circle, new Tooltip(tooltipText));
+            chartDataLocations.put(chartData.getLocation(), circle);
+        });
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -218,6 +214,7 @@ public class WorldMapTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
+            chartDataLocations.values().forEach(circle -> circle.setVisible(tile.getDataPointsVisible()));
         } else if ("REFRESH".equals(EVENT_TYPE)) {
             refresh();
         }

@@ -6769,6 +6769,7 @@ public class Tile extends Control {
                 break;
             case WORLDMAP:
                 setPrefSize(380, 250);
+                setDataPointsVisible(true);
                 break;
             case TIMER_CONTROL:
                 setSectionsVisible(true);

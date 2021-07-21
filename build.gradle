@@ -45,6 +45,8 @@ ext {
     platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
     ciOssrhUsername = System.getenv('OSSRH_USERNAME')
     ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
+    ciGHUser        = System.getenv('GH_USER')
+    ciGHToken       = System.getenv('GH_TOKEN')
     gpgkey          = System.getenv("GPG_PRIVATE_KEY")
     gpgpassphrase   = System.getenv("PASSPHRASE")
 }
@@ -178,10 +180,10 @@ publishing {
         }
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/HanSolo/Medusa"
+            url = "https://maven.pkg.github.com/HanSolo/tilesfx"
             credentials {
-                username = System.getenv("GH_USER")
-                password = System.getenv("GH_TOKEN")
+                username = null == ciGHUser  ? ghUser  : ciGHUser
+                password = null == ciGHToken ? ghToken : ciGHToken
             }
         }
     }

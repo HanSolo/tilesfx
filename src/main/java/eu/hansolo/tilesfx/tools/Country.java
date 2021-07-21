@@ -22,6 +22,7 @@ import eu.hansolo.tilesfx.icons.Flag;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -313,6 +314,14 @@ public enum Country {
     public String getDisplayName() { return displayName; }
 
     public Location getLocation() { return location; }
+
+    public Flag getFlag() {
+        return Flag.getAsList().parallelStream().filter(flag -> flag.getIso2().equals(name())).findFirst().orElse(Flag.NOT_FOUND);
+    }
+
+    public static final List<Country> getAsList() {
+        return Arrays.asList(values());
+    }
 
     public static final Country iso2(final String iso2) {
         return Arrays.asList(values()).stream().filter(country -> country.name().equalsIgnoreCase(iso2)).findFirst().orElse(null);

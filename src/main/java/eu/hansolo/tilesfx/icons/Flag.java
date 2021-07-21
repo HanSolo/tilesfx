@@ -17,9 +17,11 @@
  */
 package eu.hansolo.tilesfx.icons;
 
+import eu.hansolo.tilesfx.tools.Country;
 import javafx.scene.image.Image;
 
 import java.util.Arrays;
+import java.util.List;
 
 
 public enum Flag {
@@ -318,4 +320,10 @@ public enum Flag {
     public static final Flag iso3(final String iso3) {
         return Arrays.asList(values()).stream().filter(flag -> !flag.iso3.isEmpty()).filter(flag -> flag.iso3.equals(iso3)).findFirst().orElse(NOT_FOUND);
     }
+
+    public Country getCountry() {
+        return Country.getAsList().parallelStream().filter(country -> country.name().equals(getIso2())).findFirst().orElse(null);
+    }
+
+    public static final List<Flag> getAsList() { return Arrays.asList(values()); }
 }

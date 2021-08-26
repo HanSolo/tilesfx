@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.chart;
 
 //import com.sun.javafx.charts.Legend;
 //import com.sun.javafx.charts.Legend.LegendItem;
+
 import eu.hansolo.tilesfx.events.SmoothedChartEvent;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Point;
@@ -44,10 +45,12 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -56,8 +59,8 @@ import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -67,6 +70,8 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -456,9 +461,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public void setSymbolsVisible(final XYChart.Series<X, Y> SERIES, final boolean VISIBLE) {
         if (!getData().contains(SERIES)) { return; }
         for (XYChart.Data<X, Y> data : SERIES.getData()) {
-            StackPane stackPane = (StackPane) data.getNode();
-            if (null == stackPane) { continue; }
-            stackPane.setVisible(VISIBLE);
+            if (null == data.getNode()) { return; }
+            data.getNode().setVisible(VISIBLE);
         }
     }
 
@@ -494,12 +498,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         if (!getData().contains(SERIES)) { return new Dimension2D(0, 0); }
         if (SERIES.getData().isEmpty()) { return new Dimension2D(0, 0); }
         for (XYChart.Data<X, Y> data : SERIES.getData()) {
-            StackPane stackPane = (StackPane) data.getNode();
-            if (null == stackPane) {
-                continue;
-            } else {
-                return new Dimension2D(stackPane.getLayoutBounds().getWidth(), stackPane.getLayoutBounds().getHeight());
-            }
+            if (null == data.getNode()) { return new Dimension2D(0, 0); }
+            return new Dimension2D(data.getNode().getLayoutBounds().getWidth(), data.getNode().getLayoutBounds().getHeight());
         }
         return new Dimension2D(0, 0);
     }
@@ -508,18 +508,41 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         if (SERIES.getData().isEmpty()) { return; }
         double symbolSize = Helper.clamp(0, 30, SIZE);
         for (XYChart.Data<X, Y> data : SERIES.getData()) {
-            StackPane stackPane = (StackPane) data.getNode();
-            if (null == stackPane) { continue; }
-            stackPane.setPrefSize(symbolSize, symbolSize);
+            if (null == data.getNode()) { return; }
+            Node node = data.getNode();
+            if (node instanceof Parent) {
+                Pane pane = (Pane) node;
+                pane.setPrefSize(symbolSize, symbolSize);
+            } else if (node instanceof Control) {
+                Control control = (Control) node;
+                control.setPrefSize(symbolSize, symbolSize);
+            } else if (node instanceof Region) {
+                Region region = (Region) node;
+                region.setPrefSize(symbolSize, symbolSize);
+            } else if (node instanceof Circle) {
+                Circle circle = (Circle) node;
+                circle.setRadius(symbolSize * 0.5);
+            } else if (node instanceof Rectangle) {
+                Rectangle rectangle = (Rectangle) node;
+                rectangle.setWidth(symbolSize);
+                rectangle.setHeight(symbolSize);
+            }
         }
     }
 
     public void setSymbolFill(final Series<X, Y> SERIES, final Background SYMBOL_BACKGROUND) {
         if (!getData().contains(SERIES)) { return; }
         for (XYChart.Data<X, Y> data : SERIES.getData()) {
-            StackPane stackPane = (StackPane) data.getNode();
-            if (null == stackPane) { continue; }
-            stackPane.setBackground(SYMBOL_BACKGROUND);
+            if (null == data.getNode()) { return; }
+            Node node = data.getNode();
+            if (node instanceof Shape) {
+                if (SYMBOL_BACKGROUND.getFills().isEmpty()) { return; }
+                Shape shape = (Shape) node;
+                shape.setFill(SYMBOL_BACKGROUND.getFills().get(0).getFill());
+            } else if (node instanceof Region) {
+                Region region = (Region) node;
+                region.setBackground(SYMBOL_BACKGROUND);
+            }
         }
     }
 
@@ -645,8 +668,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
 
     public Path getFillPath(final Series<X, Y> SERIES) { return getPaths(SERIES) [0]; }
     public Path getStrokePath(final Series<X, Y> SERIES) { return getPaths(SERIES)[1]; }
-    public List<StackPane> getSymbols(final Series<X, Y> SERIES) {
-        return SERIES.getData().stream().map(node -> (StackPane) node.getNode()).collect(Collectors.toList());
+    public List<Node> getSymbols(final Series<X, Y> SERIES) {
+        return SERIES.getData().stream().map(node -> node.getNode()).collect(Collectors.toList());
     }
 
     /**

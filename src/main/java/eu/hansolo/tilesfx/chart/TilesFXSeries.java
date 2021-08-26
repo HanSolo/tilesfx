@@ -40,9 +40,14 @@ public class TilesFXSeries<X, Y> {
     }
     public TilesFXSeries(final Series<X, Y> SERIES, final Paint COLOR) {
         series = SERIES;
-        stroke = COLOR;
-        fill   = COLOR;
-        if (null != COLOR) {
+        if (null == COLOR) {
+            stroke = Color.BLACK;
+            fill   = Color.BLACK;
+            symbolBackground = new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
+            legendSymbolFill = Color.BLACK;
+        } else {
+            stroke = COLOR;
+            fill   = COLOR;
             symbolBackground = new Background(new BackgroundFill(COLOR, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
             legendSymbolFill = COLOR;
         }

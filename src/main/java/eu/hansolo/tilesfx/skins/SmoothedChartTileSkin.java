@@ -196,6 +196,5 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setSymbolsVisible(tile.getDataPointsVisible());
 
         titleText.setFill(tile.getTitleColor());
-
     }
 }

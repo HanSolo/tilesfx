@@ -1,4 +1,5 @@
-## TilesFX <img align="right" src="https://github.com/foojay2020/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100">
+## TilesFX <a href="https://foojay.io/today/works-with-openjdk"><img align="right" src="https://github.com/foojayio/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100"></a>
+<br>
 A JavaFX library containing tiles for Dashboards.
 
 Donations are welcome at [Paypal](https://paypal.me/hans0l0)

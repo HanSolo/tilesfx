@@ -50,7 +50,7 @@ public class ConicalGradient {
 
     // ******************** Constructors **************************************
     public ConicalGradient() {
-        this(0, 0, 0, Arrays.asList(new Stop[]{}));
+        this(0, 0, 0, new ArrayList<>());
     }
     public ConicalGradient(final Stop... STOPS) {
         this(0, 0, 0, Arrays.asList(STOPS));

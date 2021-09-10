@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 
 public class MatrixIcon {
     public static final Color BACKGROUND = Tile.BACKGROUND.darker();
-    
+
     private Pixel[][] matrix = { { new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND) },
                                  { new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND) },
                                  { new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND), new Pixel(BACKGROUND) },
@@ -105,10 +105,6 @@ public class MatrixIcon {
     }
 
     private boolean isValid(final int VALUE) {
-        if (VALUE < 0 || VALUE > 7) {
-            return false;
-        } else {
-            return true;
-        }
+        return VALUE >= 0 && VALUE <= 7;
     }
 }

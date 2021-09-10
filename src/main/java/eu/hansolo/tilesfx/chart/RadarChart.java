@@ -742,9 +742,7 @@ public class RadarChart extends Region {
                         chartCtx.lineTo(point.getX(), point.getY());
                     }
                     chartCtx.lineTo(interpolatedPoints[interpolatedPoints.length - 1].getX(), interpolatedPoints[interpolatedPoints.length - 1].getY());
-                    chartCtx.closePath();
 
-                    chartCtx.fill();
                 } else {
                     chartCtx.beginPath();
                     chartCtx.moveTo(CENTER_X, 0.36239 * size);
@@ -764,9 +762,9 @@ public class RadarChart extends Region {
                     }
                     radiusFactor = ((clamp(MIN_VALUE, MAX_VALUE, data.get(NO_OF_SECTORS - 1).getValue()) - MIN_VALUE) / DATA_RANGE);
                     chartCtx.lineTo(CENTER_X, clamp(0, CIRCLE_RADIUS, CENTER_Y - OFFSET - radiusFactor * RANGE));
-                    chartCtx.closePath();
-                    chartCtx.fill();
                 }
+                chartCtx.closePath();
+                chartCtx.fill();
                 break;
             case SECTOR:
                 chartCtx.translate(CENTER_X, CENTER_Y);

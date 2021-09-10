@@ -20,6 +20,7 @@ package eu.hansolo.tilesfx.tools;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -32,7 +33,7 @@ public class CountryGroup {
     public CountryGroup(final String NAME, final Country... COUNTRIES) {
         name      = NAME;
         countries = new ArrayList<>(COUNTRIES.length);
-        for (Country country : COUNTRIES) { countries.add(country); }
+        countries.addAll(Arrays.stream(COUNTRIES).toList());
     }
 
 

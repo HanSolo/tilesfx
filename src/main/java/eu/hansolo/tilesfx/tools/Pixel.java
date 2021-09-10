@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package eu.hansolo.tilesfx.tools;
 
 import javafx.scene.paint.Color;
@@ -22,6 +23,7 @@ import javafx.scene.paint.Color;
 
 public class Pixel {
     private Color color;
+
 
     // ******************** Constructors **************************************
     public Pixel(final Color color) {

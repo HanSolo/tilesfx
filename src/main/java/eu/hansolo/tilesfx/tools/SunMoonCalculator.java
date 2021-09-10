@@ -216,7 +216,7 @@ public class SunMoonCalculator {
     public static String getDateAsString(final double JULIAN_DAY, final int TIMEZONE_OFFSET) throws Exception {
         if (JULIAN_DAY == -1) return "NO RISE/SET/TRANSIT FOR THIS OBSERVER/DATE";
 
-        int date[] = SunMoonCalculator.getDate(JULIAN_DAY);
+        int[] date = SunMoonCalculator.getDate(JULIAN_DAY);
         return date[0] + "/" + date[1] + "/" + date[2] + " " + ((date[3] + TIMEZONE_OFFSET) % 24) + ":" + date[4] + ":" + date[5] + " UT";
     }
 
@@ -266,8 +266,7 @@ public class SunMoonCalculator {
     }
     public void setDate(int year, int month, int day, int h, int m, int s) throws Exception {
         // The conversion formulas are from Meeus, chapter 7.
-        boolean julian = false;
-        if (year < 1582 || (year == 1582 && month <= 10) || (year == 1582 && month == 10 && day < 15)) julian = true;
+        boolean julian = year < 1582 || (year == 1582 && month <= 10) || (year == 1582 && month == 10 && day < 15);
         if (month < 3) {
             year--;
             month += 12;
@@ -306,7 +305,7 @@ public class SunMoonCalculator {
         double jd = this.jd_UT;
 
         // First the Sun
-        double out[] = doCalc(getSun());
+        double[] out = doCalc(getSun());
         sunAz = out[0];
         sunEl = out[1];
         sunrise = out[2];
@@ -495,7 +494,7 @@ public class SunMoonCalculator {
         // Set radiusAU = 0 for geocentric calculations
         // (rise/set/transit will have no sense in this case)
         double radiusAU     = EARTH_RADIUS / AU;
-        double correction[] = new double[]{radiusAU * Math.cos(longitude) * Math.cos(lst), radiusAU * Math.cos(longitude) * Math.sin(lst), radiusAU * Math.sin(longitude)};
+        double[] correction = new double[]{radiusAU * Math.cos(longitude) * Math.cos(lst), radiusAU * Math.cos(longitude) * Math.sin(lst), radiusAU * Math.sin(longitude)};
         double xtopo        = x - correction[0];
         double ytopo        = y - correction[1];
         double ztopo        = z - correction[2];
@@ -608,7 +607,7 @@ public class SunMoonCalculator {
         for (int i = 0; i < N_ITER; i++) {
             if (riseSetJD == -1) return riseSetJD; // -1 means no rise/set from that location
             setUTDate(riseSetJD);
-            double out[] = IS_SUN ? doCalc(getSun()) : doCalc(getMoon());
+            double[] out = IS_SUN ? doCalc(getSun()) : doCalc(getMoon());
             step = Math.abs(riseSetJD - out[INDEX]);
             riseSetJD = out[INDEX];
         }
@@ -617,9 +616,9 @@ public class SunMoonCalculator {
     }
 
     public double[] getMoonDiskOrientationAngles() {
-        double outS[]    = doCalc(getSun());
-        double moonPos[] = getMoon();
-        double outM[]    = doCalc(moonPos);
+        double[] outS    = doCalc(getSun());
+        double[] moonPos = getMoon();
+        double[] outM    = doCalc(moonPos);
         double moonLon   = moonPos[0], moonLat = moonPos[1], moonRA = outM[6], moonDEC = outM[7];
         double sunRA     = outS[6], sunDEC = outS[7];
 

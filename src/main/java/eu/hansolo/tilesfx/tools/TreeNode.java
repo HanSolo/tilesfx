@@ -192,7 +192,7 @@ public class TreeNode<T> {
             if (null != getParent() && getParent().isRoot()) {
                 myRoot = this;
             } else {
-                myRoot = getMyRoot(getParent());
+                myRoot = (null == getParent()) ? this : getMyRoot(getParent());
             }
         }
         return myRoot;

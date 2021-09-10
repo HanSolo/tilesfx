@@ -18,6 +18,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.SmoothedChart;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
@@ -78,9 +79,10 @@ public class SmoothedChartTileSkin extends TileSkin {
         chart.setSnapToTicks(tile.isSnapToTicks());
         chart.setSymbolsVisible(tile.getDataPointsVisible());
 
-        switch(tile.getChartType()) {
-            case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
-            default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
+        if (tile.getChartType() == ChartType.AREA) {
+            chart.setChartType(SmoothedChart.ChartType.AREA);
+        } else {
+            chart.setChartType(SmoothedChart.ChartType.LINE);
         }
 
         getPane().getChildren().addAll(titleText, chart);
@@ -120,9 +122,10 @@ public class SmoothedChartTileSkin extends TileSkin {
             xAxis.setTickLabelsVisible(tile.getTickLabelsXVisible());
             yAxis.setTickLabelsVisible(tile.getTickLabelsYVisible());
         } else if (EventType.SERIES.name().equals(EVENT_TYPE)) {
-            switch(tile.getChartType()) {
-                case AREA: chart.setChartType(SmoothedChart.ChartType.AREA); break;
-                default  : chart.setChartType(SmoothedChart.ChartType.LINE); break;
+            if (tile.getChartType() == ChartType.AREA) {
+                chart.setChartType(SmoothedChart.ChartType.AREA);
+            } else {
+                chart.setChartType(SmoothedChart.ChartType.LINE);
             }
         } else if (EventType.SERIES_SET.name().equals(EVENT_TYPE)) {
             chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));

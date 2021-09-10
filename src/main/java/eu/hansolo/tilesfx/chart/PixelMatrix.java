@@ -304,24 +304,28 @@ public class PixelMatrix extends Region {
 
     public void shiftLeft() {
         int[] firstColumn = new int[rows];
-        for (int y = 0 ; y < rows ; y++) { firstColumn[y] = matrix[0][y]; }
+        //for (int y = 0 ; y < rows ; y++) { firstColumn[y] = matrix[0][y]; }
+        System.arraycopy(matrix[0], 0, firstColumn, 0, rows);
         for (int y = 0 ; y < rows ; y++) {
             for (int x = 1 ; x < cols ; x++) {
                 matrix[x - 1][y] = matrix[x][y];
             }
         }
-        for (int y = 0 ; y < rows ; y++) { matrix[cols - 1][y] = firstColumn[y]; }
+        //for (int y = 0 ; y < rows ; y++) { matrix[cols - 1][y] = firstColumn[y]; }
+        if (rows >= 0) System.arraycopy(firstColumn, 0, matrix[cols - 1], 0, rows);
         drawMatrix();
     }
     public void shiftRight() {
         int[] lastColumn = new int[rows];
-        for (int y = 0 ; y < rows ; y++) { lastColumn[y] = matrix[cols - 1][y]; }
+        //for (int y = 0 ; y < rows ; y++) { lastColumn[y] = matrix[cols - 1][y]; }
+        System.arraycopy(matrix[cols - 1], 0, lastColumn, 0, rows);
         for (int y = 0 ; y < rows ; y++) {
             for (int x = cols - 2 ; x >= 0 ; x--) {
                 matrix[x + 1][y] = matrix[x][y];
             }
         }
-        for (int y = 0 ; y < rows ; y++) { matrix[0][y] = lastColumn[y]; }
+        //for (int y = 0 ; y < rows ; y++) { matrix[0][y] = lastColumn[y]; }
+        if (rows >= 0) System.arraycopy(lastColumn, 0, matrix[0], 0, rows);
         drawMatrix();
     }
 

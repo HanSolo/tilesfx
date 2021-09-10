@@ -374,7 +374,7 @@ public class FluidTileSkin extends TileSkin {
 
 
     // ******************** Inner Classes *************************************
-    class Point {
+    private class Point {
         double x;
         double y;
         double originalX;

@@ -39,7 +39,7 @@ public class CatmullRom {
 
 
     // ******************** Inner Classes *************************************
-    class CatmullRomSpline {
+    private class CatmullRomSpline {
         private double p0;
         private double p1;
         private double p2;

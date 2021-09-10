@@ -6433,7 +6433,7 @@ public class Tile extends Control {
         fireTileEvent(INFO_REGION_HANDLER_EVENT);
     }
 
-    public boolean isShowing() { return null == showing ? false : showing.get(); }
+    public boolean isShowing() { return null != showing && showing.get(); }
     public BooleanBinding showingProperty() { return showing; }
 
     public void clearData() {

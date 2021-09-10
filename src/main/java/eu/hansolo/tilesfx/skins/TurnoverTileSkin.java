@@ -356,7 +356,7 @@ public class TurnoverTileSkin extends TileSkin {
 
         rankingCircle.setFill(rankColor);
         rankingText.setFill(tile.getBackgroundColor());
-        rankingContainer.setVisible(Ranking.NONE == ranking ? false : true);
+        rankingContainer.setVisible(Ranking.NONE != ranking);
 
         titleText.setFill(tile.getTitleColor());
         valueText.setFill(tile.getValueColor());

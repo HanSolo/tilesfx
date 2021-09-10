@@ -155,18 +155,18 @@ public class RotationEffect extends Region {
     public double getAlpha() { return null == alpha ? _alpha : alpha.get(); }
     public void setAlpha(final double alpha) {
         if (null == this.alpha) {
-            _alpha = clamp(0.0, 1.0, alpha);
+            _alpha = Helper.clamp(0.0, 1.0, alpha);
             updateGradient();
             redraw();
         } else {
-            this.alpha.set(clamp(0.0, 1.0, alpha));
+            this.alpha.set(Helper.clamp(0.0, 1.0, alpha));
         }
     }
     public DoubleProperty alphaProperty() {
         if (null == alpha) {
             alpha = new DoublePropertyBase(_alpha) {
                 @Override protected void invalidated() {
-                    set(clamp(0.0, 1.0, get()));
+                    set(Helper.clamp(0.0, 1.0, get()));
                     updateGradient();
                     redraw();
                 }
@@ -179,14 +179,14 @@ public class RotationEffect extends Region {
 
     public double getCenterX() { return centerX; }
     public void setCenterX(final double centerX) {
-        this.centerX = clamp(0.0, 1.0, centerX);
+        this.centerX = Helper.clamp(0.0, 1.0, centerX);
         updateGradient();
         redraw();
     }
 
     public double getCenterY() { return centerY; }
     public void setCenterY(final double centerY) {
-        this.centerY = clamp(0.0, 1.0, centerY);
+        this.centerY = Helper.clamp(0.0, 1.0, centerY);
         updateGradient();
         redraw();
     }
@@ -201,12 +201,6 @@ public class RotationEffect extends Region {
                                       false, CycleMethod.NO_CYCLE,
                                       new Stop(0.0, getColorWithOpacity(getAlpha())),
                                       new Stop(1.0, Color.TRANSPARENT));
-    }
-
-    private double clamp(final double min, final double max, final double value) {
-        if (value < min) { return min; }
-        if (value > max) { return max; }
-        return value;
     }
 
 

@@ -485,7 +485,7 @@ public class ImageSpinner extends Region implements Spinner {
         redraw();
     }
 
-    @Override public boolean isShowing() { return null == showing ? false : showing.get(); }
+    @Override public boolean isShowing() { return null != showing && showing.get(); }
 
     @Override public void setSnapshotBackground(final Color color) {
         snapshotParameters.setFill(color);

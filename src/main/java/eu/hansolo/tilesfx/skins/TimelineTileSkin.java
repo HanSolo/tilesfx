@@ -294,7 +294,7 @@ public class TimelineTileSkin extends TileSkin {
         lowerThresholdLine = new Line();
         lowerThresholdLine.setStroke(tile.getLowerThresholdColor());
         lowerThresholdLine.getStrokeDashArray().addAll(PREFERRED_WIDTH * 0.005, PREFERRED_WIDTH * 0.005);
-        Helper.enableNode(lowerThresholdLine, tile.isThresholdVisible());
+        Helper.enableNode(lowerThresholdLine, tile.isLowerThresholdVisible());
 
         averageLine = new Line();
         averageLine.setStroke(Tile.FOREGROUND);
@@ -402,7 +402,7 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(averageText2, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             Helper.enableNode(thresholdLine, tile.isThresholdVisible());
-            Helper.enableNode(lowerThresholdLine, tile.isThresholdVisible());
+            Helper.enableNode(lowerThresholdLine, tile.isLowerThresholdVisible());
             Helper.enableNode(sectionGroup, tile.getSectionsVisible());
             Helper.enableNode(percentageInSectionGroup, tile.getSectionsVisible());
             Helper.enableNode(trendText, tile.isTrendVisible());

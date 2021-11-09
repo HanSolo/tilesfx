@@ -70,11 +70,11 @@ public class Test extends Application {
     @Override public void init() {
         cpuData = new ChartData("CPU", RND.nextDouble() * 80, Color.RED);
         memData = new ChartData("MEM", RND.nextDouble() * 80, Color.GREEN);
+        cpuData.setFormatString("%.0f%%");
         tile = TileBuilder.create()
                           .skinType(SkinType.CLUSTER_MONITOR)
                           .prefSize(WIDTH, HEIGHT)
                           .title("Cluster Monitor")
-                          .textVisible(false)
                           .chartData(cpuData, memData)
                           .animated(true)
                           .decimals(1)
@@ -85,11 +85,12 @@ public class Test extends Application {
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
-                if (now > lastTimerCall + 500_000_000l) {
+                if (now > lastTimerCall + 1_000_000_000l) {
                     double v = RND.nextDouble() * tile.getRange() + tile.getMinValue();
                     //tile.setValue(v);
                     cpuData.setValue(RND.nextDouble() * 80);
                     memData.setValue(RND.nextDouble() * 80);
+                    memData.setFormatString("%.1f MB");
                     lastTimerCall = now;
                 }
             }

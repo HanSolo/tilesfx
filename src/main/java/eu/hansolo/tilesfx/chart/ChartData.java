@@ -308,7 +308,10 @@ public class ChartData implements Comparable<ChartData> {
     }
 
     public String getFormatString() { return formatString; }
-    public void setFormatString(final String FORMAT_STRING) { formatString = FORMAT_STRING; }
+    public void setFormatString(final String FORMAT_STRING) {
+        formatString = FORMAT_STRING;
+        fireChartDataEvent(UPDATE_EVENT);
+    }
 
     public double getMaxValue() { return maxValue; }
     public void setMaxValue(final double MAX_VALUE) { maxValue = MAX_VALUE; }

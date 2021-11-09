@@ -288,7 +288,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             compressed        = false;
             chartDataListener = e -> {
                 switch(e.getType()) {
-                    case UPDATE  : update(); break;
+                    case UPDATE  : setFormatString(e.getData().getFormatString()); break;
                     case FINISHED: update(); break;
                 }
             };

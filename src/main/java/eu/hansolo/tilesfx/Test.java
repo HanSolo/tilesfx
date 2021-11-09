@@ -88,7 +88,7 @@ public class Test extends Application {
                 if (now > lastTimerCall + 1_000_000_000l) {
                     double v = RND.nextDouble() * tile.getRange() + tile.getMinValue();
                     //tile.setValue(v);
-                    cpuData.setValue(RND.nextDouble() * 80);
+                    cpuData.setValue(RND.nextDouble() * 110);
                     memData.setValue(RND.nextDouble() * 80);
                     memData.setFormatString("%.1f MB");
                     lastTimerCall = now;
@@ -111,7 +111,9 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        timer.start();
+
+        cpuData.setValue(120);
+        //timer.start();
     }
 
     @Override public void stop() {

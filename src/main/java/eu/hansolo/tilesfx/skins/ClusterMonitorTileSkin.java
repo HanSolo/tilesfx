@@ -334,7 +334,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
 
         public void update() {
             value.setText(String.format(Locale.US, formatString, chartData.getValue()));
-            bar.setWidth(chartData.getValue() * step);
+            bar.setWidth(Helper.clamp(0, getPrefWidth(), chartData.getValue() * step));
             if (tile.isFillWithGradient() && null != chartData.getGradientLookup()) {
                 bar.setFill(chartData.getGradientLookup().getColorAt(chartData.getValue() / (chartData.getMaxValue() - chartData.getMinValue())));
             } else {
@@ -365,7 +365,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             title.setPrefSize(textWidth, textHeight);
             value.setPrefSize(textWidth, textHeight);
 
-            Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * (compressed ? 0.5 : 0.35)));
+            Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * (compressed ? 0.5 : 0.30)));
             title.setFont(font);
             value.setFont(font);
 

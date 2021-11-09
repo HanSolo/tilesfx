@@ -40,9 +40,9 @@ mainClassName = "$moduleName/eu.hansolo.tilesfx.Demo"
 
 Date buildTimeAndDate = new Date()
 ext {
-    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
-    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
-    platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
+    buildDate       = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime       = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+    platform        = osdetector.os == 'osx' ? osdetector.arch == 'aarch_64' ? 'mac-aarch64' : 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os == 'linux' ? osdetector.arch == 'aarch_64' ? 'linux-aarch64' : 'linux' : osdetector.os
     ciOssrhUsername = System.getenv('OSSRH_USERNAME')
     ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
     ciGHUser        = System.getenv('GH_USER')
@@ -56,12 +56,12 @@ repositories {
 }
 
 dependencies {
-    implementation "org.openjfx:javafx-base:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-graphics:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-controls:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-swing:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-web:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-media:17.0.0.1:$platform"
+    implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-web:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
 }
 
 jar {

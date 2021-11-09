@@ -60,18 +60,22 @@ public class Test extends Application {
     private static final double          HEIGHT    = 400;
     private static       int             noOfNodes = 0;
     private              Tile            tile;
+    private              ChartData       cpuData;
+    private              ChartData       memData;
     private              long            lastTimerCall;
     private AnimationTimer               timer;
 
 
 
     @Override public void init() {
+        cpuData = new ChartData("CPU", RND.nextDouble() * 80, Color.RED);
+        memData = new ChartData("MEM", RND.nextDouble() * 80, Color.GREEN);
         tile = TileBuilder.create()
-                          .skinType(SkinType.CYCLE_STEP)
+                          .skinType(SkinType.CLUSTER_MONITOR)
                           .prefSize(WIDTH, HEIGHT)
-                          .title("CycleStep Tile")
+                          .title("Cluster Monitor")
                           .textVisible(false)
-                          //.chartData(chartData1, chartData2, chartData3, chartData4, chartData5)
+                          .chartData(cpuData, memData)
                           .animated(true)
                           .decimals(1)
                           .autoItemTextColor(true)
@@ -81,9 +85,11 @@ public class Test extends Application {
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
-                if (now > lastTimerCall + 5_000_000_000l) {
+                if (now > lastTimerCall + 500_000_000l) {
                     double v = RND.nextDouble() * tile.getRange() + tile.getMinValue();
-                    tile.setValue(v);
+                    //tile.setValue(v);
+                    cpuData.setValue(RND.nextDouble() * 80);
+                    memData.setValue(RND.nextDouble() * 80);
                     lastTimerCall = now;
                 }
             }
@@ -99,22 +105,6 @@ public class Test extends Application {
         stage.setTitle("Test");
         stage.setScene(scene);
         stage.show();
-
-
-        ChartData chartData1 = new ChartData("Item 1", 24.0, Tile.GREEN);
-        ChartData chartData2 = new ChartData("Item 2", 10.0, Tile.BLUE);
-        ChartData chartData3 = new ChartData("Item 3", 12.0, Tile.RED);
-        ChartData chartData4 = new ChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
-        List<ChartData> items1 = List.of(chartData1, chartData2, chartData3, chartData4);
-
-        ChartData chartData5 = new ChartData("Item 5", 13.0, Tile.BLUE);
-        ChartData chartData6 = new ChartData("Item 6", 13.0, Tile.BLUE);
-        ChartData chartData7 = new ChartData("Item 7", 13.0, Tile.BLUE);
-        ChartData chartData8 = new ChartData("Item 8", 13.0, Tile.BLUE);
-        List<ChartData> items2 = List.of(chartData5, chartData6, chartData7, chartData8);
-
-        tile.getChartData().setAll(items1);
-        tile.getChartData().addAll(items2);
 
         // Calculate number of nodes
         calcNoOfNodes(pane);

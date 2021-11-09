@@ -120,6 +120,9 @@ public class Demo extends Application {
     private ChartData       smoothChartData3;
     private ChartData       smoothChartData4;
 
+    private ChartData       cpuData;
+    private ChartData       memData;
+
     private Rank            firstRank;
 
     private Tile            percentageTile;
@@ -176,6 +179,7 @@ public class Demo extends Application {
     private Tile            happinessTile;
     private Tile            radialDistributionTile;
     private Tile            spinnerTile;
+    private Tile            clusterMonitorTile;
 
 
     private long            lastTimerCall;
@@ -279,6 +283,9 @@ public class Demo extends Application {
         smoothChartData2 = new ChartData("Item 2", RND.nextDouble() * 25, Tile.BLUE);
         smoothChartData3 = new ChartData("Item 3", RND.nextDouble() * 25, Tile.BLUE);
         smoothChartData4 = new ChartData("Item 4", RND.nextDouble() * 25, Tile.BLUE);
+
+        cpuData = new ChartData("CPU", RND.nextDouble() * 80, Tile.RED);
+        memData = new ChartData("MEM", RND.nextDouble() * 80, Tile.GREEN);
 
         // Creating Tiles
         percentageTile = TileBuilder.create()
@@ -1170,6 +1177,14 @@ public class Demo extends Application {
                                  .build();
         spinnerTile.currentValueProperty().addListener((o, ov, nv) -> spinnerTile.setValueColor(nv.doubleValue() < 0 ? Tile.RED : Tile.FOREGROUND));
 
+        clusterMonitorTile = TileBuilder.create()
+                                        .skinType(SkinType.CLUSTER_MONITOR)
+                                        .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                        .title("Cluster Monitor")
+                                        .chartData(cpuData, memData)
+                                        .animated(true)
+                                        .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -1195,6 +1210,9 @@ public class Demo extends Application {
                     chartData6.setValue(RND.nextDouble() * 50);
                     chartData7.setValue(RND.nextDouble() * 50);
                     chartData8.setValue(RND.nextDouble() * 50);
+
+                    cpuData.setValue(RND.nextDouble() * 80);
+                    memData.setValue(RND.nextDouble() * 80);
 
                     barChartTile.getBarChartItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
 
@@ -1272,7 +1290,7 @@ public class Demo extends Application {
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
                                              timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
                                              cycleStepTile, customFlagChartTile, colorTile, turnoverTile, fluidTile, fireSmokeTile,
-                                             gauge2Tile, happinessTile, radialDistributionTile, spinnerTile);
+                                             gauge2Tile, happinessTile, radialDistributionTile, spinnerTile, clusterMonitorTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

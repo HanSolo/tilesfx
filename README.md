@@ -1,4 +1,10 @@
 ## TilesFX <a href="https://foojay.io/today/works-with-openjdk"><img align="right" src="https://github.com/foojayio/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100"></a>
+
+
+[![GitHub stars](https://badgen.net/github/stars/HanSolo/tilesfx)](https://GitHub.com/HanSolo/tilesfx/stargazers/)
+
+[![GitHub license](https://badgen.net/github/license/HanSolo/tilesfx)](https://github.com/HanSolo/tilesfx/blob/master/LICENSE)
+
 <br>
 A JavaFX library containing tiles for Dashboards.
 

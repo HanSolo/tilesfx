@@ -253,14 +253,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
     }
 
     private void updateChart() {
-        int noOfItems = dataItemMap.size();
-        if (noOfItems == 0) return;
-        for (int i = 0 ; i < noOfItems ; i++) {
-            ChartData item = dataItemMap.keySet().iterator().next();
-            dataItemMap.get(item).update();
-
-            if (i > 1) { break; }
-        }
+        dataItemMap.entrySet().forEach(entry -> entry.getValue().update());
     }
 
 

@@ -17,6 +17,7 @@
  */
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.addons.ImageSpinner;
 import eu.hansolo.tilesfx.addons.SpinnerBuilder;
@@ -37,6 +38,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
@@ -60,25 +62,21 @@ public class Test extends Application {
     private static final double          HEIGHT    = 400;
     private static       int             noOfNodes = 0;
     private              Tile            tile;
-    private              ChartData       cpuData;
-    private              ChartData       memData;
     private              long            lastTimerCall;
     private AnimationTimer               timer;
 
 
 
     @Override public void init() {
-        cpuData = new ChartData("CPU", RND.nextDouble() * 80, Color.RED);
-        memData = new ChartData("MEM", RND.nextDouble() * 80, Color.GREEN);
-        cpuData.setFormatString("%.0f%%");
         tile = TileBuilder.create()
-                          .skinType(SkinType.CLUSTER_MONITOR)
+                          .skinType(SkinType.IMAGE_COUNTER)
                           .prefSize(WIDTH, HEIGHT)
-                          .title("Cluster Monitor")
-                          .chartData(cpuData, memData)
-                          .animated(true)
-                          .decimals(1)
-                          .autoItemTextColor(true)
+                          .title("ImageCounter Tile")
+                          .text("Whatever text")
+                          .description("Whatever\nnumbers")
+                          //.unit("$")
+                          .image(new Image(Demo.class.getResourceAsStream("HanSolo.png")))
+                          .imageMask(ImageMask.ROUND)
                           .build();
 
 
@@ -88,9 +86,6 @@ public class Test extends Application {
                 if (now > lastTimerCall + 1_000_000_000l) {
                     double v = RND.nextDouble() * tile.getRange() + tile.getMinValue();
                     //tile.setValue(v);
-                    cpuData.setValue(RND.nextDouble() * 110);
-                    memData.setValue(RND.nextDouble() * 80);
-                    memData.setFormatString("%.1f MB");
                     lastTimerCall = now;
                 }
             }
@@ -111,8 +106,8 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
+        tile.setValue(849089);
 
-        cpuData.setValue(120);
         //timer.start();
     }
 

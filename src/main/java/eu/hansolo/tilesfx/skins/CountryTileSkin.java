@@ -36,8 +36,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 import java.util.List;
 
@@ -88,7 +86,7 @@ public class CountryTileSkin extends TileSkin {
         country = tile.getCountry();
         if (null == country) { country = Country.DE; }
 
-        clickHandler = event -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getColor())));
+        clickHandler = event -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getFill())));
 
         countryPaths = Helper.getHiresCountryPaths().get(country.name());
 

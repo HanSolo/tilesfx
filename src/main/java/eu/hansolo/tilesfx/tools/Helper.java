@@ -847,7 +847,6 @@ public class Helper {
 
     public static final Map<String, List<CountryPath>> getHiresCountryPaths() {
         if (null == hiresCountryProperties) { hiresCountryProperties = readProperties(HIRES_COUNTRY_PROPERTIES); }
-
         Map<String, List<CountryPath>> hiresCountryPaths = new ConcurrentHashMap<>();
         hiresCountryProperties.forEach((key, value) -> {
             String            name     = key.toString();

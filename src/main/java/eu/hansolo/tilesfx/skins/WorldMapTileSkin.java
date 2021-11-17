@@ -86,7 +86,7 @@ public class WorldMapTileSkin extends TileSkin {
         handlerMap       = new HashMap<>();
         circleHandlerMap = new HashMap<>();
 
-        countryPaths = tile.getCountryPaths();
+        countryPaths = tile.getLoresCountryPaths();
 
         String formatString = new StringBuilder("%.").append(tile.getDecimals()).append("f").toString();
 
@@ -179,8 +179,8 @@ public class WorldMapTileSkin extends TileSkin {
         countryPaths.forEach((name, pathList) -> {
             Country country = Country.valueOf(name);
             pathList.forEach(path -> {
-                path.setFill(null == country.getColor() ? fill : country.getColor());
-                path.setStroke(stroke);
+                path.setFill(null == country.getFill() ? fill : country.getFill());
+                path.setStroke(null == country.getStroke() ? stroke : country.getStroke());
                 path.setStrokeWidth(0.2);
             });
             worldPane.getChildren().addAll(pathList);
@@ -196,7 +196,7 @@ public class WorldMapTileSkin extends TileSkin {
         super.registerListeners();
         countryPaths.forEach((name , pathList) -> {
             Country country = Country.valueOf(name);
-            EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getColor())));
+            EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getFill())));
             pathList.forEach(path -> {
                 handlerMap.put(path, clickHandler);
                 path.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
@@ -232,7 +232,7 @@ public class WorldMapTileSkin extends TileSkin {
     private void setFillAndStroke() {
         countryPaths.keySet().forEach(name -> {
             Country country = Country.valueOf(name);
-            setCountryFillAndStroke(country, null == country.getColor() ? tile.getForegroundColor() : country.getColor(), tile.getBackgroundColor());
+            setCountryFillAndStroke(country, null == country.getFill() ? tile.getForegroundColor() : country.getFill(), null == country.getStroke() ? tile.getBackgroundColor() : country.getStroke());
         });
     }
     private void setCountryFillAndStroke(final Country COUNTRY, final Color FILL, final Color STROKE) {
@@ -341,8 +341,8 @@ public class WorldMapTileSkin extends TileSkin {
         countryPaths.forEach((name, pathList) -> {
             Country country = Country.valueOf(name);
             pathList.forEach(path -> {
-                path.setFill(null == country.getColor() ? fill : country.getColor());
-                path.setStroke(stroke);
+                path.setFill(null == country.getFill() ? fill : country.getFill());
+                path.setStroke(null == country.getStroke() ? stroke : country.getStroke());
                 path.setStrokeWidth(0.2);
             });
         });

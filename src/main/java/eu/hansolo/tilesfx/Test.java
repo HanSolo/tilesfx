@@ -69,14 +69,11 @@ public class Test extends Application {
 
     @Override public void init() {
         tile = TileBuilder.create()
-                          .skinType(SkinType.IMAGE_COUNTER)
+                          .skinType(SkinType.WORLDMAP)
                           .prefSize(WIDTH, HEIGHT)
-                          .title("ImageCounter Tile")
+                          .title("Worldmap Tile")
                           .text("Whatever text")
                           .description("Whatever\nnumbers")
-                          //.unit("$")
-                          .image(new Image(Demo.class.getResourceAsStream("HanSolo.png")))
-                          .imageMask(ImageMask.ROUND)
                           .build();
 
 
@@ -106,7 +103,6 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        tile.setValue(849089);
 
         //timer.start();
     }

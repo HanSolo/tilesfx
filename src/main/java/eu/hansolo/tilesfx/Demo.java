@@ -240,7 +240,7 @@ public class Demo extends Application {
             } else {
                 color = Tile.BLUE;
             }
-            Country.values()[i].setColor(color);
+            Country.values()[i].setFill(color);
         }
 
         // TimeControl Data

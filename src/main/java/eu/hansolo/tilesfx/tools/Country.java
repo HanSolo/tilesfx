@@ -284,7 +284,8 @@ public enum Country {
 
     private ValueObject valueObject;
     private double      value;
-    private Color       color;
+    private Color       fill;
+    private Color       stroke;
     private Location    location;
     private String      displayName;
 
@@ -293,7 +294,8 @@ public enum Country {
     Country(final String DISPLAY_NAME, final Location LOCATION) {
         valueObject = null;
         value       = 0;
-        color       = null;
+        fill        = null;
+        stroke      = null;
         location    = LOCATION;
         displayName = DISPLAY_NAME;
     }
@@ -308,8 +310,11 @@ public enum Country {
     public double getValue() { return value; }
     public void setValue(final double VALUE) { value = VALUE; }
 
-    public Color getColor() { return color; }
-    public void setColor(final Color COLOR) { color = COLOR; }
+    public Color getFill() { return fill; }
+    public void setFill(final Color FILL) { fill = FILL; }
+
+    public Color getStroke() { return stroke; }
+    public void setStroke(final Color STROKE) { stroke = STROKE; }
 
     public String getDisplayName() { return displayName; }
 

@@ -5925,11 +5925,19 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns a list of path elements that define the countries
-     * @return a list of path elements that define the countries
+     * Returns a list of lores path elements that define the countries
+     * @return a list of lores path elements that define the countries
      */
-    public Map<String, List<CountryPath>> getCountryPaths() {
+    public Map<String, List<CountryPath>> getLoresCountryPaths() {
         return Helper.getLoresCountryPaths();
+    }
+
+    /**
+     * Returns a list of highres path elements that define the countries
+     * @return a list of highres path elements that define the countries
+     */
+    public Map<String, List<CountryPath>> getHighresCountryPaths() {
+        return Helper.getHiresCountryPaths();
     }
 
     /**

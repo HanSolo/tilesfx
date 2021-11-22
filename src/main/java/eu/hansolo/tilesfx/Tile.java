@@ -159,7 +159,7 @@ public class Tile extends Control {
                            CYCLE_STEP("CycleStepTileSkin"), COLOR("ColorTileSkin"),
                            FLUID("FluidTileSkin"), FIRE_SMOKE("FireSmokeTileSkin"),
                            TURNOVER("TurnoverTileSkin"), RADIAL_DISTRIBUTION("RadialDistributionTileSkin"),
-                           SPINNER("Spinner");
+                           SPINNER("Spinner"), CENTER_TEXT("CenterTextTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -6715,7 +6715,8 @@ public class Tile extends Control {
             case FIRE_SMOKE          : return new FireSmokeTileSkin(Tile.this);
             case TURNOVER            : return new TurnoverTileSkin(Tile.this);
             case RADIAL_DISTRIBUTION : return new RadialDistributionTileSkin(Tile.this);
-            case SPINNER: return new SpinnerTileSkin(Tile.this);
+            case SPINNER             : return new SpinnerTileSkin(Tile.this);
+            case CENTER_TEXT         : return new CenterTextTileSkin(Tile.this);
             default                  : return new TileSkin(Tile.this);
         }
     }
@@ -6927,6 +6928,9 @@ public class Tile extends Control {
                 break;
             case SPINNER:
                 break;
+            case CENTER_TEXT:
+                setDescriptionAlignment(Pos.CENTER);
+                break;
             default:
                 break;
         }
@@ -6987,7 +6991,8 @@ public class Tile extends Control {
             case FIRE_SMOKE         : setSkin(new FireSmokeTileSkin(Tile.this)); break;
             case TURNOVER           : setSkin(new TurnoverTileSkin(Tile.this)); break;
             case RADIAL_DISTRIBUTION: setSkin(new RadialDistributionTileSkin(Tile.this)); break;
-            case SPINNER: setSkin(new SpinnerTileSkin(Tile.this)); break;
+            case SPINNER            : setSkin(new SpinnerTileSkin(Tile.this)); break;
+            case CENTER_TEXT        : setSkin(new CenterTextTileSkin(Tile.this)); break;
             default                 : setSkin(new TileSkin(Tile.this)); break;
         }
         fireTileEvent(RESIZE_EVENT);

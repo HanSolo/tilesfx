@@ -1415,6 +1415,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case SPINNER:
                     break;
+                case CENTER_TEXT:
+                    TILE.setDescriptionAlignment(Pos.CENTER);
+                    break;
                 default:
                     break;
             }

@@ -76,8 +76,10 @@ import javafx.stage.Stage;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -91,10 +93,11 @@ import java.util.concurrent.TimeUnit;
  * Time: 12:54
  */
 public class Demo extends Application {
-    private static final    Random RND = new Random();
-    private static final    double TILE_WIDTH  = 150;
-    private static final    double TILE_HEIGHT = 150;
-    private                 int    noOfNodes = 0;
+    private static final    Random            RND         = new Random();
+    private static final    DateTimeFormatter DTF         = DateTimeFormatter.ofPattern("mm.DD.yyyy HH:mm:ss");
+    private static final    double            TILE_WIDTH  = 150;
+    private static final    double            TILE_HEIGHT = 150;
+    private                 int               noOfNodes   = 0;
 
     private BarChartItem    barChartItem1;
     private BarChartItem    barChartItem2;
@@ -180,6 +183,7 @@ public class Demo extends Application {
     private Tile            radialDistributionTile;
     private Tile            spinnerTile;
     private Tile            clusterMonitorTile;
+    private Tile            centerTextTile;
 
 
     private long            lastTimerCall;
@@ -1185,6 +1189,15 @@ public class Demo extends Application {
                                         .animated(true)
                                         .build();
 
+        centerTextTile = TileBuilder.create()
+                                    .skinType(SkinType.CENTER_TEXT)
+                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                    .backgroundColor(Dark.GREEN)
+                                    .title("Server")
+                                    .description("ONLINE")
+                                    .text(DTF.format(LocalDateTime.now()))
+                                    .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -1267,6 +1280,10 @@ public class Demo extends Application {
 
                     spinnerTile.setValue(RND.nextDouble() * spinnerTile.getRange() + spinnerTile.getMinValue());
 
+                    centerTextTile.setDescription(RND.nextBoolean() ? "ONLINE" : "OFFLINE");
+                    centerTextTile.setBackgroundColor(centerTextTile.getDescription().equals("ONLINE") ? Dark.GREEN : Dark.RED);
+                    centerTextTile.setText(DTF.format(LocalDateTime.now()));
+
                     lastTimerCall = now;
                 }
             }
@@ -1290,7 +1307,7 @@ public class Demo extends Application {
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
                                              timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
                                              cycleStepTile, customFlagChartTile, colorTile, turnoverTile, fluidTile, fireSmokeTile,
-                                             gauge2Tile, happinessTile, radialDistributionTile, spinnerTile, clusterMonitorTile);
+                                             gauge2Tile, happinessTile, radialDistributionTile, spinnerTile, clusterMonitorTile, centerTextTile);
 
         pane.setHgap(5);
         pane.setVgap(5);

@@ -129,6 +129,9 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         this(NAME, VALUE, Instant.now(), DURATION);
     }
     public LeaderBoardItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION) {
+        this(NAME, VALUE, TIMESTAMP, DURATION, false);
+    }
+    public LeaderBoardItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION, final boolean SHORTEN_NUMBERS) {
         chartData            = new ChartData(NAME, VALUE, TIMESTAMP, DURATION);
         nameColor            = new ObjectPropertyBase<>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
@@ -145,7 +148,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
             @Override public Object getBean() { return LeaderBoardItem.this; }
             @Override public String getName() { return "separatorColor"; }
         };
-        shortenNumbers       = false;
+        shortenNumbers       = SHORTEN_NUMBERS;
         itemSortingTopic     = ItemSortingTopic.VALUE;
         formatString         = "%.0f";
         durationFormatString = "%d:%02d:%02d";

@@ -98,7 +98,10 @@ public class LeaderBoardTileSkin extends TileSkin {
 
         registerItemListeners();
 
-        tile.getLeaderBoardItems().forEach(item -> item.setItemSortingTopic(tile.getItemSortingTopic()));
+        tile.getLeaderBoardItems().forEach(item -> {
+            item.setItemSortingTopic(tile.getItemSortingTopic());
+            item.setShortenNumbers(tile.getShortenNumbers());
+        });
 
         leaderBoardPane = new PrettyListView();
         leaderBoardPane.getItems().addAll(tile.getLeaderBoardItems());
@@ -132,6 +135,9 @@ public class LeaderBoardTileSkin extends TileSkin {
             Helper.enableNode(text, tile.isTextVisible());
         } else if (TileEvent.EventType.DATA.name().equals(EVENT_TYPE)) {
             registerItemListeners();
+        } else if (TileEvent.EventType.RECALC.name().equals(EVENT_TYPE)) {
+            tile.getLeaderBoardItems().forEach(item -> item.setShortenNumbers(tile.getShortenNumbers()));
+            redraw();
         }
     }
 

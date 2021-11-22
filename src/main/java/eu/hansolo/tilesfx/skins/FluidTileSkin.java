@@ -168,7 +168,9 @@ public class FluidTileSkin extends TileSkin {
 
     @Override protected void handleCurrentValue(final double VALUE) {
         double percentage = VALUE / (tile.getRange());
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(Helper.clamp(minValue, maxValue, VALUE)));
         } else {
             valueText.setText(String.format(locale, formatString, Helper.clamp(minValue, maxValue, VALUE)));

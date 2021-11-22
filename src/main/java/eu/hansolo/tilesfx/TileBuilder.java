@@ -141,7 +141,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B decimals(final int DECIMALS) {
         properties.put("decimals", new SimpleIntegerProperty(DECIMALS));
-        return (B) this;
+        return (B)this;
+    }
+
+    public final B shortenNumbers(final boolean SHORTEN) {
+        properties.put("shortenNumbers", new SimpleBooleanProperty(SHORTEN));
+        return (B)this;
     }
 
     public final B tickLabelDecimals(final int DECIMALS) {
@@ -1580,6 +1585,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setValue(((DoubleProperty) properties.get(key)).get());
             } else if("decimals".equals(key)) {
                 TILE.setDecimals(((IntegerProperty) properties.get(key)).get());
+            } else if ("shortenNumbers".equals(key)) {
+                TILE.setShortenNumbers(((BooleanProperty) properties.get(key)).get());
             } else if("tickLabelDecimals".equals(key)) {
                 TILE.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
             } else if ("tickLabelsXVisible".equals(key)) {

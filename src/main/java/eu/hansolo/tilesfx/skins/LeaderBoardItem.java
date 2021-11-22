@@ -94,6 +94,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     private              ObjectProperty<Color> nameColor;
     private              ObjectProperty<Color> valueColor;
     private              ObjectProperty<Color> separatorColor;
+    private              boolean               shortenNumbers;
     private              State                 state;
     private              String                formatString;
     private              String                durationFormatString;
@@ -144,6 +145,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
             @Override public Object getBean() { return LeaderBoardItem.this; }
             @Override public String getName() { return "separatorColor"; }
         };
+        shortenNumbers       = false;
         itemSortingTopic     = ItemSortingTopic.VALUE;
         formatString         = "%.0f";
         durationFormatString = "%d:%02d:%02d";
@@ -242,6 +244,12 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
     public void setSeparatorColor(final Color COLOR) { separatorColor.set(COLOR); }
     public ObjectProperty<Color> separatorColorProperty() { return separatorColor; }
 
+    public boolean getShortenNumbers() { return shortenNumbers; }
+    public void setShortenNumbers(final boolean SHORTEN) {
+        this.shortenNumbers = shortenNumbers;
+        updateValueText();
+    }
+
     public int getIndex() { return index; }
     public void setIndex(final int INDEX) {
         lastIndex = index;
@@ -322,7 +330,13 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
                 break;
             case TIMESTAMP: valueText.setText(timestampFormatter.format(ZonedDateTime.ofInstant(getTimestamp(), ZoneId.systemDefault()))); break;
             case VALUE    :
-            default       : valueText.setText(String.format(locale, formatString, getValue())); break;
+            default       :
+                if (getShortenNumbers()) {
+                    valueText.setText(Helper.shortenNumber((long) getValue()));
+                } else {
+                    valueText.setText(String.format(locale, formatString, getValue()));
+                }
+                break;
         }
         valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
     }

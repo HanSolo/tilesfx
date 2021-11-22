@@ -104,6 +104,7 @@ public class BarChartTileSkin extends TileSkin {
             handlerMap.put(item, clickHandler);
             item.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
             item.setMaxValue(tile.getMaxValue());
+            item.setShortenNumbers(tile.getShortenNumbers());
             if (null == item.getFormatString() || item.getFormatString().isEmpty()) {
                 item.setFormatString(formatString);
             }
@@ -145,6 +146,9 @@ public class BarChartTileSkin extends TileSkin {
             tile.getBarChartItems().forEach(item -> item.getChartData().setAnimated(true));
         } else if (EventType.ANIMATED_OFF.name().equals(EVENT_TYPE)) {
             tile.getBarChartItems().forEach(item -> item.getChartData().setAnimated(false));
+        } else if (EventType.RECALC.name().equals(EVENT_TYPE)) {
+            tile.getBarChartItems().forEach(item -> item.setShortenNumbers(tile.getShortenNumbers()));
+            redraw();
         }
     }
 

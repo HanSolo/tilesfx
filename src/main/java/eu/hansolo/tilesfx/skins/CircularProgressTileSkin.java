@@ -200,12 +200,15 @@ public class CircularProgressTileSkin extends TileSkin {
         setBarColor(VALUE);
 
         percentageValueText.setText(String.format(locale, formatString, VALUE / range * 100.0));
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(VALUE));
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));
         }
     }
+
     
     private void setBarColor(final double VALUE) {
         if (!sectionsVisible) {

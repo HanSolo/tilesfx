@@ -697,7 +697,9 @@ public class TimelineTileSkin extends TileSkin {
             averageText2.setText(String.format(locale, "\u2300 " + formatString, average));
         }
 
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(VALUE));
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));

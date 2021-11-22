@@ -90,8 +90,10 @@ public class Test extends Application {
                            .prefSize(WIDTH, HEIGHT)
                            .title("Production")
                            .text("blabla")
+                           .maxValue(20000)
                            .chartData(cpuChartData, memChartData)
                            .animated(true)
+                           .shortenNumbers(true)
                            .build();
 
         tile2 = TileBuilder.create()
@@ -109,8 +111,8 @@ public class Test extends Application {
                 if (now > lastTimerCall + 1_000_000_000l) {
                     //double v = RND.nextDouble() * tile1.getRange() + tile1.getMinValue();
                     //tile.setValue(v);
-                    cpuChartData.setValue(RND.nextDouble() * 100);
-                    memChartData.setValue(RND.nextDouble() * 100);
+                    cpuChartData.setValue(RND.nextDouble() * 10000);
+                    memChartData.setValue(RND.nextDouble() * 10000);
                     lastTimerCall = now;
                 }
             }
@@ -133,7 +135,7 @@ public class Test extends Application {
 
         //tile2.setDescription("OFFLINE");
         //tile2.setBackgroundColor(Dark.RED);
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {

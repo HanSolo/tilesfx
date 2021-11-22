@@ -79,6 +79,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     private              Locale                locale;
     private              double                maxValue;
     private              double                stepSize;
+    private              boolean               shortenNumbers;
     private              ChartData             chartData;
 
 
@@ -128,6 +129,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         maxValue           = 100;
         chartData          = new ChartData(NAME, VALUE, TIMESTAMP, DURATION, COLOR);
         stepSize           = PREFERRED_WIDTH * 0.85 / maxValue;
+        shortenNumbers     = false;
         parentWidth        = 250;
         parentHeight       = 250;
         initGraphics();
@@ -221,6 +223,12 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         updateBar(getValue());
     }
 
+    public boolean getShortenNumbers() { return shortenNumbers; }
+    public void setShortenNumbers(final boolean SHORTEN) {
+        this.shortenNumbers = SHORTEN;
+        updateBar(getValue());
+    }
+
     public void setMaxValue(final double MAX_VALUE) {
         maxValue = MAX_VALUE;
         stepSize = (parentWidth - size * 0.15) / maxValue;
@@ -245,7 +253,11 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     }
 
     private void updateBar(final double VALUE) {
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
         valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
         bar.setWidth(clamp(0, (parentWidth - size * 0.15), VALUE * stepSize));
         bar.setFill(getBarColor());

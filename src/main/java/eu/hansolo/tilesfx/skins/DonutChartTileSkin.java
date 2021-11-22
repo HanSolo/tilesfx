@@ -179,6 +179,8 @@ public class DonutChartTileSkin extends TileSkin {
             legendCanvas.setHeight(legendCanvasHeight);
         } else if (EventType.DATA.name().equals(EVENT_TYPE)) {
             drawChart();
+        } else if (EventType.RECALC.name().equals(EVENT_TYPE)) {
+            drawChart();
         }
     }
 
@@ -258,7 +260,11 @@ public class DonutChartTileSkin extends TileSkin {
                 x = outerRadius * cosValue;
                 y = -outerRadius * sinValue;
                 chartCtx.setFill(data.getTextColor());
-                chartCtx.fillText(String.format(Locale.US, "%.0f", value), center + x, center + y, barWidth);
+                if (tile.getShortenNumbers()) {
+                    chartCtx.fillText(Helper.shortenNumber((long) value), center + x, center + y, barWidth);
+                } else {
+                    chartCtx.fillText(String.format(Locale.US, "%.0f", value), center + x, center + y, barWidth);
+                }
             }
         }
     }

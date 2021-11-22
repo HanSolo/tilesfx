@@ -201,7 +201,11 @@ public class RadialChartTileSkin extends TileSkin {
 
             // Value
             chartCtx.setTextAlign(TextAlignment.CENTER);
-            chartCtx.fillText(String.format(Locale.US, "%.0f", value), barXY, valueY, valueWidth);
+            if (tile.getShortenNumbers()) {
+                chartCtx.fillText(Helper.shortenNumber((long) value), barXY, valueY, valueWidth);
+            } else {
+                chartCtx.fillText(String.format(Locale.US, "%.0f", value), barXY, valueY, valueWidth);
+            }
         }
     }
 

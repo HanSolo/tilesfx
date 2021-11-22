@@ -252,7 +252,9 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         Optional<ChartData> lastDataEntry = data.stream().reduce((first, second) -> second);
         if (lastDataEntry.isPresent()) {
-            if (tile.getCustomDecimalFormatEnabled()) {
+            if (tile.getShortenNumbers()) {
+                valueText.setText(Helper.shortenNumber((long) lastDataEntry.get().getValue()));
+            } else if (tile.getCustomDecimalFormatEnabled()) {
                 valueText.setText(decimalFormat.format(lastDataEntry.get().getValue()));
             } else {
                 valueText.setText(String.format(locale, formatString, lastDataEntry.get().getValue()));

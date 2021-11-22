@@ -404,7 +404,9 @@ public class GaugeSparkLineTileSkin extends TileSkin {
 
             averageText.setText(String.format(locale, formatString, average));
         }
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(VALUE));
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));

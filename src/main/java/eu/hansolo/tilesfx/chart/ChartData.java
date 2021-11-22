@@ -132,8 +132,7 @@ public class ChartData implements Comparable<ChartData> {
     public ChartData(final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Color TEXT_COLOR, final Instant TIMESTAMP, final boolean ANIMATED, final long ANIMATION_DURATION) {
         this(null, NAME, VALUE, FILL_COLOR, STROKE_COLOR, TEXT_COLOR, TIMESTAMP, java.time.Duration.ZERO, ANIMATED, ANIMATION_DURATION);
     }
-    public ChartData(final Image IMAGE, final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Color TEXT_COLOR, final Instant TIMESTAMP, final
-                     java.time.Duration DURATION, final boolean ANIMATED, final long ANIMATION_DURATION) {
+    public ChartData(final Image IMAGE, final String NAME, final double VALUE, final Color FILL_COLOR, final Color STROKE_COLOR, final Color TEXT_COLOR, final Instant TIMESTAMP, final java.time.Duration DURATION, final boolean ANIMATED, final long ANIMATION_DURATION) {
         image              = IMAGE;
         name               = NAME;
         value              = VALUE;

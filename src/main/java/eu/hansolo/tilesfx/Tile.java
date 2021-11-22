@@ -449,6 +449,8 @@ public class Tile extends Control {
     private ObjectProperty<NumberFormat>                  numberFormat;
     private int                                           _decimals;
     private IntegerProperty                               decimals;
+    private boolean                                       _shortenNumbers;
+    private BooleanProperty                               shortenNumbers;
     private int                                           _tickLabelDecimals;
     private IntegerProperty                               tickLabelDecimals;
     private boolean                                       _tickLabelsXVisible;
@@ -717,6 +719,7 @@ public class Tile extends Control {
                 @NamedArg(value="locale", defaultValue="Locale.US") Locale locale,
                 @NamedArg(value="numberFormat", defaultValue="NumberFormat.getInstance(Locale.US)") NumberFormat numberFormat,
                 @NamedArg(value="decimals", defaultValue="1") int decimals,
+                @NamedArg(value="shortenNumbers", defaultValue="false") boolean shorteNumbers,
                 @NamedArg(value="tickLabelDecimals", defaultValue="1") int tickLabelDecimals,
                 @NamedArg(value="tickLabelsXVisible", defaultValue="true") boolean tickLabelsXVisible,
                 @NamedArg(value="tickLabelsYVisible", defaultValue="true") boolean tickLabelsYVisible,
@@ -961,6 +964,7 @@ public class Tile extends Control {
         _locale                             = Locale.US;
         _numberFormat                       = NumberFormat.getInstance(_locale);
         _decimals                           = 1;
+        _shortenNumbers                     = false;
         _tickLabelDecimals                  = 1;
         _tickLabelsXVisible                 = true;
         _tickLabelsYVisible                 = true;
@@ -3566,6 +3570,34 @@ public class Tile extends Control {
             };
         }
         return decimals;
+    }
+
+    /**
+     * If true numbers will be shorten like 1000 -> 1k, 1000000 -> 1M etc.
+     * @return numbers will be shorten like 1000 -> 1k, 1000000 -> 1M etc.
+     */
+    public boolean getShortenNumbers() { return null == shortenNumbers ? _shortenNumbers : shortenNumbers.get(); }
+    /**
+     * If true numbers will be shorten like 1000 -> 1k, 1000000 -> 1M etc.
+     * @param SHORTEN
+     */
+    public void setShortenNumbers(final boolean SHORTEN) {
+        if (null == shortenNumbers) {
+            _shortenNumbers = SHORTEN;
+            fireTileEvent(RECALC_EVENT);
+        } else {
+            shortenNumbers.set(SHORTEN);
+        }
+    }
+    public BooleanProperty shortenNumbersProperty() {
+        if (null == shortenNumbers) {
+            shortenNumbers = new BooleanPropertyBase(_shortenNumbers) {
+                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "shortenNumbers"; }
+            };
+        }
+        return shortenNumbers;
     }
 
     /**

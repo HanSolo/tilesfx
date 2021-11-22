@@ -308,10 +308,14 @@ public class CountryTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getCountry().getDisplayName());
-        if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) tile.getCurrentValue()));
         } else {
-            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            if (tile.getCustomDecimalFormatEnabled()) {
+                valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+            } else {
+                valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            }
         }
         if (tile.getUnit().contains("/")) {
             String[] units = tile.getUnit().split("/");

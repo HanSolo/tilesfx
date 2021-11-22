@@ -148,11 +148,14 @@ public class ClusterMonitorTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             if (null != graphicRegion) { Helper.enableNode(graphicRegion, tile.isTextVisible()); }
-        } else if ("DATA".equals(EVENT_TYPE)) {
+        } else if (EventType.DATA.name().equals(EVENT_TYPE)) {
+            updateChart();
+        } else if (EventType.RECALC.name().equals(EVENT_TYPE)) {
+            dataItemMap.values().forEach(item -> item.setShortenNumbers(tile.getShortenNumbers()));
             updateChart();
         }
     }
@@ -270,6 +273,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
         private              String                 formatString;
         private              double                 step;
         private              boolean                compressed;
+        private              boolean                shortenNumbers;
         private              ChartDataEventListener chartDataListener;
 
 
@@ -286,6 +290,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             formatString      = FORMAT_STRING;
             step              = PREF_WIDTH / (CHART_DATA.getMaxValue() - CHART_DATA.getMinValue());
             compressed        = false;
+            shortenNumbers    = false;
             chartDataListener = e -> {
                 switch(e.getType()) {
                     case UPDATE  : setFormatString(e.getData().getFormatString()); break;
@@ -332,8 +337,18 @@ public class ClusterMonitorTileSkin extends TileSkin {
             resize();
         }
 
+        public boolean getShortenNumbers() { return shortenNumbers; }
+        public void setShortenNumbers(final boolean SHORTEN) {
+            shortenNumbers = SHORTEN;
+            resize();
+        }
+
         public void update() {
-            value.setText(String.format(Locale.US, formatString, chartData.getValue()));
+            if (shortenNumbers) {
+                value.setText(Helper.shortenNumber((long) chartData.getValue()));
+            } else {
+                value.setText(String.format(Locale.US, formatString, chartData.getValue()));
+            }
             bar.setWidth(Helper.clamp(0, getPrefWidth(), chartData.getValue() * step));
             if (tile.isFillWithGradient() && null != chartData.getGradientLookup()) {
                 bar.setFill(chartData.getGradientLookup().getColorAt(chartData.getValue() / (chartData.getMaxValue() - chartData.getMinValue())));

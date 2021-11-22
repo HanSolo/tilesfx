@@ -50,6 +50,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1349,5 +1351,26 @@ public class Helper {
             case SECONDS:
             default     : return (int) (TIME_PERIOD.getSeconds());
         }
+    }
+
+
+    private static final NavigableMap<Long, String> SUFFIXES = new TreeMap<>(Map.of(1_000L, "k",
+                                                                                    1_000_000L, "M",
+                                                                                    1_000_000_000L, "G",
+                                                                                    1_000_000_000_000L, "T",
+                                                                                    1_000_000_000_000_000L, "P",
+                                                                                    1_000_000_000_000_000_000L, "E"));
+    public static final String shortenNumber(final long value) {
+        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        if (value == Long.MIN_VALUE) { return shortenNumber(Long.MIN_VALUE + 1); }
+        if (value < 0)               { return "-" + shortenNumber(-value); }
+        if (value < 1000)            { return Long.toString(value); }
+
+        final Entry<Long, String> entry    = SUFFIXES.floorEntry(value);
+        final Long                divideBy = entry.getKey();
+        final String              suffix     = entry.getValue();
+        final long                truncated  = value / (divideBy / 10);
+        final boolean             hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
+        return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
 }

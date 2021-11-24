@@ -102,6 +102,9 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     public BarChartItem(final String NAME, final double VALUE, final Color COLOR) {
         this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR);
     }
+    public BarChartItem(final String NAME, final double VALUE, final Color COLOR, final boolean SHORTEN_NUMBERS) {
+        this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR, SHORTEN_NUMBERS);
+    }
     public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Color COLOR) {
         this(NAME, VALUE, TIMESTAMP, Duration.ZERO, COLOR);
     }
@@ -130,7 +133,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         formatString       = "%.0f";
         locale             = Locale.US;
         maxValue           = 100;
-        chartData          = new ChartData(NAME, VALUE, TIMESTAMP, DURATION, COLOR);
+        chartData          = new ChartData(NAME, VALUE, null == TIMESTAMP ? Instant.now() : TIMESTAMP, null == DURATION ? Duration.ZERO : DURATION, COLOR);
         stepSize           = PREFERRED_WIDTH * 0.85 / maxValue;
         shortenNumbers     = SHORTEN_NUMBERS;
         parentWidth        = 250;
@@ -257,7 +260,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
 
     private void updateBar(final double VALUE) {
         if (getShortenNumbers()) {
-            valueText.setText(Helper.shortenNumber((long) VALUE));
+            valueText.setText(Helper.shortenNumber((long) VALUE, locale));
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));
         }

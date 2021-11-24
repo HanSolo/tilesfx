@@ -50,7 +50,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -84,13 +86,13 @@ public class Test extends Application {
         memChartData.setTextColor(Color.WHITE);
         memChartData.setFormatString("%.0f%%");
 
-
         tile1 = TileBuilder.create()
                            .skinType(SkinType.CLUSTER_MONITOR)
                            .prefSize(WIDTH, HEIGHT)
                            .title("Production")
                            .text("blabla")
                            .maxValue(20000)
+                           .locale(Locale.GERMAN)
                            .chartData(cpuChartData, memChartData)
                            .animated(true)
                            .shortenNumbers(true)

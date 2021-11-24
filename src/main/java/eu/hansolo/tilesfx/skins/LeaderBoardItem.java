@@ -132,7 +132,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
         this(NAME, VALUE, TIMESTAMP, DURATION, false);
     }
     public LeaderBoardItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION, final boolean SHORTEN_NUMBERS) {
-        chartData            = new ChartData(NAME, VALUE, TIMESTAMP, DURATION);
+        chartData            = new ChartData(NAME, VALUE, null == TIMESTAMP ? Instant.now() : TIMESTAMP, null == DURATION ? Duration.ZERO : DURATION);
         nameColor            = new ObjectPropertyBase<>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
             @Override public Object getBean() { return LeaderBoardItem.this; }

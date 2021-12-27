@@ -25,10 +25,10 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'com.google.osdetector'           version '1.7.0'
-    id 'org.javamodularity.moduleplugin' version '1.8.8'
+    id 'org.javamodularity.moduleplugin' version '1.8.10'
     id 'org.beryx.jlink'                 version '2.24.4'
-    id 'net.nemerosa.versioning'         version '2.14.0'
-    id 'biz.aQute.bnd.builder'           version '5.3.0'
+    id 'net.nemerosa.versioning'         version '2.15.1'
+    id 'biz.aQute.bnd.builder'           version '6.1.0'
 }
 
 apply plugin: 'biz.aQute.bnd.builder'

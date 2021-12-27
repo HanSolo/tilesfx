@@ -20,8 +20,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.PrettyListView;
@@ -76,7 +75,7 @@ public class BarChartTileSkin extends TileSkin {
                     change.getAddedSubList().forEach(addedItem -> {
                         barChartPane.getItems().add(addedItem);
                         addedItem.addChartDataEventListener(updateHandler);
-                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
+                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, addedItem.getChartData()));
                         handlerMap.put(addedItem, clickHandler);
                         addedItem.setOnMousePressed(clickHandler);
                         addedItem.setMaxValue(tile.getMaxValue());
@@ -100,7 +99,7 @@ public class BarChartTileSkin extends TileSkin {
 
         tile.getBarChartItems().forEach(item -> {
             item.addChartDataEventListener(updateHandler);
-            EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, item.getChartData()));
+            EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, item.getChartData()));
             handlerMap.put(item, clickHandler);
             item.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
             item.setMaxValue(tile.getMaxValue());
@@ -137,16 +136,16 @@ public class BarChartTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
-        } else if (EventType.DATA.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.DATA.getName().equals(EVENT_TYPE)) {
             sortItems();
-        } else if (EventType.ANIMATED_ON.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.ANIMATED_ON.getName().equals(EVENT_TYPE)) {
             tile.getBarChartItems().forEach(item -> item.getChartData().setAnimated(true));
-        } else if (EventType.ANIMATED_OFF.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.ANIMATED_OFF.getName().equals(EVENT_TYPE)) {
             tile.getBarChartItems().forEach(item -> item.getChartData().setAnimated(false));
-        } else if (EventType.RECALC.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.RECALC.getName().equals(EVENT_TYPE)) {
             tile.getBarChartItems().forEach(item -> item.setShortenNumbers(tile.getShortenNumbers()));
             redraw();
         }

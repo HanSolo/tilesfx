@@ -17,10 +17,10 @@
  */
 package eu.hansolo.tilesfx.skins;
 
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.tools.Ranking;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.ImageMask;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.RotationEffect;
@@ -147,9 +147,9 @@ public class TurnoverTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (EventType.VALUE.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VALUE.getName().equals(EVENT_TYPE)) {
             handleCurrentValue(tile.getCurrentValue());
-        } else if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             graphicContainer.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);

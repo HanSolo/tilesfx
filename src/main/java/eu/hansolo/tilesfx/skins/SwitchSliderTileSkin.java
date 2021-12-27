@@ -19,7 +19,7 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.SwitchEvent;
-import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.KeyFrame;
@@ -43,32 +43,32 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
 
 public class SwitchSliderTileSkin extends TileSkin {
-    private static final SwitchEvent SWITCH_PRESSED  = new SwitchEvent(SwitchEvent.SWITCH_PRESSED);
-    private static final SwitchEvent SWITCH_RELEASED = new SwitchEvent(SwitchEvent.SWITCH_RELEASED);
-    private final        TileEvent   VALUE_CHANGING  = new TileEvent(TileEvent.EventType.VALUE_CHANGING);
-    private final        TileEvent   VALUE_CHANGED   = new TileEvent(TileEvent.EventType.VALUE_CHANGED);
-    private Text                     titleText;
-    private Text                     text;
-    private Text                     valueText;
-    private Text                     unitText;
-    private TextFlow                 valueUnitFlow;
-    private Label                    description;
-    private Rectangle                switchBorder;
-    private Rectangle                switchBackground;
-    private Circle                   switchThumb;
-    private Circle                   thumb;
-    private Rectangle                barBackground;
-    private Rectangle                bar;
-    private Point2D                  dragStart;
-    private double                   centerX;
-    private double                   centerY;
-    private double                   formerThumbPos;
-    private double                   trackStart;
-    private double                   trackLength;
-    private Timeline                 timeline;
-    private EventHandler<MouseEvent> mouseEventHandler;
-    private InvalidationListener     selectedListener;
-    private InvalidationListener     valueListener;
+    private static final SwitchEvent              SWITCH_PRESSED  = new SwitchEvent(SwitchEvent.SWITCH_PRESSED);
+    private static final SwitchEvent              SWITCH_RELEASED = new SwitchEvent(SwitchEvent.SWITCH_RELEASED);
+    private final        TileEvt                  VALUE_CHANGING  = new TileEvt(tile, TileEvt.VALUE_CHANGING);
+    private final        TileEvt                  VALUE_CHANGED   = new TileEvt(tile, TileEvt.VALUE_CHANGED);
+    private              Text                     titleText;
+    private              Text                     text;
+    private              Text                     valueText;
+    private              Text                     unitText;
+    private              TextFlow                 valueUnitFlow;
+    private              Label                    description;
+    private              Rectangle                switchBorder;
+    private              Rectangle                switchBackground;
+    private              Circle                   switchThumb;
+    private              Circle                   thumb;
+    private              Rectangle                barBackground;
+    private              Rectangle                bar;
+    private              Point2D                  dragStart;
+    private              double                   centerX;
+    private              double                   centerY;
+    private              double                   formerThumbPos;
+    private              double                   trackStart;
+    private              double                   trackLength;
+    private              Timeline                 timeline;
+    private              EventHandler<MouseEvent> mouseEventHandler;
+    private              InvalidationListener     selectedListener;
+    private              InvalidationListener     valueListener;
 
 
     // ******************** Constructors **************************************
@@ -88,7 +88,7 @@ public class SwitchSliderTileSkin extends TileSkin {
                 if (SRC.equals(thumb)) {
                     dragStart = thumb.localToParent(e.getX(), e.getY());
                     formerThumbPos = (tile.getCurrentValue() - minValue) / range;
-                    tile.fireTileEvent(VALUE_CHANGING);
+                    tile.fireTileEvt(VALUE_CHANGING);
                 } else if (SRC.equals(switchBorder)) {
                     tile.setActive(!tile.isActive());
                     tile.fireEvent(SWITCH_PRESSED);
@@ -99,7 +99,7 @@ public class SwitchSliderTileSkin extends TileSkin {
                 thumbDragged((formerThumbPos + dragPos / trackLength));
             } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
                 if (SRC.equals(thumb)) {
-                    tile.fireTileEvent(VALUE_CHANGED);
+                    tile.fireTileEvt(VALUE_CHANGED);
                 } else if (SRC.equals(switchBorder)) {
                     tile.fireEvent(SWITCH_RELEASED);
                 }

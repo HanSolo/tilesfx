@@ -18,19 +18,19 @@
 package eu.hansolo.tilesfx.tools;
 
 
-import eu.hansolo.tilesfx.events.BoundsEvent;
-import eu.hansolo.tilesfx.events.BoundsEventListener;
+import eu.hansolo.tilesfx.events.BoundsEvt;
+import eu.hansolo.toolbox.evt.EvtObserver;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class CtxBounds {
-    private double                    x;
-    private double                    y;
-    private double                    width;
-    private double                    height;
-    private List<BoundsEventListener> listeners;
+    private double           x;
+    private double           y;
+    private double           width;
+    private double                       height;
+    private List<EvtObserver<BoundsEvt>> observers;
 
 
     // ******************** Constructors **************************************
@@ -45,7 +45,7 @@ public class CtxBounds {
         y         = Y;
         width     = Helper.clamp(0, Double.MAX_VALUE, WIDTH);
         height    = Helper.clamp(0, Double.MAX_VALUE, HEIGHT);
-        listeners = new CopyOnWriteArrayList<>();
+        observers = new CopyOnWriteArrayList<>();
     }
 
 
@@ -53,13 +53,13 @@ public class CtxBounds {
     public double getX() { return x; }
     public void setX(final double X) {
         x = X;
-        fireBoundsEvent();
+        fireBoundsEvt();
     }
 
     public double getY() { return y; }
     public void setY(final double Y) {
         y = Y;
-        fireBoundsEvent();
+        fireBoundsEvt();
     }
 
     public double getMinX() { return x; }
@@ -71,13 +71,13 @@ public class CtxBounds {
     public double getWidth() { return width; }
     public void setWidth(final double WIDTH) {
         width = Helper.clamp(0, Double.MAX_VALUE, WIDTH);
-        fireBoundsEvent();
+        fireBoundsEvt();
     }
 
     public double getHeight() { return height; }
     public void setHeight(final double HEIGHT) {
         height = Helper.clamp(0, Double.MAX_VALUE, HEIGHT);
-        fireBoundsEvent();
+        fireBoundsEvt();
     }
 
     public double getCenterX() { return x + width * 0.5; }
@@ -91,17 +91,17 @@ public class CtxBounds {
         y      = Y;
         width  = WIDTH;
         height = HEIGHT;
-        fireBoundsEvent();
+        fireBoundsEvt();
     }
 
-    public void setOnBoundsEvent(final BoundsEventListener LISTENER) { addBoundsEventListener(LISTENER); }
-    public void addBoundsEventListener(final BoundsEventListener LISTENER) { if (!listeners.contains(LISTENER)) { listeners.add(LISTENER); }}
-    public void removeBoundsEventListener(final BoundsEventListener LISTENER) { if (listeners.contains(LISTENER)) { listeners.remove(LISTENER); }}
-    public void removeAllListeners() { listeners.clear(); }
+    public void setOnBoundsEvt(final EvtObserver<BoundsEvt> OBSERVER) { addBoundsEvtObserver(OBSERVER); }
+    public void addBoundsEvtObserver(final EvtObserver<BoundsEvt> OBSERVER) { if (!observers.contains(OBSERVER)) { observers.add(OBSERVER); }}
+    public void removeBoundsEvtObserver(final EvtObserver<BoundsEvt> OBSERVER) { if (observers.contains(OBSERVER)) { observers.remove(OBSERVER); }}
+    public void removeAllBoundsEvtObservers() { observers.clear(); }
 
-    public void fireBoundsEvent() {
-        final BoundsEvent boundsEvent = new BoundsEvent(CtxBounds.this);
-        for (BoundsEventListener listener : listeners) { listener.onBoundsEvent(boundsEvent); }
+    public void fireBoundsEvt() {
+        final BoundsEvt boundsEvent = new BoundsEvt(CtxBounds.this, BoundsEvt.BOUNDS, CtxBounds.this);
+        observers.forEach(observer -> observer.handle(boundsEvent));
     }
 
 

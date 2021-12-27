@@ -19,10 +19,11 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.MapProvider;
-import eu.hansolo.tilesfx.events.LocationEventListener;
+import eu.hansolo.tilesfx.events.LocationEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.toolbox.evt.EvtObserver;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
@@ -50,7 +51,7 @@ public class MapTileSkin extends TileSkin {
     private              WebEngine                    webEngine;
     private              boolean                      readyToGo;
     private              EventHandler<MouseEvent>     mouseHandler;
-    private              LocationEventListener        locationListener;
+    private              EvtObserver<LocationEvt>     locationObserver;
     private              ListChangeListener<Location> poiListener;
 
 
@@ -65,7 +66,7 @@ public class MapTileSkin extends TileSkin {
         super.initGraphics();
 
         mouseHandler     = event -> { if (event.getClickCount() == 2) { centerLocation(); } };
-        locationListener = e -> redraw();
+        locationObserver = e -> redraw();
         poiListener      = c -> {
             while (c.next()) {
                 if (c.wasPermutated()) {      // Get items that have been permutated in list
@@ -131,7 +132,7 @@ public class MapTileSkin extends TileSkin {
             webView.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
             webView.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
         } else if ("LOCATION".equals(EVENT_TYPE)) {
-            tile.getCurrentLocation().addLocationEventListener(locationListener);
+            tile.getCurrentLocation().addLocationEvtObserver(locationObserver);
             updateLocation();
         } else if ("TRACK".equals(EVENT_TYPE)) {
             addTrack(tile.getTrack());
@@ -142,7 +143,7 @@ public class MapTileSkin extends TileSkin {
 
     @Override public void dispose() {
         pane.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseHandler);
-        tile.getCurrentLocation().removeLocationEventListener(locationListener);
+        tile.getCurrentLocation().removeLocationEvtObserver(locationObserver);
         tile.getPoiList().removeListener(poiListener);
         super.dispose();
     }

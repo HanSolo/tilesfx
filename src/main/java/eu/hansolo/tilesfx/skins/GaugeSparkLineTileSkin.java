@@ -19,7 +19,7 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -256,7 +256,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
@@ -268,7 +268,7 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             Helper.enableNode(minValueText, tile.getMinValueVisible());
             Helper.enableNode(maxValueText, tile.getMaxValueVisible());
             redraw();
-        } else if (EventType.AVERAGING.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.AVERAGING.getName().equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
 
             // To get smooth lines in the chart we need at least 4 values
@@ -279,16 +279,16 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
             sparkLine.getElements().setAll(pathElements);
             redraw();
-        } else if (EventType.HIGHLIGHT_SECTIONS.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.HIGHLIGHT_SECTIONS.getName().equals(EVENT_TYPE)) {
             boolean isHighlightSections = tile.isHighlightSections();
             sectionCanvas.setVisible(!isHighlightSections);
             sectionCanvas.setManaged(!isHighlightSections);
             highlightSectionCanvas.setVisible(isHighlightSections);
             highlightSectionCanvas.setManaged(isHighlightSections);
-        } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.CLEAR_DATA.getName().equals(EVENT_TYPE)) {
             dataList.clear();
             handleCurrentValue(minValue);
-        } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.FINISHED.getName().equals(EVENT_TYPE)) {
             double value = clamp(minValue, maxValue, tile.getValue());
             handleCurrentValue(value);
             updateSparkline(value);

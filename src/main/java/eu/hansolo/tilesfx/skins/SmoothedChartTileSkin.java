@@ -23,8 +23,7 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.SmoothedChart;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.events.SmoothedChartEvent;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
@@ -58,7 +57,7 @@ public class SmoothedChartTileSkin extends TileSkin {
     @Override protected void initGraphics() {
         super.initGraphics();
 
-        chartEventEventHandler = e -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(e.getValue())));
+        chartEventEventHandler = e -> tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, new ChartData(e.getValue())));
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -117,28 +116,28 @@ public class SmoothedChartTileSkin extends TileSkin {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
-        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             chart.setSymbolsVisible(tile.getDataPointsVisible());
             xAxis.setTickLabelsVisible(tile.getTickLabelsXVisible());
             yAxis.setTickLabelsVisible(tile.getTickLabelsYVisible());
-        } else if (EventType.SERIES.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.SERIES.getName().equals(EVENT_TYPE)) {
             if (tile.getChartType() == ChartType.AREA) {
                 chart.setChartType(SmoothedChart.ChartType.AREA);
             } else {
                 chart.setChartType(SmoothedChart.ChartType.LINE);
             }
-        } else if (EventType.SERIES_SET.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.SERIES_SET.getName().equals(EVENT_TYPE)) {
             chart.getData().setAll(tile.getTilesFXSeries().stream().map(tilesFxSeries -> tilesFxSeries.getSeries()).collect(Collectors.toList()));
             tile.getTilesFXSeries()
                 .stream()
                 .forEach(series -> chart.setSeriesColor(series.getSeries(), series.getStroke(), series.getFill(), series.getSymbolBackground(), series.getLegendSymbolFill()));
-        } else if (EventType.SERIES_ADD.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.SERIES_ADD.getName().equals(EVENT_TYPE)) {
             List<Series<String, Number>> seriesToAdd = tile.getTilesFXSeries()
                                                            .stream()
                                                            .map(tilesFxSeries -> tilesFxSeries.getSeries())
                                                            .collect(Collectors.toList());
             chart.getData().addAll(seriesToAdd.stream().filter(s -> !chart.getData().contains(s)).collect(Collectors.toList()));
-        } else if (EventType.SERIES_REMOVE.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.SERIES_REMOVE.getName().equals(EVENT_TYPE)) {
             List<Series<String, Number>> seriesToRemove = new ArrayList<>();
             for (Series<String, Number> series : chart.getData()) {
                 TilesFXSeries<String, Number> tfxs = tile.getTilesFXSeries().stream().filter(tfxSeries -> tfxSeries.getSeries().equals(series)).findFirst().orElse(null);

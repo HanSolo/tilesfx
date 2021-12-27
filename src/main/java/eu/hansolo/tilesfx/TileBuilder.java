@@ -30,9 +30,9 @@ import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
-import eu.hansolo.tilesfx.events.AlarmEventListener;
-import eu.hansolo.tilesfx.events.TileEventListener;
-import eu.hansolo.tilesfx.events.TimeEventListener;
+import eu.hansolo.tilesfx.events.AlarmEvt;
+import eu.hansolo.tilesfx.events.TileEvt;
+import eu.hansolo.tilesfx.events.TimeEvt;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.chart.ChartData;
@@ -43,6 +43,7 @@ import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.TreeNode;
+import eu.hansolo.toolbox.evt.EvtObserver;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -619,12 +620,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B onThresholdExceeded(final TileEventListener HANDLER) {
+    public final B onThresholdExceeded(final EvtObserver<TileEvt> HANDLER) {
         properties.put("onThresholdExceeded", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
-    public final B onThresholdUnderrun(final TileEventListener HANDLER) {
+    public final B onThresholdUnderrun(final EvtObserver<TileEvt> HANDLER) {
         properties.put("onThresholdUnderrun", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
@@ -779,17 +780,17 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B onAlarm(final AlarmEventListener LISTENER) {
+    public final B onAlarm(final EvtObserver<AlarmEvt> LISTENER) {
         properties.put("onAlarm", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
     }
 
-    public final B onTimeEvent(final TimeEventListener LISTENER) {
+    public final B onTimeEvent(final EvtObserver<TimeEvt> LISTENER) {
         properties.put("onTimeEvent", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
     }
 
-    public final B onTileEvent(final TileEventListener LISTENER) {
+    public final B onTileEvent(final EvtObserver<TileEvt> LISTENER) {
         properties.put("onTileEvent", new SimpleObjectProperty(LISTENER));
         return (B)this;
     }
@@ -1778,11 +1779,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
             } else if ("secondColor".equals(key)) {
                 TILE.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("onAlarm".equals(key)) {
-                TILE.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
+                TILE.setOnAlarmEvt(((ObjectProperty<EvtObserver<AlarmEvt>>) properties.get(key)).get());
             } else if ("onTimeEvent".equals(key)) {
-                TILE.setOnTimeEvent(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
+                TILE.setOnTimeEvt(((ObjectProperty<EvtObserver<TimeEvt>>) properties.get(key)).get());
             } else if ("onTileEvent".equals(key)) {
-                TILE.setOnTileEvent(((ObjectProperty<TileEventListener>) properties.get(key)).get());
+                TILE.addTileObserver(TileEvt.ANY, ((ObjectProperty<EvtObserver<TileEvt>>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
                 TILE.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("alarmsVisible".equals(key)) {

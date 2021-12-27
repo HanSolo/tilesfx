@@ -20,7 +20,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries;
 import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries.Model;
@@ -32,6 +32,7 @@ import eu.hansolo.tilesfx.tools.TimeData;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Pos;
@@ -391,7 +392,7 @@ public class TimelineTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
         if(tile.isAnimated()) { tile.setAnimated(false); }
-        if (TileEvent.EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
@@ -407,10 +408,10 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(percentageInSectionGroup, tile.getSectionsVisible());
             Helper.enableNode(trendText, tile.isTrendVisible());
             redraw();
-        } else if (TileEvent.EventType.VALUE.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.VALUE.getName().equals(EVENT_TYPE)) {
             double value = clamp(minValue, maxValue, tile.getValue());
             tile.getChartData().add(new ChartData("", value, Instant.now()));
-        } else if (TileEvent.EventType.SECTION.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.SECTION.getName().equals(EVENT_TYPE)) {
             percentageInSections.clear();
             tile.getSections().forEach(section -> {
                 Label sectionLabel = new Label();
@@ -419,7 +420,7 @@ public class TimelineTileSkin extends TileSkin {
                 percentageInSections.put(section, sectionLabel);
             });
             percentageInSectionGroup.getChildren().setAll(percentageInSections.values());
-        } else if (TileEvent.EventType.TIME_PERIOD.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.TIME_PERIOD.getName().equals(EVENT_TYPE)) {
             timePeriod        = tile.getTimePeriod();
             noOfDatapoints    = calcNumberOfDatapointsForPeriod(timePeriod);
             maxNoOfDatapoints = calcNumberOfDatapointsForPeriod(tile.getMaxTimePeriod());
@@ -446,7 +447,7 @@ public class TimelineTileSkin extends TileSkin {
             }
 
             redraw();
-        } else if (TileEvent.EventType.REGIONS_ON_TOP.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.REGIONS_ON_TOP.getName().equals(EVENT_TYPE)) {
             valueUnitFlow.setPrefWidth(width - size * 0.1);
             valueUnitFlow.relocate(size * 0.05, contentBounds.getY());
 
@@ -456,7 +457,7 @@ public class TimelineTileSkin extends TileSkin {
             fractionLine.setEndY(tile.getTitle().isEmpty() ? size * 0.2 : size * 0.3);
             fractionLine.setStroke(tile.getUnitColor());
             fractionLine.setStrokeWidth(size * 0.005);
-        } else if (TileEvent.EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.CLEAR_DATA.getName().equals(EVENT_TYPE)) {
             tile.clearChartData();
             dataList.clear();
             reducedDataList.clear();
@@ -466,20 +467,20 @@ public class TimelineTileSkin extends TileSkin {
                 dots.clear();
                 dotGroup.getChildren().clear();
             });
-        } else if (TileEvent.EventType.THRESHOLD_EXCEEDED.equals(EVENT_TYPE)) {
+        } else if (TileEvt.THRESHOLD_EXCEEDED.equals(EVENT_TYPE)) {
 
-        } else if (TileEvent.EventType.THRESHOLD_UNDERRUN.equals(EVENT_TYPE)) {
+        } else if (TileEvt.THRESHOLD_UNDERRUN.equals(EVENT_TYPE)) {
 
-        } else if (TileEvent.EventType.LOWER_THRESHOLD_EXCEEDED.equals(EVENT_TYPE)) {
+        } else if (TileEvt.LOWER_THRESHOLD_EXCEEDED.equals(EVENT_TYPE)) {
 
-        } else if (TileEvent.EventType.LOWER_THRESHOLD_UNDERRUN.equals(EVENT_TYPE)) {
+        } else if (TileEvt.LOWER_THRESHOLD_UNDERRUN.equals(EVENT_TYPE)) {
 
         }
     }
 
     private void handleMouseEvents(final MouseEvent e) {
-        EventType type = e.getEventType();
-        Circle    dot  = (Circle) e.getSource();
+        EventType<? extends Event> type = e.getEventType();
+        Circle                     dot  = (Circle) e.getSource();
         ChartData data = dots.entrySet().stream().filter(entry -> entry.getValue().equals(dot)).map(entry -> entry.getKey()).findAny().orElse(null);
         if (MouseEvent.MOUSE_ENTERED.equals(type)) {
             if (null != data) {

@@ -20,8 +20,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -57,7 +56,7 @@ import java.util.Map;
  */
 public class ClusterMonitorTileSkin extends TileSkin {
     private static final double                        MIN_HEIGHT        = 100;
-    private final        TileEvent                     SVG_PRESSED_EVENT = new TileEvent(EventType.SVG_PATH_PRESSED);
+    private final        TileEvt                       SVG_PRESSED_EVENT = new TileEvt(tile, TileEvt.SVG_PATH_PRESSED);
     private              Text                          titleText;
     private              Text                          text;
     private              VBox                          chartPane;
@@ -125,7 +124,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
 
         SVGPath svgPath = tile.getSVGPath();
         if (null != svgPath) {
-            svgPathPressedHandler = e -> tile.fireTileEvent(SVG_PRESSED_EVENT);
+            svgPathPressedHandler = e -> tile.fireTileEvt(SVG_PRESSED_EVENT);
             graphicRegion = new Region();
             graphicRegion.setShape(svgPath);
             getPane().getChildren().addAll(titleText, text, chartPane, graphicRegion);
@@ -148,13 +147,13 @@ public class ClusterMonitorTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             if (null != graphicRegion) { Helper.enableNode(graphicRegion, tile.isTextVisible()); }
-        } else if (EventType.DATA.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.DATA.getName().equals(EVENT_TYPE)) {
             updateChart();
-        } else if (EventType.RECALC.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.RECALC.getName().equals(EVENT_TYPE)) {
             dataItemMap.values().forEach(item -> item.setShortenNumbers(tile.getShortenNumbers()));
             updateChart();
         }

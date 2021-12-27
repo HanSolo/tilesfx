@@ -18,8 +18,9 @@
 package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.Tile.TileColor;
-import eu.hansolo.tilesfx.events.LocationEvent;
-import eu.hansolo.tilesfx.events.LocationEventListener;
+import eu.hansolo.tilesfx.events.LocationEvt;
+import eu.hansolo.toolbox.evt.EvtObserver;
+import eu.hansolo.toolbox.geom.CardinalDirection;
 import javafx.scene.paint.Color;
 
 import java.time.Instant;
@@ -36,43 +37,15 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 12.02.17.
  */
 public class Location {
-    public enum CardinalDirection {
-        N("North", 348.75, 11.25),
-        NNE("North North-East", 11.25, 33.75),
-        NE("North-East", 33.75, 56.25),
-        ENE("East North-East", 56.25, 78.75),
-        E("East", 78.75, 101.25),
-        ESE("East South-East", 101.25, 123.75),
-        SE("South-East", 123.75, 146.25),
-        SSE("South South-East", 146.25, 168.75),
-        S("South", 168.75, 191.25),
-        SSW("South South-West", 191.25, 213.75),
-        SW("South-West", 213.75, 236.25),
-        WSW("West South-West", 236.25, 258.75),
-        W("West", 258.75, 281.25),
-        WNW("West North-West", 281.25, 303.75),
-        NW("North-West", 303.75, 326.25),
-        NNW("North North-West", 326.25, 348.75);
-
-        public String direction;
-        public double from;
-        public double to;
-
-        CardinalDirection(final String DIRECTION, final double FROM, final double TO) {
-            direction = DIRECTION;
-            from      = FROM;
-            to        = TO;
-        }
-    }
-    private String                      name;
-    private Instant                     timestamp;
-    private double                      latitude;
-    private double                      longitude;
-    private double                      altitude;
-    private String                      info;
-    private Color                       color;
-    private int                         zoomLevel;
-    private List<LocationEventListener> listenerList;
+    private String                         name;
+    private Instant                        timestamp;
+    private double                         latitude;
+    private double                         longitude;
+    private double                         altitude;
+    private String                         info;
+    private Color                          color;
+    private int                            zoomLevel;
+    private List<EvtObserver<LocationEvt>> observers;
 
 
     // ******************** Constructors **************************************
@@ -108,8 +81,8 @@ public class Location {
         timestamp    = TIMESTAMP;
         info         = INFO;
         color        = COLOR;
-        zoomLevel    = 15;
-        listenerList = new CopyOnWriteArrayList<>();
+        zoomLevel = 15;
+        observers = new CopyOnWriteArrayList<>();
     }
 
 
@@ -124,19 +97,19 @@ public class Location {
     public double getLatitude() { return latitude; }
     public void setLatitude(final double LATITUDE) {
         latitude = LATITUDE;
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
 
     public double getLongitude() { return longitude; }
     public void setLongitude(final double LONGITUDE) {
         longitude = LONGITUDE;
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
 
     public double getAltitude() { return altitude; }
     public void setAltitude(final double ALTITUDE) {
         altitude = ALTITUDE;
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
 
     public String getInfo() { return info; }
@@ -145,7 +118,7 @@ public class Location {
     public Color getColor() { return color; }
     public void setColor(final Color COLOR) {
         color = COLOR;
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
 
     public ZonedDateTime getZonedDateTime() { return getZonedDateTime(ZoneId.systemDefault()); }
@@ -154,7 +127,7 @@ public class Location {
     public int getZoomLevel() { return zoomLevel; }
     public void setZoomLevel(final int LEVEL) {
         zoomLevel = clamp(0, 17, LEVEL);
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
 
     public void update(final double LATITUDE, final double LONGITUDE) { set(LATITUDE, LONGITUDE); }
@@ -163,14 +136,14 @@ public class Location {
         latitude  = LATITUDE;
         longitude = LONGITUDE;
         timestamp = Instant.now();
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
     public void set(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final Instant TIMESTAMP) {
         latitude  = LATITUDE;
         longitude = LONGITUDE;
         altitude  = ALTITUDE;
         timestamp = TIMESTAMP;
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
     public void set(final double LATITUDE, final double LONGITUDE, final double ALTITUDE, final Instant TIMESTAMP, final String INFO) {
         latitude  = LATITUDE;
@@ -178,7 +151,7 @@ public class Location {
         altitude  = ALTITUDE;
         timestamp = TIMESTAMP;
         info      = INFO;
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
     public void set(final Location LOCATION) {
         name      = LOCATION.getName();
@@ -189,7 +162,7 @@ public class Location {
         info      = LOCATION.info;
         color     = LOCATION.getColor();
         zoomLevel = LOCATION.getZoomLevel();
-        fireLocationEvent(new LocationEvent(Location.this));
+        fireLocationEvent(new LocationEvt(Location.this, LocationEvt.LOCATION, Location.this));
     }
 
     public double getDistanceTo(final Location LOCATION) { return calcDistanceInMeter(this, LOCATION); }
@@ -258,12 +231,13 @@ public class Location {
 
 
     // ******************** Event Handling ************************************
-    public void setOnLocationEvent(final LocationEventListener LISTENER) { addLocationEventListener(LISTENER); }
-    public void addLocationEventListener(final LocationEventListener LISTENER) { if (!listenerList.contains(LISTENER)) listenerList.add(LISTENER); }
-    public void removeLocationEventListener(final LocationEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
+    public void setOnLocationEvt(final EvtObserver<LocationEvt> OBSERVER) { addLocationEvtObserver(OBSERVER); }
+    public void addLocationEvtObserver(final EvtObserver<LocationEvt> OBSERVER)    { if (!observers.contains(OBSERVER)) observers.add(OBSERVER); }
+    public void removeLocationEvtObserver(final EvtObserver<LocationEvt> OBSERVER) { if (observers.contains(OBSERVER)) observers.remove(OBSERVER); }
+    public void removeAllLocationEvtObservers() { observers.clear(); }
 
-    public void fireLocationEvent(final LocationEvent EVENT) {
-        listenerList.forEach(listener -> listener.onLocationEvent(EVENT));
+    public void fireLocationEvent(final LocationEvt EVENT) {
+        observers.forEach(observer -> observer.handle(EVENT));
     }
 
 

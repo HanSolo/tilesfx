@@ -20,7 +20,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.SunburstChart;
-import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.events.TreeNodeEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
@@ -67,7 +67,7 @@ public class SunburstChartTileSkin extends TileSkin {
             EventType type = e.getType();
             if (EventType.NODE_SELECTED == type) {
                 TreeNode<ChartData> segment = e.getSource();
-                tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, segment.getItem()));
+                tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, segment.getItem()));
             }
         });
     }

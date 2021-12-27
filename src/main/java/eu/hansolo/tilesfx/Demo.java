@@ -32,7 +32,7 @@ import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.colors.Dark;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.icons.Flag;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
@@ -1062,11 +1062,11 @@ public class Demo extends Application {
                                   .animated(true)
                                   .checkThreshold(true)
                                   .onTileEvent(e -> {
-                                      if (EventType.THRESHOLD_EXCEEDED == e.getEventType()) {
+                                      if (e.getEvtType().equals(TileEvt.THRESHOLD_EXCEEDED)) {
                                           turnoverTile.setRank(firstRank);
                                           turnoverTile.setValueColor(firstRank.getColor());
                                           turnoverTile.setUnitColor(firstRank.getColor());
-                                      } else if (EventType.THRESHOLD_UNDERRUN == e.getEventType()) {
+                                      } else if (e.getEvtType().equals(TileEvt.THRESHOLD_UNDERRUN)) {
                                           turnoverTile.setRank(Rank.DEFAULT);
                                           turnoverTile.setValueColor(Tile.FOREGROUND);
                                           turnoverTile.setUnitColor(Tile.FOREGROUND);

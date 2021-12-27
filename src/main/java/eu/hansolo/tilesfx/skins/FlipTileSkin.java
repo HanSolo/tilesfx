@@ -18,12 +18,12 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.CtxCornerRadii;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.toolbox.geom.CornerRadii;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -42,7 +42,7 @@ import java.util.List;
 
 
 public class FlipTileSkin extends TileSkin {
-    private final TileEvent       FLIP_FINISHED = new TileEvent(EventType.FLIP_FINISHED);
+    private final TileEvt         FLIP_FINISHED = new TileEvt(this, TileEvt.FLIP_FINISHED);
     private       List<String>    characters;
     private       int             currentSelectionIndex;
     private       int             nextSelectionIndex;
@@ -148,7 +148,7 @@ public class FlipTileSkin extends TileSkin {
         });
 
         timeline.setOnFinished(EVENT -> {
-            tile.fireTileEvent(FLIP_FINISHED);
+            tile.fireTileEvt(FLIP_FINISHED);
             if (Double.compare(rotateFlap.getAngle(), 180) == 0) {
                 rotateFlap.setAngle(0);
                 flapTextBack.setOpacity(0);

@@ -27,6 +27,9 @@ module eu.hansolo.tilesfx {
     requires transitive javafx.web;
     requires transitive javafx.media;
 
+    // 3rd party
+    requires transitive eu.hansolo.toolbox;
+
     exports eu.hansolo.tilesfx;
     exports eu.hansolo.tilesfx.addons;
     exports eu.hansolo.tilesfx.chart;

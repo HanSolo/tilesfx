@@ -27,7 +27,6 @@ import javafx.beans.DefaultProperty;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -271,9 +270,9 @@ public class PixelMatrix extends Region {
     public double getMatrixWidth() { return canvas.getWidth(); }
     public double getMatrixHeight() { return canvas.getHeight(); }
 
-    public Bounds getMatrixLayoutBounds() { return canvas.getLayoutBounds(); }
-    public Bounds getMatrixBoundsInParent() { return canvas.getBoundsInParent(); }
-    public Bounds getMatrixBoundsInLocal() { return canvas.getBoundsInLocal(); }
+    public javafx.geometry.Bounds getMatrixLayoutBounds()   { return canvas.getLayoutBounds(); }
+    public javafx.geometry.Bounds getMatrixBoundsInParent() { return canvas.getBoundsInParent(); }
+    public javafx.geometry.Bounds getMatrixBoundsInLocal()  { return canvas.getBoundsInLocal(); }
 
     public int getCols() { return cols; }
     public int getRows() { return rows; }

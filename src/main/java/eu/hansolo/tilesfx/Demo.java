@@ -39,11 +39,12 @@ import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.Ranking;
 import eu.hansolo.tilesfx.tools.TreeNode;
+import eu.hansolo.toolboxfx.geom.Location;
+import eu.hansolo.toolboxfx.geom.LocationBuilder;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
@@ -483,10 +484,10 @@ public class Demo extends Application {
                              .title("Map Tile")
                              .text("Some text")
                              .description("Description")
-                             .currentLocation(new Location(51.91178, 7.63379, "Home", TileColor.MAGENTA.color))
-                             .pointsOfInterest(new Location(51.914405, 7.635732, "POI 1", TileColor.RED.color),
-                                               new Location(51.912529, 7.631752, "POI 2", TileColor.BLUE.color),
-                                               new Location(51.923993, 7.628906, "POI 3", TileColor.YELLOW_ORANGE.color))
+                             .currentLocation(LocationBuilder.create().latitude(51.91178).longitude(7.63379).name("Home").fill(TileColor.MAGENTA.color).build())
+                             .pointsOfInterest(LocationBuilder.create().latitude(51.914405).longitude(7.635732).name("POI 1").fill(TileColor.RED.color).build(),
+                                               LocationBuilder.create().latitude(51.912529).longitude(7.631752).name("POI 2").fill(TileColor.BLUE.color).build(),
+                                               LocationBuilder.create().latitude(51.923993).longitude(7.628906).name("POI 3").fill(TileColor.YELLOW_ORANGE.color).build())
                              .mapProvider(MapProvider.TOPO)
                              .build();
 
@@ -1335,8 +1336,8 @@ public class Demo extends Application {
 
         timer.start();
 
-        mapTile.addPoiLocation(new Location(51.85, 7.75, "Test"));
-        mapTile.removePoiLocation(new Location(51.85, 7.75, "Test"));
+        mapTile.addPoiLocation(LocationBuilder.create().latitude(51.85).longitude(7.75).name("Test").build());
+        mapTile.removePoiLocation(LocationBuilder.create().latitude(51.85).longitude(7.75).name("Test").build());
 
         radialPercentageTile.setNotifyRegionTooltipText("tooltip");
         radialPercentageTile.showNotifyRegion(true);

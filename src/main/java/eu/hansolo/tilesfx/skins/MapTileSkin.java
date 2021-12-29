@@ -19,11 +19,11 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.MapProvider;
-import eu.hansolo.tilesfx.events.LocationEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.toolbox.evt.EvtObserver;
+import eu.hansolo.toolboxfx.evt.type.LocationChangeEvt;
+import eu.hansolo.toolboxfx.geom.Location;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
@@ -35,6 +35,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 import java.net.URL;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -43,16 +44,16 @@ import java.util.List;
  * Created by hansolo on 12.02.17.
  */
 public class MapTileSkin extends TileSkin {
-    private static final DateTimeFormatter            DF = DateTimeFormatter.ISO_LOCAL_DATE;
-    private static final DateTimeFormatter            TF = DateTimeFormatter.ISO_LOCAL_TIME;
-    private              Text                         titleText;
-    private              Text                         text;
-    private              WebView                      webView;
-    private              WebEngine                    webEngine;
-    private              boolean                      readyToGo;
-    private              EventHandler<MouseEvent>     mouseHandler;
-    private              EvtObserver<LocationEvt>     locationObserver;
-    private              ListChangeListener<Location> poiListener;
+    private static final DateTimeFormatter              DF = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter              TF = DateTimeFormatter.ISO_LOCAL_TIME;
+    private              Text                           titleText;
+    private              Text                           text;
+    private              WebView                        webView;
+    private              WebEngine                      webEngine;
+    private              boolean                        readyToGo;
+    private              EventHandler<MouseEvent>       mouseHandler;
+    private              EvtObserver<LocationChangeEvt> locationObserver;
+    private              ListChangeListener<Location>   poiListener;
 
 
     // ******************** Constructors **************************************
@@ -132,7 +133,7 @@ public class MapTileSkin extends TileSkin {
             webView.setMaxSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
             webView.setPrefSize(size * 0.9, tile.isTextVisible() ? size * 0.68 : size * 0.795);
         } else if ("LOCATION".equals(EVENT_TYPE)) {
-            tile.getCurrentLocation().addLocationEvtObserver(locationObserver);
+            tile.getCurrentLocation().addLocationObserver(LocationChangeEvt.ANY, locationObserver);
             updateLocation();
         } else if ("TRACK".equals(EVENT_TYPE)) {
             addTrack(tile.getTrack());
@@ -143,7 +144,7 @@ public class MapTileSkin extends TileSkin {
 
     @Override public void dispose() {
         pane.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseHandler);
-        tile.getCurrentLocation().removeLocationEvtObserver(locationObserver);
+        tile.getCurrentLocation().removeLocationObserver(LocationChangeEvt.ANY, locationObserver);
         tile.getPoiList().removeListener(poiListener);
         super.dispose();
     }
@@ -180,7 +181,7 @@ public class MapTileSkin extends TileSkin {
                 double lon   = POI.getLongitude();
                 String name  = POI.getName();
                 String info  = POI.getInfo();
-                String color = POI.getColor().toString().replace("0x", "#");
+                String color = POI.getFill().toString().replace("0x", "#");
                 StringBuilder scriptCommand = new StringBuilder();
                 scriptCommand.append("window.lat = ").append(lat).append(";")
                              .append("window.lon = ").append(lon).append(";")
@@ -207,7 +208,7 @@ public class MapTileSkin extends TileSkin {
     private void updateLocationColor() {
         if (readyToGo) {
             Platform.runLater(() -> {
-                String locationColor = tile.getCurrentLocation().getColor().toString().replace("0x", "#");
+                String locationColor = tile.getCurrentLocation().getFill().toString().replace("0x", "#");
                 StringBuilder scriptCommand = new StringBuilder();
                 scriptCommand.append("window.locationColor = '").append(locationColor).append("';")
                              .append("document.setLocationColor(window.locationColor);");
@@ -271,8 +272,8 @@ public class MapTileSkin extends TileSkin {
                     lat2 = LOCATIONS.get(i + 1).getLatitude();
                     lon2 = LOCATIONS.get(i + 1).getLongitude();
                     name = LOCATIONS.get(i).getName();
-                    date = DF.format(LOCATIONS.get(i).getZonedDateTime());
-                    time = TF.format(LOCATIONS.get(i).getZonedDateTime());
+                    date = DF.format(LOCATIONS.get(i).getLocalDateTime(ZoneId.systemDefault()));
+                    time = TF.format(LOCATIONS.get(i).getLocalDateTime(ZoneId.systemDefault()));
 
                     scriptCommand.append("window.lat1 = ").append(lat1).append(";")
                                      .append("window.lon1 = ").append(lon1).append(";")
@@ -291,8 +292,8 @@ public class MapTileSkin extends TileSkin {
                 lat1 = LOCATIONS.get(0).getLatitude();
                 lon1 = LOCATIONS.get(0).getLongitude();
                 name = LOCATIONS.get(0).getName();
-                date = DF.format(LOCATIONS.get(0).getZonedDateTime());
-                time = TF.format(LOCATIONS.get(0).getZonedDateTime());
+                date = DF.format(LOCATIONS.get(0).getLocalDateTime(ZoneId.systemDefault()));
+                time = TF.format(LOCATIONS.get(0).getLocalDateTime(ZoneId.systemDefault()));
                 scriptCommand.append("window.lat1 = ").append(lat1).append(";")
                              .append("window.lon1 = ").append(lon1).append(";")
                              .append("window.locationName = \"").append(name).append("\";")
@@ -306,8 +307,8 @@ public class MapTileSkin extends TileSkin {
                 lat1 = LOCATIONS.get(length - 1).getLatitude();
                 lon1 = LOCATIONS.get(length - 1).getLongitude();
                 name = LOCATIONS.get(length - 1).getName();
-                date = DF.format(LOCATIONS.get(length - 1).getZonedDateTime());
-                time = TF.format(LOCATIONS.get(length - 1).getZonedDateTime());
+                date = DF.format(LOCATIONS.get(length - 1).getLocalDateTime(ZoneId.systemDefault()));
+                time = TF.format(LOCATIONS.get(length - 1).getLocalDateTime(ZoneId.systemDefault()));
                 scriptCommand.append("window.lat1 = ").append(lat1).append(";")
                              .append("window.lon1 = ").append(lon1).append(";")
                              .append("window.locationName = \"").append(name).append("\";")

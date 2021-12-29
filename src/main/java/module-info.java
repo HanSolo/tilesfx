@@ -29,6 +29,7 @@ module eu.hansolo.tilesfx {
 
     // 3rd party
     requires transitive eu.hansolo.toolbox;
+    requires transitive eu.hansolo.toolboxfx;
 
     exports eu.hansolo.tilesfx;
     exports eu.hansolo.tilesfx.addons;

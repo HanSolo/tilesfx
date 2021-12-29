@@ -23,7 +23,6 @@ import eu.hansolo.tilesfx.chart.SunburstChart;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.events.AlarmEvt;
-import eu.hansolo.tilesfx.events.BoundsEvt;
 import eu.hansolo.tilesfx.events.SwitchEvent;
 import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.events.TimeEvt;
@@ -34,7 +33,6 @@ import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.InfoRegion;
-import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.LowerRightRegion;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.MovingAverage;
@@ -45,6 +43,9 @@ import eu.hansolo.tilesfx.tools.TimeData;
 import eu.hansolo.tilesfx.tools.TimeSectionComparator;
 import eu.hansolo.toolbox.evt.EvtObserver;
 import eu.hansolo.toolbox.evt.EvtType;
+import eu.hansolo.toolboxfx.evt.type.BoundsEvt;
+import eu.hansolo.toolboxfx.geom.Bounds;
+import eu.hansolo.toolboxfx.geom.Location;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -6695,7 +6696,8 @@ public class Tile extends Control {
             }
 
             boundsObservers.forEach(listener -> ((TileSkin) (getSkin())).setOnContentBoundsChanged(listener));
-            ((TileSkin) (getSkin())).getContentBounds().fireBoundsEvt();
+            Bounds bounds = ((TileSkin) (getSkin())).getContentBounds();
+            bounds.fireBoundsEvt(new BoundsEvt(bounds, BoundsEvt.BOUNDS, bounds));
 
             fireTileEvt(REGIONS_ON_TOP_EVENT);
             fireTileEvt(RESIZE_EVENT);

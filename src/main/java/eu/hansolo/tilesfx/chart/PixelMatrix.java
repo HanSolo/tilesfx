@@ -20,9 +20,9 @@ package eu.hansolo.tilesfx.chart;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.PixelMatrixEvent;
 import eu.hansolo.tilesfx.events.PixelMatrixEventListener;
-import eu.hansolo.tilesfx.tools.CtxBounds;
-import eu.hansolo.tilesfx.tools.CtxCornerRadii;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.toolboxfx.geom.Bounds;
+import eu.hansolo.toolboxfx.geom.CornerRadii;
 import javafx.beans.DefaultProperty;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
@@ -375,8 +375,8 @@ public class PixelMatrix extends Region {
         ctx.clearRect(0, 0, width, height);
         switch(pixelShape) {
             case ROUNDED_RECT:
-                CtxBounds      bounds      = new CtxBounds(pixelWidthMinusDoubleSpacer, pixelHeightMinusDoubleSpacer);
-                CtxCornerRadii cornerRadii = new CtxCornerRadii(pixelSize * 0.125);
+                Bounds bounds      = new Bounds(pixelWidthMinusDoubleSpacer, pixelHeightMinusDoubleSpacer);
+                CornerRadii cornerRadii = new CornerRadii(pixelSize * 0.125);
                 for (int y = 0; y < rows; y++) {
                     for (int x = 0; x < cols; x++) {
                         ctx.save();

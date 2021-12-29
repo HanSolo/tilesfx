@@ -20,13 +20,13 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
-import eu.hansolo.tilesfx.events.BoundsEvt;
 import eu.hansolo.tilesfx.events.TileEvt;
-import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.InfoRegion;
 import eu.hansolo.tilesfx.tools.LowerRightRegion;
 import eu.hansolo.tilesfx.tools.NotifyRegion;
 import eu.hansolo.toolbox.evt.EvtObserver;
+import eu.hansolo.toolboxfx.evt.type.BoundsEvt;
+import eu.hansolo.toolboxfx.geom.Bounds;
 import javafx.beans.InvalidationListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -70,7 +70,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     protected              double                   size;
     protected              double                   inset;
     protected              double                   doubleInset;
-    protected              CtxBounds                contentBounds;
+    protected              Bounds                   contentBounds;
     protected              double                   contentCenterX;
     protected              double                   contentCenterY;
     protected              Pane                     pane;
@@ -124,7 +124,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
         sizeListener          = o -> handleEvents("RESIZE");
         observer              = e -> handleEvents(e.getEvtType().getName());
         currentValueListener  = o -> handleCurrentValue(tile.getCurrentValue());
-        contentBounds         = new CtxBounds();
+        contentBounds         = new Bounds();
         decimalFormat         = tile.getCustomDecimalFormat();
 
         initGraphics();
@@ -254,15 +254,15 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
      * null as return value here.
      * @return the bounds of the content area.
      */
-    public CtxBounds getContentBounds() { return contentBounds; }
+    public Bounds getContentBounds() { return contentBounds; }
 
     /**
      * Adds a listener to the content bounds area.
      * Keep in mind that you can only add a listener to the bounds if the skin property is set
      * in the control.
      */
-    public void setOnContentBoundsChanged(final EvtObserver<BoundsEvt> OBSERVER) { contentBounds.setOnBoundsEvt(OBSERVER); }
-    public void removeOnContentBoundsChanged(final EvtObserver<BoundsEvt> OBSERVER) { contentBounds.removeBoundsEvtObserver(OBSERVER); }
+    public void setOnContentBoundsChanged(final EvtObserver<BoundsEvt> OBSERVER) { contentBounds.addBoundsObserver(BoundsEvt.ANY, OBSERVER); }
+    public void removeOnContentBoundsChanged(final EvtObserver<BoundsEvt> OBSERVER) { contentBounds.removeBoundsObserver(BoundsEvt.ANY, OBSERVER); }
 
     public NotifyRegion getNotifyRegion() { return notifyRegion; }
 
@@ -271,7 +271,7 @@ public class TileSkin extends SkinBase<Tile> implements Skin<Tile> {
     public LowerRightRegion getLowerRightRegion() { return lowerRightRegion; }
 
     @Override public void dispose() {
-        contentBounds.removeAllBoundsEvtObservers();
+        contentBounds.removeAllBoundsObservers();
         tile.widthProperty().removeListener(sizeListener);
         tile.heightProperty().removeListener(sizeListener);
         tile.removeTileObserver(TileEvt.ANY, observer);

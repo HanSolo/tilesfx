@@ -15,39 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package eu.hansolo.tilesfx.events;
 
-import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.toolbox.evt.EvtPriority;
 import eu.hansolo.toolbox.evt.EvtType;
-import eu.hansolo.toolbox.evt.type.ChangeEvt;
+import eu.hansolo.toolboxfx.evt.type.LocationChangeEvt;
+import eu.hansolo.toolboxfx.geom.Location;
 
 
-/**
- * Created by hansolo on 12.02.17.
- */
-public class LocationEvt extends TileEvt {
-    public static final EvtType<LocationEvt> ANY      = new EvtType<>(ChangeEvt.ANY, "ANY");
-    public static final EvtType<LocationEvt> LOCATION = new EvtType<>(LocationEvt.ANY, "LOCATION");
-
-    private final Location location;
+public class LocationEvt extends LocationChangeEvt {
+    private Tile tile;
 
 
     // ******************** Constructors **************************************
-    public LocationEvt(final EvtType<? extends LocationEvt> evtType, final Location location) {
-        super(evtType);
-        this.location = location;
+    public LocationEvt(final EvtType<? extends LocationChangeEvt> evtType, final Location oldLocation, final Location location, final Tile tile) {
+        super(evtType, oldLocation, location);
+        this.tile = tile;
     }
-    public LocationEvt(final Object src, final EvtType<? extends LocationEvt> evtType, final Location location) {
-        super(src, evtType);
-        this.location = location;
+    public LocationEvt(final Object src, final EvtType<? extends LocationChangeEvt> evtType, final Location oldLocation, final Location location, final Tile tile) {
+        super(src, evtType, oldLocation, location);
+        this.tile = tile;
     }
-    public LocationEvt(final Object src, final EvtType<? extends LocationEvt> evtType, final EvtPriority priority, final Location location) {
-        super(src, evtType, priority);
-        this.location = location;
+    public LocationEvt(final Object src, final EvtType<? extends LocationChangeEvt> evtType, final EvtPriority priority, final Location oldLocation, final Location location, final Tile tile) {
+        super(src, evtType, priority, oldLocation, location);
+        this.tile = tile;
     }
 
 
     // ******************** Methods *******************************************
-    public Location getLocation() { return location; }
+    public Tile getTile() { return tile; }
 }

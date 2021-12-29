@@ -18,6 +18,11 @@
 package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.Section;
+import eu.hansolo.toolbox.Statistics;
+import eu.hansolo.toolboxfx.geom.Bounds;
+import eu.hansolo.toolboxfx.geom.CatmullRom;
+import eu.hansolo.toolboxfx.geom.CornerRadii;
+import eu.hansolo.toolboxfx.geom.Point;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
@@ -880,7 +885,7 @@ public class Helper {
         return PROPERTIES;
     }
 
-    public static final void drawRoundedRect(final GraphicsContext CTX, final CtxBounds BOUNDS, final CtxCornerRadii RADII) {
+    public static final void drawRoundedRect(final GraphicsContext CTX, final Bounds BOUNDS, final CornerRadii RADII) {
         double x           = BOUNDS.getX();
         double y           = BOUNDS.getY();
         double width       = BOUNDS.getWidth();

@@ -62,7 +62,8 @@ dependencies {
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-web:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:17.0.2"
+    implementation "eu.hansolo:toolbox:17.0.6"
+    implementation "eu.hansolo:toolboxfx:17.0.15"
 }
 
 jar {

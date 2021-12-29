@@ -27,8 +27,8 @@ import eu.hansolo.tilesfx.tools.DoubleExponentialSmoothingForLinearSeries.Model;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
-import eu.hansolo.tilesfx.tools.Statistics;
 import eu.hansolo.tilesfx.tools.TimeData;
+import eu.hansolo.toolbox.Statistics;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
@@ -667,7 +667,7 @@ public class TimelineTileSkin extends TileSkin {
                 rectangle.setFill(section.getColor());
             });
 
-            double average  = Statistics.getChartDataAverage(reducedDataList);
+            double average  = Statistics.getAverage(reducedDataList.stream().map(ChartData::getValue).collect(Collectors.toList()));
             double averageY = clamp(minY, maxY, maxY - Math.abs(minValue - average) * stepY);
 
             averageLine.setStartX(minX);
@@ -774,7 +774,7 @@ public class TimelineTileSkin extends TileSkin {
             }
         }
 
-        stdDeviation = Statistics.getChartDataStdDev(reducedDataList);
+        stdDeviation = Statistics.getStdDev(reducedDataList.stream().map(ChartData::getValue).collect(Collectors.toList()));
 
         analyse(reducedDataList);
 

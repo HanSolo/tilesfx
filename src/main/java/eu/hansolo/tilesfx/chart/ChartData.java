@@ -21,8 +21,8 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.tools.GradientLookup;
-import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.toolboxfx.GradientLookup;
+import eu.hansolo.toolboxfx.geom.Location;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -219,9 +219,9 @@ public class ChartData implements Comparable<ChartData> {
     public double getOldValue() { return oldValue; }
 
     public Color getFillColor() { return fillColor; }
-    public void setFillColor(final Color COLOR) {
-        fillColor = COLOR;
-        if (null != location) { location.setColor(COLOR); }
+    public void setFillColor(final Color FILL) {
+        fillColor = FILL;
+        if (null != location) { location.setFill(FILL); }
         fireChartDataEvent(UPDATE_EVENT);
     }
 
@@ -283,7 +283,7 @@ public class ChartData implements Comparable<ChartData> {
     public void setLocation(final Location LOCATION) {
         location = LOCATION;
         location.setName(getName());
-        location.setColor(getFillColor());
+        location.setFill(getFillColor());
         fireChartDataEvent(UPDATE_EVENT);
     }
 

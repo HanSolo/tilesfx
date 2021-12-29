@@ -26,7 +26,8 @@ import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.toolboxfx.evt.type.LocationChangeEvt;
+import eu.hansolo.toolboxfx.geom.Location;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
@@ -96,8 +97,8 @@ public class WorldMapTileSkin extends TileSkin {
                         String tooltipText = new StringBuilder(addedPoi.getName()).append("\n")
                                                                                   .append(addedPoi.getInfo())
                                                                                   .toString();
-                        EventHandler<MouseEvent> handler = e -> addedPoi.fireLocationEvent(new LocationEvt(tile, LocationEvt.LOCATION, addedPoi));
-                        Circle circle = new Circle(3, addedPoi.getColor());
+                        EventHandler<MouseEvent> handler = e -> addedPoi.fireLocationEvent(new LocationEvt(LocationChangeEvt.LOCATION_CHANGED, addedPoi, addedPoi, tile));
+                        Circle circle = new Circle(3, addedPoi.getFill());
                         Tooltip.install(circle, new Tooltip(tooltipText));
                         circleHandlerMap.put(circle, handler);
                         poiLocations.put(addedPoi, circle);
@@ -124,7 +125,7 @@ public class WorldMapTileSkin extends TileSkin {
                                                                                    .append(String.format(Locale.US, formatString, addedData.getValue()))
                                                                                    .toString();
                         EventHandler<MouseEvent> handler = e -> tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, addedData));
-                        Circle circle = new Circle(3, addedData.getLocation().getColor());
+                        Circle circle = new Circle(3, addedData.getLocation().getFill());
                         Tooltip.install(circle, new Tooltip(tooltipText));
                         circleHandlerMap.put(circle, handler);
                         chartDataLocations.put(addedData.getLocation(), circle);
@@ -149,15 +150,15 @@ public class WorldMapTileSkin extends TileSkin {
                 String tooltipText = new StringBuilder(poi.getName()).append("\n")
                                                                      .append(poi.getInfo())
                                                                      .toString();
-                Circle circle = new Circle(3, poi.getColor());
-                circle.setOnMousePressed(e -> poi.fireLocationEvent(new LocationEvt(tile, LocationEvt.LOCATION, poi)));
+                Circle circle = new Circle(3, poi.getFill());
+                circle.setOnMousePressed(e -> poi.fireLocationEvent(new LocationEvt(LocationEvt.LOCATION_CHANGED, poi, poi, tile)));
                 Tooltip.install(circle, new Tooltip(tooltipText));
                 poiLocations.put(poi, circle);
             });
 
         tile.getChartData().stream().filter(chartData -> chartData.getLocation() != null).forEach(chartData -> {
             String tooltipText = new StringBuilder(chartData.getName()).append("\n").append(String.format(Locale.US, formatString, chartData.getValue())).toString();
-            Circle circle = new Circle(3, null == chartData.getLocation().getColor() ? Color.TRANSPARENT : chartData.getLocation().getColor());
+            Circle circle = new Circle(3, null == chartData.getLocation().getFill() ? Color.TRANSPARENT : chartData.getLocation().getFill());
             circle.setOnMousePressed(e -> tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, chartData)));
             Tooltip.install(circle, new Tooltip(tooltipText));
             chartDataLocations.put(chartData.getLocation(), circle);

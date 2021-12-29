@@ -20,12 +20,12 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
-import eu.hansolo.tilesfx.tools.Point;
-import eu.hansolo.tilesfx.tools.Statistics;
+import eu.hansolo.toolbox.Statistics;
+import eu.hansolo.toolboxfx.GradientLookup;
+import eu.hansolo.toolboxfx.geom.Point;
 import javafx.beans.InvalidationListener;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
@@ -476,7 +476,7 @@ public class SparkLineTileSkin extends TileSkin {
     }
 
     private void smooth(final List<Double> DATA_LIST) {
-        Task<Point[]> smoothTask = new Task<Point[]>() {
+        Task<Point[]> smoothTask = new Task<>() {
             @Override protected Point[] call() {
                 return Helper.smoothSparkLine(DATA_LIST, minValue, maxValue, graphBounds, noOfDatapoints);
             }

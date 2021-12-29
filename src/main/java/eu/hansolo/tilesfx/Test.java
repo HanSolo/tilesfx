@@ -135,8 +135,8 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //tile2.setDescription("OFFLINE");
-        //tile2.setBackgroundColor(Dark.RED);
+        tile2.setDescription("OFFLINE");
+        tile2.setBackgroundColor(Dark.RED);
         timer.start();
     }
 

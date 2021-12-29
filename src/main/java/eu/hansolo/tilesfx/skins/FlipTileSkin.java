@@ -20,10 +20,9 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.CtxBounds;
-import eu.hansolo.tilesfx.tools.CtxCornerRadii;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.toolbox.geom.CornerRadii;
+import eu.hansolo.toolboxfx.geom.Bounds;
+import eu.hansolo.toolboxfx.geom.CornerRadii;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -198,7 +197,7 @@ public class FlipTileSkin extends TileSkin {
         // Upper Background
         upperBackground.setCache(false);
         upperBackgroundCtx.clearRect(0, 0, width, flapHeight);
-        Helper.drawRoundedRect(upperBackgroundCtx, new CtxBounds(0, 0, width, flapHeight), new CtxCornerRadii(cornerRadius, cornerRadius, 0, 0));
+        Helper.drawRoundedRect(upperBackgroundCtx, new Bounds(0, 0, width, flapHeight), new CornerRadii(cornerRadius, cornerRadius, 0, 0));
         upperBackgroundCtx.setFill(tile.getBackgroundColor());
         upperBackgroundCtx.fill();
         upperBackground.setCache(true);
@@ -207,7 +206,7 @@ public class FlipTileSkin extends TileSkin {
         // Lower Background
         lowerBackground.setCache(false);
         lowerBackgroundCtx.clearRect(0, 0, width, flapHeight);
-        Helper.drawRoundedRect(lowerBackgroundCtx, new CtxBounds(0, 0, width, flapHeight), new CtxCornerRadii(0, 0, cornerRadius, cornerRadius));
+        Helper.drawRoundedRect(lowerBackgroundCtx, new Bounds(0, 0, width, flapHeight), new CornerRadii(0, 0, cornerRadius, cornerRadius));
         lowerBackgroundCtx.setFill(tile.getBackgroundColor());
         lowerBackgroundCtx.fill();
         lowerBackground.setCache(true);
@@ -216,7 +215,7 @@ public class FlipTileSkin extends TileSkin {
         // Flap
         flap.setCache(false);
         flapCtx.clearRect(0, 0, width, flapHeight);
-        Helper.drawRoundedRect(flapCtx, new CtxBounds(0, 0, width, flapHeight), new CtxCornerRadii(cornerRadius, cornerRadius, 0, 0));
+        Helper.drawRoundedRect(flapCtx, new Bounds(0, 0, width, flapHeight), new CornerRadii(cornerRadius, cornerRadius, 0, 0));
         flapCtx.setFill(tile.getBackgroundColor());
         flapCtx.fill();
         flap.setCache(true);

@@ -18,8 +18,8 @@
 package eu.hansolo.tilesfx.chart;
 
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.tools.GradientLookup;
-import eu.hansolo.tilesfx.tools.Location;
+import eu.hansolo.toolboxfx.GradientLookup;
+import eu.hansolo.toolboxfx.geom.Location;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;

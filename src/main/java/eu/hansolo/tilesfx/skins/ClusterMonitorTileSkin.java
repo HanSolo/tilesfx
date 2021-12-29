@@ -22,8 +22,8 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.toolboxfx.geom.Bounds;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -264,7 +264,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
         private static final double                 PREF_WIDTH  = 100;
         private static final double                 PREF_HEIGHT = 95;
         private              ChartData              chartData;
-        private              CtxBounds              contentBounds;
+        private              Bounds                 contentBounds;
         private              Label                  title;
         private              Label                  value;
         private              Rectangle              scale;
@@ -276,10 +276,10 @@ public class ClusterMonitorTileSkin extends TileSkin {
         private              ChartDataEventListener chartDataListener;
 
 
-        public ChartItem(final ChartData CHART_DATA, final CtxBounds CONTENT_BOUNDS) {
+        public ChartItem(final ChartData CHART_DATA, final Bounds CONTENT_BOUNDS) {
             this(CHART_DATA, CONTENT_BOUNDS, "%.0f%%");
         }
-        public ChartItem(final ChartData CHART_DATA, final CtxBounds CONTENT_BOUNDS, final String FORMAT_STRING) {
+        public ChartItem(final ChartData CHART_DATA, final Bounds CONTENT_BOUNDS, final String FORMAT_STRING) {
             chartData         = CHART_DATA;
             contentBounds     = CONTENT_BOUNDS;
             title             = new Label(chartData.getName());

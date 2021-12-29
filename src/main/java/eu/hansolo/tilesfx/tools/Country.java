@@ -19,6 +19,7 @@ package eu.hansolo.tilesfx.tools;
 
 import eu.hansolo.tilesfx.ValueObject;
 import eu.hansolo.tilesfx.icons.Flag;
+import eu.hansolo.toolboxfx.geom.Location;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public enum Country {
     CF("Central African Republic", new Location(6.611111,20.939444)),
     CG("Congo [Republic]", new Location(-0.228021,15.827659)),
     CH("Switzerland", new Location(46.818188,8.227512)),
-    CI("C\u00F4te d'Ivoire", new Location(7.539989,-5.54708)),
+    CI("C\u00F4te d'Ivoire", new Location(7.539989, -5.54708)),
     CK("Cook Islands", new Location(-21.236736,-159.777671)),
     CL("Chile", new Location(-35.675147,-71.542969)),
     CM("Cameroon", new Location(7.369722,12.354722)),

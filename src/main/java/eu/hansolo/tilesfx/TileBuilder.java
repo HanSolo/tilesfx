@@ -17,6 +17,8 @@
  */
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.fx.countries.Country;
+import eu.hansolo.fx.countries.tools.BusinessRegion;
 import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.ItemSorting;
@@ -36,8 +38,6 @@ import eu.hansolo.tilesfx.events.TimeEvt;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.tools.Country;
-import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.Rank;
@@ -907,7 +907,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B countryGroup(final CountryGroup COUNTRY_GROUP) {
+    public final B countryGroup(final BusinessRegion COUNTRY_GROUP) {
         properties.put("countryGroup", new SimpleObjectProperty(COUNTRY_GROUP));
         return (B)this;
     }
@@ -1831,7 +1831,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
             } else if ("country".equals(key)) {
                 TILE.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
             } else if ("countryGroup".equals(key)) {
-                TILE.setCountryGroup(((ObjectProperty<CountryGroup>) properties.get(key)).get());
+                TILE.setCountryGroup(((ObjectProperty<BusinessRegion>) properties.get(key)).get());
             } else if ("flipTimeInMS".equals(key)) {
                 TILE.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
             } else if ("flipText".equals(key)) {

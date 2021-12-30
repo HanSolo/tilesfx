@@ -80,10 +80,6 @@ public class TileEvt extends ChangeEvt {
 
 
     // ******************** Constructors **************************************
-    public TileEvt(final EvtType<? extends TileEvt> evtType) {
-        super(evtType);
-        this.data = null;
-    }
     public TileEvt(final EvtType<? extends TileEvt> evtType, final ChartData data) {
         super(evtType);
         this.data = data;
@@ -108,4 +104,6 @@ public class TileEvt extends ChangeEvt {
 
     // ******************** Methods *******************************************
     public EvtType<? extends TileEvt> getEvtType() { return (EvtType<? extends TileEvt>) super.getEvtType(); }
+
+    public ChartData getData() { return data; }
 }

@@ -17,13 +17,13 @@
  */
 package eu.hansolo.tilesfx.skins;
 
+import eu.hansolo.fx.countries.Country;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.LocationEvt;
 import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.toolboxfx.evt.type.LocationChangeEvt;

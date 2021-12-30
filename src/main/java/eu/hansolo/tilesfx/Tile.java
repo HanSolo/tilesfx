@@ -17,6 +17,8 @@
  */
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.fx.countries.Country;
+import eu.hansolo.fx.countries.tools.BusinessRegion;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart;
@@ -28,8 +30,6 @@ import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.events.TimeEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.*;
-import eu.hansolo.tilesfx.tools.Country;
-import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.InfoRegion;
@@ -589,10 +589,10 @@ public class Tile extends Control {
     private Color                                         _chartGridColor;
     private ObjectProperty<Color>                         chartGridColor;
     private Country                                       _country;
-    private ObjectProperty<Country>                       country;
-    private CountryGroup                                  _countryGroup;
-    private ObjectProperty<CountryGroup>                  countryGroup;
-    private boolean                                       _dataPointsVisible;
+    private ObjectProperty<Country>        country;
+    private BusinessRegion                 _countryGroup;
+    private ObjectProperty<BusinessRegion> countryGroup;
+    private boolean                        _dataPointsVisible;
     private BooleanProperty                               dataPointsVisible;
     private boolean                                       _snapToTicks;
     private BooleanProperty                               snapToTicks;
@@ -5686,7 +5686,7 @@ public class Tile extends Control {
     }
     public ObjectProperty<Country> countryProperty() {
         if (null == country) {
-            country = new ObjectPropertyBase<Country>(_country) {
+            country = new ObjectPropertyBase<>(_country) {
                 @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "country"; }
@@ -5696,11 +5696,11 @@ public class Tile extends Control {
         return country;
     }
 
-    public CountryGroup getCountryGroup() {
-        if (null == _countryGroup && null == countryGroup) { _countryGroup = Helper.EU; }
+    public BusinessRegion getCountryGroup() {
+        if (null == _countryGroup && null == countryGroup) { _countryGroup = BusinessRegion.EUROPE; }
         return null == countryGroup ? _countryGroup : countryGroup.get();
     }
-    public void setCountryGroup(final CountryGroup GROUP) {
+    public void setCountryGroup(final BusinessRegion GROUP) {
         if (null == countryGroup) {
             _countryGroup = GROUP;
             fireTileEvt(RECALC_EVENT);
@@ -5710,9 +5710,9 @@ public class Tile extends Control {
             }
         }
     }
-    public ObjectProperty<CountryGroup> countryGroupProperty() {
+    public ObjectProperty<BusinessRegion> countryGroupProperty() {
         if (null == countryGroup) {
-            countryGroup = new ObjectPropertyBase<CountryGroup>(_countryGroup) {
+            countryGroup = new ObjectPropertyBase<>(_countryGroup) {
                 @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "countryGroup"; }

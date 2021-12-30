@@ -30,6 +30,8 @@ module eu.hansolo.tilesfx {
     // 3rd party
     requires transitive eu.hansolo.toolbox;
     requires transitive eu.hansolo.toolboxfx;
+    requires transitive eu.hansolo.fx.heatmap;
+    requires transitive eu.hansolo.fx.countries;
 
     exports eu.hansolo.tilesfx;
     exports eu.hansolo.tilesfx.addons;
@@ -37,7 +39,6 @@ module eu.hansolo.tilesfx {
     exports eu.hansolo.tilesfx.colors;
     exports eu.hansolo.tilesfx.events;
     exports eu.hansolo.tilesfx.fonts;
-    exports eu.hansolo.tilesfx.icons;
     exports eu.hansolo.tilesfx.skins;
     exports eu.hansolo.tilesfx.tools;
 }

@@ -17,6 +17,8 @@
  */
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.fx.countries.Country;
+import eu.hansolo.fx.countries.flag.Flag;
 import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.MapProvider;
@@ -33,17 +35,14 @@ import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.events.TileEvt;
-import eu.hansolo.tilesfx.icons.Flag;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.Ranking;
 import eu.hansolo.tilesfx.tools.TreeNode;
-import eu.hansolo.toolboxfx.geom.Location;
 import eu.hansolo.toolboxfx.geom.LocationBuilder;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;

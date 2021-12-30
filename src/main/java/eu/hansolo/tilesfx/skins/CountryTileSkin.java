@@ -17,8 +17,8 @@
  */
 package eu.hansolo.tilesfx.skins;
 
+import eu.hansolo.fx.countries.Country;
 import eu.hansolo.tilesfx.events.TileEvt;
-import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;

@@ -32,10 +32,6 @@ public class AlarmEvt extends TileEvt {
 
 
     // ******************** Constructors **************************************
-    public AlarmEvt(final EvtType<? extends AlarmEvt> evtType, final Alarm alarm) {
-        super(evtType);
-        this.alarm = alarm;
-    }
     public AlarmEvt(final Object src, final EvtType<? extends AlarmEvt> evtType, final Alarm alarm) {
         super(src, evtType);
         this.alarm = alarm;

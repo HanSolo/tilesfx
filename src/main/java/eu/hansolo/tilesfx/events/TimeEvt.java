@@ -50,5 +50,7 @@ public class TimeEvt extends TileEvt {
 
 
     // ******************** Methods *******************************************
+    public EvtType<? extends TimeEvt> getEvtType() { return (EvtType<? extends TimeEvt>) super.getEvtType(); }
+
     public ZonedDateTime getTime() { return time; }
 }

@@ -104,4 +104,8 @@ public class TileEvt extends ChangeEvt {
         super(src, evtType, priority);
         this.data = data;
     }
+
+
+    // ******************** Methods *******************************************
+    public EvtType<? extends TileEvt> getEvtType() { return (EvtType<? extends TileEvt>) super.getEvtType(); }
 }

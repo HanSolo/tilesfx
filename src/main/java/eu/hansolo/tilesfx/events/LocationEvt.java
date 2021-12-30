@@ -45,5 +45,7 @@ public class LocationEvt extends LocationChangeEvt {
 
 
     // ******************** Methods *******************************************
+    public EvtType<? extends LocationEvt> getEvtType() { return (EvtType<? extends LocationEvt>) super.getEvtType(); }
+
     public Tile getTile() { return tile; }
 }

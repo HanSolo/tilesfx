@@ -6632,7 +6632,7 @@ public class Tile extends Control {
         final EvtType type = evt.getEvtType();
         if (null != showing && showing.get()) {
             observers.entrySet().stream().filter(entry -> entry.getKey().equals(TileEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
-            if (observers.containsKey(type)) {
+            if (observers.containsKey(type) && !type.equals(TileEvt.ANY)) {
                 observers.get(type).forEach(observer -> observer.handle(evt));
             }
         } else {

@@ -12,6 +12,10 @@ A JavaFX library containing tiles for Dashboards.
 
 Donations are welcome at [Paypal](https://paypal.me/hans0l0)
 
+## Getting started
+Please take a look at the [gettingstarted](https://github.com/HanSolo/gettingstarted) project to learn how to get started with tilesfx
+related to imports, required modules etc.
+
 ## Intro
 The Tile is a simple JavaFX Control that comes with different skins.
 To get an idea on how to use the skins with their parameters you could

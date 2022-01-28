@@ -62,8 +62,9 @@ dependencies {
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-web:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:17.0.6"
-    implementation "eu.hansolo:toolboxfx:17.0.15"
+    implementation "eu.hansolo:jdktools:17.0.3"
+    implementation "eu.hansolo:toolbox:17.0.12"
+    implementation "eu.hansolo:toolboxfx:17.0.22"
     implementation "eu.hansolo.fx:heatmap:17.0.3"
     implementation "eu.hansolo.fx:countries:17.0.16"
 }
@@ -131,9 +132,9 @@ signing {
 publishing {
     publications {
         mavenCustom(MavenPublication) {
-            group = 'eu.hansolo'
+            group      = 'eu.hansolo'
             artifactId = 'tilesfx'
-            version = "${version}"
+            version    = "${version}"
 
             from components.java
             artifact sourcesJar
@@ -148,26 +149,26 @@ publishing {
             }
 
             pom {
-                name = 'TilesFX'
+                name        = 'TilesFX'
                 description = 'TilesFX is a JavaFX library containing tiles for dashboards'
-                url = "https://github.com/HanSolo/tilesfx/wiki"
+                url         = "https://github.com/HanSolo/tilesfx/wiki"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        url  = "http://www.apache.org/licenses/LICENSE-2.0.txt"
                     }
                 }
                 developers {
                     developer {
-                        id = "HanSolo"
-                        name = "Gerrit Grunwald"
+                        id    = "HanSolo"
+                        name  = "Gerrit Grunwald"
                         email = "han.solo@mac.com"
                     }
                 }
                 scm {
-                    connection = "scm:git:https://HanSolo/tilesfx"
+                    connection          = "scm:git:https://HanSolo/tilesfx"
                     developerConnection = "scm:git:https://HanSolo/tilesfx"
-                    url = "https://github.com/HanSolo/tilesfx"
+                    url                 = "https://github.com/HanSolo/tilesfx"
                 }
             }
         }
@@ -176,7 +177,7 @@ publishing {
     repositories {
         maven {
             name = "OSSRH"
-            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+            url  = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
             credentials {
                 username = null == ciOssrhUsername ? ossrhUsername : ciOssrhUsername
                 password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
@@ -184,7 +185,7 @@ publishing {
         }
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/HanSolo/tilesfx"
+            url  = "https://maven.pkg.github.com/HanSolo/tilesfx"
             credentials {
                 username = null == ciGHUser  ? ghUser  : ciGHUser
                 password = null == ciGHToken ? ghToken : ciGHToken

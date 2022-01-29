@@ -21,17 +21,19 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 
 public class CenterTextTileSkin extends TileSkin {
-    private Text           titleText;
-    private Text           text;
-    private Label          label;
+    private Text            titleText;
+    private Text            text;
+    private Canvas          canvas;
+    private GraphicsContext ctx;
 
 
     // ******************** Constructors **************************************
@@ -52,14 +54,10 @@ public class CenterTextTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
 
-        label = new Label(tile.getDescription());
-        label.setPrefWidth(tile.getPrefWidth() * 0.9);
-        label.setTextFill(tile.getForegroundColor());
-        label.setAlignment(Pos.CENTER);
-        label.setTextAlignment(TextAlignment.CENTER);
-        label.setWrapText(true);
+        canvas = new Canvas(getContentBounds().getWidth(), getContentBounds().getHeight());
+        ctx    = canvas.getGraphicsContext2D();
 
-        getPane().getChildren().addAll(titleText, label, text);
+        getPane().getChildren().addAll(titleText, canvas, text);
     }
 
     @Override protected void registerListeners() {
@@ -83,11 +81,6 @@ public class CenterTextTileSkin extends TileSkin {
 
 
     // ******************** Resizing ******************************************
-    @Override protected void resizeDynamicText() {
-        double fontSize = size * 0.2;
-        label.setFont(Fonts.latoRegular(fontSize));
-    }
-
     @Override protected void resizeStaticText() {
         double  maxWidth = width - size * 0.1;
         double  fontSize = size * textSize.factor;
@@ -125,9 +118,10 @@ public class CenterTextTileSkin extends TileSkin {
         if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
-            label.setPrefSize(contentBounds.getWidth(), contentBounds.getHeight());
-            label.setLayoutX(contentBounds.getX());
-            label.setLayoutY(contentBounds.getY());
+            canvas.setWidth(contentBounds.getWidth());
+            canvas.setHeight(contentBounds.getHeight());
+            canvas.setLayoutX(contentBounds.getMinX());
+            canvas.setLayoutY(contentBounds.getMinY());
             redraw();
         }
     }
@@ -136,13 +130,21 @@ public class CenterTextTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
-        label.setText(tile.getDescription());
 
         resizeDynamicText();
         resizeStaticText();
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
-        label.setTextFill(tile.getDescriptionColor());
+        drawText();
+    }
+
+    private void drawText() {
+        ctx.clearRect(0, 0, contentBounds.getWidth(), contentBounds.getHeight());
+        ctx.setTextAlign(TextAlignment.CENTER);
+        ctx.setTextBaseline(VPos.CENTER);
+        ctx.setFont(Fonts.latoRegular(size * 0.2));
+        ctx.setFill(tile.getDescriptionColor());
+        ctx.fillText(tile.getDescription(), contentBounds.getWidth() * 0.5, contentBounds.getHeight() * 0.5, contentBounds.getWidth() * 0.9);
     }
 }

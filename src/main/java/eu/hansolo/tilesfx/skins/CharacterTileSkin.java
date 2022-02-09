@@ -53,7 +53,7 @@ public class CharacterTileSkin extends TileSkin {
         description.setTextAlignment(TextAlignment.CENTER);
         description.setWrapText(true);
         description.setTextOverrun(OverrunStyle.WORD_ELLIPSIS);
-        description.setTextFill(tile.getTextColor());
+        description.setTextFill(tile.getDescriptionColor());
         description.setPrefSize(PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.795);
         Helper.enableNode(description, tile.isTextVisible());
 
@@ -132,6 +132,6 @@ public class CharacterTileSkin extends TileSkin {
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
-        description.setTextFill(tile.getTextColor());
+        description.setTextFill(tile.getDescriptionColor());
     }
 }

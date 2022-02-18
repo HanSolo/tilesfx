@@ -6693,14 +6693,15 @@ public class Tile extends Control {
                         observers.get(type).forEach(observer -> observer.handle(evt));
                     }
                 }
+                boundsObservers.forEach(listener -> ((TileSkin) (getSkin())).setOnContentBoundsChanged(listener));
+                if (null != getSkin()) {
+                    Bounds bounds = ((TileSkin) (getSkin())).getContentBounds();
+                    bounds.fireBoundsEvt(new BoundsEvt(bounds, BoundsEvt.BOUNDS, bounds));
+                }
+
+                fireTileEvt(REGIONS_ON_TOP_EVENT);
+                fireTileEvt(RESIZE_EVENT);
             }
-
-            boundsObservers.forEach(listener -> ((TileSkin) (getSkin())).setOnContentBoundsChanged(listener));
-            Bounds bounds = ((TileSkin) (getSkin())).getContentBounds();
-            bounds.fireBoundsEvt(new BoundsEvt(bounds, BoundsEvt.BOUNDS, bounds));
-
-            fireTileEvt(REGIONS_ON_TOP_EVENT);
-            fireTileEvt(RESIZE_EVENT);
         });
     }
 

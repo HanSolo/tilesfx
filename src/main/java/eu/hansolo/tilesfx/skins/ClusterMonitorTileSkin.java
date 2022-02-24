@@ -96,7 +96,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             chartPane.getChildren().add(dataItemMap.get(data));
         });
 
-        titleText = new Text();
+        titleText = new Text(tile.getTitle());
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 

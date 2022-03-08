@@ -28,10 +28,8 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.8.10'
     id 'org.beryx.jlink'                 version '2.24.4'
     id 'net.nemerosa.versioning'         version '2.15.1'
-    id 'biz.aQute.bnd.builder'           version '6.1.0'
 }
 
-apply plugin: 'biz.aQute.bnd.builder'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
@@ -62,10 +60,10 @@ dependencies {
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-web:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:17.0.14"
-    implementation "eu.hansolo:toolboxfx:17.0.23"
-    implementation "eu.hansolo.fx:heatmap:17.0.4"
-    implementation "eu.hansolo.fx:countries:17.0.18"
+    implementation "eu.hansolo:toolbox:17.0.17"
+    implementation "eu.hansolo:toolboxfx:17.0.24"
+    implementation "eu.hansolo.fx:heatmap:17.0.5"
+    implementation "eu.hansolo.fx:countries:17.0.19"
 }
 
 jar {
@@ -91,13 +89,13 @@ jar {
 
 // start the demo from gradle
 task Demo(type: JavaExec) {
-    main = "eu.hansolo.tilesfx.DemoLauncher"
+    mainClass = "eu.hansolo.tilesfx.DemoLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
 // Only used for internal test
 task Test(type: JavaExec) {
-    main = "eu.hansolo.tilesfx.TestLauncher"
+    mainClass = "eu.hansolo.tilesfx.TestLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 

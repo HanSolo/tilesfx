@@ -60,10 +60,10 @@ dependencies {
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-web:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:17.0.21"
-    implementation "eu.hansolo:toolboxfx:17.0.27"
-    implementation "eu.hansolo.fx:heatmap:17.0.8"
-    implementation "eu.hansolo.fx:countries:17.0.21"
+    implementation "eu.hansolo:toolbox:17.0.22"
+    implementation "eu.hansolo:toolboxfx:17.0.28"
+    implementation "eu.hansolo.fx:heatmap:17.0.9"
+    implementation "eu.hansolo.fx:countries:17.0.22"
 }
 
 jar {

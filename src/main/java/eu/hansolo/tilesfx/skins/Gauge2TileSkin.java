@@ -175,9 +175,9 @@ public class Gauge2TileSkin extends TileSkin {
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
         needleRectRotate.setAngle(targetAngle);
-        bar.setLength(-angleStep * VALUE);
+        bar.setLength(-angleStep * (VALUE - minValue));
         if (tile.isStrokeWithGradient()) {
-            needle.setFill(gradientLookup.getColorAt(VALUE / tile.getRange()));
+            needle.setFill(gradientLookup.getColorAt((VALUE - minValue) / tile.getRange()));
             bar.setStroke(conicalGradient.getImagePattern(barBounds));
         } else {
             needle.setFill(tile.getNeedleColor());
@@ -224,7 +224,7 @@ public class Gauge2TileSkin extends TileSkin {
         List<Stop> stops = tile.getGradientStops();
         Map<Double, Color> stopAngleMap = new HashMap<>(stops.size());
         for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()); }
-        double offsetFactor = (tile.getStartAngle() - 90);
+        double offsetFactor = ((360 - angleRange) / 2 + 180);
         conicalGradient = new AngleConicalGradient(barBounds.getX() * barBounds.getWidth() * 0.5, barBounds.getY() * barBounds.getHeight() * 0.5, offsetFactor, stopAngleMap);
     }
 

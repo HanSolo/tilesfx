@@ -174,5 +174,4 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
         }
         return DATA;
     }
-
 }

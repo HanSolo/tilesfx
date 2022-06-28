@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -159,6 +160,10 @@ public class BarChartTileSkin extends TileSkin {
             default:
                 break;
         }
+
+        final double sum = tile.getBarChartItems().stream().mapToDouble(BarChartItem::getValue).sum();
+        tile.getBarChartItems().forEach(item -> item.setPercentage((item.getValue() / sum) * 100.0));
+
         updateChart();
     }
 

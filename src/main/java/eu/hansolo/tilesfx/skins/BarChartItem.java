@@ -78,43 +78,48 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     private              String                formatString;
     private              Locale                locale;
     private              double                maxValue;
+    private              double                percentage;
     private              double                stepSize;
     private              boolean               shortenNumbers;
+    private              boolean               percentageVisible;
     private              ChartData             chartData;
 
 
     // ******************** Constructors **************************************
     public BarChartItem() {
-        this("", 0, Instant.now(), Duration.ZERO, Tile.BLUE);
+        this("", 0, Instant.now(), Duration.ZERO, Tile.BLUE, false, false);
     }
     public BarChartItem(final String NAME) {
-        this(NAME, 0, Instant.now(), Duration.ZERO, Tile.BLUE);
+        this(NAME, 0, Instant.now(), Duration.ZERO, Tile.BLUE, false, false);
     }
     public BarChartItem(final String NAME, final double VALUE) {
-        this(NAME, VALUE, Instant.now(), Duration.ZERO, Tile.BLUE);
+        this(NAME, VALUE, Instant.now(), Duration.ZERO, Tile.BLUE, false, false);
     }
     public BarChartItem(final String NAME, final Instant TIMESTAMP) {
-        this(NAME, 0, TIMESTAMP, Duration.ZERO, Tile.BLUE);
+        this(NAME, 0, TIMESTAMP, Duration.ZERO, Tile.BLUE, false,false);
     }
     public BarChartItem(final String NAME, final Duration DURATION) {
-        this(NAME, 0, Instant.now(), DURATION, Tile.BLUE);
+        this(NAME, 0, Instant.now(), DURATION, Tile.BLUE, false, false);
     }
     public BarChartItem(final String NAME, final double VALUE, final Color COLOR) {
-        this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR);
+        this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR, false, false);
     }
     public BarChartItem(final String NAME, final double VALUE, final Color COLOR, final boolean SHORTEN_NUMBERS) {
-        this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR, SHORTEN_NUMBERS);
+        this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR, SHORTEN_NUMBERS, false);
     }
     public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Color COLOR) {
-        this(NAME, VALUE, TIMESTAMP, Duration.ZERO, COLOR);
+        this(NAME, VALUE, TIMESTAMP, Duration.ZERO, COLOR, false, false);
     }
     public BarChartItem(final String NAME, final double VALUE, final Duration DURATION, final Color COLOR) {
-        this(NAME, VALUE, Instant.now(), DURATION, COLOR);
+        this(NAME, VALUE, Instant.now(), DURATION, COLOR, false, false);
     }
     public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION, final Color COLOR) {
-        this(NAME, VALUE, TIMESTAMP, DURATION, COLOR, false);
+        this(NAME, VALUE, TIMESTAMP, DURATION, COLOR, false, false);
     }
     public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION, final Color COLOR, final boolean SHORTEN_NUMBERS) {
+        this(NAME, VALUE, TIMESTAMP, DURATION, COLOR, SHORTEN_NUMBERS, false);
+    }
+    public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION, final Color COLOR, final boolean SHORTEN_NUMBERS, final boolean PERCENTAGE_VISIBLE) {
         nameColor          = new ObjectPropertyBase<>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
             @Override public Object getBean() { return BarChartItem.this; }
@@ -133,9 +138,11 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         formatString       = "%.0f";
         locale             = Locale.US;
         maxValue           = 100;
+        percentage         = 0;
         chartData          = new ChartData(NAME, VALUE, null == TIMESTAMP ? Instant.now() : TIMESTAMP, null == DURATION ? Duration.ZERO : DURATION, COLOR);
         stepSize           = PREFERRED_WIDTH * 0.85 / maxValue;
         shortenNumbers     = SHORTEN_NUMBERS;
+        percentageVisible  = PERCENTAGE_VISIBLE;
         parentWidth        = 250;
         parentHeight       = 250;
         initGraphics();
@@ -235,9 +242,20 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         updateBar(getValue());
     }
 
+    public boolean getPercentageVisible() { return percentageVisible; }
+    public void setPercentageVisible(final boolean VISIBLE) {
+        this.percentageVisible = VISIBLE;
+        updateBar(getValue());
+    }
+
     public void setMaxValue(final double MAX_VALUE) {
         maxValue = MAX_VALUE;
         stepSize = (parentWidth - size * 0.15) / maxValue;
+        updateBar(getValue());
+    }
+
+    public void setPercentage(final double PERCENTAGE) {
+        percentage = Helper.clamp(0.0, 100.0, PERCENTAGE);
         updateBar(getValue());
     }
 
@@ -259,11 +277,17 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     }
 
     private void updateBar(final double VALUE) {
+        StringBuilder valueTextBuilder = new StringBuilder();
         if (getShortenNumbers()) {
-            valueText.setText(Helper.shortenNumber((long) VALUE, locale));
+            valueTextBuilder.append(Helper.shortenNumber((long) VALUE, locale));
         } else {
-            valueText.setText(String.format(locale, formatString, VALUE));
+            valueTextBuilder.append(String.format(locale, formatString, VALUE));
         }
+        if (getPercentageVisible()) {
+            valueTextBuilder.append("/").append(String.format(locale, "%.0f%%", percentage));
+        }
+        valueText.setText(valueTextBuilder.toString());
+
         valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
         bar.setWidth(clamp(0, (parentWidth - size * 0.15), VALUE * stepSize));
         bar.setFill(getBarColor());

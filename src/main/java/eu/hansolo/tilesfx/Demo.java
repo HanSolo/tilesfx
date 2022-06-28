@@ -295,6 +295,11 @@ public class Demo extends Application {
         barChartItem3 = new BarChartItem("Lilli", 12, Tile.GREEN);
         barChartItem4 = new BarChartItem("Anton", 8, Tile.ORANGE);
 
+        barChartItem1.setPercentageVisible(true);
+        barChartItem2.setPercentageVisible(true);
+        barChartItem3.setPercentageVisible(true);
+        barChartItem4.setPercentageVisible(true);
+
         barChartItem1.setFormatString("%.1f kWh");
 
         // LeaderBoard Items

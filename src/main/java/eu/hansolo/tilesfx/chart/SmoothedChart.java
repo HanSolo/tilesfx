@@ -22,7 +22,7 @@ package eu.hansolo.tilesfx.chart;
 
 import eu.hansolo.tilesfx.events.SmoothedChartEvent;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.Point;
+import eu.hansolo.toolboxfx.geom.Point;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;

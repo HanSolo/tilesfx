@@ -19,8 +19,7 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
@@ -238,7 +237,7 @@ public class CalendarTileSkin extends TileSkin {
         LocalDate           selectedDate      = LocalDate.of(time.getYear(), time.getMonth(), selectedNo);
         Optional<ChartData> selectedChartData = dataList.stream().filter(data -> data.getTimestampAsLocalDate().isEqual(selectedDate)).findAny();
 
-        if (selectedChartData.isPresent()) { tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, selectedChartData.get())); }
+        if (selectedChartData.isPresent()) { tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, selectedChartData.get())); }
     }
 
 

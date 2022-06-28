@@ -19,11 +19,10 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.colors.ColorSkin;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.toolboxfx.GradientLookup;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -156,19 +155,21 @@ public class FluidTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (EventType.VALUE.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VALUE.getName().equals(EVENT_TYPE)) {
             handleCurrentValue(tile.getCurrentValue());
-        } else if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
-        } else if (EventType.SECTION.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.SECTION.getName().equals(EVENT_TYPE)) {
             redraw();
         }
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
         double percentage = VALUE / (tile.getRange());
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(Helper.clamp(minValue, maxValue, VALUE)));
         } else {
             valueText.setText(String.format(locale, formatString, Helper.clamp(minValue, maxValue, VALUE)));

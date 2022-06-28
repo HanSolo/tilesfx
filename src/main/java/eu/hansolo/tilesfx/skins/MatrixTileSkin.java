@@ -22,11 +22,9 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.PixelMatrix;
 import eu.hansolo.tilesfx.chart.PixelMatrix.PixelShape;
 import eu.hansolo.tilesfx.chart.PixelMatrixBuilder;
-import eu.hansolo.tilesfx.events.ChartDataEvent;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.events.PixelMatrixEventListener;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.collections.ListChangeListener;
@@ -109,7 +107,7 @@ public class MatrixTileSkin extends TileSkin {
             selectionTooltip.setY(popupLocation.getY());
             selectionTooltip.show(tile.getScene().getWindow());
 
-            tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data));
+            tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, data));
         };
         mouseHandler = e -> {
             final javafx.event.EventType<? extends MouseEvent> TYPE = e.getEventType();

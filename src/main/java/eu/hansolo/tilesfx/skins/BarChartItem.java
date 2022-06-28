@@ -79,6 +79,7 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     private              Locale                locale;
     private              double                maxValue;
     private              double                stepSize;
+    private              boolean               shortenNumbers;
     private              ChartData             chartData;
 
 
@@ -101,6 +102,9 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     public BarChartItem(final String NAME, final double VALUE, final Color COLOR) {
         this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR);
     }
+    public BarChartItem(final String NAME, final double VALUE, final Color COLOR, final boolean SHORTEN_NUMBERS) {
+        this(NAME, VALUE, Instant.now(), Duration.ZERO, COLOR, SHORTEN_NUMBERS);
+    }
     public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Color COLOR) {
         this(NAME, VALUE, TIMESTAMP, Duration.ZERO, COLOR);
     }
@@ -108,17 +112,20 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         this(NAME, VALUE, Instant.now(), DURATION, COLOR);
     }
     public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION, final Color COLOR) {
-        nameColor          = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
+        this(NAME, VALUE, TIMESTAMP, DURATION, COLOR, false);
+    }
+    public BarChartItem(final String NAME, final double VALUE, final Instant TIMESTAMP, final Duration DURATION, final Color COLOR, final boolean SHORTEN_NUMBERS) {
+        nameColor          = new ObjectPropertyBase<>(Tile.FOREGROUND) {
             @Override protected void invalidated() { nameText.setFill(get()); }
             @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "nameColor"; }
         };
-        valueColor         = new ObjectPropertyBase<Color>(Tile.FOREGROUND) {
+        valueColor         = new ObjectPropertyBase<>(Tile.FOREGROUND) {
             @Override protected void invalidated() {  valueText.setFill(get()); }
             @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "valueColor"; }
         };
-        barBackgroundColor = new ObjectPropertyBase<Color>(Color.rgb(72, 72, 72)) {
+        barBackgroundColor = new ObjectPropertyBase<>(Color.rgb(72, 72, 72)) {
             @Override protected void invalidated() { barBackground.setFill(get()); }
             @Override public Object getBean() { return BarChartItem.this; }
             @Override public String getName() { return "barBackgroundColor"; }
@@ -126,8 +133,9 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         formatString       = "%.0f";
         locale             = Locale.US;
         maxValue           = 100;
-        chartData          = new ChartData(NAME, VALUE, TIMESTAMP, DURATION, COLOR);
+        chartData          = new ChartData(NAME, VALUE, null == TIMESTAMP ? Instant.now() : TIMESTAMP, null == DURATION ? Duration.ZERO : DURATION, COLOR);
         stepSize           = PREFERRED_WIDTH * 0.85 / maxValue;
+        shortenNumbers     = SHORTEN_NUMBERS;
         parentWidth        = 250;
         parentHeight       = 250;
         initGraphics();
@@ -221,6 +229,12 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
         updateBar(getValue());
     }
 
+    public boolean getShortenNumbers() { return shortenNumbers; }
+    public void setShortenNumbers(final boolean SHORTEN) {
+        this.shortenNumbers = SHORTEN;
+        updateBar(getValue());
+    }
+
     public void setMaxValue(final double MAX_VALUE) {
         maxValue = MAX_VALUE;
         stepSize = (parentWidth - size * 0.15) / maxValue;
@@ -245,7 +259,11 @@ public class BarChartItem extends Region implements Comparable<BarChartItem>{
     }
 
     private void updateBar(final double VALUE) {
-        valueText.setText(String.format(locale, formatString, VALUE));
+        if (getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE, locale));
+        } else {
+            valueText.setText(String.format(locale, formatString, VALUE));
+        }
         valueText.relocate((parentWidth - size * 0.05) - valueText.getLayoutBounds().getWidth(), 0);
         bar.setWidth(clamp(0, (parentWidth - size * 0.15), VALUE * stepSize));
         bar.setFill(getBarColor());

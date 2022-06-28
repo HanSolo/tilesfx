@@ -1,8 +1,20 @@
-## TilesFX <a href="https://foojay.io/today/works-with-openjdk"><img align="right" src="https://github.com/foojayio/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100"></a>
+## TilesFX
+
+
+[![GitHub stars](https://badgen.net/github/stars/HanSolo/tilesfx)](https://GitHub.com/HanSolo/tilesfx/stargazers/)
+
+[![GitHub license](https://badgen.net/github/license/HanSolo/tilesfx)](https://github.com/HanSolo/tilesfx/blob/master/LICENSE)
+
 <br>
 A JavaFX library containing tiles for Dashboards.
 
+<b>ATTENTION: Version 17.1.0 will break backwards compatibility !!!</b>
+
 Donations are welcome at [Paypal](https://paypal.me/hans0l0)
+
+## Getting started
+Please take a look at the [gettingstarted](https://github.com/HanSolo/gettingstarted) project to learn how to get started with tilesfx
+related to imports, required modules etc.
 
 ## Intro
 The Tile is a simple JavaFX Control that comes with different skins.
@@ -18,7 +30,7 @@ where you will find additional information about certain tiles.
 To run the demo you simply can start it using the command "./gradlew Demo" on the command line in the project folder.
 
 ## Overview
-![Overview](https://raw.githubusercontent.com/HanSolo/tilesfx/jdk16/TilesFX.png)
+![Overview](https://raw.githubusercontent.com/HanSolo/tilesfx/jdk17/TilesFX.png)
 
 
 ## Credits

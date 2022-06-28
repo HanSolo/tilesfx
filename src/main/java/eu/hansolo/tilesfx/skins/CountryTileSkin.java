@@ -17,12 +17,11 @@
  */
 package eu.hansolo.tilesfx.skins;
 
-import eu.hansolo.tilesfx.tools.Country;
+import eu.hansolo.fx.countries.Country;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
@@ -36,8 +35,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 import java.util.List;
 
@@ -88,7 +85,7 @@ public class CountryTileSkin extends TileSkin {
         country = tile.getCountry();
         if (null == country) { country = Country.DE; }
 
-        clickHandler = event -> tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getColor())));
+        clickHandler = event -> tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, new ChartData(country.getName(), country.getValue(), country.getFill())));
 
         countryPaths = Helper.getHiresCountryPaths().get(country.name());
 
@@ -310,10 +307,14 @@ public class CountryTileSkin extends TileSkin {
         super.redraw();
         titleText.setText(tile.getTitle());
         text.setText(tile.getCountry().getDisplayName());
-        if (tile.getCustomDecimalFormatEnabled()) {
-            valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) tile.getCurrentValue()));
         } else {
-            valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            if (tile.getCustomDecimalFormatEnabled()) {
+                valueText.setText(decimalFormat.format(tile.getCurrentValue()));
+            } else {
+                valueText.setText(String.format(locale, formatString, tile.getCurrentValue()));
+            }
         }
         if (tile.getUnit().contains("/")) {
             String[] units = tile.getUnit().split("/");

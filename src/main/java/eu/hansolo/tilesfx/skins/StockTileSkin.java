@@ -21,7 +21,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
-import eu.hansolo.tilesfx.tools.Statistics;
+import eu.hansolo.toolbox.Statistics;
 import javafx.animation.FillTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;

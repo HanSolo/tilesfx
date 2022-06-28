@@ -27,13 +27,27 @@ module eu.hansolo.tilesfx {
     requires transitive javafx.web;
     requires transitive javafx.media;
 
+    // 3rd party
+    requires transitive eu.hansolo.toolbox;
+    requires transitive eu.hansolo.toolboxfx;
+    requires transitive eu.hansolo.fx.heatmap;
+    requires transitive eu.hansolo.fx.countries;
+
+    opens eu.hansolo.tilesfx to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;
+    opens eu.hansolo.tilesfx.tools to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;
+    opens eu.hansolo.tilesfx.events to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;
+    opens eu.hansolo.tilesfx.chart to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;
+    opens eu.hansolo.tilesfx.colors to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;
+    opens eu.hansolo.tilesfx.fonts to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;
+    opens eu.hansolo.tilesfx.skins to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;
+    opens eu.hansolo.tilesfx.addons to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;
+
     exports eu.hansolo.tilesfx;
     exports eu.hansolo.tilesfx.addons;
     exports eu.hansolo.tilesfx.chart;
     exports eu.hansolo.tilesfx.colors;
     exports eu.hansolo.tilesfx.events;
     exports eu.hansolo.tilesfx.fonts;
-    exports eu.hansolo.tilesfx.icons;
     exports eu.hansolo.tilesfx.skins;
     exports eu.hansolo.tilesfx.tools;
 }

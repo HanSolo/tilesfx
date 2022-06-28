@@ -17,6 +17,8 @@
  */
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.fx.countries.Country;
+import eu.hansolo.fx.countries.flag.Flag;
 import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.MapProvider;
@@ -32,18 +34,16 @@ import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.ColorSkin;
 import eu.hansolo.tilesfx.colors.Dark;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
-import eu.hansolo.tilesfx.icons.Flag;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
-import eu.hansolo.tilesfx.tools.Country;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.Ranking;
 import eu.hansolo.tilesfx.tools.TreeNode;
+import eu.hansolo.toolboxfx.geom.LocationBuilder;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
@@ -78,8 +78,10 @@ import javafx.stage.Stage;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -93,10 +95,11 @@ import java.util.concurrent.TimeUnit;
  * Time: 12:54
  */
 public class Demo extends Application {
-    private static final    Random RND = new Random();
-    private static final    double TILE_WIDTH  = 150;
-    private static final    double TILE_HEIGHT = 150;
-    private                 int    noOfNodes = 0;
+    private static final    Random            RND         = new Random();
+    private static final    DateTimeFormatter DTF         = DateTimeFormatter.ofPattern("mm.DD.yyyy HH:mm:ss");
+    private static final    double            TILE_WIDTH  = 150;
+    private static final    double            TILE_HEIGHT = 150;
+    private                 int               noOfNodes   = 0;
 
     private BarChartItem    barChartItem1;
     private BarChartItem    barChartItem2;
@@ -121,6 +124,9 @@ public class Demo extends Application {
     private ChartData       smoothChartData2;
     private ChartData       smoothChartData3;
     private ChartData       smoothChartData4;
+
+    private ChartData       cpuData;
+    private ChartData       memData;
 
     private Rank            firstRank;
 
@@ -178,6 +184,8 @@ public class Demo extends Application {
     private Tile            happinessTile;
     private Tile            radialDistributionTile;
     private Tile            spinnerTile;
+    private Tile            clusterMonitorTile;
+    private Tile            centerTextTile;
 
 
     private long            lastTimerCall;
@@ -266,7 +274,7 @@ public class Demo extends Application {
             } else {
                 color = Tile.BLUE;
             }
-            Country.values()[i].setColor(color);
+            Country.values()[i].setFill(color);
         }
 
         // TimeControl Data
@@ -309,6 +317,9 @@ public class Demo extends Application {
         smoothChartData2 = new ChartData("Item 2", RND.nextDouble() * 25, Tile.BLUE);
         smoothChartData3 = new ChartData("Item 3", RND.nextDouble() * 25, Tile.BLUE);
         smoothChartData4 = new ChartData("Item 4", RND.nextDouble() * 25, Tile.BLUE);
+
+        cpuData = new ChartData("CPU", RND.nextDouble() * 80, Tile.RED);
+        memData = new ChartData("MEM", RND.nextDouble() * 80, Tile.GREEN);
 
         // Creating Tiles
         percentageTile = TileBuilder.create()
@@ -503,10 +514,10 @@ public class Demo extends Application {
                              .title("Map Tile")
                              .text("Some text")
                              .description("Description")
-                             .currentLocation(new Location(51.91178, 7.63379, "Home", TileColor.MAGENTA.color))
-                             .pointsOfInterest(new Location(51.914405, 7.635732, "POI 1", TileColor.RED.color),
-                                               new Location(51.912529, 7.631752, "POI 2", TileColor.BLUE.color),
-                                               new Location(51.923993, 7.628906, "POI 3", TileColor.YELLOW_ORANGE.color))
+                             .currentLocation(LocationBuilder.create().latitude(51.91178).longitude(7.63379).name("Home").fill(TileColor.MAGENTA.color).build())
+                             .pointsOfInterest(LocationBuilder.create().latitude(51.914405).longitude(7.635732).name("POI 1").fill(TileColor.RED.color).build(),
+                                               LocationBuilder.create().latitude(51.912529).longitude(7.631752).name("POI 2").fill(TileColor.BLUE.color).build(),
+                                               LocationBuilder.create().latitude(51.923993).longitude(7.628906).name("POI 3").fill(TileColor.YELLOW_ORANGE.color).build())
                              .mapProvider(MapProvider.TOPO)
                              .build();
 
@@ -1082,11 +1093,11 @@ public class Demo extends Application {
                                   .animated(true)
                                   .checkThreshold(true)
                                   .onTileEvent(e -> {
-                                      if (EventType.THRESHOLD_EXCEEDED == e.getEventType()) {
+                                      if (e.getEvtType().equals(TileEvt.THRESHOLD_EXCEEDED)) {
                                           turnoverTile.setRank(firstRank);
                                           turnoverTile.setValueColor(firstRank.getColor());
                                           turnoverTile.setUnitColor(firstRank.getColor());
-                                      } else if (EventType.THRESHOLD_UNDERRUN == e.getEventType()) {
+                                      } else if (e.getEvtType().equals(TileEvt.THRESHOLD_UNDERRUN)) {
                                           turnoverTile.setRank(Rank.DEFAULT);
                                           turnoverTile.setValueColor(Tile.FOREGROUND);
                                           turnoverTile.setUnitColor(Tile.FOREGROUND);
@@ -1201,6 +1212,23 @@ public class Demo extends Application {
                                  .build();
         spinnerTile.currentValueProperty().addListener((o, ov, nv) -> spinnerTile.setValueColor(nv.doubleValue() < 0 ? Tile.RED : Tile.FOREGROUND));
 
+        clusterMonitorTile = TileBuilder.create()
+                                        .skinType(SkinType.CLUSTER_MONITOR)
+                                        .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                        .title("Cluster Monitor")
+                                        .chartData(cpuData, memData)
+                                        .animated(true)
+                                        .build();
+
+        centerTextTile = TileBuilder.create()
+                                    .skinType(SkinType.CENTER_TEXT)
+                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                    .backgroundColor(Dark.GREEN)
+                                    .title("Server")
+                                    .description("ONLINE")
+                                    .text(DTF.format(LocalDateTime.now()))
+                                    .build();
+
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -1227,6 +1255,9 @@ public class Demo extends Application {
                     chartData6.setValue(RND.nextDouble() * 50);
                     chartData7.setValue(RND.nextDouble() * 50);
                     chartData8.setValue(RND.nextDouble() * 50);
+
+                    cpuData.setValue(RND.nextDouble() * 80);
+                    memData.setValue(RND.nextDouble() * 80);
 
                     barChartTile.getBarChartItems().get(RND.nextInt(3)).setValue(RND.nextDouble() * 80);
 
@@ -1281,6 +1312,10 @@ public class Demo extends Application {
 
                     spinnerTile.setValue(RND.nextDouble() * spinnerTile.getRange() + spinnerTile.getMinValue());
 
+                    centerTextTile.setDescription(RND.nextBoolean() ? "ONLINE" : "OFFLINE");
+                    centerTextTile.setBackgroundColor(centerTextTile.getDescription().equals("ONLINE") ? Dark.GREEN : Dark.RED);
+                    centerTextTile.setText(DTF.format(LocalDateTime.now()));
+
                     lastTimerCall = now;
                 }
             }
@@ -1304,7 +1339,7 @@ public class Demo extends Application {
                                              matrixTile, radialPercentageTile, statusTile, barGaugeTile, imageTile,
                                              timelineTile, imageCounterTile, ledTile, countdownTile, matrixIconTile,
                                              cycleStepTile, customFlagChartTile, colorTile, turnoverTile, fluidTile, fireSmokeTile,
-                                             gauge2Tile, happinessTile, radialDistributionTile, spinnerTile);
+                                             gauge2Tile, happinessTile, radialDistributionTile, spinnerTile, clusterMonitorTile, centerTextTile);
 
         pane.setHgap(5);
         pane.setVgap(5);
@@ -1332,8 +1367,8 @@ public class Demo extends Application {
 
         timer.start();
 
-        mapTile.addPoiLocation(new Location(51.85, 7.75, "Test"));
-        mapTile.removePoiLocation(new Location(51.85, 7.75, "Test"));
+        mapTile.addPoiLocation(LocationBuilder.create().latitude(51.85).longitude(7.75).name("Test").build());
+        mapTile.removePoiLocation(LocationBuilder.create().latitude(51.85).longitude(7.75).name("Test").build());
 
         radialPercentageTile.setNotifyRegionTooltipText("tooltip");
         radialPercentageTile.showNotifyRegion(true);

@@ -18,7 +18,7 @@
 package eu.hansolo.tilesfx.addons;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.tools.GradientLookup;
+import eu.hansolo.toolboxfx.GradientLookup;
 import javafx.beans.DefaultProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;

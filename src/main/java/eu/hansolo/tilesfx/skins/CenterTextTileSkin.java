@@ -15,28 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.chart.SunburstChart;
-import eu.hansolo.tilesfx.events.TileEvt;
-import eu.hansolo.tilesfx.events.TreeNodeEvent.EventType;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.TreeNode;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 
-public class SunburstChartTileSkin extends TileSkin {
-    private Text          titleText;
-    private Text          text;
-    private SunburstChart sunburstChart;
+public class CenterTextTileSkin extends TileSkin {
+    private Text            titleText;
+    private Text            text;
+    private Canvas          canvas;
+    private GraphicsContext ctx;
 
 
     // ******************** Constructors **************************************
-    public SunburstChartTileSkin(final Tile TILE) {
+    public CenterTextTileSkin(final Tile TILE) {
         super(TILE);
     }
 
@@ -44,8 +45,6 @@ public class SunburstChartTileSkin extends TileSkin {
     // ******************** Initialization ************************************
     @Override protected void initGraphics() {
         super.initGraphics();
-
-        sunburstChart = tile.getSunburstChart();
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -55,21 +54,14 @@ public class SunburstChartTileSkin extends TileSkin {
         text.setFill(tile.getTextColor());
         Helper.enableNode(text, tile.isTextVisible());
 
-        getPane().getChildren().addAll(titleText, sunburstChart, text);
+        canvas = new Canvas(getContentBounds().getWidth(), getContentBounds().getHeight());
+        ctx    = canvas.getGraphicsContext2D();
+
+        getPane().getChildren().addAll(titleText, canvas, text);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
-
-        TreeNode<ChartData> tree = tile.getSunburstChart().getTreeNode();
-        if (null == tree) { return; }
-        tree.setOnTreeNodeEvent(e -> {
-            EventType type = e.getType();
-            if (EventType.NODE_SELECTED == type) {
-                TreeNode<ChartData> segment = e.getSource();
-                tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, segment.getItem()));
-            }
-        });
     }
 
 
@@ -80,21 +72,18 @@ public class SunburstChartTileSkin extends TileSkin {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
-        } else if ("RECALC".equals(EVENT_TYPE)) {
-            sunburstChart.redraw();
         }
     }
 
     @Override public void dispose() {
-        sunburstChart.dispose();
         super.dispose();
     }
 
 
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {
-        double maxWidth = width - size * 0.1;
-        double fontSize = size * textSize.factor;
+        double  maxWidth = width - size * 0.1;
+        double  fontSize = size * textSize.factor;
 
         boolean customFontEnabled = tile.isCustomFontEnabled();
         Font    customFont        = tile.getCustomFont();
@@ -126,32 +115,36 @@ public class SunburstChartTileSkin extends TileSkin {
         height = tile.getHeight() - tile.getInsets().getTop() - tile.getInsets().getBottom();
         size   = width < height ? width : height;
 
-        double chartWidth   = contentBounds.getWidth();
-        double chartHeight  = contentBounds.getHeight();
-        double chartSize    = chartWidth < chartHeight ? chartWidth : chartHeight;
-
         if (tile.isShowing() && width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
-
-            sunburstChart.setPrefSize(chartSize, chartSize);
-            sunburstChart.relocate((width - chartSize) * 0.5, contentBounds.getY() + (contentBounds.getHeight() - chartSize) * 0.5);
-
-
-            resizeStaticText();
+            canvas.setWidth(contentBounds.getWidth());
+            canvas.setHeight(contentBounds.getHeight());
+            canvas.setLayoutX(contentBounds.getMinX());
+            canvas.setLayoutY(contentBounds.getMinY());
+            redraw();
         }
     }
 
     @Override protected void redraw() {
         super.redraw();
-
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
 
+        resizeDynamicText();
         resizeStaticText();
-        sunburstChart.redraw();
 
         titleText.setFill(tile.getTitleColor());
         text.setFill(tile.getTextColor());
+        drawText();
+    }
+
+    private void drawText() {
+        ctx.clearRect(0, 0, contentBounds.getWidth(), contentBounds.getHeight());
+        ctx.setTextAlign(TextAlignment.CENTER);
+        ctx.setTextBaseline(VPos.CENTER);
+        ctx.setFont(Fonts.latoRegular(size * 0.2));
+        ctx.setFill(tile.getDescriptionColor());
+        ctx.fillText(tile.getDescription(), contentBounds.getWidth() * 0.5, contentBounds.getHeight() * 0.5, contentBounds.getWidth() * 0.9);
     }
 }

@@ -19,8 +19,7 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.chart.ChartData;
@@ -103,7 +102,7 @@ public class RadialChartTileSkin extends TileSkin {
                 double    centerY = centerX;
 
                 boolean hit = Helper.isInRingSegment(x, y, centerX, centerY, (barWH + barWidth) * 0.5, (barWH - barWidth) * 0.5, startAngle, angle);
-                if (hit) { tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, data)); break; }
+                if (hit) { tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, data)); break; }
             }
         };
 
@@ -201,7 +200,11 @@ public class RadialChartTileSkin extends TileSkin {
 
             // Value
             chartCtx.setTextAlign(TextAlignment.CENTER);
-            chartCtx.fillText(String.format(Locale.US, "%.0f", value), barXY, valueY, valueWidth);
+            if (tile.getShortenNumbers()) {
+                chartCtx.fillText(Helper.shortenNumber((long) value), barXY, valueY, valueWidth);
+            } else {
+                chartCtx.fillText(String.format(Locale.US, "%.0f", value), barXY, valueY, valueWidth);
+            }
         }
     }
 

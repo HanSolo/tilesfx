@@ -20,8 +20,8 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Section;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.toolboxfx.GradientLookup;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.layout.HBox;
@@ -32,8 +32,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 
 public class BarGaugeTileSkin extends TileSkin {
@@ -166,7 +164,9 @@ public class BarGaugeTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(VALUE));
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));

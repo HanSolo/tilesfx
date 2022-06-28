@@ -19,11 +19,12 @@ package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Alarm;
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.AlarmEvent;
-import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
-import eu.hansolo.tilesfx.events.TimeEventListener;
+import eu.hansolo.tilesfx.events.AlarmEvt;
+import eu.hansolo.tilesfx.events.TileEvt;
+import eu.hansolo.tilesfx.events.TimeEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.toolbox.evt.EvtObserver;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.VPos;
 import javafx.scene.paint.Color;
@@ -42,9 +43,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-import static eu.hansolo.tilesfx.events.TileEvent.EventType.RECALC;
-import static eu.hansolo.tilesfx.events.TileEvent.EventType.TIME_PERIOD;
-import static eu.hansolo.tilesfx.events.TileEvent.EventType.VISIBILITY;
 import static eu.hansolo.tilesfx.tools.Helper.enableNode;
 
 
@@ -66,7 +64,7 @@ public class CountdownTimerTileSkin extends TileSkin {
     private              double                  angleStep;
     private              Duration                duration;
     private              ChangeListener<Boolean> runningListener;
-    private              TimeEventListener       timeListener;
+    private              EvtObserver<TimeEvt>    timeListener;
 
 
     // ******************** Constructors **************************************
@@ -135,9 +133,7 @@ public class CountdownTimerTileSkin extends TileSkin {
             }
         };
         timeListener = e -> {
-            if (TimeEventType.SECOND == e.TYPE) {
-                updateBar();
-            }
+            if (TimeEvt.SECOND.equals(e.getEvtType())) { updateBar(); }
         };
 
         getPane().getChildren().addAll(barBackground, bar, separator, titleText, text, durationFlow, timeFlow);
@@ -146,7 +142,7 @@ public class CountdownTimerTileSkin extends TileSkin {
     @Override protected void registerListeners() {
         super.registerListeners();
         tile.runningProperty().addListener(runningListener);
-        tile.addTimeEventListener(timeListener);
+        tile.addTimeEvtObserver(timeListener);
     }
 
 
@@ -154,13 +150,13 @@ public class CountdownTimerTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (RECALC.name().equals(EVENT_TYPE)) {
+        if (TileEvt.RECALC.getName().equals(EVENT_TYPE)) {
             redraw();
-        } else if (VISIBILITY.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             enableNode(titleText, !tile.getTitle().isEmpty());
             enableNode(text, tile.isTextVisible());
             enableNode(timeText, tile.isValueVisible());
-        } else if (TIME_PERIOD.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.TIME_PERIOD.getName().equals(EVENT_TYPE)) {
             duration  = tile.getTimePeriod();
             minValue  = 0;
             maxValue  = duration.getSeconds();
@@ -176,7 +172,7 @@ public class CountdownTimerTileSkin extends TileSkin {
             bar.setLength(-value * angleStep);
             durationText.setText(DTF.format(LocalTime.ofSecondOfDay(value)));
         } else if (duration.getSeconds() == 0) {
-            tile.fireAlarmEvent(new AlarmEvent(new Alarm(ZonedDateTime.now(), tile.getAlarmColor())));
+            tile.fireAlarmEvt(new AlarmEvt(tile, AlarmEvt.ALARM, new Alarm(ZonedDateTime.now(), tile.getAlarmColor())));
             tile.setRunning(false);
             timeText.setText("");
         }
@@ -184,7 +180,7 @@ public class CountdownTimerTileSkin extends TileSkin {
 
     @Override public void dispose() {
         tile.runningProperty().removeListener(runningListener);
-        tile.removeTimeEventListener(timeListener);
+        tile.removeTimeEvtObserver(timeListener);
         super.dispose();
     }
 

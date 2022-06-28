@@ -18,14 +18,14 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.MovingAverage;
 import eu.hansolo.tilesfx.tools.NiceScale;
-import eu.hansolo.tilesfx.tools.Point;
-import eu.hansolo.tilesfx.tools.Statistics;
+import eu.hansolo.toolbox.Statistics;
+import eu.hansolo.toolboxfx.GradientLookup;
+import eu.hansolo.toolboxfx.geom.Point;
 import javafx.beans.InvalidationListener;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
@@ -237,7 +237,7 @@ public class SparkLineTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             Helper.enableNode(valueText, tile.isValueVisible());
@@ -247,12 +247,12 @@ public class SparkLineTileSkin extends TileSkin {
             Helper.enableNode(averageText, tile.isAverageVisible());
             Helper.enableNode(stdDeviationArea, tile.isAverageVisible());
             redraw();
-        } else if (EventType.VALUE.equals(EVENT_TYPE)) {
+        } else if (TileEvt.VALUE.equals(EVENT_TYPE)) {
             if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, tile.getValue());
             handleCurrentValue(value);
-        } else if (EventType.AVERAGING.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.AVERAGING.getName().equals(EVENT_TYPE)) {
             noOfDatapoints = tile.getAveragingPeriod();
 
             dataList.clear();
@@ -265,10 +265,10 @@ public class SparkLineTileSkin extends TileSkin {
             for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
             sparkLine.getElements().setAll(pathElements);
             redraw();
-        } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.CLEAR_DATA.getName().equals(EVENT_TYPE)) {
             dataList.clear();
             handleCurrentValue(minValue);
-        } else if (EventType.FINISHED.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.FINISHED.getName().equals(EVENT_TYPE)) {
             if(tile.isAnimated()) { tile.setAnimated(false); }
             if (!tile.isAveragingEnabled()) { tile.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, tile.getValue());
@@ -387,7 +387,9 @@ public class SparkLineTileSkin extends TileSkin {
 
             averageText.setText(String.format(locale, formatString, average));
         }
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(VALUE));
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));
@@ -474,7 +476,7 @@ public class SparkLineTileSkin extends TileSkin {
     }
 
     private void smooth(final List<Double> DATA_LIST) {
-        Task<Point[]> smoothTask = new Task<Point[]>() {
+        Task<Point[]> smoothTask = new Task<>() {
             @Override protected Point[] call() {
                 return Helper.smoothSparkLine(DATA_LIST, minValue, maxValue, graphBounds, noOfDatapoints);
             }

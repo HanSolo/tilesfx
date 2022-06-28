@@ -25,13 +25,11 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'com.google.osdetector'           version '1.7.0'
-    id 'org.javamodularity.moduleplugin' version '1.8.8'
-    id 'org.beryx.jlink'                 version '2.24.1'
-    id 'net.nemerosa.versioning'         version '2.14.0'
-    id 'biz.aQute.bnd.builder'           version '5.3.0'
+    id 'org.javamodularity.moduleplugin' version '1.8.10'
+    id 'org.beryx.jlink'                 version '2.24.4'
+    id 'net.nemerosa.versioning'         version '2.15.1'
 }
 
-apply plugin: 'biz.aQute.bnd.builder'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
@@ -40,9 +38,9 @@ mainClassName = "$moduleName/eu.hansolo.tilesfx.Demo"
 
 Date buildTimeAndDate = new Date()
 ext {
-    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
-    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
-    platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
+    buildDate       = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime       = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+    platform        = osdetector.os == 'osx' ? osdetector.arch == 'aarch_64' ? 'mac-aarch64' : 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os == 'linux' ? osdetector.arch == 'aarch_64' ? 'linux-aarch64' : 'linux' : osdetector.os
     ciOssrhUsername = System.getenv('OSSRH_USERNAME')
     ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
     ciGHUser        = System.getenv('GH_USER')
@@ -62,6 +60,10 @@ dependencies {
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-web:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
+    implementation "eu.hansolo:toolbox:17.0.22"
+    implementation "eu.hansolo:toolboxfx:17.0.28"
+    implementation "eu.hansolo.fx:heatmap:17.0.9"
+    implementation "eu.hansolo.fx:countries:17.0.22"
 }
 
 jar {
@@ -85,15 +87,23 @@ jar {
     }
 }
 
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
 // start the demo from gradle
 task Demo(type: JavaExec) {
-    main = "eu.hansolo.tilesfx.DemoLauncher"
+    mainClass = "eu.hansolo.tilesfx.DemoLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
 // Only used for internal test
 task Test(type: JavaExec) {
-    main = "eu.hansolo.tilesfx.TestLauncher"
+    mainClass = "eu.hansolo.tilesfx.TestLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
@@ -127,9 +137,9 @@ signing {
 publishing {
     publications {
         mavenCustom(MavenPublication) {
-            group = 'eu.hansolo'
+            group      = 'eu.hansolo'
             artifactId = 'tilesfx'
-            version = "${version}"
+            version    = "${version}"
 
             from components.java
             artifact sourcesJar
@@ -144,26 +154,26 @@ publishing {
             }
 
             pom {
-                name = 'TilesFX'
+                name        = 'TilesFX'
                 description = 'TilesFX is a JavaFX library containing tiles for dashboards'
-                url = "https://github.com/HanSolo/tilesfx/wiki"
+                url         = "https://github.com/HanSolo/tilesfx/wiki"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        url  = "http://www.apache.org/licenses/LICENSE-2.0.txt"
                     }
                 }
                 developers {
                     developer {
-                        id = "HanSolo"
-                        name = "Gerrit Grunwald"
+                        id    = "HanSolo"
+                        name  = "Gerrit Grunwald"
                         email = "han.solo@mac.com"
                     }
                 }
                 scm {
-                    connection = "scm:git:https://HanSolo/tilesfx"
+                    connection          = "scm:git:https://HanSolo/tilesfx"
                     developerConnection = "scm:git:https://HanSolo/tilesfx"
-                    url = "https://github.com/HanSolo/tilesfx"
+                    url                 = "https://github.com/HanSolo/tilesfx"
                 }
             }
         }
@@ -172,7 +182,7 @@ publishing {
     repositories {
         maven {
             name = "OSSRH"
-            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+            url  = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
             credentials {
                 username = null == ciOssrhUsername ? ossrhUsername : ciOssrhUsername
                 password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
@@ -180,7 +190,7 @@ publishing {
         }
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/HanSolo/tilesfx"
+            url  = "https://maven.pkg.github.com/HanSolo/tilesfx"
             credentials {
                 username = null == ciGHUser  ? ghUser  : ciGHUser
                 password = null == ciGHToken ? ghToken : ciGHToken

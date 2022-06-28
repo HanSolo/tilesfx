@@ -18,11 +18,11 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.AngleConicalGradient;
-import eu.hansolo.tilesfx.tools.GradientLookup;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.toolboxfx.GradientLookup;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.paint.Color;
@@ -159,7 +159,7 @@ public class Gauge2TileSkin extends TileSkin {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
-        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(valueUnitFlow, !tile.getUnit().isEmpty());
@@ -175,16 +175,18 @@ public class Gauge2TileSkin extends TileSkin {
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
         needleRectRotate.setAngle(targetAngle);
-        bar.setLength(-angleStep * VALUE);
+        bar.setLength(-angleStep * (VALUE - minValue));
         if (tile.isStrokeWithGradient()) {
-            needle.setFill(gradientLookup.getColorAt(VALUE / tile.getRange()));
+            needle.setFill(gradientLookup.getColorAt((VALUE - minValue) / tile.getRange()));
             bar.setStroke(conicalGradient.getImagePattern(barBounds));
         } else {
             needle.setFill(tile.getNeedleColor());
             bar.setStroke(tile.getBarColor());
         }
 
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(VALUE));
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));
@@ -222,7 +224,7 @@ public class Gauge2TileSkin extends TileSkin {
         List<Stop> stops = tile.getGradientStops();
         Map<Double, Color> stopAngleMap = new HashMap<>(stops.size());
         for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()); }
-        double offsetFactor = (tile.getStartAngle() - 90);
+        double offsetFactor = ((360 - angleRange) / 2 + 180);
         conicalGradient = new AngleConicalGradient(barBounds.getX() * barBounds.getWidth() * 0.5, barBounds.getY() * barBounds.getHeight() * 0.5, offsetFactor, stopAngleMap);
     }
 

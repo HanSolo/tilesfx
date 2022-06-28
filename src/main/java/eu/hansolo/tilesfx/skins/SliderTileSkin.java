@@ -18,7 +18,7 @@
 package eu.hansolo.tilesfx.skins;
 
 import eu.hansolo.tilesfx.Tile;
-import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.event.EventHandler;
@@ -34,8 +34,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 import static eu.hansolo.tilesfx.tools.Helper.clamp;
 
@@ -44,8 +42,8 @@ import static eu.hansolo.tilesfx.tools.Helper.clamp;
  * Created by hansolo on 19.12.16.
  */
 public class SliderTileSkin extends TileSkin {
-    private final TileEvent                VALUE_CHANGING = new TileEvent(TileEvent.EventType.VALUE_CHANGING);
-    private final TileEvent                VALUE_CHANGED  = new TileEvent(TileEvent.EventType.VALUE_CHANGED);
+    private final TileEvt                  VALUE_CHANGING = new TileEvt(tile, TileEvt.VALUE_CHANGING);
+    private final TileEvt                  VALUE_CHANGED  = new TileEvt(tile, TileEvt.VALUE_CHANGED);
     private       Text                     titleText;
     private       Text                     text;
     private       Text                     valueText;
@@ -82,14 +80,14 @@ public class SliderTileSkin extends TileSkin {
             if (MouseEvent.MOUSE_PRESSED == TYPE) {
                 dragStart      = thumb.localToParent(e.getX(), e.getY());
                 formerThumbPos = (tile.getCurrentValue() - minValue) / range;
-                tile.fireTileEvent(VALUE_CHANGING);
+                tile.fireTileEvt(VALUE_CHANGING);
             } else if (MouseEvent.MOUSE_DRAGGED == TYPE) {
                 Point2D currentPos = thumb.localToParent(e.getX(), e.getY());
                 double  dragPos    = currentPos.getX() - dragStart.getX();
                 thumbDragged((formerThumbPos + dragPos / trackLength));
             } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
 
-                tile.fireTileEvent(VALUE_CHANGED);
+                tile.fireTileEvt(VALUE_CHANGED);
             }
         };
 

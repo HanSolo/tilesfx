@@ -17,6 +17,8 @@
  */
 package eu.hansolo.tilesfx.tools;
 
+import eu.hansolo.toolboxfx.ConicalGradient;
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
@@ -47,7 +49,7 @@ public class AngleConicalGradient {
         for (double fraction : ANGLE_STOP_MAP.keySet()) {
             stops.add(new Stop(Helper.clamp(0, 1, (fraction % 360.0) * ANGLE_FACTOR), ANGLE_STOP_MAP.get(fraction)));
         }
-        gradient = new ConicalGradient(CENTER_X, CENTER_Y, offset, stops);
+        gradient = new ConicalGradient(CENTER_X, CENTER_Y, offset, ScaleDirection.CLOCKWISE, stops);
     }
 
     public void recalculateWithAngle(final double ANGLE) { gradient.recalculateWithAngle(ANGLE); }
@@ -68,5 +70,5 @@ public class AngleConicalGradient {
         return getImagePattern(new Rectangle(BOUNDS.getMinX(), BOUNDS.getMinY(), BOUNDS.getWidth(), BOUNDS.getHeight()));
     }
     public ImagePattern getImagePattern(final Rectangle BOUNDS) { return gradient.getImagePattern(BOUNDS); }
-    public ImagePattern getImagePattern(final CtxBounds BOUNDS) { return gradient.getImagePattern(BOUNDS); }
+    public ImagePattern getImagePattern(final eu.hansolo.toolboxfx.geom.Bounds BOUNDS) { return gradient.getImagePattern(BOUNDS); }
 }

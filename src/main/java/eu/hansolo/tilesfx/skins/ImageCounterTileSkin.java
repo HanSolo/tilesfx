@@ -35,6 +35,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 
 public class ImageCounterTileSkin extends TileSkin {
@@ -92,6 +93,7 @@ public class ImageCounterTileSkin extends TileSkin {
         valueText = new Text(String.format(locale, formatString, ((tile.getValue() - minValue) / range * 100)));
         valueText.setFill(tile.getValueColor());
         valueText.setTextOrigin(VPos.BASELINE);
+        //valueText.setTextAlignment(TextAlignment.RIGHT);
         Helper.enableNode(valueText, tile.isValueVisible());
 
         upperUnitText = new Text("");
@@ -106,6 +108,8 @@ public class ImageCounterTileSkin extends TileSkin {
 
         unitFlow = new VBox(upperUnitText, unitText);
         unitFlow.setAlignment(Pos.CENTER_RIGHT);
+
+        Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
 
         valueUnitFlow = new HBox(valueText, unitFlow);
         valueUnitFlow.setAlignment(Pos.BOTTOM_RIGHT);
@@ -141,7 +145,9 @@ public class ImageCounterTileSkin extends TileSkin {
     }
 
     @Override protected void handleCurrentValue(final double VALUE) {
-        if (tile.getCustomDecimalFormatEnabled()) {
+        if (tile.getShortenNumbers()) {
+            valueText.setText(Helper.shortenNumber((long) VALUE));
+        } else if (tile.getCustomDecimalFormatEnabled()) {
             valueText.setText(decimalFormat.format(VALUE));
         } else {
             valueText.setText(String.format(locale, formatString, VALUE));
@@ -157,7 +163,7 @@ public class ImageCounterTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     @Override protected void resizeDynamicText() {
-        double maxWidth = unitText.isVisible() ? width - size * 0.275 : width - size * 0.1;
+        double maxWidth = unitText.isVisible() ? width - size * 0.275 - contentBounds.getWidth() * 0.45 : width - size * 0.1 - contentBounds.getWidth() * 0.45;
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
@@ -286,7 +292,7 @@ public class ImageCounterTileSkin extends TileSkin {
             resizeDynamicText();
             resizeStaticText();
 
-            double textWidth = contentBounds.getWidth() * 0.5;
+            double textWidth = tile.getUnit().isEmpty() ? contentBounds.getWidth() * 0.55 : contentBounds.getWidth() * 0.5;
             valueUnitFlow.setPrefWidth(textWidth);
             valueUnitFlow.relocate(width - size * 0.05 - textWidth, contentBounds.getY());
             valueUnitFlow.setMaxHeight(valueText.getFont().getSize());
@@ -300,6 +306,7 @@ public class ImageCounterTileSkin extends TileSkin {
 
             unitFlow.setTranslateY(-size * 0.005);
 
+            textWidth = contentBounds.getWidth() * 0.5;
             description.setPrefSize(textWidth, size * 0.43);
             description.relocate(width - size * 0.05 - textWidth, titleText.isVisible() ? height * 0.42 : height * 0.32);
         }

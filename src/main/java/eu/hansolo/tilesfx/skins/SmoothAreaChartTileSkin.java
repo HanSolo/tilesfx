@@ -21,11 +21,10 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.Point;
+import eu.hansolo.toolboxfx.geom.Point;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
@@ -55,11 +54,8 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -215,14 +211,14 @@ public class SmoothAreaChartTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(valueText, tile.isValueVisible());
             Helper.enableNode(unitFlow, !tile.getUnit().isEmpty());
             Helper.enableNode(dataPointGroup, tile.getDataPointsVisible());
-        } else if (EventType.SERIES.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.SERIES.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(fillPath, ChartType.AREA == tile.getChartType());
-        } else if (EventType.CLEAR_DATA.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.CLEAR_DATA.getName().equals(EVENT_TYPE)) {
             Platform.runLater(() -> {
                 tile.clearChartData();
                 fillPath.setVisible(false);
@@ -252,7 +248,9 @@ public class SmoothAreaChartTileSkin extends TileSkin {
 
         Optional<ChartData> lastDataEntry = data.stream().reduce((first, second) -> second);
         if (lastDataEntry.isPresent()) {
-            if (tile.getCustomDecimalFormatEnabled()) {
+            if (tile.getShortenNumbers()) {
+                valueText.setText(Helper.shortenNumber((long) lastDataEntry.get().getValue()));
+            } else if (tile.getCustomDecimalFormatEnabled()) {
                 valueText.setText(decimalFormat.format(lastDataEntry.get().getValue()));
             } else {
                 valueText.setText(String.format(locale, formatString, lastDataEntry.get().getValue()));
@@ -352,7 +350,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
             selectorTooltip.setY(popupLocation.getY());
             selectorTooltip.show(tile.getScene().getWindow());
 
-            tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, selectedData));
+            tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, selectedData));
         } else {
             for (int i = 1; i < noOfElements; i++) {
                 PathElement element = elements.get(i);
@@ -378,7 +376,7 @@ public class SmoothAreaChartTileSkin extends TileSkin {
                     selectorTooltip.setY(popupLocation.getY());
                     selectorTooltip.show(tile.getScene().getWindow());
 
-                    tile.fireTileEvent(new TileEvent(EventType.SELECTED_CHART_DATA, new ChartData(selectedValue)));
+                    tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, new ChartData(selectedValue)));
                     break;
                 }
                 lastElement = element;

@@ -20,11 +20,10 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
-import eu.hansolo.tilesfx.tools.CtxBounds;
 import eu.hansolo.tilesfx.tools.Helper;
+import eu.hansolo.toolboxfx.geom.Bounds;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -57,7 +56,7 @@ import java.util.Map;
  */
 public class ClusterMonitorTileSkin extends TileSkin {
     private static final double                        MIN_HEIGHT        = 100;
-    private final        TileEvent                     SVG_PRESSED_EVENT = new TileEvent(EventType.SVG_PATH_PRESSED);
+    private final        TileEvt                       SVG_PRESSED_EVENT = new TileEvt(tile, TileEvt.SVG_PATH_PRESSED);
     private              Text                          titleText;
     private              Text                          text;
     private              VBox                          chartPane;
@@ -115,7 +114,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             chartPane.getChildren().add(dataItemMap.get(data));
         });
 
-        titleText = new Text();
+        titleText = new Text(tile.getTitle());
         titleText.setFill(tile.getTitleColor());
         Helper.enableNode(titleText, !tile.getTitle().isEmpty());
 
@@ -125,7 +124,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
 
         SVGPath svgPath = tile.getSVGPath();
         if (null != svgPath) {
-            svgPathPressedHandler = e -> tile.fireTileEvent(SVG_PRESSED_EVENT);
+            svgPathPressedHandler = e -> tile.fireTileEvt(SVG_PRESSED_EVENT);
             graphicRegion = new Region();
             graphicRegion.setShape(svgPath);
             getPane().getChildren().addAll(titleText, text, chartPane, graphicRegion);
@@ -148,11 +147,14 @@ public class ClusterMonitorTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if ("VISIBILITY".equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
             if (null != graphicRegion) { Helper.enableNode(graphicRegion, tile.isTextVisible()); }
-        } else if ("DATA".equals(EVENT_TYPE)) {
+        } else if (TileEvt.DATA.getName().equals(EVENT_TYPE)) {
+            updateChart();
+        } else if (TileEvt.RECALC.getName().equals(EVENT_TYPE)) {
+            dataItemMap.values().forEach(item -> item.setShortenNumbers(tile.getShortenNumbers()));
             updateChart();
         }
     }
@@ -253,14 +255,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
     }
 
     private void updateChart() {
-        int noOfItems = dataItemMap.size();
-        if (noOfItems == 0) return;
-        for (int i = 0 ; i < noOfItems ; i++) {
-            ChartData item = dataItemMap.keySet().iterator().next();
-            dataItemMap.get(item).update();
-
-            if (i > 1) { break; }
-        }
+        dataItemMap.entrySet().forEach(entry -> entry.getValue().update());
     }
 
 
@@ -269,7 +264,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
         private static final double                 PREF_WIDTH  = 100;
         private static final double                 PREF_HEIGHT = 95;
         private              ChartData              chartData;
-        private              CtxBounds              contentBounds;
+        private              Bounds                 contentBounds;
         private              Label                  title;
         private              Label                  value;
         private              Rectangle              scale;
@@ -277,13 +272,14 @@ public class ClusterMonitorTileSkin extends TileSkin {
         private              String                 formatString;
         private              double                 step;
         private              boolean                compressed;
+        private              boolean                shortenNumbers;
         private              ChartDataEventListener chartDataListener;
 
 
-        public ChartItem(final ChartData CHART_DATA, final CtxBounds CONTENT_BOUNDS) {
+        public ChartItem(final ChartData CHART_DATA, final Bounds CONTENT_BOUNDS) {
             this(CHART_DATA, CONTENT_BOUNDS, "%.0f%%");
         }
-        public ChartItem(final ChartData CHART_DATA, final CtxBounds CONTENT_BOUNDS, final String FORMAT_STRING) {
+        public ChartItem(final ChartData CHART_DATA, final Bounds CONTENT_BOUNDS, final String FORMAT_STRING) {
             chartData         = CHART_DATA;
             contentBounds     = CONTENT_BOUNDS;
             title             = new Label(chartData.getName());
@@ -293,9 +289,10 @@ public class ClusterMonitorTileSkin extends TileSkin {
             formatString      = FORMAT_STRING;
             step              = PREF_WIDTH / (CHART_DATA.getMaxValue() - CHART_DATA.getMinValue());
             compressed        = false;
+            shortenNumbers    = false;
             chartDataListener = e -> {
                 switch(e.getType()) {
-                    case UPDATE  : update(); break;
+                    case UPDATE  : setFormatString(e.getData().getFormatString()); break;
                     case FINISHED: update(); break;
                 }
             };
@@ -339,9 +336,19 @@ public class ClusterMonitorTileSkin extends TileSkin {
             resize();
         }
 
+        public boolean getShortenNumbers() { return shortenNumbers; }
+        public void setShortenNumbers(final boolean SHORTEN) {
+            shortenNumbers = SHORTEN;
+            resize();
+        }
+
         public void update() {
-            value.setText(String.format(Locale.US, formatString, chartData.getValue()));
-            bar.setWidth(chartData.getValue() * step);
+            if (shortenNumbers) {
+                value.setText(Helper.shortenNumber((long) chartData.getValue()));
+            } else {
+                value.setText(String.format(Locale.US, formatString, chartData.getValue()));
+            }
+            bar.setWidth(Helper.clamp(0, getPrefWidth(), chartData.getValue() * step));
             if (tile.isFillWithGradient() && null != chartData.getGradientLookup()) {
                 bar.setFill(chartData.getGradientLookup().getColorAt(chartData.getValue() / (chartData.getMaxValue() - chartData.getMinValue())));
             } else {
@@ -372,7 +379,7 @@ public class ClusterMonitorTileSkin extends TileSkin {
             title.setPrefSize(textWidth, textHeight);
             value.setPrefSize(textWidth, textHeight);
 
-            Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * (compressed ? 0.5 : 0.35)));
+            Font font = Fonts.latoRegular(Helper.clamp(1, 48, getPrefHeight() * (compressed ? 0.5 : 0.30)));
             title.setFont(font);
             value.setFont(font);
 

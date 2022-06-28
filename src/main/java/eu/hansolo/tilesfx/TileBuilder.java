@@ -17,6 +17,8 @@
  */
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.fx.countries.Country;
+import eu.hansolo.fx.countries.tools.BusinessRegion;
 import eu.hansolo.tilesfx.Tile.ChartType;
 import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.ItemSorting;
@@ -30,19 +32,18 @@ import eu.hansolo.tilesfx.chart.SunburstChart.TextOrientation;
 import eu.hansolo.tilesfx.chart.SunburstChart.VisibleData;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
-import eu.hansolo.tilesfx.events.AlarmEventListener;
-import eu.hansolo.tilesfx.events.TileEventListener;
-import eu.hansolo.tilesfx.events.TimeEventListener;
+import eu.hansolo.tilesfx.events.AlarmEvt;
+import eu.hansolo.tilesfx.events.TileEvt;
+import eu.hansolo.tilesfx.events.TimeEvt;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.chart.ChartData;
-import eu.hansolo.tilesfx.tools.Country;
-import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.Helper;
-import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.TreeNode;
+import eu.hansolo.toolbox.evt.EvtObserver;
+import eu.hansolo.toolboxfx.geom.Location;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -141,7 +142,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
 
     public final B decimals(final int DECIMALS) {
         properties.put("decimals", new SimpleIntegerProperty(DECIMALS));
-        return (B) this;
+        return (B)this;
+    }
+
+    public final B shortenNumbers(final boolean SHORTEN) {
+        properties.put("shortenNumbers", new SimpleBooleanProperty(SHORTEN));
+        return (B)this;
     }
 
     public final B tickLabelDecimals(final int DECIMALS) {
@@ -614,12 +620,12 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B onThresholdExceeded(final TileEventListener HANDLER) {
+    public final B onThresholdExceeded(final EvtObserver<TileEvt> HANDLER) {
         properties.put("onThresholdExceeded", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
-    public final B onThresholdUnderrun(final TileEventListener HANDLER) {
+    public final B onThresholdUnderrun(final EvtObserver<TileEvt> HANDLER) {
         properties.put("onThresholdUnderrun", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
@@ -774,17 +780,17 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B onAlarm(final AlarmEventListener LISTENER) {
+    public final B onAlarm(final EvtObserver<AlarmEvt> LISTENER) {
         properties.put("onAlarm", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
     }
 
-    public final B onTimeEvent(final TimeEventListener LISTENER) {
+    public final B onTimeEvent(final EvtObserver<TimeEvt> LISTENER) {
         properties.put("onTimeEvent", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
     }
 
-    public final B onTileEvent(final TileEventListener LISTENER) {
+    public final B onTileEvent(final EvtObserver<TileEvt> LISTENER) {
         properties.put("onTileEvent", new SimpleObjectProperty(LISTENER));
         return (B)this;
     }
@@ -901,7 +907,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
         return (B)this;
     }
 
-    public final B countryGroup(final CountryGroup COUNTRY_GROUP) {
+    public final B countryGroup(final BusinessRegion COUNTRY_GROUP) {
         properties.put("countryGroup", new SimpleObjectProperty(COUNTRY_GROUP));
         return (B)this;
     }
@@ -1415,6 +1421,9 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     break;
                 case SPINNER:
                     break;
+                case CENTER_TEXT:
+                    TILE.setDescriptionAlignment(Pos.CENTER);
+                    break;
                 default:
                     break;
             }
@@ -1577,6 +1586,8 @@ public class TileBuilder<B extends TileBuilder<B>> {
                 TILE.setValue(((DoubleProperty) properties.get(key)).get());
             } else if("decimals".equals(key)) {
                 TILE.setDecimals(((IntegerProperty) properties.get(key)).get());
+            } else if ("shortenNumbers".equals(key)) {
+                TILE.setShortenNumbers(((BooleanProperty) properties.get(key)).get());
             } else if("tickLabelDecimals".equals(key)) {
                 TILE.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
             } else if ("tickLabelsXVisible".equals(key)) {
@@ -1768,11 +1779,11 @@ public class TileBuilder<B extends TileBuilder<B>> {
             } else if ("secondColor".equals(key)) {
                 TILE.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("onAlarm".equals(key)) {
-                TILE.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
+                TILE.setOnAlarmEvt(((ObjectProperty<EvtObserver<AlarmEvt>>) properties.get(key)).get());
             } else if ("onTimeEvent".equals(key)) {
-                TILE.setOnTimeEvent(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
+                TILE.setOnTimeEvt(((ObjectProperty<EvtObserver<TimeEvt>>) properties.get(key)).get());
             } else if ("onTileEvent".equals(key)) {
-                TILE.setOnTileEvent(((ObjectProperty<TileEventListener>) properties.get(key)).get());
+                TILE.addTileObserver(TileEvt.ANY, ((ObjectProperty<EvtObserver<TileEvt>>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
                 TILE.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("alarmsVisible".equals(key)) {
@@ -1820,7 +1831,7 @@ public class TileBuilder<B extends TileBuilder<B>> {
             } else if ("country".equals(key)) {
                 TILE.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
             } else if ("countryGroup".equals(key)) {
-                TILE.setCountryGroup(((ObjectProperty<CountryGroup>) properties.get(key)).get());
+                TILE.setCountryGroup(((ObjectProperty<BusinessRegion>) properties.get(key)).get());
             } else if ("flipTimeInMS".equals(key)) {
                 TILE.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
             } else if ("flipText".equals(key)) {

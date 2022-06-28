@@ -17,29 +17,22 @@
  */
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.fx.countries.Country;
+import eu.hansolo.fx.countries.tools.BusinessRegion;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.chart.RadarChartMode;
 import eu.hansolo.tilesfx.chart.SunburstChart;
 import eu.hansolo.tilesfx.chart.TilesFXSeries;
 import eu.hansolo.tilesfx.colors.Bright;
-import eu.hansolo.tilesfx.events.AlarmEvent;
-import eu.hansolo.tilesfx.events.AlarmEventListener;
-import eu.hansolo.tilesfx.events.BoundsEventListener;
+import eu.hansolo.tilesfx.events.AlarmEvt;
 import eu.hansolo.tilesfx.events.SwitchEvent;
-import eu.hansolo.tilesfx.events.TileEvent;
-import eu.hansolo.tilesfx.events.TileEvent.EventType;
-import eu.hansolo.tilesfx.events.TileEventListener;
-import eu.hansolo.tilesfx.events.TimeEvent;
-import eu.hansolo.tilesfx.events.TimeEvent.TimeEventType;
-import eu.hansolo.tilesfx.events.TimeEventListener;
+import eu.hansolo.tilesfx.events.TileEvt;
+import eu.hansolo.tilesfx.events.TimeEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.*;
-import eu.hansolo.tilesfx.tools.Country;
-import eu.hansolo.tilesfx.tools.CountryGroup;
 import eu.hansolo.tilesfx.tools.CountryPath;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.InfoRegion;
-import eu.hansolo.tilesfx.tools.Location;
 import eu.hansolo.tilesfx.tools.LowerRightRegion;
 import eu.hansolo.tilesfx.tools.MatrixIcon;
 import eu.hansolo.tilesfx.tools.MovingAverage;
@@ -48,6 +41,11 @@ import eu.hansolo.tilesfx.tools.Rank;
 import eu.hansolo.tilesfx.tools.SectionComparator;
 import eu.hansolo.tilesfx.tools.TimeData;
 import eu.hansolo.tilesfx.tools.TimeSectionComparator;
+import eu.hansolo.toolbox.evt.EvtObserver;
+import eu.hansolo.toolbox.evt.EvtType;
+import eu.hansolo.toolboxfx.evt.type.BoundsEvt;
+import eu.hansolo.toolboxfx.geom.Bounds;
+import eu.hansolo.toolboxfx.geom.Location;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -117,6 +115,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -159,7 +158,7 @@ public class Tile extends Control {
                            CYCLE_STEP("CycleStepTileSkin"), COLOR("ColorTileSkin"),
                            FLUID("FluidTileSkin"), FIRE_SMOKE("FireSmokeTileSkin"),
                            TURNOVER("TurnoverTileSkin"), RADIAL_DISTRIBUTION("RadialDistributionTileSkin"),
-                           SPINNER("Spinner");
+                           SPINNER("Spinner"), CENTER_TEXT("CenterTextTileSkin");
 
         public final String CLASS_NAME;
         SkinType(final String CLASS_NAME) {
@@ -246,60 +245,60 @@ public class Tile extends Control {
     public static final  TimeUnit                       DEFAULT_TIME_PERIOD_RESOLUTION = TimeUnit.SECONDS;
     private static final int                            MAX_NO_OF_DECIMALS             = 3;
 
-    private final        TileEvent                      SHOW_NOTIFY_REGION_EVENT       = new TileEvent(EventType.SHOW_NOTIFY_REGION);
-    private final        TileEvent                      HIDE_NOTIFY_REGION_EVENT       = new TileEvent(EventType.HIDE_NOTIFY_REGION);
-    private final        TileEvent                      SHOW_INFO_REGION_EVENT         = new TileEvent(EventType.SHOW_INFO_REGION);
-    private final        TileEvent                      HIDE_INFO_REGION_EVENT         = new TileEvent(EventType.HIDE_INFO_REGION);
-    private final        TileEvent                      SHOW_LOWER_RIGHT_REGION_EVENT  = new TileEvent(EventType.SHOW_LOWER_RIGHT_REGION);
-    private final        TileEvent                      HIDE_LOWER_RIGHT_REGION_EVENT  = new TileEvent(EventType.HIDE_LOWER_RIGHT_REGION);
-    private final        TileEvent                      EXCEEDED_THRESHOLD_EVENT       = new TileEvent(EventType.THRESHOLD_EXCEEDED);
-    private final        TileEvent                      UNDERRUN_THRESHOLD_EVENT       = new TileEvent(EventType.THRESHOLD_UNDERRUN);
-    private final        TileEvent                      EXCEEDED_LOWER_THRESHOLD_EVENT = new TileEvent(EventType.LOWER_THRESHOLD_EXCEEDED);
-    private final        TileEvent                      UNDERRUN_LOWER_THRESHOLD_EVENT = new TileEvent(EventType.LOWER_THRESHOLD_UNDERRUN);
-    private final        TileEvent                      MAX_VALUE_EXCEEDED             = new TileEvent(EventType.MAX_VALUE_EXCEEDED);
-    private final        TileEvent                      MIN_VALUE_UNDERRUN             = new TileEvent(EventType.MIN_VALUE_UNDERRUN);
-    private final        TileEvent                      VALUE_IN_RANGE                 = new TileEvent(EventType.VALUE_IN_RANGE);
-    private final        TileEvent                      RECALC_EVENT                   = new TileEvent(EventType.RECALC);
-    private final        TileEvent                      REDRAW_EVENT                   = new TileEvent(EventType.REDRAW);
-    private final        TileEvent                      RESIZE_EVENT                   = new TileEvent(EventType.RESIZE);
-    private final        TileEvent                      VISIBILITY_EVENT               = new TileEvent(EventType.VISIBILITY);
-    private final        TileEvent                      SECTION_EVENT                  = new TileEvent(EventType.SECTION);
-    private final        TileEvent                      SERIES_EVENT                   = new TileEvent(EventType.SERIES);
-    private final        TileEvent                      SERIES_SET_EVENT               = new TileEvent(EventType.SERIES_SET);
-    private final        TileEvent                      SERIES_ADD_EVENT               = new TileEvent(EventType.SERIES_ADD);
-    private final        TileEvent                      SERIES_REMOVE_EVENT            = new TileEvent(EventType.SERIES_REMOVE);
-    private final        TileEvent                      DATA_EVENT                     = new TileEvent(EventType.DATA);
-    private final        TileEvent                      ALERT_EVENT                    = new TileEvent(EventType.ALERT);
-    private final        TileEvent                      VALUE_EVENT                    = new TileEvent(EventType.VALUE);
-    private final        TileEvent                      FINISHED_EVENT                 = new TileEvent(EventType.FINISHED);
-    private final        TileEvent                      GRAPHIC_EVENT                  = new TileEvent(EventType.GRAPHIC);
-    private final        TileEvent                      AVERAGING_EVENT                = new TileEvent(EventType.AVERAGING);
-    private final        TileEvent                      TIME_PERIOD_EVENT              = new TileEvent(EventType.TIME_PERIOD);
-    private final        TileEvent                      LOCATION_EVENT                 = new TileEvent(EventType.LOCATION);
-    private final        TileEvent                      TRACK_EVENT                    = new TileEvent(EventType.TRACK);
-    private final        TileEvent                      MAP_PROVIDER_EVENT             = new TileEvent(EventType.MAP_PROVIDER);
-    private final        TileEvent                      FLIP_START_EVENT               = new TileEvent(EventType.FLIP_START);
-    private final        TileEvent                      BKG_IMAGE_EVENT                = new TileEvent(EventType.BACKGROUND_IMAGE);
-    private final        TileEvent                      REGIONS_ON_TOP_EVENT           = new TileEvent(EventType.REGIONS_ON_TOP);
-    private final        TileEvent                      INFO_REGION_HANDLER_EVENT      = new TileEvent(EventType.INFO_REGION_HANDLER);
-    private final        TileEvent                      CLEAR_DATA_EVENT               = new TileEvent(EventType.CLEAR_DATA);
-    private final        TileEvent                      HIGHLIGHT_SECTIONS             = new TileEvent(EventType.HIGHLIGHT_SECTIONS);
-    private final        TileEvent                      ANIMATED_ON_EVENT              = new TileEvent(EventType.ANIMATED_ON);
-    private final        TileEvent                      ANIMATED_OFF_EVENT             = new TileEvent(EventType.ANIMATED_OFF);
+    private final        TileEvt                      SHOW_NOTIFY_REGION_EVENT       = new TileEvt(Tile.this, TileEvt.SHOW_NOTIFY_REGION);
+    private final        TileEvt                      HIDE_NOTIFY_REGION_EVENT       = new TileEvt(Tile.this, TileEvt.HIDE_NOTIFY_REGION);
+    private final        TileEvt                      SHOW_INFO_REGION_EVENT         = new TileEvt(Tile.this, TileEvt.SHOW_INFO_REGION);
+    private final        TileEvt                      HIDE_INFO_REGION_EVENT         = new TileEvt(Tile.this, TileEvt.HIDE_INFO_REGION);
+    private final        TileEvt                      SHOW_LOWER_RIGHT_REGION_EVENT  = new TileEvt(Tile.this, TileEvt.SHOW_LOWER_RIGHT_REGION);
+    private final        TileEvt                      HIDE_LOWER_RIGHT_REGION_EVENT  = new TileEvt(Tile.this, TileEvt.HIDE_LOWER_RIGHT_REGION);
+    private final        TileEvt                      EXCEEDED_THRESHOLD_EVENT       = new TileEvt(Tile.this, TileEvt.THRESHOLD_EXCEEDED);
+    private final        TileEvt                      UNDERRUN_THRESHOLD_EVENT       = new TileEvt(Tile.this, TileEvt.THRESHOLD_UNDERRUN);
+    private final        TileEvt                      EXCEEDED_LOWER_THRESHOLD_EVENT = new TileEvt(Tile.this, TileEvt.LOWER_THRESHOLD_EXCEEDED);
+    private final        TileEvt                      UNDERRUN_LOWER_THRESHOLD_EVENT = new TileEvt(Tile.this, TileEvt.LOWER_THRESHOLD_UNDERRUN);
+    private final        TileEvt                      MAX_VALUE_EXCEEDED             = new TileEvt(Tile.this, TileEvt.MAX_VALUE_EXCEEDED);
+    private final        TileEvt                      MIN_VALUE_UNDERRUN             = new TileEvt(Tile.this, TileEvt.MIN_VALUE_UNDERRUN);
+    private final        TileEvt                      VALUE_IN_RANGE                 = new TileEvt(Tile.this, TileEvt.VALUE_IN_RANGE);
+    private final        TileEvt                      RECALC_EVENT                   = new TileEvt(Tile.this, TileEvt.RECALC);
+    private final        TileEvt                      REDRAW_EVENT                   = new TileEvt(Tile.this, TileEvt.REDRAW);
+    private final        TileEvt                      RESIZE_EVENT                   = new TileEvt(Tile.this, TileEvt.RESIZE);
+    private final        TileEvt                      VISIBILITY_EVENT               = new TileEvt(Tile.this, TileEvt.VISIBILITY);
+    private final        TileEvt                      SECTION_EVENT                  = new TileEvt(Tile.this, TileEvt.SECTION);
+    private final        TileEvt                      SERIES_EVENT                   = new TileEvt(Tile.this, TileEvt.SERIES);
+    private final        TileEvt                      SERIES_SET_EVENT               = new TileEvt(Tile.this, TileEvt.SERIES_SET);
+    private final        TileEvt                      SERIES_ADD_EVENT               = new TileEvt(Tile.this, TileEvt.SERIES_ADD);
+    private final        TileEvt                      SERIES_REMOVE_EVENT            = new TileEvt(Tile.this, TileEvt.SERIES_REMOVE);
+    private final        TileEvt                      DATA_EVENT                     = new TileEvt(Tile.this, TileEvt.DATA);
+    private final        TileEvt                      ALERT_EVENT                    = new TileEvt(Tile.this, TileEvt.ALERT);
+    private final        TileEvt                      VALUE_EVENT                    = new TileEvt(Tile.this, TileEvt.VALUE);
+    private final        TileEvt                      FINISHED_EVENT                 = new TileEvt(Tile.this, TileEvt.FINISHED);
+    private final        TileEvt                      GRAPHIC_EVENT                  = new TileEvt(Tile.this, TileEvt.GRAPHIC);
+    private final        TileEvt                      AVERAGING_EVENT                = new TileEvt(Tile.this, TileEvt.AVERAGING);
+    private final        TileEvt                      TIME_PERIOD_EVENT              = new TileEvt(Tile.this, TileEvt.TIME_PERIOD);
+    private final        TileEvt                      LOCATION_EVENT                 = new TileEvt(Tile.this, TileEvt.LOCATION);
+    private final        TileEvt                      TRACK_EVENT                    = new TileEvt(Tile.this, TileEvt.TRACK);
+    private final        TileEvt                      MAP_PROVIDER_EVENT             = new TileEvt(Tile.this, TileEvt.MAP_PROVIDER);
+    private final        TileEvt                      FLIP_START_EVENT               = new TileEvt(Tile.this, TileEvt.FLIP_START);
+    private final        TileEvt                      BKG_IMAGE_EVENT                = new TileEvt(Tile.this, TileEvt.BACKGROUND_IMAGE);
+    private final        TileEvt                      REGIONS_ON_TOP_EVENT           = new TileEvt(Tile.this, TileEvt.REGIONS_ON_TOP);
+    private final        TileEvt                      INFO_REGION_HANDLER_EVENT      = new TileEvt(Tile.this, TileEvt.INFO_REGION_HANDLER);
+    private final        TileEvt                      CLEAR_DATA_EVENT               = new TileEvt(Tile.this, TileEvt.CLEAR_DATA);
+    private final        TileEvt                      HIGHLIGHT_SECTIONS             = new TileEvt(Tile.this, TileEvt.HIGHLIGHT_SECTIONS);
+    private final        TileEvt                      ANIMATED_ON_EVENT              = new TileEvt(Tile.this, TileEvt.ANIMATED_ON);
+    private final        TileEvt                      ANIMATED_OFF_EVENT             = new TileEvt(Tile.this, TileEvt.ANIMATED_OFF);
 
-    private static final StyleablePropertyFactory<Tile> FACTORY                        = new StyleablePropertyFactory<>(Region.getClassCssMetaData());
-    private static final CssMetaData<Tile, Color>       THUMB_COLOR                    = FACTORY.createColorCssMetaData("-thumb-color", s -> s.thumbColor, Color.rgb(223, 223, 223, 0.5), false);
+    private static final StyleablePropertyFactory<Tile> FACTORY                      = new StyleablePropertyFactory<>(Region.getClassCssMetaData());
+    private static final CssMetaData<Tile, Color>       THUMB_COLOR                  = FACTORY.createColorCssMetaData("-thumb-color", s -> s.thumbColor, Color.rgb(223, 223, 223, 0.5), false);
 
     private static       String                         userAgentStyleSheet;
 
     // Tile events
-    private              Queue<TileEvent>               tileEventQueue                 = new LinkedBlockingQueue<>();
-    private              List<TileEventListener>        tileEventListeners             = new CopyOnWriteArrayList<>();
-    private              List<AlarmEventListener>       alarmEventListeners            = new CopyOnWriteArrayList<>();
-    private              List<TimeEventListener>        timeEventListeners             = new CopyOnWriteArrayList<>();
-    private              List<BoundsEventListener>      boundsListeners                = new CopyOnWriteArrayList<>();
+    private              Queue<TileEvt>                           tileEventQueue      = new LinkedBlockingQueue<>();
+    private              Map<EvtType, List<EvtObserver<TileEvt>>> observers           = new ConcurrentHashMap<>();
+    private              List<EvtObserver<AlarmEvt>>              alarmObservers      = new CopyOnWriteArrayList<>();
+    private              List<EvtObserver<TimeEvt>>               timeObservers       = new CopyOnWriteArrayList<>();
+    private              List<EvtObserver<BoundsEvt>>             boundsObservers     = new CopyOnWriteArrayList<>();
 
-    private              BooleanBinding                 showing;
+    private              BooleanBinding                           showing;
 
     // Data related
     private DoubleProperty                                value;
@@ -449,6 +448,8 @@ public class Tile extends Control {
     private ObjectProperty<NumberFormat>                  numberFormat;
     private int                                           _decimals;
     private IntegerProperty                               decimals;
+    private boolean                                       _shortenNumbers;
+    private BooleanProperty                               shortenNumbers;
     private int                                           _tickLabelDecimals;
     private IntegerProperty                               tickLabelDecimals;
     private boolean                                       _tickLabelsXVisible;
@@ -588,10 +589,10 @@ public class Tile extends Control {
     private Color                                         _chartGridColor;
     private ObjectProperty<Color>                         chartGridColor;
     private Country                                       _country;
-    private ObjectProperty<Country>                       country;
-    private CountryGroup                                  _countryGroup;
-    private ObjectProperty<CountryGroup>                  countryGroup;
-    private boolean                                       _dataPointsVisible;
+    private ObjectProperty<Country>        country;
+    private BusinessRegion                 _countryGroup;
+    private ObjectProperty<BusinessRegion> countryGroup;
+    private boolean                        _dataPointsVisible;
     private BooleanProperty                               dataPointsVisible;
     private boolean                                       _snapToTicks;
     private BooleanProperty                               snapToTicks;
@@ -717,6 +718,7 @@ public class Tile extends Control {
                 @NamedArg(value="locale", defaultValue="Locale.US") Locale locale,
                 @NamedArg(value="numberFormat", defaultValue="NumberFormat.getInstance(Locale.US)") NumberFormat numberFormat,
                 @NamedArg(value="decimals", defaultValue="1") int decimals,
+                @NamedArg(value="shortenNumbers", defaultValue="false") boolean shorteNumbers,
                 @NamedArg(value="tickLabelDecimals", defaultValue="1") int tickLabelDecimals,
                 @NamedArg(value="tickLabelsXVisible", defaultValue="true") boolean tickLabelsXVisible,
                 @NamedArg(value="tickLabelsYVisible", defaultValue="true") boolean tickLabelsYVisible,
@@ -846,7 +848,7 @@ public class Tile extends Control {
                     timeline.play();
                 } else {
                     currentValue.set(VALUE);
-                    fireTileEvent(FINISHED_EVENT);
+                    fireTileEvt(FINISHED_EVENT);
                 }
                 if (isAveragingEnabled()) { movingAverage.addData(new TimeData(VALUE)); }
             }
@@ -856,7 +858,7 @@ public class Tile extends Control {
                 // only get invalid if the the new value is different from the old value
                 if (Helper.equals(VALUE, getFormerValue())) { update(); }
                 super.set(VALUE);
-                fireTileEvent(VALUE_EVENT);
+                fireTileEvt(VALUE_EVENT);
             }
             @Override public Object getBean() { return Tile.this; }
             @Override public String getName() { return "value"; }
@@ -868,18 +870,18 @@ public class Tile extends Control {
                 if (isCheckThreshold()) {
                     double threshold = getThreshold();
                     if (formerValue.get() < threshold && VALUE > threshold) {
-                        fireTileEvent(EXCEEDED_THRESHOLD_EVENT);
+                        fireTileEvt(EXCEEDED_THRESHOLD_EVENT);
                     } else if (formerValue.get() > threshold && VALUE < threshold) {
-                        fireTileEvent(UNDERRUN_THRESHOLD_EVENT);
+                        fireTileEvt(UNDERRUN_THRESHOLD_EVENT);
                     }
                 }
 
                 if (isCheckLowerThreshold()) {
                     double lowerThreshold = getLowerThreshold();
                     if (formerValue.get() < lowerThreshold && VALUE > lowerThreshold) {
-                        fireTileEvent(EXCEEDED_LOWER_THRESHOLD_EVENT);
+                        fireTileEvt(EXCEEDED_LOWER_THRESHOLD_EVENT);
                     } else if (formerValue.get() > lowerThreshold && VALUE < lowerThreshold) {
-                        fireTileEvent(UNDERRUN_LOWER_THRESHOLD_EVENT);
+                        fireTileEvt(UNDERRUN_LOWER_THRESHOLD_EVENT);
                     }
                 }
 
@@ -961,6 +963,7 @@ public class Tile extends Control {
         _locale                             = Locale.US;
         _numberFormat                       = NumberFormat.getInstance(_locale);
         _decimals                           = 1;
+        _shortenNumbers                     = false;
         _tickLabelDecimals                  = 1;
         _tickLabelsXVisible                 = true;
         _tickLabelsYVisible                 = true;
@@ -1073,7 +1076,7 @@ public class Tile extends Control {
                 timeline.getKeyFrames().setAll(KEY_FRAME2);
                 timeline.play();
             }
-            fireTileEvent(FINISHED_EVENT);
+            fireTileEvt(FINISHED_EVENT);
         });
         presetTileParameters(skinType);
     }
@@ -1149,11 +1152,11 @@ public class Tile extends Control {
         currentValueProperty().addListener(o -> {
             double currentValue = getCurrentValue();
             if (currentValue > getMaxValue()) {
-                fireTileEvent(MAX_VALUE_EXCEEDED);
+                fireTileEvt(MAX_VALUE_EXCEEDED);
             } else if (currentValue < getMinValue()) {
-                fireTileEvent(MIN_VALUE_UNDERRUN);
+                fireTileEvt(MIN_VALUE_UNDERRUN);
             } else {
-                fireTileEvent(VALUE_IN_RANGE);
+                fireTileEvt(VALUE_IN_RANGE);
             }
         });
         if (null != getScene()) {
@@ -1258,7 +1261,7 @@ public class Tile extends Control {
             if (Helper.equals(originalMinValue, -Double.MAX_VALUE)) { originalMinValue = _minValue; }
             if (isStartFromZero() && _minValue < 0) { setValue(0); }
             if (Helper.equals(originalThreshold, getThreshold())) { setThreshold(clamp(_minValue, getMaxValue(), originalThreshold)); }
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
             if (!valueProperty().isBound() && isShowing()) { Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue())); }
         } else {
             if (!minValue.isBound()) {
@@ -1276,7 +1279,7 @@ public class Tile extends Control {
                     if (Helper.equals(originalMinValue, -Double.MAX_VALUE)) originalMinValue = value;
                     if (isStartFromZero() && _minValue < 0) Tile.this.setValue(0);
                     if (Helper.lessThan(originalThreshold, getThreshold())) { setThreshold(clamp(value, getMaxValue(), originalThreshold)); }
-                    fireTileEvent(RECALC_EVENT);
+                    fireTileEvt(RECALC_EVENT);
                     if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
                 }
                 @Override public Object getBean() { return Tile.this; }
@@ -1306,7 +1309,7 @@ public class Tile extends Control {
             setRange(_maxValue - getMinValue());
             if (Helper.equals(originalMaxValue, Double.MAX_VALUE)) originalMaxValue = _maxValue;
             if (Helper.biggerThan(originalThreshold, getThreshold())) { setThreshold(clamp(getMinValue(), _maxValue, originalThreshold)); }
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
             if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
         } else {
             if (!maxValue.isBound()) {
@@ -1323,7 +1326,7 @@ public class Tile extends Control {
                     setRange(VALUE - getMinValue());
                     if (Helper.equals(originalMaxValue, Double.MAX_VALUE)) originalMaxValue = VALUE;
                     if (Helper.biggerThan(originalThreshold, getThreshold())) { setThreshold(clamp(getMinValue(), VALUE, originalThreshold)); }
-                    fireTileEvent(RECALC_EVENT);
+                    fireTileEvt(RECALC_EVENT);
                     if (!valueProperty().isBound() && isShowing()) Tile.this.setValue(clamp(getMinValue(), getMaxValue(), Tile.this.getValue()));
                 }
                 @Override public Object getBean() { return Tile.this; }
@@ -1385,7 +1388,7 @@ public class Tile extends Control {
         originalThreshold = THRESHOLD;
         if (null == threshold) {
             _threshold = clamp(getMinValue(), getMaxValue(), THRESHOLD);
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!threshold.isBound()) {
                 threshold.set(THRESHOLD);
@@ -1400,7 +1403,7 @@ public class Tile extends Control {
                     if (!isBound() && (THRESHOLD < getMinValue() || THRESHOLD > getMaxValue())) {
                         set(clamp(getMinValue(), getMaxValue(), THRESHOLD));
                     }
-                    fireTileEvent(RESIZE_EVENT);
+                    fireTileEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "threshold"; }
@@ -1413,7 +1416,7 @@ public class Tile extends Control {
     public void setLowerThreshold(final double THRESHOLD) {
         if (null == lowerThreshold) {
             _lowerThreshold = clamp(getMinValue(), getMaxValue(), THRESHOLD);
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!lowerThreshold.isBound()) {
                 lowerThreshold.set(THRESHOLD);
@@ -1425,7 +1428,7 @@ public class Tile extends Control {
             lowerThreshold = new DoublePropertyBase(_lowerThreshold) {
                 @Override protected void invalidated() {
                     set(clamp(getMinValue(), getMaxValue(), get()));
-                    fireTileEvent(RESIZE_EVENT);
+                    fireTileEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "lowerThreshold"; }
@@ -1448,7 +1451,7 @@ public class Tile extends Control {
     public void setReferenceValue(final double VALUE) {
         if (null == referenceValue) {
             _referenceValue = VALUE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!referenceValue.isBound()) {
                 referenceValue.set(VALUE);
@@ -1458,7 +1461,7 @@ public class Tile extends Control {
     public DoubleProperty referenceValueProperty() {
         if (null == referenceValue) {
             referenceValue = new DoublePropertyBase(_referenceValue) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "referenceValue"; }
             };
@@ -1513,8 +1516,8 @@ public class Tile extends Control {
     public void setTitle(final String TITLE) {
         if (null == title) {
             _title = null == TITLE ? "" : TITLE;
-            fireTileEvent(VISIBILITY_EVENT);
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!title.isBound()) {
                 title.set(TITLE);
@@ -1526,8 +1529,8 @@ public class Tile extends Control {
             title  = new StringPropertyBase(_title) {
                 @Override protected void invalidated() {
                     if (null == get()) { set(""); }
-                    fireTileEvent(VISIBILITY_EVENT);
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(VISIBILITY_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "title"; }
@@ -1553,7 +1556,7 @@ public class Tile extends Control {
     public void setTitleAlignment(final TextAlignment ALIGNMENT) {
         if (null == titleAlignment) {
             _titleAlignment = ALIGNMENT;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!titleAlignment.isBound()) {
                 titleAlignment.set(ALIGNMENT);
@@ -1563,7 +1566,7 @@ public class Tile extends Control {
     public ObjectProperty<TextAlignment> titleAlignmentProperty() {
         if (null == titleAlignment) {
             titleAlignment = new ObjectPropertyBase<TextAlignment>(_titleAlignment) {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "titleAlignment"; }
             };
@@ -1588,8 +1591,8 @@ public class Tile extends Control {
     public void setDescription(final String DESCRIPTION) {
         if (null == description) {
             _description = DESCRIPTION;
-            fireTileEvent(VISIBILITY_EVENT);
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!description.isBound()) {
                 description.set(DESCRIPTION);
@@ -1600,8 +1603,8 @@ public class Tile extends Control {
         if (null == description) {
             description = new StringPropertyBase(_description) {
                 @Override protected void invalidated() {
-                    fireTileEvent(VISIBILITY_EVENT);
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(VISIBILITY_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "description"; }
@@ -1624,7 +1627,7 @@ public class Tile extends Control {
     public void setDescriptionAlignment(final Pos ALIGNMENT) {
         if (null == descriptionAlignment) {
             _descriptionAlignment = ALIGNMENT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!descriptionAlignment.isBound()) {
                 descriptionAlignment.set(ALIGNMENT);
@@ -1634,7 +1637,7 @@ public class Tile extends Control {
     public ObjectProperty<Pos> descriptionAlignmentProperty() {
         if (null == descriptionAlignment) {
             descriptionAlignment = new ObjectPropertyBase<Pos>(_descriptionAlignment) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "descriptionAlignment"; }
             };
@@ -1659,8 +1662,8 @@ public class Tile extends Control {
     public void setUnit(final String UNIT) {
         if (null == unit) {
             _unit = UNIT;
-            fireTileEvent(VISIBILITY_EVENT);
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!unit.isBound()) {
                 unit.set(UNIT);
@@ -1670,7 +1673,7 @@ public class Tile extends Control {
     public StringProperty unitProperty() {
         if (null == unit) {
             unit  = new StringPropertyBase(_unit) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "unit"; }
             };
@@ -1691,7 +1694,7 @@ public class Tile extends Control {
     public void setFlipText(final String TEXT) {
         if (null == flipText) {
             _flipText = TEXT;
-            if (!oldFlipText.equals(_flipText)) { fireTileEvent(FLIP_START_EVENT); }
+            if (!oldFlipText.equals(_flipText)) { fireTileEvt(FLIP_START_EVENT); }
             oldFlipText = _flipText;
         } else {
             if (!flipText.isBound()) {
@@ -1703,7 +1706,7 @@ public class Tile extends Control {
         if (null == flipText) {
             flipText = new StringPropertyBase(_flipText) {
                 @Override protected void invalidated() {
-                    if (!oldFlipText.equals(get())) { fireTileEvent(FLIP_START_EVENT); }
+                    if (!oldFlipText.equals(get())) { fireTileEvt(FLIP_START_EVENT); }
                     oldFlipText = get();
                 }
                 @Override public Object getBean() { return Tile.this; }
@@ -1726,7 +1729,7 @@ public class Tile extends Control {
     public void setActive(final boolean SELECTED) {
         if (null == active) {
             _active = SELECTED;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!active.isBound()) {
                 active.set(SELECTED);
@@ -1736,7 +1739,7 @@ public class Tile extends Control {
     public BooleanProperty activeProperty() {
         if (null == active) {
             active = new BooleanPropertyBase(_active) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "active"; }
             };
@@ -1764,7 +1767,7 @@ public class Tile extends Control {
     public void setAveragingEnabled(final boolean ENABLED) {
         if (null == averagingEnabled) {
             _averagingEnabled = ENABLED;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!averagingEnabled.isBound()) {
                 averagingEnabled.set(ENABLED);
@@ -1774,7 +1777,7 @@ public class Tile extends Control {
     public BooleanProperty averagingEnabledProperty() {
         if (null == averagingEnabled) {
             averagingEnabled = new BooleanPropertyBase(_averagingEnabled) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "averagingEnabled"; }
             };
@@ -1800,7 +1803,7 @@ public class Tile extends Control {
             _averagingPeriod = Helper.clamp(0, MAX_PERIOD, PERIOD);
             getMovingAverage().setPeriod(_averagingPeriod); // MAX 1000 values
             if (null == showing) return;
-            fireTileEvent(AVERAGING_EVENT);
+            fireTileEvt(AVERAGING_EVENT);
         } else {
             if (!averagingPeriod.isBound()) {
                 averagingPeriod.set(Helper.clamp(0, MAX_PERIOD, PERIOD));
@@ -1812,7 +1815,7 @@ public class Tile extends Control {
             averagingPeriod = new IntegerPropertyBase(_averagingPeriod) {
                 @Override protected void invalidated() {
                     getMovingAverage().setPeriod(get());
-                    fireTileEvent(AVERAGING_EVENT);
+                    fireTileEvt(AVERAGING_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "averagingPeriod"; }
@@ -1859,7 +1862,7 @@ public class Tile extends Control {
             if (PERIOD.getSeconds() > getMaxTimePeriod().getSeconds()) {
                 setMaxTimePeriod(PERIOD);
             }
-            fireTileEvent(TIME_PERIOD_EVENT);
+            fireTileEvt(TIME_PERIOD_EVENT);
         } else {
             if (!timePeriod.isBound()) {
                 timePeriod.set(PERIOD);
@@ -1873,7 +1876,7 @@ public class Tile extends Control {
                     if (get().getSeconds() > getMaxTimePeriod().getSeconds()) {
                         setMaxTimePeriod(get());
                     }
-                    fireTileEvent(TIME_PERIOD_EVENT);
+                    fireTileEvt(TIME_PERIOD_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "timePeriod"; }
@@ -1898,7 +1901,7 @@ public class Tile extends Control {
             _maxTimePeriod = MAX_PERIOD;
             if (getTimePeriod().getSeconds() > _maxTimePeriod.getSeconds()) {
                 setTimePeriod(MAX_PERIOD);
-                fireTileEvent(TIME_PERIOD_EVENT);
+                fireTileEvt(TIME_PERIOD_EVENT);
             }
         } else {
             if (!maxTimePeriod.isBound()) {
@@ -1913,7 +1916,7 @@ public class Tile extends Control {
                     if (getTimePeriod().getSeconds() < get().getSeconds()) {
                         setTimePeriod(get());
                     }
-                    fireTileEvent(TIME_PERIOD_EVENT);
+                    fireTileEvt(TIME_PERIOD_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "maxTimePeriod"; }
@@ -1928,7 +1931,7 @@ public class Tile extends Control {
     public void setTimePeriodResolution(final TimeUnit RESOLUTION) {
         if (null == timePeriodResolution) {
             _timePeriodResolution = RESOLUTION;
-            fireTileEvent(TIME_PERIOD_EVENT);
+            fireTileEvt(TIME_PERIOD_EVENT);
         } else {
             if (!timePeriodResolution.isBound()) {
                 timePeriodResolution.set(RESOLUTION);
@@ -1938,7 +1941,7 @@ public class Tile extends Control {
     public ObjectProperty<TimeUnit> timePeriodResolutionProperty() {
         if (null == timePeriodResolution) {
             timePeriodResolution = new ObjectPropertyBase<TimeUnit>(_timePeriodResolution) {
-                @Override protected void invalidated() { fireTileEvent(TIME_PERIOD_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(TIME_PERIOD_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "timePeriodResolution"; }
             };
@@ -1961,7 +1964,7 @@ public class Tile extends Control {
     public void setFixedYScale(final boolean FIXED_Y_SCALE) {
         if (null == fixedYScale) {
             _fixedYScale = FIXED_Y_SCALE;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!fixedYScale.isBound()) {
                 fixedYScale.set(FIXED_Y_SCALE);
@@ -1971,7 +1974,7 @@ public class Tile extends Control {
     public BooleanProperty fixedYScaleProperty() {
         if (null == fixedYScale) {
             fixedYScale = new BooleanPropertyBase(_fixedYScale) {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "fixedYScale"; }
             };
@@ -1991,7 +1994,7 @@ public class Tile extends Control {
     public void setDuration(final LocalTime DURATION) {
         if (null == duration) {
             _duration = DURATION;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!duration.isBound()) {
                 duration.set(DURATION);
@@ -2033,7 +2036,7 @@ public class Tile extends Control {
     public void setSections(final List<Section> SECTIONS) {
         getSections().setAll(SECTIONS);
         getSections().sort(new SectionComparator());
-        fireTileEvent(SECTION_EVENT);
+        fireTileEvt(SECTION_EVENT);
     }
     /**
      * Sets the sections to the given array of Section objects. The
@@ -2054,7 +2057,7 @@ public class Tile extends Control {
         if (null == SECTION) return;
         getSections().add(SECTION);
         getSections().sort(new SectionComparator());
-        fireTileEvent(SECTION_EVENT);
+        fireTileEvt(SECTION_EVENT);
     }
     /**
      * Removes the given Section from the list of sections.
@@ -2067,14 +2070,14 @@ public class Tile extends Control {
         if (null == SECTION) return;
         getSections().remove(SECTION);
         getSections().sort(new SectionComparator());
-        fireTileEvent(SECTION_EVENT);
+        fireTileEvt(SECTION_EVENT);
     }
     /**
      * Clears the list of sections.
      */
     public void clearSections() {
         getSections().clear();
-        fireTileEvent(SECTION_EVENT);
+        fireTileEvt(SECTION_EVENT);
     }
 
     public ObservableList<Series<String, Number>> getSeries() {
@@ -2107,7 +2110,7 @@ public class Tile extends Control {
             seriesToRemove.add(str);
         }
         series.removeAll(seriesToRemove);
-        fireTileEvent(SERIES_REMOVE_EVENT);
+        fireTileEvt(SERIES_REMOVE_EVENT);
     }
     public void clearSeries() { clearTilesFXSeries(); }
 
@@ -2118,7 +2121,7 @@ public class Tile extends Control {
     public void setTilesFXSeries(final TilesFXSeries<String, Number>... TILESFX_SERIES) { setTilesFXSeries(Arrays.asList(TILESFX_SERIES)); }
     public void setTilesFXSeries(final List<TilesFXSeries<String, Number>> TILESFX_SERIES) {
         getTilesFXSeries().setAll(TILESFX_SERIES);
-        fireTileEvent(SERIES_SET_EVENT);
+        fireTileEvt(SERIES_SET_EVENT);
     }
     public void addTilesFXSeries(final TilesFXSeries<String, Number>... TILESFX_SERIES) {
         if (null == TILESFX_SERIES || TILESFX_SERIES.length == 0) return;
@@ -2130,18 +2133,18 @@ public class Tile extends Control {
                                         .filter(tfxs0 -> getTilesFXSeries().stream()
                                                                            .noneMatch(tfxs1 -> tfxs1.getSeries().equals(tfxs0.getSeries())))
                                         .collect(Collectors.toList()));
-        fireTileEvent(SERIES_ADD_EVENT);
+        fireTileEvt(SERIES_ADD_EVENT);
     }
     public void removeTilesFXSeries(final TilesFXSeries<String, Number> SERIES) {
         if (null == SERIES) return;
         if (getTilesFXSeries().contains(SERIES)) {
             getTilesFXSeries().remove(SERIES);
-            fireTileEvent(SERIES_REMOVE_EVENT);
+            fireTileEvt(SERIES_REMOVE_EVENT);
         }
     }
     public void clearTilesFXSeries() {
         getTilesFXSeries().clear();
-        fireTileEvent(SERIES_REMOVE_EVENT);
+        fireTileEvt(SERIES_REMOVE_EVENT);
     }
 
     public ObservableList<BarChartItem> getBarChartItems() {
@@ -2150,22 +2153,22 @@ public class Tile extends Control {
     }
     public void setBarChartItems(final List<BarChartItem> ITEMS) {
         getBarChartItems().setAll(ITEMS);
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
     public void setBarChartItems(final BarChartItem... ITEMS) { setBarChartItems(Arrays.asList(ITEMS)); }
     public void addBarChartItem(final BarChartItem ITEM) {
         if (null == ITEM) return;
         getBarChartItems().add(ITEM);
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
     public void removeBarChartItem(final BarChartItem ITEM) {
         if (null == ITEM) return;
         getBarChartItems().remove(ITEM);
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
     public void clearBarChartItems() {
         getBarChartItems().clear();
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
 
     public ObservableList<LeaderBoardItem> getLeaderBoardItems() {
@@ -2174,22 +2177,22 @@ public class Tile extends Control {
     }
     public void setLeaderBoardItems(final List<LeaderBoardItem> ITEMS) {
         getLeaderBoardItems().setAll(ITEMS);
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
     public void setLeaderBoardItems(final LeaderBoardItem... ITEMS) { setLeaderBoardItems(Arrays.asList(ITEMS)); }
     public void addLeaderBoardItem(final LeaderBoardItem ITEM) {
         if (null == ITEM) return;
         getLeaderBoardItems().add(ITEM);
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
     public void removeLeaderBoardItem(final LeaderBoardItem ITEM) {
         if (null == ITEM) return;
         getLeaderBoardItems().remove(ITEM);
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
     public void clearLeaderBoardItems() {
         getLeaderBoardItems().clear();
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
 
     public List<Stop> getGradientStops() {
@@ -2202,7 +2205,7 @@ public class Tile extends Control {
     public void setGradientStops(final List<Stop> STOPS) {
         getGradientStops().clear();
         getGradientStops().addAll(STOPS);
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public Image getImage() { return null == image ? null : image.get(); }
@@ -2214,7 +2217,7 @@ public class Tile extends Control {
     public ObjectProperty<Image> imageProperty() {
         if (null == image) {
             image = new ObjectPropertyBase<Image>() {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "image"; }
             };
@@ -2226,7 +2229,7 @@ public class Tile extends Control {
     public void setImageMask(final ImageMask MASK) {
         if (null == imageMask) {
             _imageMask = MASK;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!imageMask.isBound()) {
                 imageMask.set(MASK);
@@ -2236,7 +2239,7 @@ public class Tile extends Control {
     public ObjectProperty<ImageMask> imageMaskProperty() {
         if (null == imageMask) {
             imageMask = new ObjectPropertyBase<ImageMask>(_imageMask) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "imageMask"; }
             };
@@ -2265,8 +2268,8 @@ public class Tile extends Control {
         if (null == graphic) {
             graphic = new ObjectPropertyBase<>() {
                 @Override protected void invalidated() {
-                	fireTileEvent(GRAPHIC_EVENT);
-                	fireTileEvent(RESIZE_EVENT);
+                	fireTileEvt(GRAPHIC_EVENT);
+                	fireTileEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "graphic"; }
@@ -2285,7 +2288,7 @@ public class Tile extends Control {
         if (null == svgPath) {
             svgPath = new ObjectPropertyBase<>() {
                 @Override protected void invalidated() {
-                    fireTileEvent(RESIZE_EVENT);
+                    fireTileEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "svgPath"; }
@@ -2298,7 +2301,7 @@ public class Tile extends Control {
     public void setCurrentLocation(final Location LOCATION) {
         if (null == currentLocation) {
             _currentLocation = LOCATION;
-            fireTileEvent(LOCATION_EVENT);
+            fireTileEvt(LOCATION_EVENT);
         } else {
             if (!currentLocation.isBound()) {
                 currentLocation.set(LOCATION);
@@ -2308,7 +2311,7 @@ public class Tile extends Control {
     public ObjectProperty<Location> currentLocationProperty() {
         if (null == currentLocation) {
             currentLocation = new ObjectPropertyBase<Location>(_currentLocation) {
-                @Override protected void invalidated() { fireTileEvent(LOCATION_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(LOCATION_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "currentLocation"; }
             };
@@ -2318,7 +2321,7 @@ public class Tile extends Control {
     }
     public void updateLocation(final double LATITUDE, final double LONGITUDE) {
         getCurrentLocation().set(LATITUDE, LONGITUDE);
-        fireTileEvent(LOCATION_EVENT);
+        fireTileEvt(LOCATION_EVENT);
     }
 
     public ObservableList<Location> getPoiList() {
@@ -2337,7 +2340,7 @@ public class Tile extends Control {
     }
     public void clearPoiLocations() {
         getPoiList().clear();
-        fireTileEvent(DATA_EVENT);
+        fireTileEvt(DATA_EVENT);
     }
 
     public List<Location> getTrack() {
@@ -2350,18 +2353,18 @@ public class Tile extends Control {
     public void setTrack(final List<Location> LOCATIONS) {
         getTrack().clear();
         getTrack().addAll(LOCATIONS);
-        fireTileEvent(TRACK_EVENT);
+        fireTileEvt(TRACK_EVENT);
     }
     public void clearTrack() {
         getTrack().clear();
-        fireTileEvent(TRACK_EVENT);
+        fireTileEvt(TRACK_EVENT);
     }
 
     public TileColor getTrackColor() { return null == trackColor ? _trackColor : trackColor.get(); }
     public void setTrackColor(final TileColor COLOR) {
         if (null == trackColor) {
             _trackColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!trackColor.isBound()) {
                 trackColor.set(COLOR);
@@ -2371,7 +2374,7 @@ public class Tile extends Control {
     public ObjectProperty<TileColor> trackColorProperty() {
         if (null == trackColor) {
             trackColor = new ObjectPropertyBase<TileColor>(_trackColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "trackColor"; }
             };
@@ -2384,7 +2387,7 @@ public class Tile extends Control {
     public void setMapProvider(final MapProvider PROVIDER) {
         if (null == mapProvider) {
             _mapProvider = PROVIDER;
-            fireTileEvent(MAP_PROVIDER_EVENT);
+            fireTileEvt(MAP_PROVIDER_EVENT);
         } else {
             if (!mapProvider.isBound()) {
                 mapProvider.set(PROVIDER);
@@ -2394,7 +2397,7 @@ public class Tile extends Control {
     public ObjectProperty<MapProvider> mapProviderProperty() {
         if (null == mapProvider) {
             mapProvider = new ObjectPropertyBase<MapProvider>(_mapProvider) {
-                @Override protected void invalidated() { fireTileEvent(MAP_PROVIDER_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(MAP_PROVIDER_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "mapProvider"; }
             };
@@ -2422,7 +2425,7 @@ public class Tile extends Control {
     public void setItemSorting(final ItemSorting ITEM_SORTING) {
         if (null == itemSorting) {
             _itemSorting = ITEM_SORTING;
-            fireTileEvent(DATA_EVENT);
+            fireTileEvt(DATA_EVENT);
         } else {
             if (!itemSorting.isBound()) {
                 itemSorting.set(ITEM_SORTING);
@@ -2432,7 +2435,7 @@ public class Tile extends Control {
     public ObjectProperty<ItemSorting> itemSortingProperty() {
         if (null == itemSorting) {
             itemSorting = new ObjectPropertyBase<ItemSorting>(_itemSorting) {
-                @Override protected void invalidated() { fireTileEvent(DATA_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(DATA_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "itemSorting"; }
             };
@@ -2445,7 +2448,7 @@ public class Tile extends Control {
     public void setItemSortingTopic(final ItemSortingTopic ITEM_SORTING_TOPIC) {
         if (null == itemSortingTopic) {
             _itemSortingTopic = ITEM_SORTING_TOPIC;
-            fireTileEvent(DATA_EVENT);
+            fireTileEvt(DATA_EVENT);
         } else {
             if (!itemSortingTopic.isBound()) {
                 itemSortingTopic.set(ITEM_SORTING_TOPIC);
@@ -2455,7 +2458,7 @@ public class Tile extends Control {
     public ObjectProperty<ItemSortingTopic> itemSortingTopicProperty() {
         if (null == itemSortingTopic) {
             itemSortingTopic = new ObjectPropertyBase<ItemSortingTopic>(_itemSortingTopic) {
-                @Override protected void invalidated() { fireTileEvent(DATA_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(DATA_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "itemSortingTopic"; }
             };
@@ -2478,7 +2481,7 @@ public class Tile extends Control {
     public void setAutoItemTextColor(final boolean AUTO) {
         if (null == autoItemTextColor) {
             _autoItemTextColor = AUTO;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             autoItemTextColor.set(AUTO);
         }
@@ -2486,7 +2489,7 @@ public class Tile extends Control {
     public BooleanProperty autoItemTextColorProperty() {
         if (null == autoItemTextColor) {
             autoItemTextColor = new BooleanPropertyBase(_autoItemTextColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "autoItemTextColor"; }
             };
@@ -2508,7 +2511,7 @@ public class Tile extends Control {
     public void setAutoItemDarkTextColor(final Color COLOR) {
         if (null == autoItemDarkTextColor) {
             _autoItemDarkTextColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             autoItemDarkTextColor.set(COLOR);
         }
@@ -2516,7 +2519,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> autoItemDarkTextColor() {
         if (null == autoItemDarkTextColor) {
             autoItemDarkTextColor = new ObjectPropertyBase<>(_autoItemDarkTextColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() {
                     return "autoItemDarkTextColor";
@@ -2541,7 +2544,7 @@ public class Tile extends Control {
     public void setAutoItemBrightTextColor(final Color COLOR) {
         if (null == autoItemBrightTextColor) {
             _autoItemBrightTextColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             autoItemBrightTextColor.set(COLOR);
         }
@@ -2549,7 +2552,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> autoItemBrightTextColor() {
         if (null == autoItemBrightTextColor) {
             autoItemBrightTextColor = new ObjectPropertyBase<>(_autoItemBrightTextColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() {
                     return "autoItemBrightTextColor";
@@ -2598,7 +2601,7 @@ public class Tile extends Control {
         if (null == valueColor) { _valueColor = COLOR; } else { valueColor.set(COLOR); }
         if (null == textColor) { _textColor = COLOR; } else { textColor.set(COLOR); }
         if (null == foregroundColor) { _foregroundColor = COLOR; } else { foregroundColor.set(COLOR); }
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public Color getThumbColor() { return thumbColor.getValue(); }
@@ -2619,7 +2622,7 @@ public class Tile extends Control {
     public void setFlatUI(final boolean FLATUI) {
         if (null == flatUI) {
             _flatUI = FLATUI;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!flatUI.isBound()) {
                 flatUI.set(FLATUI);
@@ -2629,7 +2632,7 @@ public class Tile extends Control {
     public BooleanProperty flatUIProperty() {
         if (null == flatUI) {
             flatUI = new BooleanPropertyBase(_flatUI) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "flatUI"; }
             };
@@ -2653,7 +2656,7 @@ public class Tile extends Control {
     public void setTextSize(final TextSize SIZE) {
         if (null == textSize) {
             _textSize = SIZE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!textSize.isBound()) {
                 textSize.set(SIZE);
@@ -2663,7 +2666,7 @@ public class Tile extends Control {
     public ObjectProperty<TextSize> textSizeProperty() {
         if (null == textSize) {
             textSize = new ObjectPropertyBase<TextSize>(_textSize) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT);}
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT);}
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "textSize"; }
             };
@@ -2683,7 +2686,7 @@ public class Tile extends Control {
     public void setRoundedCorners(final boolean ROUNDED) {
         if (null == roundedCorners) {
             _roundedCorners = ROUNDED;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!roundedCorners.isBound()) {
                 roundedCorners.set(ROUNDED);
@@ -2693,7 +2696,7 @@ public class Tile extends Control {
     public BooleanProperty roundedCornersProperty() {
         if (null == roundedCorners) {
             roundedCorners = new BooleanPropertyBase(_roundedCorners) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "roundedCorners"; }
             };
@@ -2720,7 +2723,7 @@ public class Tile extends Control {
         if (null == startFromZero) {
             _startFromZero = IS_TRUE;
             setValue(IS_TRUE && getMinValue() < 0 ? 0 : getMinValue());
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!startFromZero.isBound()) {
                 startFromZero.set(IS_TRUE);
@@ -2732,7 +2735,7 @@ public class Tile extends Control {
             startFromZero = new BooleanPropertyBase(_startFromZero) {
                 @Override protected void invalidated() {
                     Tile.this.setValue((get() && getMinValue() < 0) ? 0 : getMinValue());
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "startFromZero"; }
@@ -2760,7 +2763,7 @@ public class Tile extends Control {
     public void setReturnToZero(final boolean IS_TRUE) {
         if (null == returnToZero) {
             _returnToZero = Double.compare(getMinValue(), 0.0) <= 0 && IS_TRUE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!returnToZero.isBound()) {
                 returnToZero.set(IS_TRUE);
@@ -2772,7 +2775,7 @@ public class Tile extends Control {
             returnToZero = new BooleanPropertyBase(_returnToZero) {
                 @Override protected void invalidated() {
                     if (Helper.biggerThan(getMaxValue(), 0.0)) set(false);
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "returnToZero"; }
@@ -2857,7 +2860,7 @@ public class Tile extends Control {
     public void setMinMeasuredValueVisible(final boolean VISIBLE) {
         if (null == minMeasuredValueVisible) {
             _minMeasuredValueVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!minMeasuredValueVisible.isBound()) {
                 minMeasuredValueVisible.set(VISIBLE);
@@ -2867,7 +2870,7 @@ public class Tile extends Control {
     public BooleanProperty minMeasuredValueVisibleProperty() {
         if (null == minMeasuredValueVisible) {
             minMeasuredValueVisible = new BooleanPropertyBase(_minMeasuredValueVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "minMeasuredValueVisible"; }
             };
@@ -2889,7 +2892,7 @@ public class Tile extends Control {
     public void setMaxMeasuredValueVisible(final boolean VISIBLE) {
         if (null == maxMeasuredValueVisible) {
             _maxMeasuredValueVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!maxMeasuredValueVisible.isBound()) {
                 maxMeasuredValueVisible.set(VISIBLE);
@@ -2899,7 +2902,7 @@ public class Tile extends Control {
     public BooleanProperty maxMeasuredValueVisibleProperty() {
         if (null == maxMeasuredValueVisible) {
             maxMeasuredValueVisible = new BooleanPropertyBase(_maxMeasuredValueVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "maxMeasuredValueVisible"; }
             };
@@ -2921,7 +2924,7 @@ public class Tile extends Control {
     public void setOldValueVisible(final boolean VISIBLE) {
         if (null == oldValueVisible) {
             _oldValueVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!oldValueVisible.isBound()) {
                 oldValueVisible.set(VISIBLE);
@@ -2931,7 +2934,7 @@ public class Tile extends Control {
     public BooleanProperty oldValueVisibleProperty() {
         if (null == oldValueVisible) {
             oldValueVisible = new BooleanPropertyBase(_oldValueVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "oldValueVisible"; }
             };
@@ -2954,7 +2957,7 @@ public class Tile extends Control {
     public void setValueVisible(final boolean VISIBLE) {
         if (null == valueVisible) {
             _valueVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!valueVisible.isBound()) {
                 valueVisible.set(VISIBLE);
@@ -2964,7 +2967,7 @@ public class Tile extends Control {
     public BooleanProperty valueVisibleProperty() {
         if (null == valueVisible) {
             valueVisible = new BooleanPropertyBase(_valueVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "valueVisible"; }
             };
@@ -2987,7 +2990,7 @@ public class Tile extends Control {
     public void setForegroundColor(final Color COLOR) {
         if (null == foregroundColor) {
             _foregroundColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!foregroundColor.isBound()) {
                 foregroundColor.set(COLOR);
@@ -2997,7 +3000,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> foregroundColorProperty() {
         if (null == foregroundColor) {
             foregroundColor = new ObjectPropertyBase<>(_foregroundColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "foregroundColor"; }
             };
@@ -3021,7 +3024,7 @@ public class Tile extends Control {
     public void setBackgroundColor(final Color COLOR) {
         if (null == backgroundColor) {
             _backgroundColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!backgroundColor.isBound()) {
                 backgroundColor.set(COLOR);
@@ -3031,7 +3034,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> backgroundColorProperty() {
         if (null == backgroundColor) {
             backgroundColor = new ObjectPropertyBase<Color>(_backgroundColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "backgroundColor"; }
             };
@@ -3055,7 +3058,7 @@ public class Tile extends Control {
     public void setBorderColor(final Color PAINT) {
         if (null == borderColor) {
             _borderColor = PAINT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!borderColor.isBound()) {
                 borderColor.set(PAINT);
@@ -3065,7 +3068,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> borderColorProperty() {
         if (null == borderColor) {
             borderColor = new ObjectPropertyBase<Color>(_borderColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "borderColor"; }
             };
@@ -3090,7 +3093,7 @@ public class Tile extends Control {
     public void setBorderWidth(final double WIDTH) {
         if (null == borderWidth) {
             _borderWidth = clamp(0.0, 50.0, WIDTH);
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!borderWidth.isBound()) {
                 borderWidth.set(WIDTH);
@@ -3103,7 +3106,7 @@ public class Tile extends Control {
                 @Override protected void invalidated() {
                     final double WIDTH = get();
                     if (WIDTH < 0 || WIDTH > 50) set(clamp(0.0, 50.0, WIDTH));
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "borderWidth"; }
@@ -3128,7 +3131,7 @@ public class Tile extends Control {
     public void setKnobColor(final Color COLOR) {
         if (null == knobColor) {
             _knobColor = COLOR;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!knobColor.isBound()) {
                 knobColor.set(COLOR);
@@ -3138,7 +3141,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> knobColorProperty() {
         if (null == knobColor) {
             knobColor  = new ObjectPropertyBase<Color>(_knobColor) {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "knobColor"; }
             };
@@ -3151,7 +3154,7 @@ public class Tile extends Control {
     public void setActiveColor(final Color COLOR) {
         if (null == activeColor) {
             _activeColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!activeColor.isBound()) {
                 activeColor.set(COLOR);
@@ -3161,7 +3164,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> activeColorProperty() {
         if (null == activeColor) {
             activeColor = new ObjectPropertyBase<Color>(_activeColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "activeColor"; }
             };
@@ -3193,7 +3196,7 @@ public class Tile extends Control {
         if (null == animated) {
             _animated = ANIMATED;
             updateChartData();
-            fireTileEvent(ANIMATED ? ANIMATED_ON_EVENT : ANIMATED_OFF_EVENT);
+            fireTileEvt(ANIMATED ? ANIMATED_ON_EVENT : ANIMATED_OFF_EVENT);
         } else {
             if (!animated.isBound()) {
                 animated.set(ANIMATED);
@@ -3205,7 +3208,7 @@ public class Tile extends Control {
             animated = new BooleanPropertyBase(_animated) {
                 @Override protected void invalidated() {
                     updateChartData();
-                    fireTileEvent(get() ? ANIMATED_ON_EVENT : ANIMATED_OFF_EVENT);
+                    fireTileEvt(get() ? ANIMATED_ON_EVENT : ANIMATED_OFF_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "animated"; }
@@ -3275,7 +3278,7 @@ public class Tile extends Control {
     public void setStartAngle(final double ANGLE) {
         if (null == startAngle) {
             _startAngle = clamp(0.0, 360.0, ANGLE);
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!startAngle.isBound()) {
                 startAngle.set(ANGLE);
@@ -3288,7 +3291,7 @@ public class Tile extends Control {
                 @Override protected void invalidated() {
                     final double ANGLE = get();
                     if (ANGLE < 0 || ANGLE > 360 ) set(clamp(0.0, 360.0, ANGLE));
-                    fireTileEvent(RECALC_EVENT);
+                    fireTileEvt(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }
                 @Override public String getName() { return "startAngle"; }
@@ -3320,7 +3323,7 @@ public class Tile extends Control {
             _angleRange = tmpAngleRange;
             setAngleStep(tmpAngleRange / getRange());
             if (isAutoScale()) { calcAutoScale(); }
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!angleRange.isBound()) {
                 angleRange.set(tmpAngleRange);
@@ -3335,7 +3338,7 @@ public class Tile extends Control {
                     if (ANGLE_RANGE < 0 || ANGLE_RANGE > 360) set(clamp(0.0, 360.0, ANGLE_RANGE));
                     setAngleStep(get() / getRange());
                     if (isAutoScale()) { calcAutoScale(); }
-                    fireTileEvent(RECALC_EVENT);
+                    fireTileEvt(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }
                 @Override public String getName() { return "angleRange"; }
@@ -3402,7 +3405,7 @@ public class Tile extends Control {
                 setMinValue(Helper.equals(-Double.MAX_VALUE, originalMinValue) ? getMinValue() : originalMinValue);
                 setMaxValue(Helper.equals(Double.MAX_VALUE, originalMaxValue) ? getMaxValue() : originalMaxValue);
             }
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!autoScale.isBound()) {
                 autoScale.set(AUTO_SCALE);
@@ -3419,7 +3422,7 @@ public class Tile extends Control {
                         setMinValue(originalMinValue);
                         setMaxValue(originalMaxValue);
                     }
-                    fireTileEvent(RECALC_EVENT);
+                    fireTileEvt(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }
                 @Override public String getName() { return "autoScale"; }
@@ -3446,7 +3449,7 @@ public class Tile extends Control {
     public void setShadowsEnabled(final boolean ENABLED) {
         if (null == shadowsEnabled) {
             _shadowsEnabled = ENABLED;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!shadowsEnabled.isBound()) {
                 shadowsEnabled.set(ENABLED);
@@ -3456,7 +3459,7 @@ public class Tile extends Control {
     public BooleanProperty shadowsEnabledProperty() {
         if (null == shadowsEnabled) {
             shadowsEnabled = new BooleanPropertyBase(_shadowsEnabled) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "shadowsEnabled"; }
             };
@@ -3468,7 +3471,7 @@ public class Tile extends Control {
     public void setLocale(final Locale LOCALE) {
         if (null == locale) {
             _locale = null == LOCALE ? Locale.US : LOCALE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!locale.isBound()) {
                 locale.set(LOCALE);
@@ -3480,7 +3483,7 @@ public class Tile extends Control {
             locale  = new ObjectPropertyBase<Locale>(_locale) {
                 @Override protected void invalidated() {
                     if (null == get()) set(Locale.US);
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "locale"; }
@@ -3506,7 +3509,7 @@ public class Tile extends Control {
     public void setNumberFormat(final NumberFormat FORMAT) {
         if (null == numberFormat) {
             _numberFormat = null == FORMAT ? NumberFormat.getInstance(getLocale()) : FORMAT;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!numberFormat.isBound()) {
                 numberFormat.set(FORMAT);
@@ -3518,7 +3521,7 @@ public class Tile extends Control {
             numberFormat  = new ObjectPropertyBase<NumberFormat>(_numberFormat) {
                 @Override protected void invalidated() {
                     if (null == get()) set(NumberFormat.getInstance(getLocale()));
-                    fireTileEvent(RESIZE_EVENT);
+                    fireTileEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "numberFormat"; }
@@ -3546,7 +3549,7 @@ public class Tile extends Control {
     public void setDecimals(final int DECIMALS) {
         if (null == decimals) {
             _decimals = clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!decimals.isBound()) {
                 decimals.set(DECIMALS);
@@ -3559,13 +3562,41 @@ public class Tile extends Control {
                 @Override protected void invalidated() {
                     final int VALUE = get();
                     if (VALUE < 0 || VALUE > MAX_NO_OF_DECIMALS) set(clamp(0, MAX_NO_OF_DECIMALS, VALUE));
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "decimals"; }
             };
         }
         return decimals;
+    }
+
+    /**
+     * If true numbers will be shorten like 1000 -> 1k, 1000000 -> 1M etc.
+     * @return numbers will be shorten like 1000 -> 1k, 1000000 -> 1M etc.
+     */
+    public boolean getShortenNumbers() { return null == shortenNumbers ? _shortenNumbers : shortenNumbers.get(); }
+    /**
+     * If true numbers will be shorten like 1000 -> 1k, 1000000 -> 1M etc.
+     * @param SHORTEN
+     */
+    public void setShortenNumbers(final boolean SHORTEN) {
+        if (null == shortenNumbers) {
+            _shortenNumbers = SHORTEN;
+            fireTileEvt(RECALC_EVENT);
+        } else {
+            shortenNumbers.set(SHORTEN);
+        }
+    }
+    public BooleanProperty shortenNumbersProperty() {
+        if (null == shortenNumbers) {
+            shortenNumbers = new BooleanPropertyBase(_shortenNumbers) {
+                @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
+                @Override public Object getBean() { return Tile.this; }
+                @Override public String getName() { return "shortenNumbers"; }
+            };
+        }
+        return shortenNumbers;
     }
 
     /**
@@ -3586,7 +3617,7 @@ public class Tile extends Control {
     public void setTickLabelDecimals(final int DECIMALS) {
         if (null == tickLabelDecimals) {
             _tickLabelDecimals = clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!tickLabelDecimals.isBound()) {
                 tickLabelDecimals.set(DECIMALS);
@@ -3599,7 +3630,7 @@ public class Tile extends Control {
                 @Override protected void invalidated() {
                     final int VALUE = get();
                     if (VALUE < 0 || VALUE > MAX_NO_OF_DECIMALS) set(clamp(0, MAX_NO_OF_DECIMALS, VALUE));
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "tickLabelDecimals"; }
@@ -3612,7 +3643,7 @@ public class Tile extends Control {
     public void setTickLabelsXVisible(final boolean VISIBLE) {
         if (null == this.tickLabelsXVisible) {
             _tickLabelsXVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!tickLabelsXVisible.isBound()) {
                 tickLabelsXVisible.set(VISIBLE);
@@ -3622,7 +3653,7 @@ public class Tile extends Control {
     public BooleanProperty tickLabelsXVisibleProperty() {
         if (null == tickLabelsXVisible) {
             tickLabelsXVisible = new BooleanPropertyBase(_tickLabelsXVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }  
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }  
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "tickLabelsXVisible"; }
             };
@@ -3634,7 +3665,7 @@ public class Tile extends Control {
     public void setTickLabelsYVisible(final boolean VISIBLE) {
         if (null == this.tickLabelsYVisible) {
             _tickLabelsYVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!tickLabelsYVisible.isBound()) {
                 tickLabelsYVisible.set(VISIBLE);
@@ -3644,7 +3675,7 @@ public class Tile extends Control {
     public BooleanProperty tickLabelsYVisibleProperty() {
         if (null == tickLabelsYVisible) {
             tickLabelsYVisible = new BooleanPropertyBase(_tickLabelsYVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "tickLabelsYVisible"; }
             };
@@ -3656,7 +3687,7 @@ public class Tile extends Control {
     public void setMinValueVisible(final boolean VISIBLE) {
         if (null == this.minValueVisible) {
             _minValueVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!minValueVisible.isBound()) {
                 minValueVisible.set(VISIBLE);
@@ -3666,7 +3697,7 @@ public class Tile extends Control {
     public BooleanProperty minValueVisibleProperty() {
         if (null == minValueVisible) {
             minValueVisible = new BooleanPropertyBase(_minValueVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "minValueVisible"; }
             };
@@ -3678,7 +3709,7 @@ public class Tile extends Control {
     public void setMaxValueVisible(final boolean VISIBLE) {
         if (null == this.maxValueVisible) {
             _maxValueVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!maxValueVisible.isBound()) {
                 maxValueVisible.set(VISIBLE);
@@ -3688,7 +3719,7 @@ public class Tile extends Control {
     public BooleanProperty maxValueVisibleProperty() {
         if (null == maxValueVisible) {
             maxValueVisible = new BooleanPropertyBase(_maxValueVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "maxValueVisible"; }
             };
@@ -3712,7 +3743,7 @@ public class Tile extends Control {
     public void setNeedleColor(final Color COLOR) {
         if (null == needleColor) {
             _needleColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!needleColor.isBound()) {
                 needleColor.set(COLOR);
@@ -3722,7 +3753,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> needleColorProperty() {
         if (null == needleColor) {
             needleColor  = new ObjectPropertyBase<Color>(_needleColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "needleColor"; }
             };
@@ -3747,7 +3778,7 @@ public class Tile extends Control {
     public void setBarColor(final Color COLOR) {
         if (null == barColor) {
             _barColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!barColor.isBound()) {
                 barColor.set(COLOR);
@@ -3757,7 +3788,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> barColorProperty() {
         if (null == barColor) {
             barColor  = new ObjectPropertyBase<Color>(_barColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "barColor"; }
             };
@@ -3782,7 +3813,7 @@ public class Tile extends Control {
     public void setBarBackgroundColor(final Color COLOR) {
         if (null == barBackgroundColor) {
             _barBackgroundColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!barBackgroundColor.isBound()) {
                 barBackgroundColor.set(COLOR);
@@ -3792,7 +3823,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> barBackgroundColorProperty() {
         if (null == barBackgroundColor) {
             barBackgroundColor  = new ObjectPropertyBase<Color>(_barBackgroundColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "barBackgroundColor"; }
             };
@@ -3817,7 +3848,7 @@ public class Tile extends Control {
     public void setTitleColor(final Color COLOR) {
         if (null == titleColor) {
             _titleColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!titleColor.isBound()) {
                 titleColor.set(COLOR);
@@ -3827,7 +3858,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> titleColorProperty() {
         if (null == titleColor) {
             titleColor  = new ObjectPropertyBase<Color>(_titleColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "titleColor"; }
             };
@@ -3852,7 +3883,7 @@ public class Tile extends Control {
     public void setDescriptionColor(final Color COLOR) {
         if (null == descriptionColor) {
             _descriptionColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!descriptionColor.isBound()) {
                 descriptionColor.set(COLOR);
@@ -3862,7 +3893,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> descriptionColorProperty() {
         if (null == descriptionColor) {
             descriptionColor = new ObjectPropertyBase<Color>(_descriptionColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "descriptionColor"; }
             };
@@ -3887,7 +3918,7 @@ public class Tile extends Control {
     public void setUnitColor(final Color COLOR) {
         if (null == unitColor) {
             _unitColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!unitColor.isBound()) {
                 unitColor.set(COLOR);
@@ -3897,7 +3928,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> unitColorProperty() {
         if (null == unitColor) {
             unitColor  = new ObjectPropertyBase<Color>(_unitColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "unitColor"; }
             };
@@ -3922,7 +3953,7 @@ public class Tile extends Control {
     public void setValueColor(final Color COLOR) {
         if (null == valueColor) {
             _valueColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!valueColor.isBound()) {
                 valueColor.set(COLOR);
@@ -3932,7 +3963,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> valueColorProperty() {
         if (null == valueColor) {
             valueColor  = new ObjectPropertyBase<Color>(_valueColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "valueColor"; }
             };
@@ -3957,7 +3988,7 @@ public class Tile extends Control {
     public void setThresholdColor(final Color COLOR) {
         if (null == thresholdColor) {
             _thresholdColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!thresholdColor.isBound()) {
                 thresholdColor.set(COLOR);
@@ -3967,7 +3998,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> thresholdColorProperty() {
         if (null == thresholdColor) {
             thresholdColor  = new ObjectPropertyBase<Color>(_thresholdColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "thresholdColor"; }
             };
@@ -3980,7 +4011,7 @@ public class Tile extends Control {
     public void setLowerThresholdColor(final Color COLOR) {
         if (null == lowerThresholdColor) {
             _lowerThresholdColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!lowerThresholdColor.isBound()) {
                 lowerThresholdColor.set(COLOR);
@@ -3990,7 +4021,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> lowerThresholdColorProperty() {
         if (null == lowerThresholdColor) {
             lowerThresholdColor = new ObjectPropertyBase<Color>(_lowerThresholdColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "lowerThresholdColor"; }
             };
@@ -4100,7 +4131,7 @@ public class Tile extends Control {
     public void setInnerShadowEnabled(final boolean ENABLED) {
         if (null == innerShadowEnabled) {
             _innerShadowEnabled = ENABLED;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!innerShadowEnabled.isBound()) {
                 innerShadowEnabled.set(ENABLED);
@@ -4110,7 +4141,7 @@ public class Tile extends Control {
     public BooleanProperty innerShadowEnabledProperty() {
         if (null == innerShadowEnabled) {
             innerShadowEnabled = new BooleanPropertyBase(_innerShadowEnabled) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "innerShadowEnabled"; }
             };
@@ -4132,7 +4163,7 @@ public class Tile extends Control {
     public void setThresholdVisible(final boolean VISIBLE) {
         if (null == thresholdVisible) {
             _thresholdVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!thresholdVisible.isBound()) {
                 thresholdVisible.set(VISIBLE);
@@ -4142,7 +4173,7 @@ public class Tile extends Control {
     public BooleanProperty thresholdVisibleProperty() {
         if (null == thresholdVisible) {
             thresholdVisible = new BooleanPropertyBase(_thresholdVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "thresholdVisible"; }
             };
@@ -4164,7 +4195,7 @@ public class Tile extends Control {
     public void setLowerThresholdVisible(final boolean VISIBLE) {
         if (null == lowerThresholdVisible) {
             _lowerThresholdVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!lowerThresholdVisible.isBound()) {
                 lowerThresholdVisible.set(VISIBLE);
@@ -4174,7 +4205,7 @@ public class Tile extends Control {
     public BooleanProperty lowerThresholdVisibleProperty() {
         if (null == lowerThresholdVisible) {
             lowerThresholdVisible = new BooleanPropertyBase(_lowerThresholdVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "lowerThresholdVisible"; }
             };
@@ -4196,7 +4227,7 @@ public class Tile extends Control {
     public void setAverageVisible(final boolean VISIBLE) {
         if (null == averageVisible) {
             _averageVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!averageVisible.isBound()) {
                 averageVisible.set(VISIBLE);
@@ -4206,7 +4237,7 @@ public class Tile extends Control {
     public BooleanProperty averageVisibleProperty() {
         if (null == averageVisible) {
             averageVisible = new BooleanPropertyBase() {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "averageVisible"; }
             };
@@ -4228,7 +4259,7 @@ public class Tile extends Control {
     public void setSectionsVisible(final boolean VISIBLE) {
         if (null == sectionsVisible) {
             _sectionsVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!sectionsVisible.isBound()) {
                 sectionsVisible.set(VISIBLE);
@@ -4238,7 +4269,7 @@ public class Tile extends Control {
     public BooleanProperty sectionsVisibleProperty() {
         if (null == sectionsVisible) {
             sectionsVisible = new BooleanPropertyBase(_sectionsVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "sectionsVisible"; }
             };
@@ -4260,7 +4291,7 @@ public class Tile extends Control {
     public void setSectionsAlwaysVisible(final boolean VISIBLE) {
         if (null == sectionsAlwaysVisible) {
             _sectionsAlwaysVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!sectionsAlwaysVisible.isBound()) {
                 sectionsAlwaysVisible.set(VISIBLE);
@@ -4270,7 +4301,7 @@ public class Tile extends Control {
     public BooleanProperty sectionsAlwaysVisibleProperty() {
         if (null == sectionsAlwaysVisible) {
             sectionsAlwaysVisible = new BooleanPropertyBase(_sectionsAlwaysVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "sectionsAlwaysVisible"; }
             };
@@ -4294,7 +4325,7 @@ public class Tile extends Control {
     public void setSectionTextVisible(final boolean VISIBLE) {
         if (null == sectionTextVisible) {
             _sectionTextVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!sectionTextVisible.isBound()) {
                 sectionTextVisible.set(VISIBLE);
@@ -4304,7 +4335,7 @@ public class Tile extends Control {
     public BooleanProperty sectionTextVisibleProperty() {
         if (null == sectionTextVisible) {
             sectionTextVisible = new BooleanPropertyBase(_sectionTextVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "sectionTextVisible"; }
             };
@@ -4328,7 +4359,7 @@ public class Tile extends Control {
     public void setSectionIconsVisible(final boolean VISIBLE) {
         if (null == sectionIconsVisible) {
             _sectionIconsVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!sectionIconsVisible.isBound()) {
                 sectionIconsVisible.set(VISIBLE);
@@ -4338,7 +4369,7 @@ public class Tile extends Control {
     public BooleanProperty sectionIconsVisibleProperty() {
         if (null == sectionIconsVisible) {
             sectionIconsVisible = new BooleanPropertyBase(_sectionIconsVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "sectionIconsVisible"; }
             };
@@ -4362,8 +4393,8 @@ public class Tile extends Control {
     public void setHighlightSections(final boolean HIGHLIGHT) {
         if (null == highlightSections) {
             _highlightSections = HIGHLIGHT;
-            //fireTileEvent(REDRAW_EVENT);
-            fireTileEvent(HIGHLIGHT_SECTIONS);
+            //fireTileEvt(REDRAW_EVENT);
+            fireTileEvt(HIGHLIGHT_SECTIONS);
         } else {
             if (!highlightSections.isBound()) {
                 highlightSections.set(HIGHLIGHT);
@@ -4373,7 +4404,7 @@ public class Tile extends Control {
     public BooleanProperty highlightSectionsProperty() {
         if (null == highlightSections) {
             highlightSections = new BooleanPropertyBase(_highlightSections) {
-                @Override protected void invalidated() { fireTileEvent(HIGHLIGHT_SECTIONS); }
+                @Override protected void invalidated() { fireTileEvt(HIGHLIGHT_SECTIONS); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "highlightSections"; }
             };
@@ -4399,7 +4430,7 @@ public class Tile extends Control {
     public void setOrientation(final Orientation ORIENTATION) {
         if (null == orientation) {
             _orientation = ORIENTATION;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!orientation.isBound()) {
                 orientation.set(ORIENTATION);
@@ -4409,7 +4440,7 @@ public class Tile extends Control {
     public ObjectProperty<Orientation> orientationProperty() {
         if (null == orientation) {
             orientation  = new ObjectPropertyBase<Orientation>(_orientation) {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "orientation"; }
             };
@@ -4463,7 +4494,7 @@ public class Tile extends Control {
     public void setAlert(final boolean ALERT) {
         if (null == alert) {
             _alert = ALERT;
-            fireTileEvent(ALERT_EVENT);
+            fireTileEvt(ALERT_EVENT);
         } else {
             if (!alert.isBound()) {
                 alert.set(ALERT);
@@ -4473,7 +4504,7 @@ public class Tile extends Control {
     public BooleanProperty alertProperty() {
         if (null == alert) {
             alert = new BooleanPropertyBase(_alert) {
-                @Override protected void invalidated() { fireTileEvent(ALERT_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(ALERT_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "alert"; }
             };
@@ -4495,7 +4526,7 @@ public class Tile extends Control {
     public void setAlertMessage(final String MESSAGE) {
         if (null == alertMessage) {
             _alertMessage = MESSAGE;
-            fireTileEvent(ALERT_EVENT);
+            fireTileEvt(ALERT_EVENT);
         } else {
             if (!alertMessage.isBound()) {
                 alertMessage.set(MESSAGE);
@@ -4505,7 +4536,7 @@ public class Tile extends Control {
     public StringProperty alertMessageProperty() {
         if (null == alertMessage) {
             alertMessage = new StringPropertyBase(_alertMessage) {
-                @Override protected void invalidated() { fireTileEvent(ALERT_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(ALERT_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "alertMessage"; }
             };
@@ -4530,7 +4561,7 @@ public class Tile extends Control {
     public void setSmoothing(final boolean SMOOTHING) {
         if (null == smoothing) {
             _smoothing = SMOOTHING;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!smoothing.isBound()) {
                 smoothing.set(SMOOTHING);
@@ -4540,7 +4571,7 @@ public class Tile extends Control {
     public BooleanProperty smoothingProperty() {
         if (null == smoothing) {
             smoothing = new BooleanPropertyBase(_smoothing) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "smoothing"; }
             };
@@ -4573,18 +4604,18 @@ public class Tile extends Control {
             time = new ObjectPropertyBase<ZonedDateTime>(now) {
                 @Override protected void invalidated() {
                     zoneId = get().getZone();
-                    fireTileEvent(RECALC_EVENT);
+                    fireTileEvt(RECALC_EVENT);
                     if (!isRunning() && isAnimated()) {
                         long animationDuration = getAnimationDuration();
                         timeline.stop();
                         final KeyValue KEY_VALUE = new KeyValue(currentTime, now.toEpochSecond());
                         final KeyFrame KEY_FRAME = new KeyFrame(javafx.util.Duration.millis(animationDuration), KEY_VALUE);
                         timeline.getKeyFrames().setAll(KEY_FRAME);
-                        timeline.setOnFinished(e -> fireTileEvent(FINISHED_EVENT));
+                        timeline.setOnFinished(e -> fireTileEvt(FINISHED_EVENT));
                         timeline.play();
                     } else {
                         currentTime.set(now.toEpochSecond());
-                        fireTileEvent(FINISHED_EVENT);
+                        fireTileEvt(FINISHED_EVENT);
                     }
                 }
                 @Override public Object getBean() { return Tile.this; }
@@ -4634,7 +4665,7 @@ public class Tile extends Control {
     public void setText(final String TEXT) {
         if (null == text) {
             _text = TEXT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!text.isBound()) {
                 text.set(TEXT);
@@ -4644,7 +4675,7 @@ public class Tile extends Control {
     public StringProperty textProperty() {
         if (null == text) {
             text  = new StringPropertyBase(_text) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "text"; }
             };
@@ -4669,7 +4700,7 @@ public class Tile extends Control {
     public void setTextAlignment(final TextAlignment ALIGNMENT) {
         if (null == textAlignment) {
             _textAlignment = ALIGNMENT;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!textAlignment.isBound()) {
                 textAlignment.set(ALIGNMENT);
@@ -4679,7 +4710,7 @@ public class Tile extends Control {
     public ObjectProperty<TextAlignment> textAlignmentProperty() {
         if (null == textAlignment) {
             textAlignment = new ObjectPropertyBase<TextAlignment>(_textAlignment) {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "textAlignment"; }
             };
@@ -4709,7 +4740,7 @@ public class Tile extends Control {
     public void setTimeSections(final List<TimeSection> SECTIONS) {
         getTimeSections().setAll(SECTIONS);
         getTimeSections().sort(new TimeSectionComparator());
-        fireTileEvent(SECTION_EVENT);
+        fireTileEvt(SECTION_EVENT);
     }
     /**
      * Sets the sections to the given array of TimeSection objects. The
@@ -4729,7 +4760,7 @@ public class Tile extends Control {
         if (null == SECTION) return;
         getTimeSections().add(SECTION);
         getTimeSections().sort(new TimeSectionComparator());
-        fireTileEvent(SECTION_EVENT);
+        fireTileEvt(SECTION_EVENT);
     }
     /**
      * Removes the given TimeSection from the list of sections.
@@ -4741,14 +4772,14 @@ public class Tile extends Control {
         if (null == SECTION) return;
         getTimeSections().remove(SECTION);
         getTimeSections().sort(new TimeSectionComparator());
-        fireTileEvent(SECTION_EVENT);
+        fireTileEvt(SECTION_EVENT);
     }
     /**
      * Clears the list of sections.
      */
     public void clearTimeSections() {
         getTimeSections().clear();
-        fireTileEvent(SECTION_EVENT);
+        fireTileEvt(SECTION_EVENT);
     }
     
     /**
@@ -4872,7 +4903,7 @@ public class Tile extends Control {
     public void setSecondsVisible(boolean VISIBLE) {
         if (null == secondsVisible) {
             _secondsVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!secondsVisible.isBound()) {
                 secondsVisible.set(VISIBLE);
@@ -4882,7 +4913,7 @@ public class Tile extends Control {
     public BooleanProperty secondsVisibleProperty() {
         if (null == secondsVisible) {
             secondsVisible = new BooleanPropertyBase(_secondsVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "secondsVisible"; }
             };
@@ -4902,7 +4933,7 @@ public class Tile extends Control {
     public void setTextVisible(final boolean VISIBLE) {
         if (null == textVisible) {
             _textVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!textVisible.isBound()) {
                 textVisible.set(VISIBLE);
@@ -4912,7 +4943,7 @@ public class Tile extends Control {
     public BooleanProperty textVisibleProperty() {
         if (null == textVisible) {
             textVisible = new BooleanPropertyBase(_textVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "textVisible"; }
             };
@@ -4932,7 +4963,7 @@ public class Tile extends Control {
     public void setDateVisible(final boolean VISIBLE) {
         if (null == dateVisible) {
             _dateVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!dateVisible.isBound()){
                 dateVisible.set(VISIBLE);
@@ -4943,7 +4974,7 @@ public class Tile extends Control {
     public BooleanProperty dateVisibleProperty() {
         if (null == dateVisible) {
             dateVisible = new BooleanPropertyBase(_dateVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "dateVisible"; }
             };
@@ -4965,7 +4996,7 @@ public class Tile extends Control {
     public void setPercentageVisible(final boolean VISIBLE) {
         if (null == percentageVisible) {
             _percentageVisible = VISIBLE;
-            fireTileEvent((VISIBILITY_EVENT));
+            fireTileEvt((VISIBILITY_EVENT));
         } else {
             percentageVisible.set(VISIBLE);
         }
@@ -4973,7 +5004,7 @@ public class Tile extends Control {
     public BooleanProperty percentageVisibleProperty() {
         if (null == percentageVisible) {
             percentageVisible = new BooleanPropertyBase(_percentageVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this;}
                 @Override public String getName() { return "percentageVisible"; }
             };
@@ -5026,7 +5057,7 @@ public class Tile extends Control {
     public void setTextColor(final Color COLOR) {
         if (null == textColor) {
             _textColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!textColor.isBound()) {
                 textColor.set(COLOR);
@@ -5036,7 +5067,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> textColorProperty() {
         if (null == textColor) {
             textColor  = new ObjectPropertyBase<Color>(_textColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "textColor"; }
             };
@@ -5057,7 +5088,7 @@ public class Tile extends Control {
     public void setDateColor(final Color COLOR) {
         if (null == dateColor) {
             _dateColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!dateColor.isBound()) {
                 dateColor.set(COLOR);
@@ -5067,7 +5098,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> dateColorProperty() {
         if (null == dateColor) {
             dateColor  = new ObjectPropertyBase<Color>(_dateColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "dateColor"; }
             };
@@ -5088,7 +5119,7 @@ public class Tile extends Control {
     public void setHourTickMarkColor(final Color COLOR) {
         if (null == hourTickMarkColor) {
             _hourTickMarkColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!hourTickMarkColor.isBound()) {
                 hourTickMarkColor.set(COLOR);
@@ -5098,7 +5129,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> hourTickMarkColorProperty() {
         if (null == hourTickMarkColor) {
             hourTickMarkColor  = new ObjectPropertyBase<Color>(_hourTickMarkColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "hourTickMarkColor"; }
             };
@@ -5119,7 +5150,7 @@ public class Tile extends Control {
     public void setMinuteTickMarkColor(final Color COLOR) {
         if (null == minuteTickMarkColor) {
             _minuteTickMarkColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!minuteTickMarkColor.isBound()) {
                 minuteTickMarkColor.set(COLOR);
@@ -5129,7 +5160,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> minuteTickMarkColorProperty() {
         if (null == minuteTickMarkColor) {
             minuteTickMarkColor  = new ObjectPropertyBase<Color>(_minuteTickMarkColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "minuteTickMarkColor"; }
             };
@@ -5150,7 +5181,7 @@ public class Tile extends Control {
     public void setAlarmColor(final Color COLOR) {
         if (null == alarmColor) {
             _alarmColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!alarmColor.isBound()) {
                 alarmColor.set(COLOR);
@@ -5160,7 +5191,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> alarmColorProperty() {
         if (null == alarmColor) {
             alarmColor  = new ObjectPropertyBase<Color>(_alarmColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "alarmColor"; }
             };
@@ -5177,7 +5208,7 @@ public class Tile extends Control {
     public void setTickLabelColor(final Color COLOR) {
         if (null == tickLabelColor) {
             _tickLabelColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!tickLabelColor.isBound()) {
                 tickLabelColor.set(COLOR);
@@ -5187,7 +5218,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> tickLabelColorProperty() {
         if (null == tickLabelColor) {
             tickLabelColor = new ObjectPropertyBase<Color>(_tickLabelColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "tickLabelColor"; }
             };
@@ -5204,7 +5235,7 @@ public class Tile extends Control {
     public void setTickMarkColor(final Color COLOR) {
         if (null == tickMarkColor) {
             _tickMarkColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!tickMarkColor.isBound()) {
                 tickMarkColor.set(COLOR);
@@ -5214,7 +5245,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> tickMarkColorProperty() {
         if (null == tickMarkColor) {
             tickMarkColor = new ObjectPropertyBase<Color>(_tickMarkColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "tickMarkColor"; }
             };
@@ -5235,7 +5266,7 @@ public class Tile extends Control {
     public void setHourTickMarksVisible(final boolean VISIBLE) {
         if (null == hourTickMarksVisible) {
             _hourTickMarksVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!hourTickMarksVisible.isBound()) {
                 hourTickMarksVisible.set(VISIBLE);
@@ -5245,7 +5276,7 @@ public class Tile extends Control {
     public BooleanProperty hourTickMarksVisibleProperty() {
         if (null == hourTickMarksVisible) {
             hourTickMarksVisible = new BooleanPropertyBase(_hourTickMarksVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "hourTickMarksVisible"; }
             };
@@ -5265,7 +5296,7 @@ public class Tile extends Control {
     public void setMinuteTickMarksVisible(final boolean VISIBLE) {
         if (null == minuteTickMarksVisible) {
             _minuteTickMarksVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!minuteTickMarksVisible.isBound()) {
                 minuteTickMarksVisible.set(VISIBLE);
@@ -5275,7 +5306,7 @@ public class Tile extends Control {
     public BooleanProperty minuteTickMarksVisibleProperty() {
         if (null == minuteTickMarksVisible) {
             minuteTickMarksVisible = new BooleanPropertyBase(_minuteTickMarksVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "minuteTickMarksVisible"; }
             };
@@ -5295,7 +5326,7 @@ public class Tile extends Control {
     public void setHourColor(final Color COLOR) {
         if (null == hourColor) {
             _hourColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!hourColor.isBound()) {
                 hourColor.set(COLOR);
@@ -5305,7 +5336,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> hourColorProperty() {
         if (null == hourColor) {
             hourColor  = new ObjectPropertyBase<Color>(_hourColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "hourColor"; }
             };
@@ -5326,7 +5357,7 @@ public class Tile extends Control {
     public void setMinuteColor(final Color COLOR) {
         if (null == minuteColor) {
             _minuteColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!minuteColor.isBound()) {
                 minuteColor.set(COLOR);
@@ -5336,7 +5367,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> minuteColorProperty() {
         if (null == minuteColor) {
             minuteColor  = new ObjectPropertyBase<Color>(_minuteColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "minuteColor"; }
             };
@@ -5357,7 +5388,7 @@ public class Tile extends Control {
     public void setSecondColor(final Color COLOR) {
         if (null == secondColor) {
             _secondColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!secondColor.isBound()) {
                 secondColor.set(COLOR);
@@ -5367,7 +5398,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> secondColorProperty() {
         if (null == secondColor) {
             secondColor  = new ObjectPropertyBase<Color>(_secondColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "secondColor"; }
             };
@@ -5390,7 +5421,7 @@ public class Tile extends Control {
     public void setAlarmsEnabled(final boolean CHECK) {
         if (null == alarmsEnabled) {
             _alarmsEnabled = CHECK;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!alarmsEnabled.isBound()) {
                 alarmsEnabled.set(CHECK);
@@ -5400,7 +5431,7 @@ public class Tile extends Control {
     public BooleanProperty alarmsEnabledProperty() {
         if (null == alarmsEnabled) {
             alarmsEnabled = new BooleanPropertyBase(_alarmsEnabled) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "alarmsEnabled"; }
             };
@@ -5420,7 +5451,7 @@ public class Tile extends Control {
     public void setAlarmsVisible(final boolean VISIBLE) {
         if (null == alarmsVisible) {
             _alarmsVisible = VISIBLE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!alarmsVisible.isBound()) {
                 alarmsVisible.set(VISIBLE);
@@ -5430,7 +5461,7 @@ public class Tile extends Control {
     public BooleanProperty alarmsVisibleProperty() {
         if (null == alarmsVisible) {
             alarmsVisible = new BooleanPropertyBase(_alarmsVisible) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "alarmsVisible"; }
             };
@@ -5518,7 +5549,7 @@ public class Tile extends Control {
     public void setXAxis(final Axis AXIS) {
         if (null == xAxis) {
             _xAxis = AXIS;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!xAxis.isBound()) {
                 xAxis.set(AXIS);
@@ -5528,7 +5559,7 @@ public class Tile extends Control {
     public ObjectProperty<Axis> xAxisProperty() {
         if (null == xAxis) {
             xAxis = new ObjectPropertyBase<Axis>(_xAxis) {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() {
                     return "xAxis";
@@ -5543,7 +5574,7 @@ public class Tile extends Control {
     public void setYAxis(final Axis AXIS) {
         if (null == yAxis) {
             _yAxis = AXIS;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!yAxis.isBound()) {
                 yAxis.set(AXIS);
@@ -5553,7 +5584,7 @@ public class Tile extends Control {
     public ObjectProperty<Axis> yAxisProperty() {
         if (null == yAxis) {
             yAxis = new ObjectPropertyBase<Axis>(_yAxis) {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "yAxis"; }
             };
@@ -5577,7 +5608,7 @@ public class Tile extends Control {
     public void setRadarChartMode(final RadarChartMode MODE) {
         if (null == radarChartMode) {
             _radarChartMode = MODE;
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!radarChartMode.isBound()) {
                 radarChartMode.set(MODE);
@@ -5587,7 +5618,7 @@ public class Tile extends Control {
     public ObjectProperty<RadarChartMode> radarChartModeProperty() {
         if (null == radarChartMode) {
             radarChartMode = new ObjectPropertyBase<RadarChartMode>(_radarChartMode) {
-                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "radarChartMode"; }
             };
@@ -5610,7 +5641,7 @@ public class Tile extends Control {
     public void setChartGridColor(final Color COLOR) {
         if (null == chartGridColor) {
             _chartGridColor = COLOR;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!chartGridColor.isBound()) {
                 chartGridColor.set(COLOR);
@@ -5620,7 +5651,7 @@ public class Tile extends Control {
     public ObjectProperty<Color> chartGridColorProperty() {
         if (null == chartGridColor) {
             chartGridColor = new ObjectPropertyBase<Color>(_chartGridColor) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "chartGridColor"; }
             };
@@ -5646,7 +5677,7 @@ public class Tile extends Control {
     public void setCountry(final Country COUNTRY) {
         if (null == country) {
             _country = COUNTRY;
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!country.isBound()) {
                 country.set(COUNTRY);
@@ -5655,8 +5686,8 @@ public class Tile extends Control {
     }
     public ObjectProperty<Country> countryProperty() {
         if (null == country) {
-            country = new ObjectPropertyBase<Country>(_country) {
-                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+            country = new ObjectPropertyBase<>(_country) {
+                @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "country"; }
             };
@@ -5665,24 +5696,24 @@ public class Tile extends Control {
         return country;
     }
 
-    public CountryGroup getCountryGroup() {
-        if (null == _countryGroup && null == countryGroup) { _countryGroup = Helper.EU; }
+    public BusinessRegion getCountryGroup() {
+        if (null == _countryGroup && null == countryGroup) { _countryGroup = BusinessRegion.EUROPE; }
         return null == countryGroup ? _countryGroup : countryGroup.get();
     }
-    public void setCountryGroup(final CountryGroup GROUP) {
+    public void setCountryGroup(final BusinessRegion GROUP) {
         if (null == countryGroup) {
             _countryGroup = GROUP;
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!countryGroup.isBound()) {
                 countryGroup.set(GROUP);
             }
         }
     }
-    public ObjectProperty<CountryGroup> countryGroupProperty() {
+    public ObjectProperty<BusinessRegion> countryGroupProperty() {
         if (null == countryGroup) {
-            countryGroup = new ObjectPropertyBase<CountryGroup>(_countryGroup) {
-                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+            countryGroup = new ObjectPropertyBase<>(_countryGroup) {
+                @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "countryGroup"; }
             };
@@ -5695,7 +5726,7 @@ public class Tile extends Control {
     public void setDataPointsVisible(final boolean VISIBLE) {
         if (null == dataPointsVisible) {
             _dataPointsVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!dataPointsVisible.isBound()) {
                 dataPointsVisible.set(VISIBLE);
@@ -5705,7 +5736,7 @@ public class Tile extends Control {
     public BooleanProperty dataPointsVisibleProperty() {
         if (null == dataPointsVisible) {
             dataPointsVisible = new BooleanPropertyBase(_dataPointsVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "dataPointsVisible"; }
             };
@@ -5717,7 +5748,7 @@ public class Tile extends Control {
     public void setSnapToTicks(final boolean SNAP) {
         if (null == snapToTicks) {
             _snapToTicks = SNAP;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!snapToTicks.isBound()) {
                 snapToTicks.set(SNAP);
@@ -5727,7 +5758,7 @@ public class Tile extends Control {
     public BooleanProperty snapToTicksProperty() {
         if (null == snapToTicks) {
             snapToTicks = new BooleanPropertyBase(_snapToTicks) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "snapToTicks"; }
             };
@@ -5755,38 +5786,38 @@ public class Tile extends Control {
     }
     public void setMatrixSize(final int COLUMNS, final int ROWS) {
         _matrixSize = new int[] { Helper.clamp(2, 1000, COLUMNS), Helper.clamp(2, 1000, ROWS) };
-        fireTileEvent(RECALC_EVENT);
+        fireTileEvt(RECALC_EVENT);
     }
 
     public List<MatrixIcon> getMatrixIcons() { return matrixIcons; }
     public void setMatrixIcons(final MatrixIcon... MATRIX_ICONS) { setMatrixIcons(Arrays.asList(MATRIX_ICONS)); }
     public void setMatrixIcons(final List<MatrixIcon> MATRIX_ICONS) {
         matrixIcons.setAll(MATRIX_ICONS);
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
     public void addMatrixIcon(final MatrixIcon MATRIX_ICON) {
         if (matrixIcons.contains(MATRIX_ICON)) { return; }
         matrixIcons.add(MATRIX_ICON);
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
     public void removeMatrixIcon(final MatrixIcon MATRIX_ICON) {
         if (matrixIcons.contains(MATRIX_ICON)) {
             matrixIcons.remove(MATRIX_ICON);
         }
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public ChartType getChartType() { return _chartType; }
     public void setChartType(final ChartType TYPE) {
         _chartType = TYPE;
-        fireTileEvent(SERIES_EVENT);
+        fireTileEvt(SERIES_EVENT);
     }
 
     public double getTooltipTimeout() { return null == tooltipTimeout ? _tooltipTimeout : tooltipTimeout.get(); }
     public void setTooltipTimeout(final double TIMEOUT) {
         if (null == tooltipTimeout) {
             _tooltipTimeout = Helper.clamp(0, 10000, TIMEOUT);
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!tooltipTimeout.isBound()) {
                 tooltipTimeout.set(TIMEOUT);
@@ -5798,7 +5829,7 @@ public class Tile extends Control {
             tooltipTimeout = new DoublePropertyBase(_tooltipTimeout) {
                 @Override protected void invalidated() {
                     set(Helper.clamp(0, 10000, get()));
-                    fireTileEvent(REDRAW_EVENT);
+                    fireTileEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() {
@@ -5826,7 +5857,7 @@ public class Tile extends Control {
     public void setCustomFontEnabled(final boolean ENABLED) {
         if (null == customFontEnabled) {
             _customFontEnabled = ENABLED;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!customFontEnabled.isBound()) {
                 customFontEnabled.set(ENABLED);
@@ -5836,7 +5867,7 @@ public class Tile extends Control {
     public BooleanProperty customFontEnabledProperty() {
         if (null == customFontEnabled) {
             customFontEnabled = new BooleanPropertyBase(_customFontEnabled) {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "customFontEnabled"; }
             };
@@ -5860,7 +5891,7 @@ public class Tile extends Control {
     public void setCustomFont(final Font FONT) {
         if (null == customFont) {
             _customFont = FONT;
-            fireTileEvent(RESIZE_EVENT);
+            fireTileEvt(RESIZE_EVENT);
         } else {
             if (!customFont.isBound()) {
                 customFont.set(FONT);
@@ -5870,7 +5901,7 @@ public class Tile extends Control {
     public ObjectProperty<Font> customFontProperty() {
         if (null == customFont) {
             customFont = new ObjectPropertyBase<Font>() {
-                @Override protected void invalidated() { fireTileEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "customFont"; }
             };
@@ -5883,7 +5914,7 @@ public class Tile extends Control {
     public void setCustomDecimalFormatEnabled(final boolean ENABLED) {
         if (null == customDecimalFormatEnabled) {
             _customDecimalFormatEnabled = ENABLED;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!customDecimalFormatEnabled.isBound()) {
                 customDecimalFormatEnabled.set(ENABLED);
@@ -5893,7 +5924,7 @@ public class Tile extends Control {
     public BooleanProperty customDecimalFormatEnabledProperty() {
         if (null == customDecimalFormatEnabled) {
             customDecimalFormatEnabled = new BooleanPropertyBase(_customDecimalFormatEnabled) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "customDecimalFormatEnabled"; }
             };
@@ -5905,7 +5936,7 @@ public class Tile extends Control {
     public void setCustomDecimalFormat(final DecimalFormat DECIMAL_FORMAT) {
         if (null == customDecimalFormat) {
             _customDecimalFormat = DECIMAL_FORMAT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!customDecimalFormat.isBound()) {
                 customDecimalFormat.set(DECIMAL_FORMAT);
@@ -5915,7 +5946,7 @@ public class Tile extends Control {
     public ObjectProperty<DecimalFormat> customDecimalFormatProperty() {
         if (null == customDecimalFormat) {
             customDecimalFormat = new ObjectPropertyBase(_customDecimalFormat) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "customDecimalFormat"; }
             };
@@ -5925,11 +5956,19 @@ public class Tile extends Control {
     }
 
     /**
-     * Returns a list of path elements that define the countries
-     * @return a list of path elements that define the countries
+     * Returns a list of lores path elements that define the countries
+     * @return a list of lores path elements that define the countries
      */
-    public Map<String, List<CountryPath>> getCountryPaths() {
+    public Map<String, List<CountryPath>> getLoresCountryPaths() {
         return Helper.getLoresCountryPaths();
+    }
+
+    /**
+     * Returns a list of highres path elements that define the countries
+     * @return a list of highres path elements that define the countries
+     */
+    public Map<String, List<CountryPath>> getHighresCountryPaths() {
+        return Helper.getHiresCountryPaths();
     }
 
     /**
@@ -5946,7 +5985,7 @@ public class Tile extends Control {
     public void setStrokeWithGradient(final boolean STROKE_WITH_GRADIENT) {
         if (null == strokeWithGradient) {
             _strokeWithGradient = STROKE_WITH_GRADIENT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!strokeWithGradient.isBound()) {
                 strokeWithGradient.set(STROKE_WITH_GRADIENT);
@@ -5956,7 +5995,7 @@ public class Tile extends Control {
     public BooleanProperty strokeWithGradientProperty() {
         if (null == strokeWithGradient) {
             strokeWithGradient = new BooleanPropertyBase(_strokeWithGradient) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "strokeWithGradient"; }
             };
@@ -5978,7 +6017,7 @@ public class Tile extends Control {
     public void setFillWithGradient(final boolean FILL_WITH_GRADIENT) {
         if (null == fillWithGradient) {
             _fillWithGradient = FILL_WITH_GRADIENT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!fillWithGradient.isBound()) {
                 fillWithGradient.set(FILL_WITH_GRADIENT);
@@ -5988,7 +6027,7 @@ public class Tile extends Control {
     public BooleanProperty fillWithGradientProperty() {
         if (null == fillWithGradient) {
             fillWithGradient = new BooleanPropertyBase(_fillWithGradient) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "fillWithGradient"; }
             };
@@ -6009,19 +6048,19 @@ public class Tile extends Control {
     public Color getNotifyRegionBackgroundColor() { return _notifyRegionBackgroundColor; }
     public void setNotifyRegionBackgroundColor(final Color COLOR) {
         _notifyRegionBackgroundColor = COLOR;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public Color getNotifyRegionForegroundColor() { return _notifyRegionForegroundColor; }
     public void setNotifyRegionForegroundColor(final Color COLOR) {
         _notifyRegionForegroundColor = COLOR;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
     
     public String getNotifyRegionTooltipText() { return _notifyRegionTooltipText; }
     public void setNotifyRegionTooltipText(final String TEXT) {
         _notifyRegionTooltipText = TEXT;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     /**
@@ -6037,19 +6076,19 @@ public class Tile extends Control {
     public Color getInfoRegionBackgroundColor() { return _infoRegionBackgroundColor; }
     public void setInfoRegionBackgroundColor(final Color COLOR) {
         _infoRegionBackgroundColor = COLOR;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public Color getInfoRegionForegroundColor() { return _infoRegionForegroundColor; }
     public void setInfoRegionForegroundColor(final Color COLOR) {
         _infoRegionForegroundColor = COLOR;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public String getInfoRegionTooltipText() { return _infoRegionTooltipText; }
     public void setInfoRegionTooltipText(final String TEXT) {
         _infoRegionTooltipText = TEXT;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     /**
@@ -6065,45 +6104,45 @@ public class Tile extends Control {
     public Color getLowerRightRegionBackgroundColor() { return _lowerRightRegionBackgroundColor; }
     public void setLowerRightRegionBackgroundColor(final Color COLOR) {
         _lowerRightRegionBackgroundColor = COLOR;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public Color getLowerRightRegionForegroundColor() { return _lowerRightRegionForegroundColor; }
     public void setLowerRightRegionForegroundColor(final Color COLOR) {
         _lowerRightRegionForegroundColor = COLOR;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public String getLowerRightRegionTooltipText() { return _lowerRightRegionTooltipText; }
     public void setLowerRightRegionTooltipText(final String TEXT) {
         _lowerRightRegionTooltipText = TEXT;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
     
     public Image getBackgroundImage() { return _backgroundImage; }
     public void setBackgroundImage(final Image IMAGE) {
         _backgroundImage = IMAGE;
-        fireTileEvent(BKG_IMAGE_EVENT);
+        fireTileEvt(BKG_IMAGE_EVENT);
     }
 
     public double getBackgroundImageOpacity() { return _backgroundImageOpacity; }
     public void setBackgroundImageOpacity(final double OPACITY) {
         _backgroundImageOpacity = Helper.clamp(0, 1, OPACITY);
         if (null == _backgroundImage) return;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public boolean getBackgroundImageKeepAspect() { return _backgroundImageKeepAspect; }
     public void setBackgroundImageKeepAspect(final boolean KEEP_ASPECT) {
         _backgroundImageKeepAspect = KEEP_ASPECT;
-        fireTileEvent(REDRAW_EVENT);
+        fireTileEvt(REDRAW_EVENT);
     }
 
     public String getLeftText() { return null == leftText ? _leftText : leftText.get(); }
     public void setLeftText(final String TEXT) {
         if (null == leftText) {
             _leftText = TEXT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!leftText.isBound()) {
                 leftText.set(TEXT);
@@ -6113,7 +6152,7 @@ public class Tile extends Control {
     public StringProperty leftTextProperty() {
         if (null == leftText) {
             leftText = new StringPropertyBase(_leftText) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "leftText"; }
             };
@@ -6126,7 +6165,7 @@ public class Tile extends Control {
     public void setMiddleText(final String TEXT) {
         if (null == middleText) {
             _middleText = TEXT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!middleText.isBound()) {
                 middleText.set(TEXT);
@@ -6136,7 +6175,7 @@ public class Tile extends Control {
     public StringProperty middleTextProperty() {
         if (null == middleText) {
             middleText = new StringPropertyBase(_middleText) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "middleText"; }
             };
@@ -6149,7 +6188,7 @@ public class Tile extends Control {
     public void setRightText(final String TEXT) {
         if (null == rightText) {
             _rightText = TEXT;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!rightText.isBound()) {
                 rightText.set(TEXT);
@@ -6159,7 +6198,7 @@ public class Tile extends Control {
     public StringProperty rightTextProperty() {
         if (null == rightText) {
             rightText = new StringPropertyBase(_rightText) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "rightText"; }
             };
@@ -6172,7 +6211,7 @@ public class Tile extends Control {
     public void setLeftValue(final double VALUE) {
         if (null == leftValue) {
             _leftValue = VALUE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!leftValue.isBound()) {
                 leftValue.set(VALUE);
@@ -6182,7 +6221,7 @@ public class Tile extends Control {
     public DoubleProperty leftValueProperty() {
         if (null == leftValue) {
             leftValue = new DoublePropertyBase(_leftValue) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "leftValue"; }
             };
@@ -6194,7 +6233,7 @@ public class Tile extends Control {
     public void setMiddleValue(final double VALUE) {
         if (null == middleValue) {
             _middleValue = VALUE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!middleValue.isBound()) {
                 middleValue.set(VALUE);
@@ -6204,7 +6243,7 @@ public class Tile extends Control {
     public DoubleProperty middleValueProperty() {
         if (null == middleValue) {
             middleValue = new DoublePropertyBase(_middleValue) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "middleValue"; }
             };
@@ -6216,7 +6255,7 @@ public class Tile extends Control {
     public void setRightValue(final double VALUE) {
         if (null == rightValue) {
             _rightValue = VALUE;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!rightValue.isBound()) {
                 rightValue.set(VALUE);
@@ -6226,7 +6265,7 @@ public class Tile extends Control {
     public DoubleProperty rightValueProperty() {
         if (null == rightValue) {
             rightValue = new DoublePropertyBase(_rightValue) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "rightValue"; }
             };
@@ -6238,7 +6277,7 @@ public class Tile extends Control {
     public void setLeftGraphics(final Node NODE) {
         if (null == leftGraphics) {
             _leftGraphics = NODE;
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!leftGraphics.isBound()) {
                 leftGraphics.set(NODE);
@@ -6248,7 +6287,7 @@ public class Tile extends Control {
     public ObjectProperty<Node> leftGraphicsProperty() {
         if (null == leftGraphics) {
             leftGraphics = new ObjectPropertyBase<Node>(_leftGraphics) {
-                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "leftGraphics"; }
             };
@@ -6261,7 +6300,7 @@ public class Tile extends Control {
     public void setMiddleGraphics(final Node NODE) {
         if (null == middleGraphics) {
             _middleGraphics = NODE;
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!middleGraphics.isBound()) {
                 middleGraphics.set(NODE);
@@ -6271,7 +6310,7 @@ public class Tile extends Control {
     public ObjectProperty<Node> middleGraphicsProperty() {
         if (null == middleGraphics) {
             middleGraphics = new ObjectPropertyBase<Node>(_middleGraphics) {
-                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "middleGraphics"; }
             };
@@ -6284,7 +6323,7 @@ public class Tile extends Control {
     public void setRightGraphics(final Node NODE) {
         if (null == rightGraphics) {
             _rightGraphics = NODE;
-            fireTileEvent(RECALC_EVENT);
+            fireTileEvt(RECALC_EVENT);
         } else {
             if (!rightGraphics.isBound()) {
                 rightGraphics.set(NODE);
@@ -6294,7 +6333,7 @@ public class Tile extends Control {
     public ObjectProperty<Node> rightGraphicsProperty() {
         if (null == rightGraphics) {
             rightGraphics = new ObjectPropertyBase<Node>(_rightGraphics) {
-                @Override protected void invalidated() { fireTileEvent(RECALC_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "rightGraphics"; }
             };
@@ -6315,7 +6354,7 @@ public class Tile extends Control {
     public void setTrendVisible(final boolean VISIBLE) {
         if (null == trendVisible) {
             _trendVisible = VISIBLE;
-            fireTileEvent(VISIBILITY_EVENT);
+            fireTileEvt(VISIBILITY_EVENT);
         } else {
             if (!trendVisible.isBound()) {
                 trendVisible.set(VISIBLE);
@@ -6325,7 +6364,7 @@ public class Tile extends Control {
     public BooleanProperty trendVisibleProperty() {
         if (null == trendVisible) {
             trendVisible = new BooleanPropertyBase(_trendVisible) {
-                @Override protected void invalidated() { fireTileEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "trendVisible"; }
             };
@@ -6341,7 +6380,7 @@ public class Tile extends Control {
     public void setTimeoutMs(final long TIMEOUT_MS) {
         if (null == timeoutMs) {
             _timeoutMs = TIMEOUT_MS;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!timeoutMs.isBound()) {
                 timeoutMs.set(TIMEOUT_MS);
@@ -6362,7 +6401,7 @@ public class Tile extends Control {
     public void setRank(final Rank RANK) {
         if (null == rank) {
             _rank = RANK;
-            fireTileEvent(REDRAW_EVENT);
+            fireTileEvt(REDRAW_EVENT);
         } else {
             if (!rank.isBound()) {
                 rank.set(RANK);
@@ -6372,7 +6411,7 @@ public class Tile extends Control {
     public ObjectProperty<Rank> rankProperty() {
         if (null == rank) {
             rank = new ObjectPropertyBase<Rank>(_rank) {
-                @Override protected void invalidated() { fireTileEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireTileEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Tile.this; }
                 @Override public String getName() { return "ranking"; }
             };
@@ -6421,23 +6460,23 @@ public class Tile extends Control {
         return numberOfValuesForTrendCalculation;
     }
 
-    public void showNotifyRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_NOTIFY_REGION_EVENT : HIDE_NOTIFY_REGION_EVENT); }
+    public void showNotifyRegion(final boolean SHOW) { fireTileEvt(SHOW ? SHOW_NOTIFY_REGION_EVENT : HIDE_NOTIFY_REGION_EVENT); }
 
-    public void showInfoRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_INFO_REGION_EVENT : HIDE_INFO_REGION_EVENT); }
+    public void showInfoRegion(final boolean SHOW) { fireTileEvt(SHOW ? SHOW_INFO_REGION_EVENT : HIDE_INFO_REGION_EVENT); }
 
-    public void showLowerRightRegion(final boolean SHOW) { fireTileEvent(SHOW ? SHOW_LOWER_RIGHT_REGION_EVENT : HIDE_LOWER_RIGHT_REGION_EVENT); }
+    public void showLowerRightRegion(final boolean SHOW) { fireTileEvt(SHOW ? SHOW_LOWER_RIGHT_REGION_EVENT : HIDE_LOWER_RIGHT_REGION_EVENT); }
 
     public EventHandler<MouseEvent> getInfoRegionHandler() { return infoRegionHandler; }
     public void setInfoRegionEventHandler(final EventHandler<MouseEvent> HANDLER) {
         infoRegionHandler = HANDLER;
-        fireTileEvent(INFO_REGION_HANDLER_EVENT);
+        fireTileEvt(INFO_REGION_HANDLER_EVENT);
     }
 
     public boolean isShowing() { return null != showing && showing.get(); }
     public BooleanBinding showingProperty() { return showing; }
 
     public void clearData() {
-        fireTileEvent(CLEAR_DATA_EVENT);
+        fireTileEvt(CLEAR_DATA_EVENT);
     }
 
     private Properties readProperties(final String FILE_NAME) {
@@ -6466,7 +6505,7 @@ public class Tile extends Control {
                 case ONCE:
                     if (TIME.isAfter(ALARM_TIME)) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(alarm));
+                            fireAlarmEvt(new AlarmEvt(this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                         alarmsToRemove.add(alarm);
@@ -6477,7 +6516,7 @@ public class Tile extends Control {
                          ALARM_TIME.plusMinutes(30).getMinute() == TIME.getMinute()) &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(alarm));
+                            fireAlarmEvt(new AlarmEvt(this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -6486,7 +6525,7 @@ public class Tile extends Control {
                     if (ALARM_TIME.getMinute() == TIME.getMinute() &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(alarm));
+                            fireAlarmEvt(new AlarmEvt(this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -6496,7 +6535,7 @@ public class Tile extends Control {
                         ALARM_TIME.getMinute() == TIME.getMinute() &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(alarm));
+                            fireAlarmEvt(new AlarmEvt(this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -6507,7 +6546,7 @@ public class Tile extends Control {
                         ALARM_TIME.getMinute()    == TIME.getMinute() &&
                         ALARM_TIME.getSecond()    == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(alarm));
+                            fireAlarmEvt(new AlarmEvt(this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -6526,11 +6565,11 @@ public class Tile extends Control {
             for (TimeSection timeSection : timeSections) { timeSection.checkForTimeAndDate(now); }
         }
 
-        if (timeEventListeners.isEmpty()) return;
+        if (timeObservers.isEmpty()) return;
         // Fire TimeEvents
-        if (oldTime.getSecond() != now.getSecond()) fireTimeEvent(new TimeEvent(Tile.this, now, TimeEventType.SECOND));
-        if (oldTime.getMinute() != now.getMinute()) fireTimeEvent(new TimeEvent(Tile.this, now, TimeEventType.MINUTE));
-        if (oldTime.getHour() != now.getHour()) fireTimeEvent(new TimeEvent(Tile.this, now, TimeEventType.HOUR));
+        if (oldTime.getSecond() != now.getSecond()) fireTimeEvt(new TimeEvt(Tile.this, TimeEvt.SECOND, now));
+        if (oldTime.getMinute() != now.getMinute()) fireTimeEvt(new TimeEvt(Tile.this, TimeEvt.MINUTE, now));
+        if (oldTime.getHour() != now.getHour()) fireTimeEvt(new TimeEvt(Tile.this, TimeEvt.HOUR, now));
     }); }
 
 
@@ -6575,38 +6614,47 @@ public class Tile extends Control {
 
     
     // ******************** Event handling ************************************
-    public void setOnTileEvent(final TileEventListener LISTENER) { addTileEventListener(LISTENER); }
-    public void addTileEventListener(final TileEventListener LISTENER) { if (!tileEventListeners.contains(LISTENER)) tileEventListeners.add(LISTENER); }
-    public void removeTileEventListener(final TileEventListener LISTENER) { if (tileEventListeners.contains(LISTENER)) tileEventListeners.remove(LISTENER); }
-    public void removeAllTileEventListeners() { tileEventListeners.clear(); }
-
-    public void fireTileEvent(final TileEvent EVENT) {
-        if (null != showing && showing.get()) {
-            for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(EVENT); }
-        } else {
-            tileEventQueue.add(EVENT);
+    public void addTileObserver(final EvtType type, final EvtObserver<TileEvt> observer) {
+        if (!observers.containsKey(type)) { observers.put(type, new CopyOnWriteArrayList<>()); }
+        if (observers.get(type).contains(observer)) { return; }
+        observers.get(type).add(observer);
+    }
+    public void removeTileObserver(final EvtType type, final EvtObserver<TileEvt> observer) {
+        if (observers.containsKey(type)) {
+            if (observers.get(type).contains(observer)) {
+                observers.get(type).remove(observer);
+            }
         }
     }
+    public void removeAllObservers() { observers.clear(); }
 
+    public void fireTileEvt(final TileEvt evt) {
+        final EvtType type = evt.getEvtType();
+        if (null != showing && showing.get()) {
+            observers.entrySet().stream().filter(entry -> entry.getKey().equals(TileEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
+            if (observers.containsKey(type) && !type.equals(TileEvt.ANY)) {
+                observers.get(type).forEach(observer -> observer.handle(evt));
+            }
+        } else {
+            tileEventQueue.add(evt);
+        }
+    }
     
-    public void setOnAlarm(final AlarmEventListener LISTENER) { addAlarmEventListener(LISTENER); }
-    public void addAlarmEventListener(final AlarmEventListener LISTENER) { if (!alarmEventListeners.contains(LISTENER)) alarmEventListeners.add(LISTENER); }
-    public void removeAlarmEventListener(final AlarmEventListener LISTENER) { if (alarmEventListeners.contains(LISTENER)) alarmEventListeners.remove(LISTENER); }
-    public void removeAllAlarmEventListeners() { alarmEventListeners.clear(); }
+    
+    public void setOnAlarmEvt(final EvtObserver<AlarmEvt> OBSERVER) { addAlarmEvtObserver(OBSERVER); }
+    public void addAlarmEvtObserver(final EvtObserver<AlarmEvt> OBSERVER) { if (!alarmObservers.contains(OBSERVER)) alarmObservers.add(OBSERVER); }
+    public void removeAlarmEvtObserver(final EvtObserver<AlarmEvt> OBSERVER) { if (alarmObservers.contains(OBSERVER)) alarmObservers.remove(OBSERVER); }
+    public void removeAllAlarmEvtObservers() { alarmObservers.clear(); }
 
-    public void fireAlarmEvent(final AlarmEvent EVENT) {
-        for (AlarmEventListener listener : alarmEventListeners) { listener.onAlarmEvent(EVENT); }
-    }
+    public void fireAlarmEvt(final AlarmEvt EVT) { alarmObservers.forEach(observer -> observer.handle(EVT)); }
 
 
-    public void setOnTimeEvent(final TimeEventListener LISTENER) { addTimeEventListener(LISTENER); }
-    public void addTimeEventListener(final TimeEventListener LISTENER) { if (!timeEventListeners.contains(LISTENER)) timeEventListeners.add(LISTENER); }
-    public void removeTimeEventListener(final TimeEventListener LISTENER) { if (timeEventListeners.contains(LISTENER)) timeEventListeners.remove(LISTENER); }
-    public void removeAllTimeEventListeners() { timeEventListeners.clear(); }
+    public void setOnTimeEvt(final EvtObserver<TimeEvt> OBSERVER) { addTimeEvtObserver(OBSERVER); }
+    public void addTimeEvtObserver(final EvtObserver<TimeEvt> OBSERVER) { if (!timeObservers.contains(OBSERVER)) timeObservers.add(OBSERVER); }
+    public void removeTimeEvtObserver(final EvtObserver<TimeEvt> OBSERVER) { if (timeObservers.contains(OBSERVER)) timeObservers.remove(OBSERVER); }
+    public void removeAllTimeEvtObservers() { timeObservers.clear(); }
 
-    public void fireTimeEvent(final TimeEvent EVENT) {
-        for (TimeEventListener listener : timeEventListeners) { listener.onTimeEvent(EVENT); }
-    }
+    public void fireTimeEvt(final TimeEvt EVT) { timeObservers.forEach(observer -> observer.handle(EVT)); }
 
 
     public void setOnSwitchPressed(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.SWITCH_PRESSED, HANDLER); }
@@ -6615,15 +6663,15 @@ public class Tile extends Control {
     public void setOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { addEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
     public void removeOnSwitchReleased(final EventHandler<SwitchEvent> HANDLER) { removeEventHandler(SwitchEvent.SWITCH_RELEASED, HANDLER); }
 
-    public void setOnContentSizeChanged(final BoundsEventListener LISTENER) {
+    public void setOnContentSizeChanged(final EvtObserver<BoundsEvt> OBSERVER) {
         if (null == getSkin()) {
-            if (!boundsListeners.contains(LISTENER)) { boundsListeners.add(LISTENER); }
+            if (!boundsObservers.contains(OBSERVER)) { boundsObservers.add(OBSERVER); }
         } else {
-            ((TileSkin) (getSkin())).setOnContentBoundsChanged(LISTENER);
+            ((TileSkin) (getSkin())).setOnContentBoundsChanged(OBSERVER);
         }
     }
-    public void removeOnContentSizeChanged(final BoundsEventListener LISTENER) {
-        if (boundsListeners.contains(LISTENER)) { boundsListeners.remove(LISTENER); }
+    public void removeOnContentSizeChanged(final EvtObserver<BoundsEvt> OBSERVER) {
+        if (boundsObservers.contains(OBSERVER)) { boundsObservers.remove(OBSERVER); }
     }
 
     private void setupBinding() {
@@ -6636,18 +6684,24 @@ public class Tile extends Control {
         }, sceneProperty(), getScene().windowProperty(), getScene().getWindow().showingProperty());
         
         showing.addListener(o -> {
-        if (showing.get()) {
-            while(tileEventQueue.peek() != null) {
-                TileEvent event = tileEventQueue.poll();
-                    for (TileEventListener listener : tileEventListeners) { listener.onTileEvent(event); }
+            if (showing.get()) {
+                while(tileEventQueue.peek() != null) {
+                    final TileEvt evt  = tileEventQueue.poll();
+                    final EvtType type = evt.getEvtType();
+                    observers.entrySet().stream().filter(entry -> entry.getKey().equals(TileEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
+                    if (observers.containsKey(type)) {
+                        observers.get(type).forEach(observer -> observer.handle(evt));
+                    }
                 }
+                boundsObservers.forEach(listener -> ((TileSkin) (getSkin())).setOnContentBoundsChanged(listener));
+                if (null != getSkin()) {
+                    Bounds bounds = ((TileSkin) (getSkin())).getContentBounds();
+                    bounds.fireBoundsEvt(new BoundsEvt(bounds, BoundsEvt.BOUNDS, bounds));
+                }
+
+                fireTileEvt(REGIONS_ON_TOP_EVENT);
+                fireTileEvt(RESIZE_EVENT);
             }
-
-            boundsListeners.forEach(listener -> ((TileSkin) (getSkin())).setOnContentBoundsChanged(listener));
-            ((TileSkin) (getSkin())).getContentBounds().fireBoundsEvent();
-
-            fireTileEvent(REGIONS_ON_TOP_EVENT);
-            fireTileEvent(RESIZE_EVENT);
         });
     }
 
@@ -6707,7 +6761,8 @@ public class Tile extends Control {
             case FIRE_SMOKE          : return new FireSmokeTileSkin(Tile.this);
             case TURNOVER            : return new TurnoverTileSkin(Tile.this);
             case RADIAL_DISTRIBUTION : return new RadialDistributionTileSkin(Tile.this);
-            case SPINNER: return new SpinnerTileSkin(Tile.this);
+            case SPINNER             : return new SpinnerTileSkin(Tile.this);
+            case CENTER_TEXT         : return new CenterTextTileSkin(Tile.this);
             default                  : return new TileSkin(Tile.this);
         }
     }
@@ -6919,6 +6974,9 @@ public class Tile extends Control {
                 break;
             case SPINNER:
                 break;
+            case CENTER_TEXT:
+                setDescriptionAlignment(Pos.CENTER);
+                break;
             default:
                 break;
         }
@@ -6979,10 +7037,11 @@ public class Tile extends Control {
             case FIRE_SMOKE         : setSkin(new FireSmokeTileSkin(Tile.this)); break;
             case TURNOVER           : setSkin(new TurnoverTileSkin(Tile.this)); break;
             case RADIAL_DISTRIBUTION: setSkin(new RadialDistributionTileSkin(Tile.this)); break;
-            case SPINNER: setSkin(new SpinnerTileSkin(Tile.this)); break;
+            case SPINNER            : setSkin(new SpinnerTileSkin(Tile.this)); break;
+            case CENTER_TEXT        : setSkin(new CenterTextTileSkin(Tile.this)); break;
             default                 : setSkin(new TileSkin(Tile.this)); break;
         }
-        fireTileEvent(RESIZE_EVENT);
+        fireTileEvt(RESIZE_EVENT);
         presetTileParameters(SKIN_TYPE);
     }
 }

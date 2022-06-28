@@ -15,21 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package eu.hansolo.tilesfx.events;
 
-import eu.hansolo.tilesfx.tools.CtxBounds;
+import eu.hansolo.tilesfx.Alarm;
+import eu.hansolo.toolbox.evt.EvtPriority;
+import eu.hansolo.toolbox.evt.EvtType;
+import eu.hansolo.toolbox.evt.type.ChangeEvt;
 
 
-public class BoundsEvent {
-    private final CtxBounds BOUNDS;
+public class AlarmEvt extends TileEvt {
+    public static final EvtType<AlarmEvt> ANY   = new EvtType<>(ChangeEvt.ANY, "ANY");
+    public static final EvtType<AlarmEvt> ALARM = new EvtType<>(AlarmEvt.ANY, "ALARM");
+
+    private final Alarm alarm;
 
 
     // ******************** Constructors **************************************
-    public BoundsEvent(final CtxBounds BOUNDS) {
-        this.BOUNDS = BOUNDS;
+    public AlarmEvt(final Object src, final EvtType<? extends AlarmEvt> evtType, final Alarm alarm) {
+        super(src, evtType);
+        this.alarm = alarm;
+    }
+    public AlarmEvt(final Object src, final EvtType<? extends AlarmEvt> evtType, final EvtPriority priority, final Alarm alarm) {
+        super(src, evtType, priority);
+        this.alarm = alarm;
     }
 
 
     // ******************** Methods *******************************************
-    public CtxBounds getBounds() { return BOUNDS; }
+    public Alarm getAlarm() { return alarm; }
 }

@@ -17,11 +17,15 @@
  */
 package eu.hansolo.tilesfx;
 
+import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.addons.ImageSpinner;
 import eu.hansolo.tilesfx.addons.SpinnerBuilder;
 import eu.hansolo.tilesfx.addons.SpinnerType;
 import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.colors.Bright;
+import eu.hansolo.tilesfx.colors.Dark;
+import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.skins.BarChartItem;
 import eu.hansolo.tilesfx.tools.Helper;
 import javafx.animation.AnimationTimer;
@@ -37,13 +41,18 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -59,31 +68,53 @@ public class Test extends Application {
     private static final double          WIDTH     = 400;
     private static final double          HEIGHT    = 400;
     private static       int             noOfNodes = 0;
-    private              Tile            tile;
+    private              Tile            tile1;
+    private              Tile            tile2;
     private              long            lastTimerCall;
     private AnimationTimer               timer;
+    private ChartData                    cpuChartData;
+    private ChartData                    memChartData;
 
 
 
     @Override public void init() {
-        tile = TileBuilder.create()
-                          .skinType(SkinType.CYCLE_STEP)
-                          .prefSize(WIDTH, HEIGHT)
-                          .title("CycleStep Tile")
-                          .textVisible(false)
-                          //.chartData(chartData1, chartData2, chartData3, chartData4, chartData5)
-                          .animated(true)
-                          .decimals(1)
-                          .autoItemTextColor(true)
-                          .build();
+        cpuChartData = new ChartData("CPU", 0.0, Tile.GREEN);
+        cpuChartData.setTextColor(Color.WHITE);
+        cpuChartData.setFormatString("%.0f%%");
+
+        memChartData = new ChartData("MEM", 0.0, Tile.GREEN);
+        memChartData.setTextColor(Color.WHITE);
+        memChartData.setFormatString("%.0f%%");
+
+        tile1 = TileBuilder.create()
+                           .skinType(SkinType.CLUSTER_MONITOR)
+                           .prefSize(WIDTH, HEIGHT)
+                           .title("Production")
+                           .text("blabla")
+                           .maxValue(20000)
+                           .locale(Locale.GERMAN)
+                           .chartData(cpuChartData, memChartData)
+                           .animated(true)
+                           .shortenNumbers(true)
+                           .build();
+
+        tile2 = TileBuilder.create()
+                           .skinType(SkinType.CENTER_TEXT)
+                           .title("Server")
+                           .text("Last check")
+                           .backgroundColor(Dark.GREEN)
+                           .description("ONLINE")
+                           .build();
 
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(final long now) {
-                if (now > lastTimerCall + 5_000_000_000l) {
-                    double v = RND.nextDouble() * tile.getRange() + tile.getMinValue();
-                    tile.setValue(v);
+                if (now > lastTimerCall + 1_000_000_000l) {
+                    //double v = RND.nextDouble() * tile1.getRange() + tile1.getMinValue();
+                    //tile.setValue(v);
+                    cpuChartData.setValue(RND.nextDouble() * 10000);
+                    memChartData.setValue(RND.nextDouble() * 10000);
                     lastTimerCall = now;
                 }
             }
@@ -91,7 +122,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(tile);
+        StackPane pane = new StackPane(new HBox(10, tile1, tile2));
         pane.setPadding(new Insets(10));
 
         Scene scene = new Scene(pane);
@@ -100,26 +131,12 @@ public class Test extends Application {
         stage.setScene(scene);
         stage.show();
 
-
-        ChartData chartData1 = new ChartData("Item 1", 24.0, Tile.GREEN);
-        ChartData chartData2 = new ChartData("Item 2", 10.0, Tile.BLUE);
-        ChartData chartData3 = new ChartData("Item 3", 12.0, Tile.RED);
-        ChartData chartData4 = new ChartData("Item 4", 13.0, Tile.YELLOW_ORANGE);
-        List<ChartData> items1 = List.of(chartData1, chartData2, chartData3, chartData4);
-
-        ChartData chartData5 = new ChartData("Item 5", 13.0, Tile.BLUE);
-        ChartData chartData6 = new ChartData("Item 6", 13.0, Tile.BLUE);
-        ChartData chartData7 = new ChartData("Item 7", 13.0, Tile.BLUE);
-        ChartData chartData8 = new ChartData("Item 8", 13.0, Tile.BLUE);
-        List<ChartData> items2 = List.of(chartData5, chartData6, chartData7, chartData8);
-
-        tile.getChartData().setAll(items1);
-        tile.getChartData().addAll(items2);
-
         // Calculate number of nodes
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
+        tile2.setDescription("OFFLINE");
+        tile2.setBackgroundColor(Dark.RED);
         timer.start();
     }
 

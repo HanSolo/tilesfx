@@ -20,7 +20,7 @@ package eu.hansolo.tilesfx.skins;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.events.ChartDataEvent.EventType;
 import eu.hansolo.tilesfx.events.ChartDataEventListener;
-import eu.hansolo.tilesfx.events.TileEvent;
+import eu.hansolo.tilesfx.events.TileEvt;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.tilesfx.tools.PrettyListView;
@@ -79,7 +79,7 @@ public class LeaderBoardTileSkin extends TileSkin {
                         addedItem.setFormatString(formatString);
                         addedItem.addChartDataEventListener(updateHandler);
                         addedItem.setItemSortingTopic(tile.getItemSortingTopic());
-                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, addedItem.getChartData()));
+                        EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, addedItem.getChartData()));
                         handlerMap.put(addedItem, clickHandler);
                         addedItem.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
                         leaderBoardPane.getItems().add(addedItem);
@@ -98,7 +98,10 @@ public class LeaderBoardTileSkin extends TileSkin {
 
         registerItemListeners();
 
-        tile.getLeaderBoardItems().forEach(item -> item.setItemSortingTopic(tile.getItemSortingTopic()));
+        tile.getLeaderBoardItems().forEach(item -> {
+            item.setItemSortingTopic(tile.getItemSortingTopic());
+            item.setShortenNumbers(tile.getShortenNumbers());
+        });
 
         leaderBoardPane = new PrettyListView();
         leaderBoardPane.getItems().addAll(tile.getLeaderBoardItems());
@@ -127,11 +130,14 @@ public class LeaderBoardTileSkin extends TileSkin {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
 
-        if (TileEvent.EventType.VISIBILITY.name().equals(EVENT_TYPE)) {
+        if (TileEvt.VISIBILITY.getName().equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !tile.getTitle().isEmpty());
             Helper.enableNode(text, tile.isTextVisible());
-        } else if (TileEvent.EventType.DATA.name().equals(EVENT_TYPE)) {
+        } else if (TileEvt.DATA.getName().equals(EVENT_TYPE)) {
             registerItemListeners();
+        } else if (TileEvt.RECALC.getName().equals(EVENT_TYPE)) {
+            tile.getLeaderBoardItems().forEach(item -> item.setShortenNumbers(tile.getShortenNumbers()));
+            redraw();
         }
     }
 
@@ -139,7 +145,7 @@ public class LeaderBoardTileSkin extends TileSkin {
         tile.getLeaderBoardItems().forEach(item -> {
             item.setFormatString(formatString);
             item.addChartDataEventListener(updateHandler);
-            EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvent(new TileEvent(TileEvent.EventType.SELECTED_CHART_DATA, item.getChartData()));
+            EventHandler<MouseEvent> clickHandler = e -> tile.fireTileEvt(new TileEvt(tile, TileEvt.SELECTED_CHART_DATA, item.getChartData()));
             handlerMap.put(item, clickHandler);
             item.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
         });

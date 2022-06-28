@@ -56,12 +56,12 @@ repositories {
 }
 
 dependencies {
-    implementation "org.openjfx:javafx-base:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-graphics:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-controls:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-swing:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-web:17.0.0.1:$platform"
-    implementation "org.openjfx:javafx-media:17.0.0.1:$platform"
+    implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-web:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
 }
 
 jar {

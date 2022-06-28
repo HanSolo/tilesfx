@@ -48,6 +48,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -56,6 +57,7 @@ import javafx.scene.Parent;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -221,6 +223,34 @@ public class Demo extends Application {
         series3.getData().add(new XYChart.Data("SA", 3));
         series3.getData().add(new XYChart.Data("SU", 5));
 
+
+        // Chart Series with values above data points in line chart
+        XYChart.Data<String, Number> data1 = new XYChart.Data<>("MO", 8);
+        data1.setNode(Helper.createDataNode(data1.YValueProperty(), "%d", 5, Tile.FOREGROUND));
+
+        XYChart.Data<String, Number> data2 = new XYChart.Data<>("TU", 5);
+        data2.setNode(Helper.createDataNode(data2.YValueProperty(), "%d", 5, Tile.FOREGROUND));
+
+        XYChart.Data<String, Number> data3 = new XYChart.Data<>("WE", 0);
+        data3.setNode(Helper.createDataNode(data3.YValueProperty(), "%d", 5, Tile.FOREGROUND));
+
+        XYChart.Data<String, Number> data4 = new XYChart.Data<>("TH", 2);
+        data4.setNode(Helper.createDataNode(data4.YValueProperty(), "%d", 5, Tile.FOREGROUND));
+
+        XYChart.Data<String, Number> data5 = new XYChart.Data<>("FR", 4);
+        data5.setNode(Helper.createDataNode(data5.YValueProperty(), "%d", 5, Tile.FOREGROUND));
+
+        XYChart.Data<String, Number> data6 = new XYChart.Data<>("SA", 3);
+        data6.setNode(Helper.createDataNode(data6.YValueProperty(), "%d", 5, Tile.FOREGROUND));
+
+        XYChart.Data<String, Number> data7 = new XYChart.Data<>("SU", 5);
+        data7.setNode(Helper.createDataNode(data7.YValueProperty(), "%d", 5, Tile.FOREGROUND));
+
+        XYChart.Series<String, Number> series3Ext = new XYChart.Series();
+        series3Ext.setName("Outside");
+        series3Ext.getData().addAll(data1, data2, data3, data4, data5, data6, data7);
+
+
         // WorldMap Data
         for (int i = 0; i < Country.values().length ; i++) {
             double value = RND.nextInt(10);
@@ -344,7 +374,8 @@ public class Demo extends Application {
                                    .title("SmoothedChart Tile")
                                    //.animated(true)
                                    .smoothing(false)
-                                   .series(series2, series3)
+                                   .series(series2, series3Ext)
+                                   .dataPointsVisible(true)
                                    .build();
 
         highLowTile = TileBuilder.create()
@@ -1186,6 +1217,7 @@ public class Demo extends Application {
                     series1.getData().forEach(data -> data.setYValue(RND.nextInt(100)));
                     series2.getData().forEach(data -> data.setYValue(RND.nextInt(30)));
                     series3.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
+                    series3Ext.getData().forEach(data -> data.setYValue(RND.nextInt(10)));
 
                     chartData1.setValue(RND.nextDouble() * 50);
                     chartData2.setValue(RND.nextDouble() * 50);

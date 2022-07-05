@@ -23,12 +23,15 @@ import eu.hansolo.toolboxfx.geom.Bounds;
 import eu.hansolo.toolboxfx.geom.CatmullRom;
 import eu.hansolo.toolboxfx.geom.CornerRadii;
 import eu.hansolo.toolboxfx.geom.Point;
+import javafx.beans.binding.ObjectExpression;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.LineTo;
@@ -1129,5 +1132,24 @@ public class Helper {
         formatter.setMinimumFractionDigits(1);
         formatter.setMaximumFractionDigits(1);
         return hasDecimal ? formatter.format(truncated / 10d) + suffix : (truncated / 10) + suffix;
+    }
+
+
+// Create value label for line charts
+    public static final Node createDataNode(final ObjectExpression<Number> VALUE, final double RADIUS) {
+        return createDataNode(VALUE, "%,.2f", RADIUS, Color.WHITE);
+    }
+    public static final Node createDataNode(final ObjectExpression<Number> VALUE, final String FORMAT_STRING, final double RADIUS, final Color TEXT_COLOR) {
+        var label = new Label();
+        label.setTextFill(TEXT_COLOR);
+        label.textProperty().bind(VALUE.asString(FORMAT_STRING));
+
+        var pane = new Pane(label);
+        pane.setShape(new Circle(RADIUS));
+        pane.setScaleShape(false);
+
+        label.translateYProperty().bind(label.heightProperty().divide(-1.5));
+
+        return pane;
     }
 }

@@ -99,7 +99,8 @@ public class Test extends Application {
                            .textVisible(false)
                            .chartData(chartData1, chartData2, chartData3, chartData4, chartData5)
                            .animated(true)
-                           .decimals(1)
+                           .decimals(0)
+                           .autoItemTextColor(false)
                            .build();
 
 
@@ -109,14 +110,14 @@ public class Test extends Application {
                 if (now > lastTimerCall + 3_000_000_000l) {
                     //double v = RND.nextDouble() * tile1.getRange() + tile1.getMinValue();
                     //tile.setValue(v);
-                    chartData1.setValue(RND.nextDouble() * 100_000);
-                    chartData2.setValue(RND.nextDouble() * 100_000);
-                    chartData3.setValue(RND.nextDouble() * 100_000);
-                    chartData4.setValue(RND.nextDouble() * 100_000);
-                    chartData5.setValue(RND.nextDouble() * 100_000);
-                    chartData6.setValue(RND.nextDouble() * 100_000);
-                    chartData7.setValue(RND.nextDouble() * 100_000);
-                    chartData8.setValue(RND.nextDouble() * 100_000);
+                    chartData1.setValue(RND.nextDouble() * 100);
+                    chartData2.setValue(RND.nextDouble() * 100);
+                    chartData3.setValue(RND.nextDouble() * 100);
+                    chartData4.setValue(RND.nextDouble() * 100);
+                    chartData5.setValue(RND.nextDouble() * 100);
+                    chartData6.setValue(RND.nextDouble() * 100);
+                    chartData7.setValue(RND.nextDouble() * 100);
+                    chartData8.setValue(RND.nextDouble() * 100);
                     lastTimerCall = now;
                 }
             }

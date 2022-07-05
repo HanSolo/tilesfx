@@ -273,22 +273,22 @@ public class CycleStepTileSkin extends TileSkin {
             Color      barBackgroundColor = Helper.getColorWithOpacity(tile.getForegroundColor(), 0.1);
             Color      barColor           = chartData.getFillColor();
             boolean    autoItemTextColor  = tile.getAutoItemTextColor();
-            Color      textColor          = tile.getForegroundColor();
-            Font       valueFont          = Fonts.latoRegular(height * 0.3);
+            Color      textFill           = tile.getForegroundColor();
+            double     valueFontSize      = height * 0.3;
+            Font       valueFont          = Fonts.latoRegular(valueFontSize);
             FontMetrix fontMetrix         = new FontMetrix(valueFont);
             String     valueText          = String.format(tile.getLocale(), formatString, value);
             if (autoItemTextColor) {
                 if (fontMetrix.computeStringWidth(valueText) > barWidth) {
-                    textColor = Helper.isDark(tile.getBackgroundColor()) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
+                    textFill = Helper.isDark(tile.getBackgroundColor()) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
                 } else {
-                    textColor = Helper.isDark(barColor) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
+                    textFill = Helper.isDark(barColor) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
                 }
             }
 
             double barLeftX      = barStartX + factorX * maxBarWidth;
             double barRightX     = barStartX + factorX * maxBarWidth + barWidth;
             double bar25Percent  = barStartX + (maxBarWidth * 0.25);
-            double bar50Percent  = barStartX + (maxBarWidth * 0.5);
             double bar75Percent  = barStartX + (maxBarWidth * 0.75);
             double bar100Percent = barStartX + maxBarWidth;
 
@@ -302,21 +302,23 @@ public class CycleStepTileSkin extends TileSkin {
             ctx.fillRect(barStartX, barStartY, maxBarWidth, barHeight);
             ctx.setFill(barColor);
             ctx.fillRect(barLeftX, barStartY, barWidth, barHeight);
-            ctx.setFill(textColor);
+            ctx.setFill(textFill);
             ctx.setFont(valueFont);
 
-            if (barLeftX < bar25Percent) {
-                ctx.setTextAlign(TextAlignment.LEFT);
-                maxTextWidth = bar100Percent - barLeftX;
-                ctx.fillText(valueText, barLeftX, height * 0.5, maxTextWidth);
-            } else if (barRightX > bar75Percent) {
-                ctx.setTextAlign(TextAlignment.RIGHT);
-                maxTextWidth = barRightX - barStartX;
-                ctx.fillText(valueText, barRightX, height * 0.5, maxTextWidth);
-            } else if (barLeftX >= bar25Percent || barRightX <= bar75Percent) {
-                ctx.setTextAlign(TextAlignment.CENTER);
-                maxTextWidth = bar100Percent - barLeftX + barRightX - barStartX;
-                ctx.fillText(valueText, barLeftX + (barWidth * 0.5), height * 0.5, maxTextWidth);
+            if (valueFontSize >= 6) {
+                if (barLeftX < bar25Percent) {
+                    ctx.setTextAlign(TextAlignment.LEFT);
+                    maxTextWidth = bar100Percent - barLeftX;
+                    ctx.fillText(valueText, barLeftX, height * 0.5, maxTextWidth);
+                } else if (barRightX > bar75Percent) {
+                    ctx.setTextAlign(TextAlignment.RIGHT);
+                    maxTextWidth = barRightX - barStartX;
+                    ctx.fillText(valueText, barRightX, height * 0.5, maxTextWidth);
+                } else {
+                    ctx.setTextAlign(TextAlignment.CENTER);
+                    maxTextWidth = bar100Percent - barLeftX + barRightX - barStartX;
+                    ctx.fillText(valueText, barLeftX + (barWidth * 0.5), height * 0.5, maxTextWidth);
+                }
             }
         }
 

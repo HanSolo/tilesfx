@@ -277,7 +277,7 @@ public class CycleStepTileSkin extends TileSkin {
             double     valueFontSize      = height * 0.3;
             Font       valueFont          = Fonts.latoRegular(valueFontSize);
             FontMetrix fontMetrix         = new FontMetrix(valueFont);
-            String     valueText          = String.format(tile.getLocale(), formatString, value);
+            String     valueText          = tile.getShortenNumbers() ? Helper.shortenNumber((long) value, locale) : String.format(tile.getLocale(), formatString, value);
             if (autoItemTextColor) {
                 if (fontMetrix.computeStringWidth(valueText) > barWidth) {
                     textFill = Helper.isDark(tile.getBackgroundColor()) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();

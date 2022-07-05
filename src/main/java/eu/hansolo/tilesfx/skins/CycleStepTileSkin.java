@@ -245,6 +245,7 @@ public class CycleStepTileSkin extends TileSkin {
             redraw();
         }
 
+
         // ******************** Resizing ******************************************
         private void resize() {
             width  = getWidth() - getInsets().getLeft() - getInsets().getRight();
@@ -284,6 +285,13 @@ public class CycleStepTileSkin extends TileSkin {
                 }
             }
 
+            double barLeftX      = barStartX + factorX * maxBarWidth;
+            double barRightX     = barStartX + factorX * maxBarWidth + barWidth;
+            double bar25Percent  = barStartX + (maxBarWidth * 0.25);
+            double bar50Percent  = barStartX + (maxBarWidth * 0.5);
+            double bar75Percent  = barStartX + (maxBarWidth * 0.75);
+            double bar100Percent = barStartX + maxBarWidth;
+
             ctx.setTextBaseline(VPos.CENTER);
             ctx.setFont(Fonts.latoRegular(height * 0.4));
             ctx.setTextAlign(TextAlignment.LEFT);
@@ -293,11 +301,23 @@ public class CycleStepTileSkin extends TileSkin {
             ctx.setFill(barBackgroundColor);
             ctx.fillRect(barStartX, barStartY, maxBarWidth, barHeight);
             ctx.setFill(barColor);
-            ctx.fillRect(barStartX + factorX * maxBarWidth, barStartY, barWidth, barHeight);
+            ctx.fillRect(barLeftX, barStartY, barWidth, barHeight);
             ctx.setFill(textColor);
             ctx.setFont(valueFont);
-            ctx.setTextAlign(TextAlignment.CENTER);
-            ctx.fillText(valueText, barStartX + factorX * maxBarWidth + barWidth * 0.5, height * 0.5, maxTextWidth);
+
+            if (barLeftX < bar25Percent) {
+                ctx.setTextAlign(TextAlignment.LEFT);
+                maxTextWidth = bar100Percent - barLeftX;
+                ctx.fillText(valueText, barLeftX, height * 0.5, maxTextWidth);
+            } else if (barRightX > bar75Percent) {
+                ctx.setTextAlign(TextAlignment.RIGHT);
+                maxTextWidth = barRightX - barStartX;
+                ctx.fillText(valueText, barRightX, height * 0.5, maxTextWidth);
+            } else if (barLeftX >= bar25Percent || barRightX <= bar75Percent) {
+                ctx.setTextAlign(TextAlignment.CENTER);
+                maxTextWidth = bar100Percent - barLeftX + barRightX - barStartX;
+                ctx.fillText(valueText, barLeftX + (barWidth * 0.5), height * 0.5, maxTextWidth);
+            }
         }
 
         @Override public void onChartDataEvent(final ChartDataEvent EVENT) {

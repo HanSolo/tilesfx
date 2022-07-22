@@ -108,28 +108,18 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
     public final Section build() {
         final Section SECTION = new Section();
         for (String key : properties.keySet()) {
-            if ("start".equals(key)) {
-                SECTION.setStart(((DoubleProperty) properties.get(key)).get());
-            } else if("stop".equals(key)) {
-                SECTION.setStop(((DoubleProperty) properties.get(key)).get());
-            } else if("text".equals(key)) {
-                SECTION.setText(((StringProperty) properties.get(key)).get());
-            } else if("icon".equals(key)) {
-                SECTION.setIcon(((ObjectProperty<Image>) properties.get(key)).get());
-            } else if ("color".equals(key)) {
-                SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("highlightColor".equals(key)) {
-                SECTION.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("textColor".equals(key)) {
-                SECTION.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("active".equals(key)) {
-                SECTION.setActive(((BooleanProperty) properties.get(key)).get());
-            } else if ("onSectionEntered".equals(key)) {
-                SECTION.setOnSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("onSectionLeft".equals(key)) {
-                SECTION.setOnSectionLeft(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("styleClass".equals(key)) {
-                SECTION.setStyleClass(((StringProperty) properties.get(key)).get());
+            switch (key) {
+                case "start"            -> SECTION.setStart(((DoubleProperty) properties.get(key)).get());
+                case "stop"             -> SECTION.setStop(((DoubleProperty) properties.get(key)).get());
+                case "text"             -> SECTION.setText(((StringProperty) properties.get(key)).get());
+                case "icon"             -> SECTION.setIcon(((ObjectProperty<Image>) properties.get(key)).get());
+                case "color"            -> SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "highlightColor"   -> SECTION.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "textColor"        -> SECTION.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "active"           -> SECTION.setActive(((BooleanProperty) properties.get(key)).get());
+                case "onSectionEntered" -> SECTION.setOnSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "onSectionLeft"    -> SECTION.setOnSectionLeft(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "styleClass"       -> SECTION.setStyleClass(((StringProperty) properties.get(key)).get());
             }
         }
         return SECTION;

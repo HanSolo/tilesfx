@@ -1542,409 +1542,220 @@ public class TileBuilder<B extends TileBuilder<B>> {
         }
 
         for (String key : properties.keySet()) {
-            if ("prefSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                TILE.setPrefSize(dim.getWidth(), dim.getHeight());
-            } else if("minSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                TILE.setMinSize(dim.getWidth(), dim.getHeight());
-            } else if("maxSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                TILE.setMaxSize(dim.getWidth(), dim.getHeight());
-            } else if("prefWidth".equals(key)) {
-                TILE.setPrefWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("prefHeight".equals(key)) {
-                TILE.setPrefHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("minWidth".equals(key)) {
-                TILE.setMinWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("minHeight".equals(key)) {
-                TILE.setMinHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("maxWidth".equals(key)) {
-                TILE.setMaxWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("maxHeight".equals(key)) {
-                TILE.setMaxHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("scaleX".equals(key)) {
-                TILE.setScaleX(((DoubleProperty) properties.get(key)).get());
-            } else if("scaleY".equals(key)) {
-                TILE.setScaleY(((DoubleProperty) properties.get(key)).get());
-            } else if ("layoutX".equals(key)) {
-                TILE.setLayoutX(((DoubleProperty) properties.get(key)).get());
-            } else if ("layoutY".equals(key)) {
-                TILE.setLayoutY(((DoubleProperty) properties.get(key)).get());
-            } else if ("translateX".equals(key)) {
-                TILE.setTranslateX(((DoubleProperty) properties.get(key)).get());
-            } else if ("translateY".equals(key)) {
-                TILE.setTranslateY(((DoubleProperty) properties.get(key)).get());
-            } else if ("padding".equals(key)) {
-                TILE.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
-            } else if("styleClass".equals(key)) {
-                TILE.getStyleClass().setAll("tile");
-                TILE.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
-            } else if ("autoScale".equals(key)) {
-                TILE.setAutoScale(((BooleanProperty) properties.get(key)).get());
-            } else if("value".equals(key)) {
-                TILE.setValue(((DoubleProperty) properties.get(key)).get());
-            } else if("decimals".equals(key)) {
-                TILE.setDecimals(((IntegerProperty) properties.get(key)).get());
-            } else if ("shortenNumbers".equals(key)) {
-                TILE.setShortenNumbers(((BooleanProperty) properties.get(key)).get());
-            } else if("tickLabelDecimals".equals(key)) {
-                TILE.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
-            } else if ("tickLabelsXVisible".equals(key)) {
-                TILE.setTickLabelsXVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("tickLabelsYVisible".equals(key)) {
-                TILE.setTickLabelsYVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("minValueVisible".equals(key)) {
-                TILE.setMinValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("maxValueVisible".equals(key)) {
-                TILE.setMaxValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if("title".equals(key)) {
-                TILE.setTitle(((StringProperty) properties.get(key)).get());
-            } else if("titleAlignment".equals(key)) {
-                TILE.setTitleAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
-            } else if("description".equals(key)) {
-                TILE.setDescription(((StringProperty) properties.get(key)).get());
-            } else if ("descriptionAlignment".equals(key)) {
-                TILE.setDescriptionAlignment(((ObjectProperty<Pos>) properties.get(key)).get());
-            } else if("unit".equals(key)) {
-                TILE.setUnit(((StringProperty) properties.get(key)).get());
-            } else if ("thumbColor".equals(key)) {
-                TILE.setThumbColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("flatUI".equals(key)) {
-                TILE.setFlatUI(((BooleanProperty) properties.get(key)).get());
-            } else if ("selected".equals(key)) {
-                TILE.setActive(((BooleanProperty) properties.get(key)).get());
-            } else if("averagingEnabled".equals(key)) {
-                TILE.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if("averagingPeriod".equals(key)) {
-                TILE.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
-            } else if ("timePeriod".equals(key)) {
-                TILE.setTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
-            } else if ("maxTimePeriod".equals(key)) {
-                TILE.setMaxTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
-            } else if ("timePeriodResolution".equals(key)) {
-                TILE.setTimePeriodResolution(((ObjectProperty<TimeUnit>) properties.get(key)).get());
-            } else if ("fixedYScale".equals(key)) {
-                TILE.setFixedYScale(((BooleanProperty) properties.get(key)).get());
-            } else if("startFromZero".equals(key)) {
-                TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());
-            } else if("returnToZero".equals(key)) {
-                TILE.setReturnToZero(((BooleanProperty) properties.get(key)).get());
-            } else if ("minMeasuredValueVisible".equals(key)) {
-                TILE.setMinMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("maxMeasuredValueVisible".equals(key)) {
-                TILE.setMaxMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("oldValueVisible".equals(key)) {
-                TILE.setOldValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("valueVisible".equals(key)) {
-                TILE.setValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("foregroundColor".equals(key)) {
-                TILE.setForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("backgroundColor".equals(key)) {
-                TILE.setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("borderColor".equals(key)) {
-                TILE.setBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("borderWidth".equals(key)) {
-                TILE.setBorderWidth(((DoubleProperty) properties.get(key)).get());
-            } else if ("knobColor".equals(key)) {
-                TILE.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("animated".equals(key)) {
-                TILE.setAnimated(((BooleanProperty) properties.get(key)).get());
-            } else if("animationDuration".equals(key)) {
-                TILE.setAnimationDuration(((LongProperty) properties.get(key)).get());
-            } else if("pauseDuration".equals(key)) {
-                TILE.setPauseDuration(((LongProperty) properties.get(key)).get());
-            } else if("startAngle".equals(key)) {
-                TILE.setStartAngle(((DoubleProperty) properties.get(key)).get());
-            } else if("angleRange".equals(key)) {
-                TILE.setAngleRange(((DoubleProperty) properties.get(key)).get());
-            } else if("needleColor".equals(key)) {
-                TILE.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("barColor".equals(key)) {
-                TILE.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("barBackgroundColor".equals(key)) {
-                TILE.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("locale".equals(key)) {
-                TILE.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
-            } else if("numberFormat".equals(key)) {
-                TILE.setNumberFormat(((ObjectProperty<NumberFormat>) properties.get(key)).get());
-            } else if("shadowsEnabled".equals(key)) {
-                TILE.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("style".equals(key)) {
-                TILE.setStyle(((StringProperty) properties.get(key)).get());
-            } else if ("innerShadowEnabled".equals(key)) {
-                TILE.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("thresholdVisible".equals(key)) {
-                TILE.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("lowerThresholdVisible".equals(key)) {
-                TILE.setLowerThresholdVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("averageVisible".equals(key)) {
-                TILE.setAverageVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionsVisible".equals(key)) {
-                TILE.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionsAlwaysVisible".equals(key)) {
-                TILE.setSectionsAlwaysVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionTextVisible".equals(key)) {
-                TILE.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionIconsVisible".equals(key)) {
-                TILE.setSectionIconsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("highlightSections".equals(key)) {
-                TILE.setHighlightSections(((BooleanProperty) properties.get(key)).get());
-            } else if ("titleColor".equals(key)) {
-                TILE.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("descriptionColor".equals(key)) {
-                TILE.setDescriptionColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("unitColor".equals(key)) {
-                TILE.setUnitColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("valueColor".equals(key)) {
-                TILE.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("thresholdColor".equals(key)) {
-                TILE.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("lowerThresholdColor".equals(key)) {
-                TILE.setLowerThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("orientation".equals(key)) {
-                TILE.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
-            } else if ("checkSectionsForValue".equals(key)) {
-                TILE.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
-            } else if ("checkThreshold".equals(key)) {
-                TILE.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
-            } else if ("checkLowerThreshold".equals(key)) {
-                TILE.setCheckLowerThreshold(((BooleanProperty) properties.get(key)).get());
-            } else if ("onValueChanged".equals(key)) {
-                TILE.currentValueProperty().addListener(((ObjectProperty<InvalidationListener>) properties.get(key)).get());
-            } else if ("keepAspect".equals(key)) {
-                TILE.setKeepAspect(((BooleanProperty) properties.get(key)).get());
-            } else if ("threshold".equals(key)) {
-                TILE.setThreshold(((DoubleProperty) properties.get(key)).get());
-            } else if ("lowerThreshold".equals(key)) {
-                TILE.setLowerThreshold(((DoubleProperty) properties.get(key)).get());
-            } else if ("referenceValue".equals(key)) {
-                TILE.setReferenceValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("autoReferenceValue".equals(key)) {
-                TILE.setAutoReferenceValue(((BooleanProperty) properties.get(key)).get());
-            } else if ("customFontEnabled".equals(key)) {
-                TILE.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("customFont".equals(key)) {
-                TILE.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
-            } else if ("customDecimalFormatEnabled".equals(key)) {
-                TILE.setCustomDecimalFormatEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("customDecimalFormat".equals(key)) {
-                TILE.setCustomDecimalFormat(((ObjectProperty<DecimalFormat>) properties.get(key)).get());
-            } else if ("alertMessage".equals(key)) {
-                TILE.setAlertMessage(((StringProperty) properties.get(key)).get());
-            } else if ("smoothing".equals(key)) {
-                TILE.setSmoothing(((BooleanProperty) properties.get(key)).get());
-            } else if ("time".equals(key)) {
-                TILE.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
-            } else if ("text".equals(key)) {
-                TILE.setText(((StringProperty) properties.get(key)).get());
-            } else if ("textAlignment".equals(key)) {
-                TILE.setTextAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
-            } else if ("discreteSeconds".equals(key)) {
-                TILE.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
-            } else if ("discreteMinutes".equals(key)) {
-                TILE.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
-            } else if ("discreteHours".equals(key)) {
-                TILE.setDiscreteHours(((BooleanProperty) properties.get(key)).get());
-            } else if ("secondsVisible".equals(key)) {
-                TILE.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("textVisible".equals(key)) {
-                TILE.setTextVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("dateVisible".equals(key)) {
-                TILE.setDateVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("percentageVisible".equals(key)) {
-                TILE.setPercentageVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("textColor".equals(key)) {
-                TILE.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("dateColor".equals(key)) {
-                TILE.setDateColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("hourTickMarkColor".equals(key)) {
-                TILE.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("minuteTickMarkColor".equals(key)) {
-                TILE.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("alarmColor".equals(key)) {
-                TILE.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("tickLabelColor".equals(key)) {
-                TILE.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("tickMarkColor".equals(key)) {
-                TILE.setTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("hourTickMarksVisible".equals(key)) {
-                TILE.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("minuteTickMarksVisible".equals(key)) {
-                TILE.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("hourColor".equals(key)) {
-                TILE.setHourColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("minuteColor".equals(key)) {
-                TILE.setMinuteColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("secondColor".equals(key)) {
-                TILE.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("onAlarm".equals(key)) {
-                TILE.setOnAlarmEvt(((ObjectProperty<EvtObserver<AlarmEvt>>) properties.get(key)).get());
-            } else if ("onTimeEvent".equals(key)) {
-                TILE.setOnTimeEvt(((ObjectProperty<EvtObserver<TimeEvt>>) properties.get(key)).get());
-            } else if ("onTileEvent".equals(key)) {
-                TILE.addTileObserver(TileEvt.ANY, ((ObjectProperty<EvtObserver<TileEvt>>) properties.get(key)).get());
-            } else if ("alarmsEnabled".equals(key)) {
-                TILE.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("alarmsVisible".equals(key)) {
-                TILE.setAlarmsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("running".equals(key)) {
-                TILE.setRunning(((BooleanProperty) properties.get(key)).get());
-            } else if ("increment".equals(key)) {
-                TILE.setIncrement(((DoubleProperty) properties.get(key)).get());
-            } else if ("activeColor".equals(key)) {
-                TILE.setActiveColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("duration".equals(key)) {
-                TILE.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
-            } else if ("strokeWithGradient".equals(key)) {
-                TILE.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
-            } else if ("fillWithGradient".equals(key)) {
-                TILE.setFillWithGradient(((BooleanProperty) properties.get(key)).get());
-            } else if ("image".equals(key)) {
-                TILE.setImage(((ObjectProperty<Image>) properties.get(key)).get());
-            } else if ("imageMask".equals(key)) {
-                TILE.setImageMask(((ObjectProperty<ImageMask>) properties.get(key)).get());
-            } else if ("graphic".equals(key)) {
-                TILE.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
-            } else if ("svgPath".equals(key)) {
-                TILE.setSVGPath(((ObjectProperty<SVGPath>) properties.get(key)).get());
-            } else if ("roundedCorners".equals(key)) {
-                TILE.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
-            } else if ("textSize".equals(key)) {
-                TILE.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
-            } else if ("currentLocation".equals(key)) {
-                TILE.setCurrentLocation(((ObjectProperty<Location>) properties.get(key)).get());
-            } else if ("trackColor".equals(key)) {
-                TILE.setTrackColor(((ObjectProperty<TileColor>) properties.get(key)).get());
-            } else if ("mapProvider".equals(key)) {
-                TILE.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
-            } else if ("tooltipText".equals(key)) {
-                TILE.setTooltipText(((StringProperty) properties.get(key)).get());
-            } else if ("xAxis".equals(key)) {
-                TILE.setXAxis(((ObjectProperty<Axis>) properties.get(key)).get());
-            } else if ("yAxis".equals(key)) {
-                TILE.setYAxis(((ObjectProperty<Axis>) properties.get(key)).get());
-            } else if ("radarChartMode".equals(key)) {
-                TILE.setRadarChartMode(((ObjectProperty<RadarChartMode>) properties.get(key)).get());
-            } else if ("chartGridColor".equals(key)) {
-                TILE.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("country".equals(key)) {
-                TILE.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
-            } else if ("countryGroup".equals(key)) {
-                TILE.setCountryGroup(((ObjectProperty<BusinessRegion>) properties.get(key)).get());
-            } else if ("flipTimeInMS".equals(key)) {
-                TILE.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
-            } else if ("flipText".equals(key)) {
-                TILE.setFlipText(((StringProperty) properties.get(key)).get());
-            } else if ("itemSorting".equals(key)) {
-                TILE.setItemSorting(((ObjectProperty<ItemSorting>) properties.get(key)).get());
-            } else if ("itemSortingTopic".equals(key)) {
-                TILE.setItemSortingTopic(((ObjectProperty<ItemSortingTopic>) properties.get(key)).get());
-            } else if ("autoItemTextColor".equals(key)) {
-                TILE.setAutoItemTextColor(((BooleanProperty) properties.get(key)).get());
-            } else if ("autoItemDarkTextColor".equals(key)) {
-                TILE.setAutoItemDarkTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("autoItemBrightTextColor".equals(key)) {
-                TILE.setAutoItemBrightTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("dataPointsVisible".equals(key)) {
-                TILE.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sunburstTree".equals(key)) {
-                TILE.getSunburstChart().setTree(((ObjectProperty<TreeNode>) properties.get(key)).get());
-            } else if ("sunburstBackgroundColor".equals(key)) {
-                TILE.getSunburstChart().setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("sunburstTextColor".equals(key)) {
-                TILE.getSunburstChart().setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("sunburstUseColorFromParent".equals(key)) {
-                TILE.getSunburstChart().setUseColorFromParent(((BooleanProperty) properties.get(key)).get());
-            } else if ("sunburstTextOrientation".equals(key)) {
-                TILE.getSunburstChart().setTextOrientation(((ObjectProperty<TextOrientation>) properties.get(key)).get());
-            } else if("sunburstVisibleData".equals(key)) {
-                TILE.getSunburstChart().setVisibleData(((ObjectProperty<VisibleData>) properties.get(key)).get());
-            } else if ("sunburstInteractive".equals(key)) {
-                TILE.getSunburstChart().setInteractive(((BooleanProperty) properties.get(key)).get());
-            } else if ("sunburstAutoTextColor".equals(key)) {
-                TILE.getSunburstChart().setAutoTextColor(((BooleanProperty) properties.get(key)).get());
-            } else if ("sunburstUseChartDataTextColor".equals(key)) {
-                TILE.getSunburstChart().setUseChartDataTextColor(((BooleanProperty) properties.get(key)).get());
-            } else if ("snapToTicks".equals(key)) {
-                TILE.setSnapToTicks(((BooleanProperty) properties.get(key)).get());
-            } else if ("minorTickCount".equals(key)) {
-                TILE.setMinorTickCount(((IntegerProperty) properties.get(key)).get());
-            } else if ("majorTickUnit".equals(key)) {
-                TILE.setMajorTickUnit(((DoubleProperty) properties.get(key)).get());
-            } else if ("matrixSize".equals(key)) {
-                final int COLS = ((IntegerProperty) properties.get("matrixColumns")).get();
-                final int ROWS = ((IntegerProperty) properties.get("matrixRows")).get();
-                TILE.setMatrixSize(COLS, ROWS);
-            } else if ("chartType".equals(key)) {
-                TILE.setChartType(((ObjectProperty<ChartType>) properties.get(key)).get());
-            } else if ("tooltipTimeout".equals(key)) {
-                TILE.setTooltipTimeout(((DoubleProperty) properties.get(key)).get());
-            } else if ("notifyRegionBackgroundColor".equals(key)) {
-                TILE.setNotifyRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("notifyRegionForegroundColor".equals(key)) {
-                TILE.setNotifyRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("notifyRegionTooltipText".equals(key)) {
-                TILE.setNotifyRegionTooltipText(((StringProperty) properties.get(key)).get());
-            } else if ("showNotifyRegion".equals(key)) {
-                TILE.showNotifyRegion(((BooleanProperty) properties.get(key)).get());
-            } else if ("infoRegionBackgroundColor".equals(key)) {
-                TILE.setInfoRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("infoRegionForegroundColor".equals(key)) {
-                TILE.setInfoRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("infoRegionTooltipText".equals(key)) {
-                TILE.setInfoRegionTooltipText(((StringProperty) properties.get(key)).get());
-            } else if ("showInfoRegion".equals(key)) {
-                TILE.showInfoRegion(((BooleanProperty) properties.get(key)).get());
-            } else if ("lowerRightRegionBackgroundColor".equals(key)) {
-                TILE.setLowerRightRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("lowerRightRegionForegroundColor".equals(key)) {
-                TILE.setLowerRightRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("lowerRightRegionTooltipText".equals(key)) {
-                TILE.setLowerRightRegionTooltipText(((StringProperty) properties.get(key)).get());
-            } else if ("showLowerRightRegion".equals(key)) {
-                TILE.showLowerRightRegion(((BooleanProperty) properties.get(key)).get());
-            } else if ("leftText".equals(key)) {
-                TILE.setLeftText(((StringProperty) properties.get(key)).get());
-            } else if ("middleText".equals(key)) {
-                TILE.setMiddleText(((StringProperty) properties.get(key)).get());
-            } else if ("rightText".equals(key)) {
-                TILE.setRightText(((StringProperty) properties.get(key)).get());
-            } else if ("leftValue".equals(key)) {
-                TILE.setLeftValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("middleValue".equals(key)) {
-                TILE.setMiddleValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("rightValue".equals(key)) {
-                TILE.setRightValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("leftGraphics".equals(key)) {
-                TILE.setLeftGraphics(((ObjectProperty<Node>) properties.get(key)).get());
-            } else if ("middleGraphics".equals(key)) {
-                TILE.setMiddleGraphics(((ObjectProperty<Node>) properties.get(key)).get());
-            } else if ("rightGraphics".equals(key)) {
-                TILE.setRightGraphics(((ObjectProperty<Node>) properties.get(key)).get());
-            } else if ("trendVisible".equals(key)) {
-                TILE.setTrendVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("timeoutMs".equals(key)) {
-                TILE.setTimeoutMs(((LongProperty) properties.get(key)).get());
-            } else if ("rank".equals(key)) {
-                TILE.setRank(((ObjectProperty<Rank>) properties.get(key)).get());
-            } else if ("interactive".equals(key)) {
-                TILE.setInteractive(((BooleanProperty) properties.get(key)).get());
-            } else if ("numberOfValuesForTrendCalculation".equals(key)) {
-                TILE.setNumberOfValuesForTrendCalculation(((IntegerProperty) properties.get(key)).get());
-            } else if ("backgroundImage".equals(key)) {
-                TILE.setBackgroundImage(((ObjectProperty<Image>) properties.get(key)).get());
-            } else if ("backgroundImageOpacity".equals(key)) {
-                TILE.setBackgroundImageOpacity(((DoubleProperty) properties.get(key)).get());
-            } else if ("backgroundImageKeepAspect".equals(key)) {
-                TILE.setBackgroundImageKeepAspect(((BooleanProperty) properties.get(key)).get());
-            } else if ("infoRegionEventHandler".equals(key)) {
-                TILE.setInfoRegionEventHandler(((ObjectProperty<EventHandler<MouseEvent>>) properties.get(key)).get());
-            } else if ("infoRegionTooltipText".equals(key)) {
-                TILE.setInfoRegionTooltipText(((StringProperty) properties.get(key)).get());
-            } else if ("notifyRegionTooltipText".equals(key)) {
-                TILE.setNotifyRegionTooltipText(((StringProperty) properties.get(key)).get());
-            } 
+            switch (key) {
+                case "prefSize"                          -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    TILE.setPrefSize(dim.getWidth(), dim.getHeight());
+                }
+                case "minSize"                           -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    TILE.setMinSize(dim.getWidth(), dim.getHeight());
+                }
+                case "maxSize"                           -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    TILE.setMaxSize(dim.getWidth(), dim.getHeight());
+                }
+                case "prefWidth"                         -> TILE.setPrefWidth(((DoubleProperty) properties.get(key)).get());
+                case "prefHeight"                        -> TILE.setPrefHeight(((DoubleProperty) properties.get(key)).get());
+                case "minWidth"                          -> TILE.setMinWidth(((DoubleProperty) properties.get(key)).get());
+                case "minHeight"                         -> TILE.setMinHeight(((DoubleProperty) properties.get(key)).get());
+                case "maxWidth"                          -> TILE.setMaxWidth(((DoubleProperty) properties.get(key)).get());
+                case "maxHeight"                         -> TILE.setMaxHeight(((DoubleProperty) properties.get(key)).get());
+                case "scaleX"                            -> TILE.setScaleX(((DoubleProperty) properties.get(key)).get());
+                case "scaleY"                            -> TILE.setScaleY(((DoubleProperty) properties.get(key)).get());
+                case "layoutX"                           -> TILE.setLayoutX(((DoubleProperty) properties.get(key)).get());
+                case "layoutY"                           -> TILE.setLayoutY(((DoubleProperty) properties.get(key)).get());
+                case "translateX"                        -> TILE.setTranslateX(((DoubleProperty) properties.get(key)).get());
+                case "translateY"                        -> TILE.setTranslateY(((DoubleProperty) properties.get(key)).get());
+                case "padding"                           -> TILE.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
+                case "styleClass"                        -> {
+                    TILE.getStyleClass().setAll("tile");
+                    TILE.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
+                }
+                case "autoScale"                         -> TILE.setAutoScale(((BooleanProperty) properties.get(key)).get());
+                case "value"                             -> TILE.setValue(((DoubleProperty) properties.get(key)).get());
+                case "decimals"                          -> TILE.setDecimals(((IntegerProperty) properties.get(key)).get());
+                case "shortenNumbers"                    -> TILE.setShortenNumbers(((BooleanProperty) properties.get(key)).get());
+                case "tickLabelDecimals"                 -> TILE.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
+                case "tickLabelsXVisible"                -> TILE.setTickLabelsXVisible(((BooleanProperty) properties.get(key)).get());
+                case "tickLabelsYVisible"                -> TILE.setTickLabelsYVisible(((BooleanProperty) properties.get(key)).get());
+                case "minValueVisible"                   -> TILE.setMinValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "maxValueVisible"                   -> TILE.setMaxValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "title"                             -> TILE.setTitle(((StringProperty) properties.get(key)).get());
+                case "titleAlignment"                    -> TILE.setTitleAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
+                case "description"                       -> TILE.setDescription(((StringProperty) properties.get(key)).get());
+                case "descriptionAlignment"              -> TILE.setDescriptionAlignment(((ObjectProperty<Pos>) properties.get(key)).get());
+                case "unit"                              -> TILE.setUnit(((StringProperty) properties.get(key)).get());
+                case "thumbColor"                        -> TILE.setThumbColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "flatUI"                            -> TILE.setFlatUI(((BooleanProperty) properties.get(key)).get());
+                case "selected"                          -> TILE.setActive(((BooleanProperty) properties.get(key)).get());
+                case "averagingEnabled"                  -> TILE.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
+                case "averagingPeriod"                   -> TILE.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
+                case "timePeriod"                        -> TILE.setTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
+                case "maxTimePeriod"                     -> TILE.setMaxTimePeriod(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
+                case "timePeriodResolution"              -> TILE.setTimePeriodResolution(((ObjectProperty<TimeUnit>) properties.get(key)).get());
+                case "fixedYScale"                       -> TILE.setFixedYScale(((BooleanProperty) properties.get(key)).get());
+                case "startFromZero"                     -> TILE.setStartFromZero(((BooleanProperty) properties.get(key)).get());
+                case "returnToZero"                      -> TILE.setReturnToZero(((BooleanProperty) properties.get(key)).get());
+                case "minMeasuredValueVisible"           -> TILE.setMinMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "maxMeasuredValueVisible"           -> TILE.setMaxMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "oldValueVisible"                   -> TILE.setOldValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "valueVisible"                      -> TILE.setValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "foregroundColor"                   -> TILE.setForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "backgroundColor"                   -> TILE.setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "borderColor"                       -> TILE.setBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "borderWidth"                       -> TILE.setBorderWidth(((DoubleProperty) properties.get(key)).get());
+                case "knobColor"                         -> TILE.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "animated"                          -> TILE.setAnimated(((BooleanProperty) properties.get(key)).get());
+                case "animationDuration"                 -> TILE.setAnimationDuration(((LongProperty) properties.get(key)).get());
+                case "pauseDuration"                     -> TILE.setPauseDuration(((LongProperty) properties.get(key)).get());
+                case "startAngle"                        -> TILE.setStartAngle(((DoubleProperty) properties.get(key)).get());
+                case "angleRange"                        -> TILE.setAngleRange(((DoubleProperty) properties.get(key)).get());
+                case "needleColor"                       -> TILE.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "barColor"                          -> TILE.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "barBackgroundColor"                -> TILE.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "locale"                            -> TILE.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
+                case "numberFormat"                      -> TILE.setNumberFormat(((ObjectProperty<NumberFormat>) properties.get(key)).get());
+                case "shadowsEnabled"                    -> TILE.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
+                case "style"                             -> TILE.setStyle(((StringProperty) properties.get(key)).get());
+                case "innerShadowEnabled"                -> TILE.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
+                case "thresholdVisible"                  -> TILE.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
+                case "lowerThresholdVisible"             -> TILE.setLowerThresholdVisible(((BooleanProperty) properties.get(key)).get());
+                case "averageVisible"                    -> TILE.setAverageVisible(((BooleanProperty) properties.get(key)).get());
+                case "sectionsVisible"                   -> TILE.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
+                case "sectionsAlwaysVisible"             -> TILE.setSectionsAlwaysVisible(((BooleanProperty) properties.get(key)).get());
+                case "sectionTextVisible"                -> TILE.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
+                case "sectionIconsVisible"               -> TILE.setSectionIconsVisible(((BooleanProperty) properties.get(key)).get());
+                case "highlightSections"                 -> TILE.setHighlightSections(((BooleanProperty) properties.get(key)).get());
+                case "titleColor"                        -> TILE.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "descriptionColor"                  -> TILE.setDescriptionColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "unitColor"                         -> TILE.setUnitColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "valueColor"                        -> TILE.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "thresholdColor"                    -> TILE.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "lowerThresholdColor"               -> TILE.setLowerThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "orientation"                       -> TILE.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
+                case "checkSectionsForValue"             -> TILE.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
+                case "checkThreshold"                    -> TILE.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
+                case "checkLowerThreshold"               -> TILE.setCheckLowerThreshold(((BooleanProperty) properties.get(key)).get());
+                case "onValueChanged"                    -> TILE.currentValueProperty().addListener(((ObjectProperty<InvalidationListener>) properties.get(key)).get());
+                case "keepAspect"                        -> TILE.setKeepAspect(((BooleanProperty) properties.get(key)).get());
+                case "threshold"                         -> TILE.setThreshold(((DoubleProperty) properties.get(key)).get());
+                case "lowerThreshold"                    -> TILE.setLowerThreshold(((DoubleProperty) properties.get(key)).get());
+                case "referenceValue"                    -> TILE.setReferenceValue(((DoubleProperty) properties.get(key)).get());
+                case "autoReferenceValue"                -> TILE.setAutoReferenceValue(((BooleanProperty) properties.get(key)).get());
+                case "customFontEnabled"                 -> TILE.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
+                case "customFont"                        -> TILE.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
+                case "customDecimalFormatEnabled"        -> TILE.setCustomDecimalFormatEnabled(((BooleanProperty) properties.get(key)).get());
+                case "customDecimalFormat"               -> TILE.setCustomDecimalFormat(((ObjectProperty<DecimalFormat>) properties.get(key)).get());
+                case "alertMessage"                      -> TILE.setAlertMessage(((StringProperty) properties.get(key)).get());
+                case "smoothing"                         -> TILE.setSmoothing(((BooleanProperty) properties.get(key)).get());
+                case "time"                              -> TILE.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
+                case "text"                              -> TILE.setText(((StringProperty) properties.get(key)).get());
+                case "textAlignment"                     -> TILE.setTextAlignment(((ObjectProperty<TextAlignment>) properties.get(key)).get());
+                case "discreteSeconds"                   -> TILE.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
+                case "discreteMinutes"                   -> TILE.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
+                case "discreteHours"                     -> TILE.setDiscreteHours(((BooleanProperty) properties.get(key)).get());
+                case "secondsVisible"                    -> TILE.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
+                case "textVisible"                       -> TILE.setTextVisible(((BooleanProperty) properties.get(key)).get());
+                case "dateVisible"                       -> TILE.setDateVisible(((BooleanProperty) properties.get(key)).get());
+                case "percentageVisible"                 -> TILE.setPercentageVisible(((BooleanProperty) properties.get(key)).get());
+                case "textColor"                         -> TILE.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "dateColor"                         -> TILE.setDateColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "hourTickMarkColor"                 -> TILE.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "minuteTickMarkColor"               -> TILE.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "alarmColor"                        -> TILE.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "tickLabelColor"                    -> TILE.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "tickMarkColor"                     -> TILE.setTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "hourTickMarksVisible"              -> TILE.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                case "minuteTickMarksVisible"            -> TILE.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                case "hourColor"                         -> TILE.setHourColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "minuteColor"                       -> TILE.setMinuteColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "secondColor"                       -> TILE.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "onAlarm"                           -> TILE.setOnAlarmEvt(((ObjectProperty<EvtObserver<AlarmEvt>>) properties.get(key)).get());
+                case "onTimeEvent"                       -> TILE.setOnTimeEvt(((ObjectProperty<EvtObserver<TimeEvt>>) properties.get(key)).get());
+                case "onTileEvent"                       -> TILE.addTileObserver(TileEvt.ANY, ((ObjectProperty<EvtObserver<TileEvt>>) properties.get(key)).get());
+                case "alarmsEnabled"                     -> TILE.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
+                case "alarmsVisible"                     -> TILE.setAlarmsVisible(((BooleanProperty) properties.get(key)).get());
+                case "running"                           -> TILE.setRunning(((BooleanProperty) properties.get(key)).get());
+                case "increment"                         -> TILE.setIncrement(((DoubleProperty) properties.get(key)).get());
+                case "activeColor"                       -> TILE.setActiveColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "duration"                          -> TILE.setDuration(((ObjectProperty<LocalTime>) properties.get(key)).get());
+                case "strokeWithGradient"                -> TILE.setStrokeWithGradient(((BooleanProperty) properties.get(key)).get());
+                case "fillWithGradient"                  -> TILE.setFillWithGradient(((BooleanProperty) properties.get(key)).get());
+                case "image"                             -> TILE.setImage(((ObjectProperty<Image>) properties.get(key)).get());
+                case "imageMask"                         -> TILE.setImageMask(((ObjectProperty<ImageMask>) properties.get(key)).get());
+                case "graphic"                           -> TILE.setGraphic(((ObjectProperty<Node>) properties.get(key)).get());
+                case "svgPath"                           -> TILE.setSVGPath(((ObjectProperty<SVGPath>) properties.get(key)).get());
+                case "roundedCorners"                    -> TILE.setRoundedCorners(((BooleanProperty) properties.get(key)).get());
+                case "textSize"                          -> TILE.setTextSize(((ObjectProperty<TextSize>) properties.get(key)).get());
+                case "currentLocation"                   -> TILE.setCurrentLocation(((ObjectProperty<Location>) properties.get(key)).get());
+                case "trackColor"                        -> TILE.setTrackColor(((ObjectProperty<TileColor>) properties.get(key)).get());
+                case "mapProvider"                       -> TILE.setMapProvider(((ObjectProperty<MapProvider>) properties.get(key)).get());
+                case "tooltipText"                       -> TILE.setTooltipText(((StringProperty) properties.get(key)).get());
+                case "xAxis"                             -> TILE.setXAxis(((ObjectProperty<Axis>) properties.get(key)).get());
+                case "yAxis"                             -> TILE.setYAxis(((ObjectProperty<Axis>) properties.get(key)).get());
+                case "radarChartMode"                    -> TILE.setRadarChartMode(((ObjectProperty<RadarChartMode>) properties.get(key)).get());
+                case "chartGridColor"                    -> TILE.setChartGridColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "country"                           -> TILE.setCountry(((ObjectProperty<Country>) properties.get(key)).get());
+                case "countryGroup"                      -> TILE.setCountryGroup(((ObjectProperty<BusinessRegion>) properties.get(key)).get());
+                case "flipTimeInMS"                      -> TILE.setFlipTimeInMS(((LongProperty) properties.get(key)).get());
+                case "flipText"                          -> TILE.setFlipText(((StringProperty) properties.get(key)).get());
+                case "itemSorting"                       -> TILE.setItemSorting(((ObjectProperty<ItemSorting>) properties.get(key)).get());
+                case "itemSortingTopic"                  -> TILE.setItemSortingTopic(((ObjectProperty<ItemSortingTopic>) properties.get(key)).get());
+                case "autoItemTextColor"                 -> TILE.setAutoItemTextColor(((BooleanProperty) properties.get(key)).get());
+                case "autoItemDarkTextColor"             -> TILE.setAutoItemDarkTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "autoItemBrightTextColor"           -> TILE.setAutoItemBrightTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "dataPointsVisible"                 -> TILE.setDataPointsVisible(((BooleanProperty) properties.get(key)).get());
+                case "sunburstTree"                      -> TILE.getSunburstChart().setTree(((ObjectProperty<TreeNode>) properties.get(key)).get());
+                case "sunburstBackgroundColor"           -> TILE.getSunburstChart().setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "sunburstTextColor"                 -> TILE.getSunburstChart().setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "sunburstUseColorFromParent"        -> TILE.getSunburstChart().setUseColorFromParent(((BooleanProperty) properties.get(key)).get());
+                case "sunburstTextOrientation"           -> TILE.getSunburstChart().setTextOrientation(((ObjectProperty<TextOrientation>) properties.get(key)).get());
+                case "sunburstVisibleData"               -> TILE.getSunburstChart().setVisibleData(((ObjectProperty<VisibleData>) properties.get(key)).get());
+                case "sunburstInteractive"               -> TILE.getSunburstChart().setInteractive(((BooleanProperty) properties.get(key)).get());
+                case "sunburstAutoTextColor"             -> TILE.getSunburstChart().setAutoTextColor(((BooleanProperty) properties.get(key)).get());
+                case "sunburstUseChartDataTextColor"     -> TILE.getSunburstChart().setUseChartDataTextColor(((BooleanProperty) properties.get(key)).get());
+                case "snapToTicks"                       -> TILE.setSnapToTicks(((BooleanProperty) properties.get(key)).get());
+                case "minorTickCount"                    -> TILE.setMinorTickCount(((IntegerProperty) properties.get(key)).get());
+                case "majorTickUnit"                     -> TILE.setMajorTickUnit(((DoubleProperty) properties.get(key)).get());
+                case "matrixSize"                        -> {
+                    final int COLS = ((IntegerProperty) properties.get("matrixColumns")).get();
+                    final int ROWS = ((IntegerProperty) properties.get("matrixRows")).get();
+                    TILE.setMatrixSize(COLS, ROWS);
+                }
+                case "chartType"                         -> TILE.setChartType(((ObjectProperty<ChartType>) properties.get(key)).get());
+                case "tooltipTimeout"                    -> TILE.setTooltipTimeout(((DoubleProperty) properties.get(key)).get());
+                case "notifyRegionBackgroundColor"       -> TILE.setNotifyRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "notifyRegionForegroundColor"       -> TILE.setNotifyRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "showNotifyRegion"                  -> TILE.showNotifyRegion(((BooleanProperty) properties.get(key)).get());
+                case "infoRegionBackgroundColor"         -> TILE.setInfoRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "infoRegionForegroundColor"         -> TILE.setInfoRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "showInfoRegion"                    -> TILE.showInfoRegion(((BooleanProperty) properties.get(key)).get());
+                case "lowerRightRegionBackgroundColor"   -> TILE.setLowerRightRegionBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "lowerRightRegionForegroundColor"   -> TILE.setLowerRightRegionForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "lowerRightRegionTooltipText"       -> TILE.setLowerRightRegionTooltipText(((StringProperty) properties.get(key)).get());
+                case "showLowerRightRegion"              -> TILE.showLowerRightRegion(((BooleanProperty) properties.get(key)).get());
+                case "leftText"                          -> TILE.setLeftText(((StringProperty) properties.get(key)).get());
+                case "middleText"                        -> TILE.setMiddleText(((StringProperty) properties.get(key)).get());
+                case "rightText"                         -> TILE.setRightText(((StringProperty) properties.get(key)).get());
+                case "leftValue"                         -> TILE.setLeftValue(((DoubleProperty) properties.get(key)).get());
+                case "middleValue"                       -> TILE.setMiddleValue(((DoubleProperty) properties.get(key)).get());
+                case "rightValue"                        -> TILE.setRightValue(((DoubleProperty) properties.get(key)).get());
+                case "leftGraphics"                      -> TILE.setLeftGraphics(((ObjectProperty<Node>) properties.get(key)).get());
+                case "middleGraphics"                    -> TILE.setMiddleGraphics(((ObjectProperty<Node>) properties.get(key)).get());
+                case "rightGraphics"                     -> TILE.setRightGraphics(((ObjectProperty<Node>) properties.get(key)).get());
+                case "trendVisible"                      -> TILE.setTrendVisible(((BooleanProperty) properties.get(key)).get());
+                case "timeoutMs"                         -> TILE.setTimeoutMs(((LongProperty) properties.get(key)).get());
+                case "rank"                              -> TILE.setRank(((ObjectProperty<Rank>) properties.get(key)).get());
+                case "interactive"                       -> TILE.setInteractive(((BooleanProperty) properties.get(key)).get());
+                case "numberOfValuesForTrendCalculation" -> TILE.setNumberOfValuesForTrendCalculation(((IntegerProperty) properties.get(key)).get());
+                case "backgroundImage"                   -> TILE.setBackgroundImage(((ObjectProperty<Image>) properties.get(key)).get());
+                case "backgroundImageOpacity"            -> TILE.setBackgroundImageOpacity(((DoubleProperty) properties.get(key)).get());
+                case "backgroundImageKeepAspect"         -> TILE.setBackgroundImageKeepAspect(((BooleanProperty) properties.get(key)).get());
+                case "infoRegionEventHandler"            -> TILE.setInfoRegionEventHandler(((ObjectProperty<EventHandler<MouseEvent>>) properties.get(key)).get());
+                case "infoRegionTooltipText"             -> TILE.setInfoRegionTooltipText(((StringProperty) properties.get(key)).get());
+                case "notifyRegionTooltipText"           -> TILE.setNotifyRegionTooltipText(((StringProperty) properties.get(key)).get());
+            }
         }
         properties.clear();
         return TILE;

@@ -24,11 +24,16 @@ import eu.hansolo.tilesfx.events.ChartDataEventListener;
 import eu.hansolo.tilesfx.fonts.Fonts;
 import eu.hansolo.tilesfx.tools.Helper;
 import eu.hansolo.toolboxfx.FontMetrix;
+import eu.hansolo.toolboxfx.geom.Rectangle;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -46,6 +51,9 @@ public class CycleStepTileSkin extends TileSkin {
     private List<ChartItem>               chartItems;
     private VBox                          chartBox;
     private ListChangeListener<ChartData> chartDataListener;
+    private Tooltip                       selectionTooltip;
+    private EventHandler<MouseEvent>      mouseHandler;
+
 
 
     // ******************** Constructors **************************************
@@ -59,10 +67,19 @@ public class CycleStepTileSkin extends TileSkin {
         super.initGraphics();
 
         chartDataListener = change -> {
+            chartBox.getChildren().forEach(child -> ((ChartItem) child).dispose());
             chartBox.getChildren().clear();
             double sum = tile.getChartData().stream().mapToDouble(chartData -> chartData.getValue()).sum();
             tile.getChartData().forEach(chartData -> chartBox.getChildren().add(new ChartItem(chartData, sum)));
             updateChart();
+        };
+
+        mouseHandler = e -> {
+            final javafx.event.EventType<? extends MouseEvent> TYPE = e.getEventType();
+            if (MouseEvent.MOUSE_MOVED.equals(TYPE) || MouseEvent.MOUSE_EXITED.equals(TYPE)) {
+                selectionTooltip.hide();
+                selectionTooltip.setOpacity(0);
+            }
         };
 
         chartItems = new ArrayList<>();
@@ -81,12 +98,21 @@ public class CycleStepTileSkin extends TileSkin {
         text.setFill(tile.getUnitColor());
         Helper.enableNode(text, tile.isTextVisible());
 
+        selectionTooltip = new Tooltip("");
+        selectionTooltip.setOpacity(0);
+        selectionTooltip.setWidth(60);
+        selectionTooltip.setHeight(48);
+        Tooltip.install(getPane(), selectionTooltip);
+
         getPane().getChildren().addAll(titleText, text, chartBox);
     }
 
     @Override protected void registerListeners() {
         super.registerListeners();
         tile.getChartData().addListener(chartDataListener);
+
+        tile.addEventHandler(MouseEvent.MOUSE_MOVED, mouseHandler);
+        tile.addEventHandler(MouseEvent.MOUSE_EXITED, mouseHandler);
     }
 
 
@@ -104,6 +130,8 @@ public class CycleStepTileSkin extends TileSkin {
 
     @Override public void dispose() {
         tile.getChartData().removeListener(chartDataListener);
+        tile.removeEventHandler(MouseEvent.MOUSE_MOVED, mouseHandler);
+        tile.removeEventHandler(MouseEvent.MOUSE_EXITED, mouseHandler);
         super.dispose();
     }
 
@@ -176,28 +204,41 @@ public class CycleStepTileSkin extends TileSkin {
 
 
     public class ChartItem extends Region implements ChartDataEventListener {
-        private static final double          PREFERRED_WIDTH  = 250;
-        private static final double          PREFERRED_HEIGHT = 250;
-        private static final double          MINIMUM_WIDTH    = 10;
-        private static final double          MINIMUM_HEIGHT   = 10;
-        private static final double          MAXIMUM_WIDTH    = 1024;
-        private static final double          MAXIMUM_HEIGHT   = 1024;
-        private              double          size;
-        private              double          width;
-        private              double          height;
-        private              Canvas          canvas;
-        private              GraphicsContext ctx;
-        private              ChartData       chartData;
-        private              double          sum;
-        private              double          factorX;
-
+        private static final double                   PREFERRED_WIDTH  = 250;
+        private static final double                   PREFERRED_HEIGHT = 250;
+        private static final double                   MINIMUM_WIDTH    = 10;
+        private static final double                   MINIMUM_HEIGHT   = 10;
+        private static final double                   MAXIMUM_WIDTH    = 1024;
+        private static final double                   MAXIMUM_HEIGHT   = 1024;
+        private              double                   size;
+        private              double                   width;
+        private              double                   height;
+        private              Canvas                   canvas;
+        private              GraphicsContext          ctx;
+        private              ChartData                chartData;
+        private              double                   sum;
+        private              double                   factorX;
+        private              Rectangle                barRectangle;
+        private              EventHandler<MouseEvent> mouseHandler;
 
 
         // ******************** Constructors **************************************
         public ChartItem(final ChartData chartData, final double sum) {
-            this.chartData = chartData;
-            this.sum       = sum;
-            this.factorX   = 0;
+            this.chartData    = chartData;
+            this.sum          = sum;
+            this.factorX      = 0;
+            this.barRectangle = new Rectangle();
+            this.mouseHandler = e -> {
+                if (barRectangle.contains(e.getSceneX(), e.getSceneY())) {
+                    String  tooltipText   = new StringBuilder(chartData.getName()).append("\n").append(String.format(locale, formatString, chartData.getValue())).toString();
+                    Point2D popupLocation = new Point2D(e.getScreenX() - selectionTooltip.getWidth() * 0.5, e.getScreenY() - size * 0.025 - selectionTooltip.getHeight());
+                    selectionTooltip.setText(tooltipText);
+                    selectionTooltip.setX(popupLocation.getX());
+                    selectionTooltip.setY(popupLocation.getY());
+                    selectionTooltip.setOpacity(1);
+                    selectionTooltip.show(tile.getScene().getWindow());
+                }
+            };
             initGraphics();
             registerListeners();
         }
@@ -224,6 +265,7 @@ public class CycleStepTileSkin extends TileSkin {
             widthProperty().addListener(o -> resize());
             heightProperty().addListener(o -> resize());
             chartData.addChartDataEventListener(this);
+            addEventFilter(MouseEvent.MOUSE_CLICKED, mouseHandler);
         }
 
 
@@ -236,14 +278,21 @@ public class CycleStepTileSkin extends TileSkin {
         @Override protected double computeMaxHeight(final double WIDTH) { return MAXIMUM_HEIGHT; }
 
 
-
         public ChartData getChartData() { return chartData; }
+
+        public Rectangle getBarRectangle() { return barRectangle; }
 
         public void update(final double sum, final double factorX) {
             this.sum     = sum;
             this.factorX = factorX;
             redraw();
         }
+
+        public void dispose() {
+            chartData.removeChartDataEventListener(this);
+            removeEventFilter(MouseEvent.MOUSE_CLICKED, mouseHandler);
+        }
+
 
         // ******************** Resizing ******************************************
         private void resize() {
@@ -272,17 +321,24 @@ public class CycleStepTileSkin extends TileSkin {
             Color      barBackgroundColor = Helper.getColorWithOpacity(tile.getForegroundColor(), 0.1);
             Color      barColor           = chartData.getFillColor();
             boolean    autoItemTextColor  = tile.getAutoItemTextColor();
-            Color      textColor          = tile.getForegroundColor();
-            Font       valueFont          = Fonts.latoRegular(height * 0.3);
+            Color      textFill           = tile.getForegroundColor();
+            double     valueFontSize      = height * 0.3;
+            Font       valueFont          = Fonts.latoRegular(valueFontSize);
             FontMetrix fontMetrix         = new FontMetrix(valueFont);
-            String     valueText          = String.format(tile.getLocale(), formatString, value);
+            String     valueText          = tile.getShortenNumbers() ? Helper.shortenNumber((long) value, locale) : String.format(tile.getLocale(), formatString, value);
             if (autoItemTextColor) {
                 if (fontMetrix.computeStringWidth(valueText) > barWidth) {
-                    textColor = Helper.isDark(tile.getBackgroundColor()) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
+                    textFill = Helper.isDark(tile.getBackgroundColor()) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
                 } else {
-                    textColor = Helper.isDark(barColor) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
+                    textFill = Helper.isDark(barColor) ? tile.getAutoItemBrightTextColor() : tile.getAutoItemDarkTextColor();
                 }
             }
+
+            double barLeftX      = barStartX + factorX * maxBarWidth;
+            double barRightX     = barStartX + factorX * maxBarWidth + barWidth;
+            double bar25Percent  = barStartX + (maxBarWidth * 0.25);
+            double bar75Percent  = barStartX + (maxBarWidth * 0.75);
+            double bar100Percent = barStartX + maxBarWidth;
 
             ctx.setTextBaseline(VPos.CENTER);
             ctx.setFont(Fonts.latoRegular(height * 0.4));
@@ -293,11 +349,28 @@ public class CycleStepTileSkin extends TileSkin {
             ctx.setFill(barBackgroundColor);
             ctx.fillRect(barStartX, barStartY, maxBarWidth, barHeight);
             ctx.setFill(barColor);
-            ctx.fillRect(barStartX + factorX * maxBarWidth, barStartY, barWidth, barHeight);
-            ctx.setFill(textColor);
+            ctx.fillRect(barLeftX, barStartY, barWidth, barHeight);
+            ctx.setFill(textFill);
             ctx.setFont(valueFont);
-            ctx.setTextAlign(TextAlignment.CENTER);
-            ctx.fillText(valueText, barStartX + factorX * maxBarWidth + barWidth * 0.5, height * 0.5, maxTextWidth);
+
+            Point2D p = canvas.localToScene(barStartX, barStartY);
+            barRectangle.set(p.getX(), p.getY(), maxBarWidth, barHeight);
+
+            if (valueFontSize >= 6) {
+                if (barLeftX < bar25Percent) {
+                    ctx.setTextAlign(TextAlignment.LEFT);
+                    maxTextWidth = bar100Percent - barLeftX;
+                    ctx.fillText(valueText, barLeftX, height * 0.5, maxTextWidth);
+                } else if (barRightX > bar75Percent) {
+                    ctx.setTextAlign(TextAlignment.RIGHT);
+                    maxTextWidth = barRightX - barStartX;
+                    ctx.fillText(valueText, barRightX, height * 0.5, maxTextWidth);
+                } else {
+                    ctx.setTextAlign(TextAlignment.CENTER);
+                    maxTextWidth = bar100Percent - barLeftX + barRightX - barStartX;
+                    ctx.fillText(valueText, barLeftX + (barWidth * 0.5), height * 0.5, maxTextWidth);
+                }
+            }
         }
 
         @Override public void onChartDataEvent(final ChartDataEvent EVENT) {

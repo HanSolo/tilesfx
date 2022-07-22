@@ -92,7 +92,7 @@ public class FireSmokeTileSkin extends TileSkin {
         smoke = new Smoke();
         fire  = new Fire();
 
-        getPane().getChildren().addAll(titleText, valueUnitFlow, fractionLine, text, smoke, fire);
+        getPane().getChildren().addAll(titleText, text, smoke, fire, valueUnitFlow, fractionLine);
     }
 
     @Override protected void registerListeners() {

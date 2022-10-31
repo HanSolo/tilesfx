@@ -138,38 +138,23 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
     public final ChartData build() {
         final ChartData DATA = new ChartData();
         for (String key : properties.keySet()) {
-            if ("name".equals(key)) {
-                DATA.setName(((StringProperty) properties.get(key)).get());
-            } else if("value".equals(key)) {
-                DATA.setValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("timestamp".equals(key)) {
-                DATA.setTimestamp(((ObjectProperty<Instant>) properties.get(key)).get());
-            } else if ("duration".equals(key)) {
-                DATA.setDuration(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
-            } else if ("location".equals(key)) {
-                DATA.setLocation(((ObjectProperty<Location>) properties.get(key)).get());
-            } else if ("fillColor".equals(key)) {
-                DATA.setFillColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("strokeColor".equals(key)) {
-                DATA.setStrokeColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("textColor".equals(key)) {
-                DATA.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("animated".equals(key)) {
-                DATA.setAnimated(((BooleanProperty) properties.get(key)).get());
-            } else if("formatString".equals(key)) {
-                DATA.setFormatString(((StringProperty) properties.get(key)).get());
-            } else if("minValue".equals(key)) {
-                DATA.setMinValue(((DoubleProperty) properties.get(key)).get());
-            } else if("maxValue".equals(key)) {
-                DATA.setMaxValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("gradientLookup".equals(key)) {
-                DATA.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
-            } else if ("useChartDataColor".equals(key)) {
-                DATA.setUseChartDataColors(((BooleanProperty) properties.get(key)).get());
-            } else if ("onChartDataEvent".equals(key)) {
-                DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
-            } else if ("image".equals(key)) {
-                DATA.setImage(((ObjectProperty<Image>) properties.get(key)).get());
+            switch (key) {
+                case "name"              -> DATA.setName(((StringProperty) properties.get(key)).get());
+                case "value"             -> DATA.setValue(((DoubleProperty) properties.get(key)).get());
+                case "timestamp"         -> DATA.setTimestamp(((ObjectProperty<Instant>) properties.get(key)).get());
+                case "duration"          -> DATA.setDuration(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
+                case "location"          -> DATA.setLocation(((ObjectProperty<Location>) properties.get(key)).get());
+                case "fillColor"         -> DATA.setFillColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "strokeColor"       -> DATA.setStrokeColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "textColor"         -> DATA.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "animated"          -> DATA.setAnimated(((BooleanProperty) properties.get(key)).get());
+                case "formatString"      -> DATA.setFormatString(((StringProperty) properties.get(key)).get());
+                case "minValue"          -> DATA.setMinValue(((DoubleProperty) properties.get(key)).get());
+                case "maxValue"          -> DATA.setMaxValue(((DoubleProperty) properties.get(key)).get());
+                case "gradientLookup"    -> DATA.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
+                case "useChartDataColor" -> DATA.setUseChartDataColors(((BooleanProperty) properties.get(key)).get());
+                case "onChartDataEvent"  -> DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
+                case "image"             -> DATA.setImage(((ObjectProperty<Image>) properties.get(key)).get());
             }
         }
         return DATA;

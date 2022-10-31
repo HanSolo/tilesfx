@@ -80,18 +80,13 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
     public final Alarm build() {
         final Alarm SECTION = new Alarm();
         for (String key : properties.keySet()) {
-            if ("repetition".equals(key)) {
-                SECTION.setRepetition(((ObjectProperty<Repetition>) properties.get(key)).get());
-            } else if("time".equals(key)) {
-                SECTION.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
-            } else if("armed".equals(key)) {
-                SECTION.setArmed(((BooleanProperty) properties.get(key)).get());
-            } else if("text".equals(key)) {
-                SECTION.setText(((StringProperty) properties.get(key)).get());
-            } else if ("command".equals(key)) {
-                SECTION.setCommand(((ObjectProperty<Command>) properties.get(key)).get());
-            } else if ("color".equals(key)) {
-                SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
+            switch (key) {
+                case "repetition" -> SECTION.setRepetition(((ObjectProperty<Repetition>) properties.get(key)).get());
+                case "time"       -> SECTION.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
+                case "armed"      -> SECTION.setArmed(((BooleanProperty) properties.get(key)).get());
+                case "text"       -> SECTION.setText(((StringProperty) properties.get(key)).get());
+                case "command"    -> SECTION.setCommand(((ObjectProperty<Command>) properties.get(key)).get());
+                case "color"      -> SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
             }
         }
         return SECTION;

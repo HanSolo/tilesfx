@@ -113,32 +113,20 @@ public class BarChartItemBuilder<B extends BarChartItemBuilder<B>> {
     public final BarChartItem build() {
         final BarChartItem item = new BarChartItem();
         for (String key : properties.keySet()) {
-            if ("name".equals(key)) {
-                item.setName(((StringProperty) properties.get(key)).get());
-            } else if("value".equals(key)) {
-                item.setValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("timestamp".equals(key)) {
-                item.setTimestamp(((ObjectProperty<Instant>) properties.get(key)).get());
-            } else if ("duration".equals(key)) {
-                item.setDuration(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
-            } else if ("barColor".equals(key)) {
-                item.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("barBackgroundColor".equals(key)) {
-                item.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("nameColor".equals(key)) {
-                item.setNameColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("valueColor".equals(key)) {
-                item.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("formatString".equals(key)) {
-                item.setFormatString(((StringProperty) properties.get(key)).get());
-            } else if("maxValue".equals(key)) {
-                item.setMaxValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("shortenNumbers".equals(key)) {
-                item.setShortenNumbers(((BooleanProperty) properties.get(key)).get());
-            } else if ("percentageVisible".equals(key)) {
-                item.setPercentageVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("onChartDataEvent".equals(key)) {
-                item.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
+            switch (key) {
+                case "name"               -> item.setName(((StringProperty) properties.get(key)).get());
+                case "value"              -> item.setValue(((DoubleProperty) properties.get(key)).get());
+                case "timestamp"          -> item.setTimestamp(((ObjectProperty<Instant>) properties.get(key)).get());
+                case "duration"           -> item.setDuration(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
+                case "barColor"           -> item.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "barBackgroundColor" -> item.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "nameColor"          -> item.setNameColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "valueColor"         -> item.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "formatString"       -> item.setFormatString(((StringProperty) properties.get(key)).get());
+                case "maxValue"           -> item.setMaxValue(((DoubleProperty) properties.get(key)).get());
+                case "shortenNumbers"     -> item.setShortenNumbers(((BooleanProperty) properties.get(key)).get());
+                case "percentageVisible"  -> item.setPercentageVisible(((BooleanProperty) properties.get(key)).get());
+                case "onChartDataEvent"   -> item.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
             }
         }
         return item;

@@ -152,6 +152,7 @@ public class Demo extends Application {
     private Tile            radialChartTile;
     private Tile            donutChartTile;
     private Tile            circularProgressTile;
+    private Tile            circularProgressNumberTile;
     private Tile            stockTile;
     private Tile            gaugeSparkLineTile;
     private Tile            radarChartTile1;
@@ -552,6 +553,14 @@ public class Demo extends Application {
                                           .text("Some text")
                                           .unit(Helper.PERCENTAGE)
                                           .build();
+
+        circularProgressNumberTile = TileBuilder.create()
+                                                .skinType(SkinType.CIRCULAR_PROGRESS_NUMBER)
+                                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                                .title("CircularProgressNumber Tile")
+                                                .text("Some text")
+                                                .build();
+
 
         stockTile = TileBuilder.create()
                                .skinType(SkinType.STOCK)
@@ -1270,6 +1279,8 @@ public class Demo extends Application {
 
                     circularProgressTile.setValue(RND.nextDouble() * 120);
 
+                    circularProgressNumberTile.setValue(RND.nextDouble() * 120);
+
                     stockTile.setValue(RND.nextDouble() * 50 + 500);
 
                     gaugeSparkLineTile.setValue(RND.nextDouble() * 100);
@@ -1337,7 +1348,7 @@ public class Demo extends Application {
                                              lineChartTile, timerControlTile, numberTile, textTile,
                                              highLowTile, plusMinusTile, sliderTile, switchTile, timeTile,
                                              barChartTile, customTile, leaderBoardTile, worldTile, mapTile,
-                                             radialChartTile, donutChartTile, circularProgressTile, stockTile,
+                                             radialChartTile, donutChartTile, circularProgressTile, circularProgressNumberTile, stockTile,
                                              gaugeSparkLineTile, radarChartTile1, radarChartTile2,
                                              smoothAreaChartTile, countryTile, characterTile,
                                              flipTile, switchSliderTile, dateTile, calendarTile, sunburstTile,

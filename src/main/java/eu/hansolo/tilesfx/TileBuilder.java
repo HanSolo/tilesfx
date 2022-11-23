@@ -1279,6 +1279,10 @@ public class TileBuilder<B extends TileBuilder<B>> {
                     TILE.setBarBackgroundColor(TILE.getBackgroundColor().brighter());
                     TILE.setAnimated(true);
                     break;
+                case CIRCLE_PROGRESS_NUM:
+                    TILE.setBarBackgroundColor(TILE.getBackgroundColor().brighter());
+                    TILE.setAnimated(true);
+                    break;
                 case STOCK:
                     TILE.setAnimated(false);
                     TILE.setAveragingPeriod(720);

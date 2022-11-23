@@ -144,6 +144,7 @@ public class Demo extends Application {
     private Tile            radialChartTile;
     private Tile            donutChartTile;
     private Tile            circularProgressTile;
+    private Tile            circleProgresTileNum;
     private Tile            stockTile;
     private Tile            gaugeSparkLineTile;
     private Tile            radarChartTile1;
@@ -503,6 +504,13 @@ public class Demo extends Application {
                                           .text("Some text")
                                           .unit(Helper.PERCENTAGE)
                                           .build();
+
+        circleProgresTileNum = TileBuilder.create()
+                                .skinType(SkinType.CIRCLE_PROGRESS_NUM)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                .title("CircularProgress Num Tile")
+                                .text("Some text")
+                                .build();
 
         stockTile = TileBuilder.create()
                                .skinType(SkinType.STOCK)

@@ -96,6 +96,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -146,6 +147,7 @@ public class Tile extends Control {
                            LEADER_BOARD("LeaderBoardTileSkin"),
                            MAP("MapTileSkin"), RADIAL_CHART("RadialChartTileSkin"), DONUT_CHART("DonutChartTileSkin"),
                            CIRCULAR_PROGRESS("CircularProgressTileSkin"), STOCK("StockTileSkin"),
+                           CIRCLE_PROGRESS_NUM("CircleProgressTileNumberSkin"),
                            GAUGE_SPARK_LINE("GaugeSparkLineTileSkin"), SMOOTH_AREA_CHART("SmoothAreaChartTileSkin"),
                            RADAR_CHART("RadarChartTileSkin"), RADAR_NODE_CHART("RadarNodeChartTileSkin"), COUNTRY("CountryTileSkin"),
                            CHARACTER("CharacterTileSkin"), FLIP("FlipTileSkin"), SWITCH_SLIDER("SwitchSliderTileSkin"),
@@ -6510,6 +6512,7 @@ public class Tile extends Control {
             case RADIAL_CHART        : return new RadialChartTileSkin(Tile.this);
             case DONUT_CHART         : return new DonutChartTileSkin(Tile.this);
             case CIRCULAR_PROGRESS   : return new CircularProgressTileSkin(Tile.this);
+            case CIRCLE_PROGRESS_NUM : return new CircleProgressTileNumberSkin(Tile.this);
             case STOCK               : return new StockTileSkin(Tile.this);
             case GAUGE_SPARK_LINE    : return new GaugeSparkLineTileSkin(Tile.this);
             case SMOOTH_AREA_CHART   : return new SmoothAreaChartTileSkin(Tile.this);
@@ -6631,6 +6634,10 @@ public class Tile extends Control {
                 setAnimated(true);
                 break;
             case CIRCULAR_PROGRESS:
+                setBarBackgroundColor(getBackgroundColor().brighter());
+                setAnimated(true);
+                break;
+            case CIRCLE_PROGRESS_NUM:
                 setBarBackgroundColor(getBackgroundColor().brighter());
                 setAnimated(true);
                 break;
@@ -6778,6 +6785,7 @@ public class Tile extends Control {
             case RADIAL_CHART       : setSkin(new RadialChartTileSkin(Tile.this)); break;
             case DONUT_CHART        : setSkin(new DonutChartTileSkin(Tile.this)); break;
             case CIRCULAR_PROGRESS  : setSkin(new CircularProgressTileSkin(Tile.this)); break;
+            case CIRCLE_PROGRESS_NUM: setSkin(new CircleProgressTileNumberSkin(Tile.this)); break;
             case STOCK              : setSkin(new StockTileSkin(Tile.this)); break;
             case GAUGE_SPARK_LINE   : setSkin(new GaugeSparkLineTileSkin(Tile.this)); break;
             case SMOOTH_AREA_CHART  : setSkin(new SmoothAreaChartTileSkin(Tile.this)); break;

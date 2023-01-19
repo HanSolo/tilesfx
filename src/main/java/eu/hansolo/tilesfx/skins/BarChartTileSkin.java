@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 
 /**
@@ -182,7 +181,12 @@ public class BarChartTileSkin extends TileSkin {
 
     // ******************** Resizing ******************************************
     private void updateChart() {
-        Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue).reversed());
+        switch (tile.getItemSorting()) {
+            case ASCENDING  -> Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue));
+            case DESCENDING -> Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue).reversed());
+            case NONE       -> barChartPane.getItems();
+            default         -> Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue).reversed());
+        }
     }
 
     @Override protected void resizeStaticText() {

@@ -9,17 +9,18 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [17.0.3]
+        java: [17.0.6]
       fail-fast: false
       max-parallel: 4
     name: Test JDK ${{ matrix.java }}, ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: foojayio/setup-java@disco
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17.0.6
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
+          distribution: 'zulu'
       - name: Import GPG Key
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@v3

@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -18,7 +16,11 @@ import java.text.SimpleDateFormat
  * limitations under the License.
  */
 
-// TilesFX main build file
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+import java.text.SimpleDateFormat
+
 plugins {
     id 'idea'
     id 'java-library'
@@ -34,10 +36,10 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 description   = 'TilesFX is a JavaFX library containing tiles for dashboards'
-mainClassName = "$moduleName/eu.hansolo.tilesfx.Demo"
 
 Date buildTimeAndDate = new Date()
 ext {
+    moduleName      = 'eu.hansolo.tilesfx'
     buildDate       = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
     buildTime       = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
     platform        = osdetector.os == 'osx' ? osdetector.arch == 'aarch_64' ? 'mac-aarch64' : 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os == 'linux' ? osdetector.arch == 'aarch_64' ? 'linux-aarch64' : 'linux' : osdetector.os
@@ -63,7 +65,25 @@ dependencies {
     implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
 }
 
+application {
+    mainClass = "eu.hansolo.tilesfx.DemoLauncher"
+    mainModule = moduleName
+}
+
+java {
+    // Set to false per https://github.com/java9-modularity/gradle-modules-plugin
+    modularity.inferModulePath.set(false)
+}
+
 jar {
+    from {
+        //duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        //configurations.runtimeClasspath.collect {  it.isDirectory() ? it : zipTree(it)  }
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
     manifest {
         attributes(
                 'Built-By'              : System.properties['user.name'],
@@ -77,12 +97,15 @@ jar {
                 'Implementation-Version': project.version,
                 'Bundle-Name'           : project.name,
                 'Bundle-License'        : 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://spdx.org/licenses/Apache-2.0.html',
-                'Bundle-Description'    : description,
+                'Bundle-Description'    : project.description,
                 'Bundle-SymbolicName'   : 'eu.hansolo.tilesfx',
-                'Export-Package'        : 'eu.hansolo.tilesfx, eu.hansolo.tilesfx.chart, eu.hansolo.tilesfx.colors, eu.hansolo.tilesfx.events, eu.hansolo.tilesfx.fonts, eu.hansolo.tilesfx.icons, eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools'
+                'Export-Package'        : 'eu.hansolo.tilesfx, eu.hansolo.tilesfx.chart, eu.hansolo.tilesfx.colors, eu.hansolo.tilesfx.events, eu.hansolo.tilesfx.fonts, eu.hansolo.tilesfx.icons, eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools',
+                'Class-Path'            : "${project.name}-${project.version}.jar",
+                'Main-Class'            : application.mainClass
         )
     }
 }
+
 
 if (JavaVersion.current().isJava8Compatible()) {
     allprojects {
@@ -92,15 +115,14 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-// start the demo from gradle
+
 task Demo(type: JavaExec) {
-    mainClass = "eu.hansolo.tilesfx.DemoLauncher"
+    mainClass = 'eu.hansolo.tilesfx.DemoLauncher'
     classpath = sourceSets.main.runtimeClasspath
 }
 
-// Only used for internal test
 task Test(type: JavaExec) {
-    mainClass = "eu.hansolo.tilesfx.TestLauncher"
+    mainClass = 'eu.hansolo.tilesfx.TestLauncher'
     classpath = sourceSets.main.runtimeClasspath
 }
 
@@ -129,6 +151,24 @@ signing {
 
     sign configurations.archives
     sign publishing.publications
+}
+
+// Remove 'thirdPartyCompatibility' from JavaFX runtimeElements variant
+// Otherwise it locks Gradle Module Metadata (GMM) to the publishing OS
+tasks.withType(GenerateModuleMetadata).configureEach {
+    doLast { _ ->
+        def gmmFile = it.outputFile.get().asFile
+        def inJson = new JsonSlurper().parseText(gmmFile.text)
+        def filteredVariant = inJson.variants.findAll { it.name == configurations.runtimeElements.name }
+        // remove "thirdPartyCompatibility" from GMM
+        filteredVariant.dependencies.first().each {
+            if (it.group == 'org.openjfx') {
+                it.remove('thirdPartyCompatibility')
+            }
+        }
+        def outJson = JsonOutput.toJson(inJson)
+        gmmFile.write(JsonOutput.prettyPrint(outJson))
+    }
 }
 
 publishing {
@@ -180,17 +220,25 @@ publishing {
         maven {
             name = "OSSRH"
             url  = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-            credentials {
-                username = null == ciOssrhUsername ? ossrhUsername : ciOssrhUsername
-                password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
+            try {
+                credentials {
+                    username = null == ciOssrhUsername ? ossrhUsername : ciOssrhUsername
+                    password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
+                }
+            } catch (Exception e) {
+
             }
         }
         maven {
             name = "GitHubPackages"
             url  = "https://maven.pkg.github.com/HanSolo/tilesfx"
-            credentials {
-                username = null == ciGHUser  ? ghUser  : ciGHUser
-                password = null == ciGHToken ? ghToken : ciGHToken
+            try {
+                credentials {
+                    username = null == ciGHUser  ? ghUser  : ciGHUser
+                    password = null == ciGHToken ? ghToken : ciGHToken
+                }
+            } catch (Exception e) {
+
             }
         }
     }

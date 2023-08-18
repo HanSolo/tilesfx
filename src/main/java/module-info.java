@@ -21,16 +21,13 @@ module eu.hansolo.tilesfx {
     requires java.base;
 
     // Java-FX
-    requires transitive javafx.base;
-    requires transitive javafx.graphics;
-    requires transitive javafx.controls;
-    requires transitive javafx.web;
-    requires transitive javafx.media;
+    requires javafx.base;
+    requires javafx.graphics;
+    requires javafx.controls;
+    requires javafx.web;
+    requires javafx.media;
 
     // 3rd party
-    requires transitive eu.hansolo.toolbox;
-    requires transitive eu.hansolo.toolboxfx;
-    requires transitive eu.hansolo.fx.heatmap;
     requires transitive eu.hansolo.fx.countries;
 
     opens eu.hansolo.tilesfx to eu.hansolo.toolbox, eu.hansolo.toolboxfx, eu.hansolo.fx.heatmap, eu.hansolo.fx.countries;

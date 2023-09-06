@@ -5,6 +5,8 @@
 
 [![GitHub license](https://badgen.net/github/license/HanSolo/tilesfx)](https://github.com/HanSolo/tilesfx/blob/master/LICENSE)
 
+[![JFXCentral](https://img.shields.io/badge/Find_me_on-JFXCentral-blue?logo=googlechrome&logoColor=white)](https://www.jfx-central.com/libraries/tilesfx)
+
 <br>
 A JavaFX library containing tiles for Dashboards.
 

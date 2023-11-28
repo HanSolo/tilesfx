@@ -10,8 +10,6 @@
 <br>
 A JavaFX library containing tiles for Dashboards.
 
-<b>ATTENTION: Version 17.1.0 will break backwards compatibility !!!</b>
-
 Donations are welcome at [Paypal](https://paypal.me/hans0l0)
 
 ## Getting started

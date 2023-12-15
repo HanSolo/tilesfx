@@ -56,7 +56,7 @@ repositories {
 }
 
 dependencies {
-    api "eu.hansolo.fx:countries:21.0.1"
+    api "eu.hansolo.fx:countries:21.0.3"
     implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"

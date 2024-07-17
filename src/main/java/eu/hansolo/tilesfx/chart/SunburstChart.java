@@ -587,7 +587,8 @@ public class SunburstChart extends Region {
      * @param TREE
      */
     public void setTree(final TreeNode<ChartData> TREE) {
-        if (null != tree) { getTreeNode().flattened().forEach(node -> node.removeAllTreeNodeEventListeners()); }
+        if (null == tree) { return; }
+        getTreeNode().flattened().forEach(node -> node.removeAllTreeNodeEventListeners());
         tree.set(TREE);
         getTreeNode().flattened().forEach(node -> node.setOnTreeNodeEvent(e -> redraw()));
         prepareData();

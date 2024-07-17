@@ -722,14 +722,11 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
      * @return an array of paths where [0] == FillPath and [1] == StrokePath
      */
     private Path[] getPaths(final Series<X, Y> SERIES) {
-            if (!getData().contains(SERIES)) { return null; }
-
-            Node seriesNode = SERIES.getNode();
-            if (null == seriesNode) { return null; }
-
-            Group seriesGroup = (Group) seriesNode;
-            if (seriesGroup.getChildren().isEmpty() || seriesGroup.getChildren().size() < 2) { return null; }
-
+        if (!getData().contains(SERIES) || null == SERIES.getNode() || ((Group) (SERIES.getNode())).getChildren().isEmpty() || ((Group) (SERIES.getNode())).getChildren().size() < 2) {
+            throw new IllegalArgumentException("Series must contain at least two series");
+        }
+        Node  seriesNode  = SERIES.getNode();
+        Group seriesGroup = (Group) seriesNode;
         return new Path[] { /* FillPath   */ (Path) (seriesGroup).getChildren().get(0),
                             /* StrokePath */ (Path) (seriesGroup).getChildren().get(1) };
     }

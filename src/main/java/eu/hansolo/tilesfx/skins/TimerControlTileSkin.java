@@ -50,6 +50,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -250,7 +251,7 @@ public class TimerControlTileSkin extends TileSkin {
         double        offset            = 90;
         double        angleStep         = 360.0 / 60.0;
         boolean       highlightSections = tile.isHighlightSections();
-        for (TimeSection section : sectionMap.keySet()) {
+        sectionMap.forEach((section, arc) -> {
             LocalTime   start     = section.getStart();
             LocalTime   stop      = section.getStop();
             boolean     isStartAM = start.get(ChronoField.AMPM_OF_DAY) == 0;
@@ -263,7 +264,6 @@ public class TimerControlTileSkin extends TileSkin {
                 double sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5.0 + (stop.getMinute() - start.getMinute()) / 12.0 + (stop.getSecond() - start.getSecond()) / 300.0) * angleStep;
                 if (start.getHour() > stop.getHour()) { sectionAngleExtend = (360.0 - Math.abs(sectionAngleExtend)); }
 
-                Arc arc = sectionMap.get(section);
                 arc.setCenterX(clockSize * 0.5);
                 arc.setCenterY(clockSize * 0.5);
                 arc.setRadiusX(clockSize * 0.45);
@@ -281,7 +281,7 @@ public class TimerControlTileSkin extends TileSkin {
                     arc.setStroke(section.getColor());
                 }
             }
-        }
+        });
     }
 
     public void updateTime(final ZonedDateTime TIME) {
@@ -306,13 +306,13 @@ public class TimerControlTileSkin extends TileSkin {
         }
 
         if (sectionsVisible) {
-            for (TimeSection section : sectionMap.keySet()) {
+            sectionMap.forEach((section, arc) -> {
                 if (highlightSections) {
-                    sectionMap.get(section).setStroke(section.contains(TIME.toLocalTime()) ? section.getHighlightColor() : section.getColor());
+                    arc.setStroke(section.contains(TIME.toLocalTime()) ? section.getHighlightColor() : section.getColor());
                 } else {
-                    sectionMap.get(section).setStroke(section.getColor());
+                    arc.setStroke(section.getColor());
                 }
-            }
+            });
             drawTimeSections();
         }
 
@@ -321,7 +321,7 @@ public class TimerControlTileSkin extends TileSkin {
         amPmText.setX((width - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(height * 0.5 - size * 0.1);
 
-        dateText.setText(dateFormatter.format(TIME).toUpperCase());
+        dateText.setText(dateFormatter.format(TIME).toUpperCase(Locale.ENGLISH));
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.setX((width - dateText.getLayoutBounds().getWidth()) * 0.5);
         dateText.setY(height * 0.5 + size * 0.15);

@@ -161,7 +161,6 @@ public class FlowGridPane extends GridPane {
         setNoOfRows(ROWS);
     }
 
-    private int coordsToOffset(final int COL, final int ROW) { return ROW * noOfCols.get() + COL; }
     private int offsetToCol(final int OFFSET) { return OFFSET % noOfCols.get(); }
     private int offsetToRow(final int OFFSET) { return OFFSET / noOfCols.get(); }
 

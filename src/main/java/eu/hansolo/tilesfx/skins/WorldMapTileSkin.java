@@ -229,20 +229,6 @@ public class WorldMapTileSkin extends TileSkin {
         super.dispose();
     }
 
-    private void setFillAndStroke() {
-        countryPaths.keySet().forEach(name -> {
-            Country country = Country.valueOf(name);
-            setCountryFillAndStroke(country, null == country.getFill() ? tile.getForegroundColor() : country.getFill(), null == country.getStroke() ? tile.getBackgroundColor() : country.getStroke());
-        });
-    }
-    private void setCountryFillAndStroke(final Country COUNTRY, final Color FILL, final Color STROKE) {
-        List<CountryPath> paths = countryPaths.get(COUNTRY.getName());
-        for (CountryPath path : paths) {
-            path.setFill(FILL);
-            path.setStroke(STROKE);
-        }
-    }
-
 
     // ******************** Resizing ******************************************
     @Override protected void resizeStaticText() {

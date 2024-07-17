@@ -99,30 +99,21 @@ public class SpinnerBuilder<B extends SpinnerBuilder<B>> {
         return (B)this;
     }
 
-    private final void build(final Spinner spinner) {
-        for (String key : properties.keySet()) {
-            if ("value".equals(key)) {
-                spinner.setValue(((DoubleProperty) properties.get(key)).get());
-            } else if ("snapshotBackground".equals(key)) {
-                spinner.setSnapshotBackground(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("backgroundVisible".equals(key)) {
-                spinner.setBackgroundVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("overlayVisible".equals(key)) {
-                spinner.setOverlayVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("backgroundColor".equals(key)) {
-                spinner.setBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("foregroundColor".equals(key)) {
-                spinner.setForegroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("spinnerType".equals(key)) {
-                spinner.setSpinnerType(((ObjectProperty<SpinnerType>) properties.get(key)).get());
-            } else if ("onValueChanged".equals(key)) {
-                spinner.setOnValueChanged(((ObjectProperty<SpinnerObserver>) properties.get(key)).get());
-            } else if ("onZeroPassed".equals(key)) {
-                spinner.setOnZeroPassed(((ObjectProperty<SpinnerObserver>) properties.get(key)).get());
-            } else if ("onSpinnerEvent".equals(key)) {
-                spinner.setOnSpinnerEvent(((ObjectProperty<SpinnerObserver>) properties.get(key)).get());
+    private void build(final Spinner spinner) {
+        properties.forEach((key, property) -> {
+            switch (key) {
+                case "value"              -> spinner.setValue(((DoubleProperty) property).get());
+                case "snapshotBackground" -> spinner.setSnapshotBackground(((ObjectProperty<Color>) property).get());
+                case "backgroundVisible"  -> spinner.setBackgroundVisible(((BooleanProperty) property).get());
+                case "overlayVisible"     -> spinner.setOverlayVisible(((BooleanProperty) property).get());
+                case "backgroundColor"    -> spinner.setBackgroundColor(((ObjectProperty<Color>) property).get());
+                case "foregroundColor"    -> spinner.setForegroundColor(((ObjectProperty<Color>) property).get());
+                case "spinnerType"        -> spinner.setSpinnerType(((ObjectProperty<SpinnerType>) property).get());
+                case "onValueChanged"     -> spinner.setOnValueChanged(((ObjectProperty<SpinnerObserver>) property).get());
+                case "onZeroPassed"       -> spinner.setOnZeroPassed(((ObjectProperty<SpinnerObserver>) property).get());
+                case "onSpinnerEvent"     -> spinner.setOnSpinnerEvent(((ObjectProperty<SpinnerObserver>) property).get());
             }
-        }
+        });
     }
 
     public final ImageSpinner buildImageSpinner() {

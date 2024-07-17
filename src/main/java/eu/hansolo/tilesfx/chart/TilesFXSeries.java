@@ -56,7 +56,7 @@ public class TilesFXSeries<X, Y> {
         series = SERIES;
         stroke = STROKE;
         fill   = FILL;
-        if (null != stroke & null != fill) {
+        if (null != stroke && null != fill) {
             symbolBackground = new Background(new BackgroundFill(STROKE, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
             legendSymbolFill = stroke;
         }

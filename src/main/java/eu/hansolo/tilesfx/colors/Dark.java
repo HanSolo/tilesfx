@@ -24,16 +24,16 @@ import javafx.scene.paint.Color;
  * Created by hansolo on 05.07.18.
  */
 public class Dark implements TileColor {
-    public static Color RED           = Color.web("#b21c1a");
-    public static Color ORANGE_RED    = Color.web("#b2571a");
-    public static Color ORANGE        = Color.web("#b2751a");
-    public static Color YELLOW_ORANGE = Color.web("#b2941a");
-    public static Color YELLOW        = Color.web("#b1b11b");
-    public static Color GREEN_YELLOW  = Color.web("#739522");
-    public static Color GREEN         = Color.web("#267d2c");
-    public static Color BLUE_GREEN    = Color.web("#26667d");
-    public static Color BLUE          = Color.web("#26477d");
-    public static Color PURPLE_BLUE   = Color.web("#36267d");
-    public static Color PURPLE        = Color.web("#65267d");
-    public static Color RED_PURPLE    = Color.web("#8a245a");
+    public static final Color RED           = Color.web("#b21c1a");
+    public static final Color ORANGE_RED    = Color.web("#b2571a");
+    public static final Color ORANGE        = Color.web("#b2751a");
+    public static final Color YELLOW_ORANGE = Color.web("#b2941a");
+    public static final Color YELLOW        = Color.web("#b1b11b");
+    public static final Color GREEN_YELLOW  = Color.web("#739522");
+    public static final Color GREEN         = Color.web("#267d2c");
+    public static final Color BLUE_GREEN    = Color.web("#26667d");
+    public static final Color BLUE          = Color.web("#26477d");
+    public static final Color PURPLE_BLUE   = Color.web("#36267d");
+    public static final Color PURPLE        = Color.web("#65267d");
+    public static final Color RED_PURPLE    = Color.web("#8a245a");
 }

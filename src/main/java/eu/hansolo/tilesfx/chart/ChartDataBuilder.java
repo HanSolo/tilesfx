@@ -137,26 +137,26 @@ public class ChartDataBuilder<B extends ChartDataBuilder<B>> {
 
     public final ChartData build() {
         final ChartData DATA = new ChartData();
-        for (String key : properties.keySet()) {
+        properties.forEach((key, property) -> {
             switch (key) {
-                case "name"              -> DATA.setName(((StringProperty) properties.get(key)).get());
-                case "value"             -> DATA.setValue(((DoubleProperty) properties.get(key)).get());
-                case "timestamp"         -> DATA.setTimestamp(((ObjectProperty<Instant>) properties.get(key)).get());
-                case "duration"          -> DATA.setDuration(((ObjectProperty<java.time.Duration>) properties.get(key)).get());
-                case "location"          -> DATA.setLocation(((ObjectProperty<Location>) properties.get(key)).get());
-                case "fillColor"         -> DATA.setFillColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "strokeColor"       -> DATA.setStrokeColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "textColor"         -> DATA.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "animated"          -> DATA.setAnimated(((BooleanProperty) properties.get(key)).get());
-                case "formatString"      -> DATA.setFormatString(((StringProperty) properties.get(key)).get());
-                case "minValue"          -> DATA.setMinValue(((DoubleProperty) properties.get(key)).get());
-                case "maxValue"          -> DATA.setMaxValue(((DoubleProperty) properties.get(key)).get());
-                case "gradientLookup"    -> DATA.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
-                case "useChartDataColor" -> DATA.setUseChartDataColors(((BooleanProperty) properties.get(key)).get());
-                case "onChartDataEvent"  -> DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) properties.get(key)).get());
-                case "image"             -> DATA.setImage(((ObjectProperty<Image>) properties.get(key)).get());
+                case "name"              -> DATA.setName(((StringProperty) property).get());
+                case "value"             -> DATA.setValue(((DoubleProperty) property).get());
+                case "timestamp"         -> DATA.setTimestamp(((ObjectProperty<Instant>) property).get());
+                case "duration"          -> DATA.setDuration(((ObjectProperty<java.time.Duration>) property).get());
+                case "location"          -> DATA.setLocation(((ObjectProperty<Location>) property).get());
+                case "fillColor"         -> DATA.setFillColor(((ObjectProperty<Color>) property).get());
+                case "strokeColor"       -> DATA.setStrokeColor(((ObjectProperty<Color>) property).get());
+                case "textColor"         -> DATA.setTextColor(((ObjectProperty<Color>) property).get());
+                case "animated"          -> DATA.setAnimated(((BooleanProperty) property).get());
+                case "formatString"      -> DATA.setFormatString(((StringProperty) property).get());
+                case "minValue"          -> DATA.setMinValue(((DoubleProperty) property).get());
+                case "maxValue"          -> DATA.setMaxValue(((DoubleProperty) property).get());
+                case "gradientLookup"    -> DATA.setGradientLookup(((ObjectProperty<GradientLookup>) property).get());
+                case "useChartDataColor" -> DATA.setUseChartDataColors(((BooleanProperty) property).get());
+                case "onChartDataEvent"  -> DATA.setOnChartDataEvent(((ObjectProperty<ChartDataEventListener>) property).get());
+                case "image"             -> DATA.setImage(((ObjectProperty<Image>) property).get());
             }
-        }
+        });
         return DATA;
     }
 }

@@ -492,7 +492,8 @@ public class Helper {
         } else {
             Stop lowerBound = STOPS.get(0.0);
             Stop upperBound = STOPS.get(1.0);
-            for (Double fraction : STOPS.keySet()) {
+            for (Entry<Double, Stop> entry : STOPS.entrySet()) {
+                double fraction = entry.getKey();
                 if (Double.compare(fraction,POSITION) < 0) {
                     lowerBound = STOPS.get(fraction);
                 }
@@ -551,14 +552,10 @@ public class Helper {
         return Arrays.asList(subdividePoints(points, SUB_DEVISIONS));
     }
     public static final Point[] subdividePoints(final Point[] POINTS, final int SUB_DEVISIONS) {
-        assert POINTS != null;
-        assert POINTS.length >= 3;
-        int    noOfPoints = POINTS.length;
-
-        Point[] subdividedPoints = new Point[((noOfPoints - 1) * SUB_DEVISIONS) + 1];
-
-        double increments = 1.0 / (double) SUB_DEVISIONS;
-
+        if (null == POINTS || POINTS.length < 3) { throw new IllegalArgumentException("Points cannot be null and must at least contain 3 items"); }
+        final int     noOfPoints       = POINTS.length;
+        final Point[] subdividedPoints = new Point[((noOfPoints - 1) * SUB_DEVISIONS) + 1];
+        final double  increments       = 1.0 / (double) SUB_DEVISIONS;
         for (int i = 0 ; i < noOfPoints - 1 ; i++) {
             Point p0 = i == 0 ? POINTS[i] : POINTS[i - 1];
             Point p1 = POINTS[i];
@@ -571,7 +568,6 @@ public class Helper {
                 subdividedPoints[(i * SUB_DEVISIONS) + j] = crs.q(j * increments);
             }
         }
-
         return subdividedPoints;
     }
 
@@ -1120,8 +1116,8 @@ public class Helper {
     public static final String shortenNumber(final long value, final Locale locale) {
         //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) { return shortenNumber(Long.MIN_VALUE + 1, locale); }
-        if (value < 0)               { return "-" + shortenNumber(-value, locale); }
-        if (value < 1000)            { return Long.toString(value); }
+        if (value < 0) { return "-" + shortenNumber(-value, locale); }
+        if (value < 1000) { return Long.toString(value); }
 
         final Entry<Long, String>    entry      = SUFFIXES.floorEntry(value);
         final Long                   divideBy   = entry.getKey();

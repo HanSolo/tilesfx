@@ -249,7 +249,7 @@ public class LeaderBoardItem extends Region implements Comparable<LeaderBoardIte
 
     public boolean getShortenNumbers() { return shortenNumbers; }
     public void setShortenNumbers(final boolean SHORTEN) {
-        this.shortenNumbers = shortenNumbers;
+        this.shortenNumbers = SHORTEN;
         updateValueText();
     }
 

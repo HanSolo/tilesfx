@@ -92,8 +92,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
     private              Text                 maxValueText;
     private              double               low;
     private              double               high;
-    private              double               lastLow;
-    private              double               lastHigh;
+    //private              double               lastLow;
+    //private              double               lastHigh;
     private              double               stdDeviation;
     private              int                  noOfDatapoints;
     private              List<Double>         dataList;
@@ -150,9 +150,9 @@ public class GaugeSparkLineTileSkin extends TileSkin {
 
         gradientLookup = new GradientLookup(tile.getGradientStops());
         low = maxValue;
-        lastLow        = low;
+        //lastLow        = low;
         high           = minValue;
-        lastHigh       = high;
+        //lastHigh       = high;
         stdDeviation   = 0;
         movingAverage  = tile.getMovingAverage();
         noOfDatapoints = tile.getAveragingPeriod();
@@ -418,8 +418,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         }
         resizeDynamicText();
 
-        lastLow = low;
-        lastHigh = high;
+        //lastLow = low;
+        //lastHigh = high;
     }
 
     private void setBar(final double VALUE) {
@@ -714,8 +714,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
         super.resize();
         graphBounds = new Rectangle((width - (size * 0.35)) * 0.5, (height - (size * 0.35)) * 0.5, size * 0.35, size * 0.35);
 
-        lastLow  = maxValue;
-        lastHigh = minValue;
+        //lastLow  = maxValue;
+        //lastHigh = minValue;
 
         tickLabelFontSize  = graphBounds.getHeight() * 0.1;
         Font tickLabelFont = Fonts.latoRegular(tickLabelFontSize);
@@ -839,8 +839,8 @@ public class GaugeSparkLineTileSkin extends TileSkin {
             }
             resizeDynamicText();
 
-            lastLow  = low;
-            lastHigh = high;
+            //lastLow  = low;
+            //lastHigh = high;
 
             setBar(tile.getCurrentValue());
 

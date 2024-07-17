@@ -48,7 +48,6 @@ public class YearChart extends Region {
     private static final double               MINIMUM_HEIGHT   = 10;
     private static final double               MAXIMUM_WIDTH    = 2048;
     private static final double               MAXIMUM_HEIGHT   = 2048;
-    private              double               size;
     private              double               width;
     private              double               height;
     private              Canvas               canvas;
@@ -170,7 +169,6 @@ public class YearChart extends Region {
     private void resize() {
         width = getWidth() - getInsets().getLeft() - getInsets().getRight();
         height = getHeight() - getInsets().getTop() - getInsets().getBottom();
-        size = width < height ? width : height;
 
         if (width > 0 && height > 0) {
             canvas.setWidth(width);

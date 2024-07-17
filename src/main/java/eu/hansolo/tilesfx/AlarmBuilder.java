@@ -79,16 +79,16 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
 
     public final Alarm build() {
         final Alarm SECTION = new Alarm();
-        for (String key : properties.keySet()) {
+        properties.forEach((key, property) -> {
             switch (key) {
-                case "repetition" -> SECTION.setRepetition(((ObjectProperty<Repetition>) properties.get(key)).get());
-                case "time"       -> SECTION.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
-                case "armed"      -> SECTION.setArmed(((BooleanProperty) properties.get(key)).get());
-                case "text"       -> SECTION.setText(((StringProperty) properties.get(key)).get());
-                case "command"    -> SECTION.setCommand(((ObjectProperty<Command>) properties.get(key)).get());
-                case "color"      -> SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "repetition" -> SECTION.setRepetition(((ObjectProperty<Repetition>) property).get());
+                case "time"       -> SECTION.setTime(((ObjectProperty<ZonedDateTime>) property).get());
+                case "armed"      -> SECTION.setArmed(((BooleanProperty) property).get());
+                case "text"       -> SECTION.setText(((StringProperty) property).get());
+                case "command"    -> SECTION.setCommand(((ObjectProperty<Command>) property).get());
+                case "color"      -> SECTION.setColor(((ObjectProperty<Color>) property).get());
             }
-        }
+        });
         return SECTION;
     }
 }

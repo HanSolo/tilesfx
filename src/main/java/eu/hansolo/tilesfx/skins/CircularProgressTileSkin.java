@@ -322,27 +322,25 @@ public class CircularProgressTileSkin extends TileSkin {
                 graphicContainer.setPrefSize(containerWidth, containerHeight);
                 graphicContainer.relocate((width - containerWidth) * 0.5, (height - containerHeight) * 0.35);
 
-                if (null != tile) {
-                    Node graphic = tile.getGraphic();
-                    if (tile.getGraphic() instanceof Shape) {
-                        double graphicWidth  = graphic.getBoundsInLocal().getWidth();
-                        double graphicHeight = graphic.getBoundsInLocal().getHeight();
+                Node graphic = tile.getGraphic();
+                if (tile.getGraphic() instanceof Shape) {
+                    double graphicWidth  = graphic.getBoundsInLocal().getWidth();
+                    double graphicHeight = graphic.getBoundsInLocal().getHeight();
 
-                        if (graphicWidth > containerWidth || graphicHeight > containerHeight) {
-                            double scale;
-                            if (graphicWidth - containerWidth > graphicHeight - containerHeight) {
-                                scale = containerWidth / graphicWidth;
-                            } else {
-                                scale = containerHeight / graphicHeight;
-                            }
-
-                            graphic.setScaleX(scale);
-                            graphic.setScaleY(scale);
+                    if (graphicWidth > containerWidth || graphicHeight > containerHeight) {
+                        double scale;
+                        if (graphicWidth - containerWidth > graphicHeight - containerHeight) {
+                            scale = containerWidth / graphicWidth;
+                        } else {
+                            scale = containerHeight / graphicHeight;
                         }
-                    } else if (tile.getGraphic() instanceof ImageView) {
-                        ((ImageView) graphic).setFitWidth(containerWidth);
-                        ((ImageView) graphic).setFitHeight(containerHeight);
+
+                        graphic.setScaleX(scale);
+                        graphic.setScaleY(scale);
                     }
+                } else if (tile.getGraphic() instanceof ImageView) {
+                    ((ImageView) graphic).setFitWidth(containerWidth);
+                    ((ImageView) graphic).setFitHeight(containerHeight);
                 }
             }
             resizeStaticText();

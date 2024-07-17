@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2016-2021 Gerrit Grunwald.
+ * Copyright 2016-2024 Gerrit Grunwald.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'com.google.osdetector'           version '1.7.3'
-    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.javamodularity.moduleplugin' version '1.8.15'
     id 'org.beryx.jlink'                 version '3.0.1'
-    id 'net.nemerosa.versioning'         version '3.0.0'
+    id 'net.nemerosa.versioning'         version '3.1.0'
 }
 
 apply plugin: 'maven-publish'
@@ -56,7 +56,7 @@ repositories {
 }
 
 dependencies {
-    api "eu.hansolo.fx:countries:21.0.3"
+    api "eu.hansolo.fx:countries:21.0.17"
     implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
@@ -222,8 +222,8 @@ publishing {
             url  = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
             try {
                 credentials {
-                    username = null == ciOssrhUsername ? ossrhUsername : ciOssrhUsername
-                    password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
+                    username = null == ciOssrhUsername ? ossrhToken         : ciOssrhUsername
+                    password = null == ciOssrhPassword ? ossrhTokenPassword : ciOssrhPassword
                 }
             } catch (Exception e) {
 

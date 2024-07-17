@@ -182,10 +182,9 @@ public class BarChartTileSkin extends TileSkin {
     // ******************** Resizing ******************************************
     private void updateChart() {
         switch (tile.getItemSorting()) {
-            case ASCENDING  -> Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue));
-            case DESCENDING -> Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue).reversed());
-            case NONE       -> barChartPane.getItems();
-            default         -> Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue).reversed());
+            case ASCENDING           -> Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue));
+            case NONE                -> barChartPane.getItems();
+            default /* DESCENDING */ -> Collections.sort(barChartPane.getItems(), Comparator.comparing(BarChartItem::getValue).reversed());
         }
     }
 

@@ -77,7 +77,7 @@ public class FluidTileSkin extends TileSkin {
 
         density         = 0.9; //0.75;
         friction        = 1.1; //1.14;
-        detail          = Math.round(PREFERRED_WIDTH / 20); // no of particles used to build up the wave
+        detail          = 12; // no of particles used to build up the wave
         particles       = new ArrayList<>();
         impulseInterval = 1_000_000_000l;  // Interval between random impulses being inserted into the wave to keep it moving
         updateInterval  = 50_000_000l;     // Wave update interval
@@ -98,11 +98,16 @@ public class FluidTileSkin extends TileSkin {
 
         // Create wave particles
         for( int i = 0 ; i < detail + 1 ; i++ ) {
+            /*
             particles.add(new Point(PREFERRED_WIDTH / (detail - 4) * (i - 2), PREFERRED_HEIGHT * (1d - tile.getCurrentValue()),
                                     0, PREFERRED_HEIGHT * (1d - tile.getCurrentValue()),
                                     0, Math.random() * 3,
                                     0, 0,
                                     20));
+            */
+            particles.add(new Point(PREFERRED_WIDTH / (detail - 4) * (i - 2), PREFERRED_HEIGHT * (1d - tile.getCurrentValue()),
+                                    PREFERRED_HEIGHT * (1d - tile.getCurrentValue()),
+                                    Math.random() * 3, 0, 20));
         }
 
         canvas = new Canvas();
@@ -282,7 +287,7 @@ public class FluidTileSkin extends TileSkin {
             p.x = width / (detail - 4) * (i - 2);
             p.y = height * (1d - tile.getCurrentValue());
 
-            p.originalX = p.x;
+            //p.originalX = p.x;
             p.originalY = p.y;
         }
     }
@@ -378,27 +383,28 @@ public class FluidTileSkin extends TileSkin {
     private class Point {
         double x;
         double y;
-        double originalX;
+        //double originalX;
         double originalY;
-        double velocityX;
+        //double velocityX;
         double velocityY;
-        double forceX;
+        //double forceX;
         double forceY;
         double mass;
 
 
-        public Point(final double X, final double Y,
+        public Point(final double X, final double Y, final double ORIGINAL_Y, final double VELOCITY_Y, final double FORCE_Y, final double MASS) {
+        /*public Point(final double X, final double Y,
                      final double ORIGINAL_X, final double ORIGINAL_Y,
                      final double VELOCITY_X, final double VELOCITY_Y,
                      final double FORCE_X, final double FORCE_Y,
-                     final double MASS) {
+                     final double MASS) {*/
             x         = X;
             y         = Y;
-            originalX = ORIGINAL_X;
+            //originalX = ORIGINAL_X;
             originalY = ORIGINAL_Y;
-            velocityX = VELOCITY_X;
+            //velocityX = VELOCITY_X;
             velocityY = VELOCITY_Y;
-            forceX    = FORCE_X;
+            //forceX    = FORCE_X;
             forceY    = FORCE_Y;
             mass      = MASS;
         }

@@ -34,6 +34,8 @@ import javafx.event.EventType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import java.util.Objects;
+
 
 /**
  * Created by hansolo on 19.12.16.
@@ -370,10 +372,16 @@ public class Section implements Comparable<Section> {
         checkedValue = VALUE;
     }
 
-    public boolean equals(final Section SECTION) {
-        return (Double.compare(SECTION.getStart(), getStart()) == 0 &&
-                Double.compare(SECTION.getStop(), getStop()) == 0 &&
-                SECTION.getText().equals(getText()));
+    @Override public boolean equals(final Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        Section section = (Section) o;
+        return Double.compare(_start, section._start) == 0 && Double.compare(_stop, section._stop) == 0 && Objects.equals(start, section.start) && Objects.equals(stop, section.stop) && Objects.equals(_text, section._text) &&
+               Objects.equals(text, section.text);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(_start, start, _stop, stop, _text, text);
     }
 
     @Override public int compareTo(final Section SECTION) {

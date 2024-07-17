@@ -86,13 +86,13 @@ public class SunMoonCalculator {
      * Values for azimuth, elevation, rise, set, and transit for the Sun. Angles in radians, rise ... as Julian days in UT.
      * Distance in AU.
      */
-    public double sunAz, sunEl, sunrise, sunset, sunTransit, sunTransitElev, sunDist;
+    private double sunAz, sunEl, sunrise, sunset, sunTransit, sunTransitElev, sunDist;
 
     /**
      * Values for azimuth, elevation, rise, set, and transit for the Moon. Angles in radians, rise ... as Julian days in UT.
      * Moon age is the number of days since last new Moon, in days, from 0 to 29.5. Distance in AU.
      */
-    public double moonAz, moonEl, moonRise, moonSet, moonTransit, moonAge, moonTransitElev, moonDist;
+    private double moonAz, moonEl, moonRise, moonSet, moonTransit, moonAge, moonTransitElev, moonDist;
 
     /**
      * Input values.
@@ -574,7 +574,7 @@ public class SunMoonCalculator {
         double transitToday2 = Math.floor(jd_UT + transit_time2 - 0.5) + 0.5;
         // Obtain the transit time. Preference should be given to the closest event
         // in time to the current calculation time
-        if (jdToday == transitToday2 && Math.abs(transit_time2) < Math.abs(transit_time1)) transit_time = transit_time2;
+        if (Double.compare(jdToday, transitToday2) == 0 && Math.abs(transit_time2) < Math.abs(transit_time1)) transit_time = transit_time2;
         double transit = jd_UT + transit_time;
 
         // Make calculations for rise and set
@@ -590,11 +590,11 @@ public class SunMoonCalculator {
             // in time to the current calculation time (so that iteration in other method will converge)
             double rise_time  = rise_time1;
             double riseToday2 = Math.floor(jd_UT + rise_time2 - 0.5) + 0.5;
-            if (jdToday == riseToday2 && Math.abs(rise_time2) < Math.abs(rise_time1)) rise_time = rise_time2;
+            if (Double.compare(jdToday, riseToday2) == 0 && Math.abs(rise_time2) < Math.abs(rise_time1)) rise_time = rise_time2;
 
             double set_time  = set_time1;
             double setToday2 = Math.floor(jd_UT + set_time2 - 0.5) + 0.5;
-            if (jdToday == setToday2 && Math.abs(set_time2) < Math.abs(set_time1)) set_time = set_time2;
+            if (Double.compare(jdToday, setToday2) == 0 && Math.abs(set_time2) < Math.abs(set_time1)) set_time = set_time2;
             rise = jd_UT + rise_time;
             set = jd_UT + set_time;
         }

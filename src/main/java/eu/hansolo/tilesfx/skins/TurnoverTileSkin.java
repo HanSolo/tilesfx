@@ -249,56 +249,54 @@ public class TurnoverTileSkin extends TileSkin {
                 graphicContainer.setPrefSize(containerWidth, containerHeight);
                 graphicContainer.relocate(contentBounds.getX(), contentBounds.getY() * 0.3);
 
-                if (null != tile) {
-                    imgView.setPreserveRatio(true);
-                    imgView.setFitWidth(containerWidth * 0.46);
-                    imgView.setFitHeight(containerHeight * 0.46);
-                    imgView.relocate((width - containerWidth) * 0.5, (height - containerHeight) * 0.5);
+                imgView.setPreserveRatio(true);
+                imgView.setFitWidth(containerWidth * 0.46);
+                imgView.setFitHeight(containerHeight * 0.46);
+                imgView.relocate((width - containerWidth) * 0.5, (height - containerHeight) * 0.5);
 
-                    switch(tile.getImageMask()) {
-                        case ROUND:
-                            imgView.setClip(new Circle(imgView.getLayoutBounds().getWidth()  * 0.5, imgView.getLayoutBounds().getHeight() * 0.5, containerSize * 0.23));
-                            rectangularFrame.setManaged(false);
-                            rectangularFrame.setVisible(false);
-                            roundFrame.setManaged(true);
-                            roundFrame.setVisible(true);
-                            roundFrame.setRadius(containerSize * 0.25);
-                            roundFrame.setStrokeWidth(size * 0.01);
-                            break;
-                        case RECTANGULAR:
-                            Rectangle clip = new Rectangle(containerSize * 0.46, containerSize * 0.46);
-                            clip.setArcWidth(size * 0.03);
-                            clip.setArcHeight(size * 0.03);
-                            imgView.setClip(clip);
-                            roundFrame.setManaged(false);
-                            roundFrame.setVisible(false);
-                            rectangularFrame.setManaged(true);
-                            rectangularFrame.setVisible(true);
-                            rectangularFrame.setWidth(containerSize * 0.5);
-                            rectangularFrame.setHeight(containerSize * 0.5);
-                            rectangularFrame.setStrokeWidth(size * 0.01);
-                            rectangularFrame.setArcWidth(size * 0.05);
-                            rectangularFrame.setArcHeight(size * 0.05);
-                            break;
-                        case NONE:
-                        default  :
-                            imgView.setClip(null);
-                            roundFrame.setManaged(false);
-                            roundFrame.setVisible(false);
-                            rectangularFrame.setManaged(false);
-                            rectangularFrame.setVisible(false);
-                            break;
-                    }
-                    if (ImageMask.ROUND == tile.getImageMask()) {
+                switch(tile.getImageMask()) {
+                    case ROUND:
                         imgView.setClip(new Circle(imgView.getLayoutBounds().getWidth()  * 0.5, imgView.getLayoutBounds().getHeight() * 0.5, containerSize * 0.23));
+                        rectangularFrame.setManaged(false);
+                        rectangularFrame.setVisible(false);
                         roundFrame.setManaged(true);
                         roundFrame.setVisible(true);
                         roundFrame.setRadius(containerSize * 0.25);
                         roundFrame.setStrokeWidth(size * 0.01);
-                    } else {
+                        break;
+                    case RECTANGULAR:
+                        Rectangle clip = new Rectangle(containerSize * 0.46, containerSize * 0.46);
+                        clip.setArcWidth(size * 0.03);
+                        clip.setArcHeight(size * 0.03);
+                        imgView.setClip(clip);
                         roundFrame.setManaged(false);
                         roundFrame.setVisible(false);
-                    }
+                        rectangularFrame.setManaged(true);
+                        rectangularFrame.setVisible(true);
+                        rectangularFrame.setWidth(containerSize * 0.5);
+                        rectangularFrame.setHeight(containerSize * 0.5);
+                        rectangularFrame.setStrokeWidth(size * 0.01);
+                        rectangularFrame.setArcWidth(size * 0.05);
+                        rectangularFrame.setArcHeight(size * 0.05);
+                        break;
+                    case NONE:
+                    default  :
+                        imgView.setClip(null);
+                        roundFrame.setManaged(false);
+                        roundFrame.setVisible(false);
+                        rectangularFrame.setManaged(false);
+                        rectangularFrame.setVisible(false);
+                        break;
+                }
+                if (ImageMask.ROUND == tile.getImageMask()) {
+                    imgView.setClip(new Circle(imgView.getLayoutBounds().getWidth()  * 0.5, imgView.getLayoutBounds().getHeight() * 0.5, containerSize * 0.23));
+                    roundFrame.setManaged(true);
+                    roundFrame.setVisible(true);
+                    roundFrame.setRadius(containerSize * 0.25);
+                    roundFrame.setStrokeWidth(size * 0.01);
+                } else {
+                    roundFrame.setManaged(false);
+                    roundFrame.setVisible(false);
                 }
             }
             rankingCircle.setRadius(containerSize * 0.075);

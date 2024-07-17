@@ -58,8 +58,7 @@ public class Switch extends Region {
     private static final double                   MINIMUM_HEIGHT   = 20;
     private static final double                   MAXIMUM_WIDTH    = 1024;
     private static final double                   MAXIMUM_HEIGHT   = 1024;
-    private static       double                   aspectRatio;
-    private              double                   size;
+    private static       double                   aspectRatio      = PREFERRED_HEIGHT / PREFERRED_WIDTH;
     private              double                   width;
     private              double                   height;
     private              DropShadow               shadow;
@@ -82,7 +81,6 @@ public class Switch extends Region {
 
     // ******************** Constructors **************************************
     public Switch() {
-        aspectRatio      = PREFERRED_HEIGHT / PREFERRED_WIDTH;
         _active          = false;
         _activeColor     = Tile.BLUE;
         _foregroundColor = Tile.FOREGROUND;
@@ -271,7 +269,6 @@ public class Switch extends Region {
     private void resize() {
         width  = getWidth() - getInsets().getLeft() - getInsets().getRight();
         height = getHeight() - getInsets().getTop() - getInsets().getBottom();
-        size   = width < height ? width : height;
 
         if (aspectRatio * width > height) {
             width = 1 / (aspectRatio / height);

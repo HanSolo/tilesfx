@@ -78,7 +78,7 @@ public class GaugeTileSkin extends TileSkin {
     private Tooltip           alertTooltip;
     private Map<Section, Arc> sectionMap;
     private Color             barColor;
-    private Color             thresholdColor;
+    //private Color             thresholdColor;
 
 
     // ******************** Constructors **************************************
@@ -98,7 +98,7 @@ public class GaugeTileSkin extends TileSkin {
         for(Section section : sections) { sectionMap.put(section, new Arc()); }
 
         barColor       = tile.getBarColor();
-        thresholdColor = tile.getThresholdColor();
+        //thresholdColor = tile.getThresholdColor();
 
         barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, angleRange * 0.5 + 90, -angleRange);
         barBackground.setType(ArcType.OPEN);
@@ -572,7 +572,7 @@ public class GaugeTileSkin extends TileSkin {
         resizeStaticText();
 
         barColor       = tile.getBarColor();
-        thresholdColor = tile.getThresholdColor();
+        //thresholdColor = tile.getThresholdColor();
 
         barBackground.setStroke(barColor);
         thresholdBar.setStroke(tile.getThresholdColor());

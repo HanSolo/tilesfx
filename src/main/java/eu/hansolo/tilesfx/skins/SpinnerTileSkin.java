@@ -191,7 +191,7 @@ public class SpinnerTileSkin extends TileSkin {
                 targetValue = (int) character == 32 ? 10 : (int) character - 48;
                 spinner.setSpinnerType(SpinnerType.NUMERIC_0_9);
             }
-            if (spinner.getValue() != targetValue) {
+            if (Double.compare(spinner.getValue(), targetValue) != 0) {
                 KeyValue kv0 = new KeyValue(spinner.valueProperty(), spinner.getValue(), Interpolator.LINEAR);
                 KeyValue kv1 = new KeyValue(spinner.valueProperty(), targetValue, Interpolator.LINEAR);
                 kf0Values.add(kv0);
@@ -263,11 +263,7 @@ public class SpinnerTileSkin extends TileSkin {
 
 
     // ******************** Resizing ******************************************
-    @Override protected void resizeDynamicText() {
-        double maxWidth = width - size * 0.1;
-        double fontSize = size * 0.24;
-
-    }
+    //@Override protected void resizeDynamicText() { }
     @Override protected void resizeStaticText() {
         double maxWidth = width - size * 0.1;
         double fontSize = size * textSize.factor;

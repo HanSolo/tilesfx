@@ -90,26 +90,26 @@ public class Smoke extends Canvas {
         ctx.clearRect(0, 0, width, height);
 
         for (ImageParticle p : particles) {
-            p.opacity = p.remainingLife / p.life * 0.5;
+            p.setOpacity(p.getRemainingLife() / p.getLife() * 0.5);
 
             // Draw particle from image
             ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.scale(p.size, p.size);
+            ctx.translate(p.getX(), p.getY());
+            ctx.scale(p.getSize(), p.getSize());
             //ctx.translate(p.image.getWidth() * (-0.5), p.image.getHeight() * (-0.5));
             ctx.translate(-HALF_WIDTH, -HALF_HEIGHT);
-            ctx.setGlobalAlpha(p.opacity);
-            ctx.drawImage(p.image, 0, 0);
+            ctx.setGlobalAlpha(p.getOpacity());
+            ctx.drawImage(p.getImage(), 0, 0);
             ctx.restore();
 
             //p.remainingLife--;
-            p.remainingLife *= 0.98;
+            p.setRemainingLife(p.getRemainingLife() * 0.98);
             //p.size *= 0.99;
-            p.x += p.vX;
-            p.y += p.vY;
+            p.setX(p.getX() + p.getvX());
+            p.setY(p.getY() + p.getvY());
 
             //regenerate particles
-            if (p.remainingLife < 0 || p.size < 0 || p.opacity < 0.01) {
+            if (p.getRemainingLife() < 0 || p.getSize() < 0 || p.getOpacity() < 0.01) {
                 if (running) {
                     p.reInit(width, height);
                 } else {

@@ -435,11 +435,6 @@ public class PixelMatrix extends Region {
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
     }
 
-    private long getRed(final long COLOR_VALUE) { return  (COLOR_VALUE & RED_MASK) >> 16; }
-    private long getGreen(final long COLOR_VALUE) { return  (COLOR_VALUE & GREEN_MASK) >> 8; }
-    private long getBlue(final long COLOR_VALUE) { return (COLOR_VALUE & BLUE_MASK); }
-    private long getAlpha(final long COLOR_VALUE) { return (COLOR_VALUE & ALPHA_MASK) >>> 24; }
-
     public void checkForClick(final MouseEvent EVT) {
         double spacerPlusPixelWidthMinusDoubleSpacer  = spacer + pixelWidthMinusDoubleSpacer;
         double spacerPlusPixelHeightMinusDoubleSpacer = spacer + pixelHeightMinusDoubleSpacer;

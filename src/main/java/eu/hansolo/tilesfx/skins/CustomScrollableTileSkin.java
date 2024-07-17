@@ -174,9 +174,8 @@ public class CustomScrollableTileSkin extends TileSkin {
                 graphicContainer.setPrefSize(containerWidth, containerHeight);
                 graphicContainer.relocate(contentBounds.getX(), contentBounds.getY());
 
-                if (null != tile) {
-                    Node graphic = tile.getGraphic();
-                    if (tile.getGraphic() instanceof Shape) {
+                Node graphic = tile.getGraphic();
+                if (tile.getGraphic() instanceof Shape) {
                         double graphicWidth  = graphic.getBoundsInLocal().getWidth();
                         double graphicHeight = graphic.getBoundsInLocal().getHeight();
 
@@ -200,7 +199,6 @@ public class CustomScrollableTileSkin extends TileSkin {
                         //((ImageView) graphic).setFitWidth(containerWidth);
                         //((ImageView) graphic).setFitHeight(containerHeight);
                     }
-                }
             }
             resizeStaticText();
         }

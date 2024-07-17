@@ -178,43 +178,43 @@ public class PixelMatrixBuilder<B extends PixelMatrixBuilder<B>> {
             CONTROL = new PixelMatrix();
         }
 
-        for (String key : properties.keySet()) {
+        properties.forEach((key, property) -> {
             switch (key) {
                 case "prefSize"           -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
                 }
                 case "minSize"            -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     CONTROL.setMinSize(dim.getWidth(), dim.getHeight());
                 }
                 case "maxSize"            -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     CONTROL.setMaxSize(dim.getWidth(), dim.getHeight());
                 }
-                case "prefWidth"          -> CONTROL.setPrefWidth(((DoubleProperty) properties.get(key)).get());
-                case "prefHeight"         -> CONTROL.setPrefHeight(((DoubleProperty) properties.get(key)).get());
-                case "minWidth"           -> CONTROL.setMinWidth(((DoubleProperty) properties.get(key)).get());
-                case "minHeight"          -> CONTROL.setMinHeight(((DoubleProperty) properties.get(key)).get());
-                case "maxWidth"           -> CONTROL.setMaxWidth(((DoubleProperty) properties.get(key)).get());
-                case "maxHeight"          -> CONTROL.setMaxHeight(((DoubleProperty) properties.get(key)).get());
-                case "scaleX"             -> CONTROL.setScaleX(((DoubleProperty) properties.get(key)).get());
-                case "scaleY"             -> CONTROL.setScaleY(((DoubleProperty) properties.get(key)).get());
-                case "layoutX"            -> CONTROL.setLayoutX(((DoubleProperty) properties.get(key)).get());
-                case "layoutY"            -> CONTROL.setLayoutY(((DoubleProperty) properties.get(key)).get());
-                case "translateX"         -> CONTROL.setTranslateX(((DoubleProperty) properties.get(key)).get());
-                case "translateY"         -> CONTROL.setTranslateY(((DoubleProperty) properties.get(key)).get());
-                case "padding"            -> CONTROL.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
-                case "pixelOnColor"       -> CONTROL.setPixelOnColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "pixelOffColor"      -> CONTROL.setPixelOffColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "pixelShape"         -> CONTROL.setPixelShape(((ObjectProperty<PixelShape>) properties.get(key)).get());
-                case "matrixFont"         -> CONTROL.setMatrixFont(((ObjectProperty<MatrixFont>) properties.get(key)).get());
-                case "useSpacer"          -> CONTROL.setUseSpacer(((BooleanProperty) properties.get(key)).get());
-                case "spacerSizeFactor"   -> CONTROL.setSpacerSizeFactor(((DoubleProperty) properties.get(key)).get());
-                case "squarePixels"       -> CONTROL.setSquarePixels(((BooleanProperty) properties.get(key)).get());
-                case "innerShadowEnabled" -> CONTROL.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
+                case "prefWidth"          -> CONTROL.setPrefWidth(((DoubleProperty) property).get());
+                case "prefHeight"         -> CONTROL.setPrefHeight(((DoubleProperty) property).get());
+                case "minWidth"           -> CONTROL.setMinWidth(((DoubleProperty) property).get());
+                case "minHeight"          -> CONTROL.setMinHeight(((DoubleProperty) property).get());
+                case "maxWidth"           -> CONTROL.setMaxWidth(((DoubleProperty) property).get());
+                case "maxHeight"          -> CONTROL.setMaxHeight(((DoubleProperty) property).get());
+                case "scaleX"             -> CONTROL.setScaleX(((DoubleProperty) property).get());
+                case "scaleY"             -> CONTROL.setScaleY(((DoubleProperty) property).get());
+                case "layoutX"            -> CONTROL.setLayoutX(((DoubleProperty) property).get());
+                case "layoutY"            -> CONTROL.setLayoutY(((DoubleProperty) property).get());
+                case "translateX"         -> CONTROL.setTranslateX(((DoubleProperty) property).get());
+                case "translateY"         -> CONTROL.setTranslateY(((DoubleProperty) property).get());
+                case "padding"            -> CONTROL.setPadding(((ObjectProperty<Insets>) property).get());
+                case "pixelOnColor"       -> CONTROL.setPixelOnColor(((ObjectProperty<Color>) property).get());
+                case "pixelOffColor"      -> CONTROL.setPixelOffColor(((ObjectProperty<Color>) property).get());
+                case "pixelShape"         -> CONTROL.setPixelShape(((ObjectProperty<PixelShape>) property).get());
+                case "matrixFont"         -> CONTROL.setMatrixFont(((ObjectProperty<MatrixFont>) property).get());
+                case "useSpacer"          -> CONTROL.setUseSpacer(((BooleanProperty) property).get());
+                case "spacerSizeFactor"   -> CONTROL.setSpacerSizeFactor(((DoubleProperty) property).get());
+                case "squarePixels"       -> CONTROL.setSquarePixels(((BooleanProperty) property).get());
+                case "innerShadowEnabled" -> CONTROL.setInnerShadowEnabled(((BooleanProperty) property).get());
             }
-        }
+        });
         return CONTROL;
     }
 }

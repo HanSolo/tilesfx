@@ -6480,16 +6480,6 @@ public class Tile extends Control {
         fireTileEvt(CLEAR_DATA_EVENT);
     }
 
-    private Properties readProperties(final String FILE_NAME) {
-        final ClassLoader LOADER     = Thread.currentThread().getContextClassLoader();
-        final Properties  PROPERTIES = new Properties();
-        try(InputStream resourceStream = LOADER.getResourceAsStream(FILE_NAME)) {
-            PROPERTIES.load(resourceStream);
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-        return PROPERTIES;
-    }
 
     /**
      * Calling this method will check the current time against all Alarm
@@ -6610,8 +6600,6 @@ public class Tile extends Control {
         if (null != periodicTickTask) { stopTask(periodicTickTask); }
         if (null != periodicTickExecutorService) { periodicTickExecutorService.shutdownNow(); }
     }
-
-    private void createShutdownHook() { Runtime.getRuntime().addShutdownHook(new Thread(() -> stop())); }
 
     
     // ******************** Event handling ************************************

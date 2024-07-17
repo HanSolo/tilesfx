@@ -25,17 +25,17 @@ import java.util.Random;
 
 public class ImageParticle {
     private static final Random RND = new Random();
-    public  double x;
-    public  double y;
-    public  double vX;
-    public  double vY;
-    public  double opacity;
-    public  double size;
-    public  Image  image;
-    public  double halfWidth;
-    public  double halfHeight;
-    public  double life;
-    public double remainingLife;
+    private double x;
+    private double y;
+    private double vX;
+    private double vY;
+    private double opacity;
+    private double size;
+    private Image  image;
+    private double halfWidth;
+    private double halfHeight;
+    private double life;
+    private double remainingLife;
 
 
     // ******************** Constructor ***********************************
@@ -85,4 +85,37 @@ public class ImageParticle {
         life          = (RND.nextDouble() * 20) + 40;
         remainingLife = life;
     }
+
+    public double getX() { return x; }
+    public void setX(final double x) { this.x = x; }
+
+    public double getY() { return y; }
+    public void setY(final double y) { this.y = y; }
+
+    public double getvX() { return vX; }
+    public void setvX(final double vX) { this.vX = vX; }
+
+    public double getvY() { return vY; }
+    public void setvY(final double vY) { this.vY = vY; }
+
+    public double getOpacity() { return opacity; }
+    public void setOpacity(final double opacity) { this.opacity = opacity; }
+
+    public double getSize() { return size; }
+    public void setSize(final double size) { this.size = size; }
+
+    public Image getImage() { return image; }
+    public void setImage(final Image image) { this.image = image; }
+
+    public double getHalfWidth() { return halfWidth; }
+    public void setHalfWidth(final double halfWidth) { this.halfWidth = halfWidth; }
+
+    public double getHalfHeight() { return halfHeight; }
+    public void setHalfHeight(final double halfHeight) { this.halfHeight = halfHeight; }
+
+    public double getLife() { return life; }
+    public void setLife(final double life) { this.life = life; }
+
+    public double getRemainingLife() { return remainingLife; }
+    public void setRemainingLife(final double remainingLife) { this.remainingLife = remainingLife; }
 }

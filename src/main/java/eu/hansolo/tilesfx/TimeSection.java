@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -347,10 +348,15 @@ public class TimeSection implements Comparable<TimeSection> {
         if (days.contains(DATE_TIME.getDayOfWeek())) { checkForTime(DATE_TIME.toLocalTime()); }
     }
 
-    public boolean equals(final TimeSection SECTION) {
-        return (SECTION.getStart().equals(getStart()) &&
-                SECTION.getStop().equals(getStop()) &&
-                SECTION.getText().equals(getText()));
+    @Override public boolean equals(final Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        TimeSection that = (TimeSection) o;
+        return Objects.equals(_start, that._start) && Objects.equals(start, that.start) && Objects.equals(_stop, that._stop) && Objects.equals(stop, that.stop) && Objects.equals(_text, that._text) && Objects.equals(text, that.text);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(_start, start, _stop, stop, _text, text);
     }
 
     @Override public int compareTo(final TimeSection SECTION) {

@@ -73,7 +73,7 @@ public class CanvasSpinner extends Region implements Spinner {
     protected static final double                                 MAXIMUM_HEIGHT      = 1024;
     private final          SpinnerEvent                           VALUE_CHANGED_EVENT = new SpinnerEvent(CanvasSpinner.this, SpinnerEventType.VALUE_CHANGED);
     private final          SpinnerEvent                           ZERO_PASSED_EVENT   = new SpinnerEvent(CanvasSpinner.this, SpinnerEventType.ZERO_PASSED);
-    private static         double                                 aspectRatio;
+    private static         double                                 aspectRatio         = PREFERRED_HEIGHT / PREFERRED_WIDTH;
     private                boolean                                keepAspect;
     private                double                                 width;
     private                double                                 height;
@@ -116,7 +116,6 @@ public class CanvasSpinner extends Region implements Spinner {
     }
     public CanvasSpinner(final SpinnerType SpinnerTYPE) {
         getStylesheets().add(CanvasSpinner.class.getResource("spinner.css").toExternalForm());
-        aspectRatio        = PREFERRED_HEIGHT / PREFERRED_WIDTH;
         width              = PREFERRED_WIDTH;
         height             = PREFERRED_HEIGHT;
         keepAspect         = true;

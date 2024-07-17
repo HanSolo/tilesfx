@@ -107,7 +107,7 @@ public class SwitchSliderTileSkin extends TileSkin {
         };
         selectedListener  = o -> moveThumb();
         valueListener     = o -> {
-            if (tile.isActive() && tile.getValue() != tile.getMinValue()) {
+            if (tile.isActive() && Double.compare(tile.getValue(), tile.getMinValue()) != 0) {
                 thumb.setFill(tile.getBarColor());
             } else {
                 thumb.setFill(tile.getForegroundColor());
@@ -356,7 +356,7 @@ public class SwitchSliderTileSkin extends TileSkin {
         barBackground.setFill(tile.getBarBackgroundColor());
         bar.setFill(tile.getBarColor());
 
-        if (tile.isActive() && tile.getValue() != tile.getMinValue()) {
+        if (tile.isActive() && Double.compare(tile.getValue(), tile.getMinValue()) != 0) {
             thumb.setFill(tile.getBarColor());
         } else {
             thumb.setFill(tile.getForegroundColor());

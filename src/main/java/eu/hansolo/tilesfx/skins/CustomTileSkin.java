@@ -142,32 +142,30 @@ public class CustomTileSkin extends TileSkin {
                 graphicContainer.setPrefSize(containerWidth, containerHeight);
                 graphicContainer.relocate(contentBounds.getX(), contentBounds.getY());
 
-                if (null != tile) {
-                    Node graphic = tile.getGraphic();
-                    if (tile.getGraphic() instanceof Shape) {
-                        double graphicWidth  = graphic.getBoundsInLocal().getWidth();
-                        double graphicHeight = graphic.getBoundsInLocal().getHeight();
+                Node graphic = tile.getGraphic();
+                if (tile.getGraphic() instanceof Shape) {
+                    double graphicWidth  = graphic.getBoundsInLocal().getWidth();
+                    double graphicHeight = graphic.getBoundsInLocal().getHeight();
 
-	                    if (graphicWidth > containerWidth || graphicHeight > containerHeight) {
-		                    double scale = 1;
+                    if (graphicWidth > containerWidth || graphicHeight > containerHeight) {
+                        double scale = 1;
 
-		                    if (graphicWidth - containerWidth > graphicHeight - containerHeight) {
-			                    scale = containerWidth / graphicWidth;
-		                    } else {
-		                        scale = containerHeight / graphicHeight;
-                            }
+                        if (graphicWidth - containerWidth > graphicHeight - containerHeight) {
+                            scale = containerWidth / graphicWidth;
+                        } else {
+                            scale = containerHeight / graphicHeight;
+                        }
 
-		                    graphic.setScaleX(scale);
-		                    graphic.setScaleY(scale);
-	                    }
-                    } else if (tile.getGraphic() instanceof ImageView) {
-                        ImageView imgView = (ImageView) graphic;
-                        imgView.setPreserveRatio(true);
-                        imgView.setFitWidth(containerWidth);
-                        imgView.setFitHeight(containerHeight);
-                        //((ImageView) graphic).setFitWidth(containerWidth);
-                        //((ImageView) graphic).setFitHeight(containerHeight);
+                        graphic.setScaleX(scale);
+                        graphic.setScaleY(scale);
                     }
+                } else if (tile.getGraphic() instanceof ImageView) {
+                    ImageView imgView = (ImageView) graphic;
+                    imgView.setPreserveRatio(true);
+                    imgView.setFitWidth(containerWidth);
+                    imgView.setFitHeight(containerHeight);
+                    //((ImageView) graphic).setFitWidth(containerWidth);
+                    //((ImageView) graphic).setFitHeight(containerHeight);
                 }
             }
             resizeStaticText();

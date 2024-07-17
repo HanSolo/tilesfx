@@ -408,7 +408,7 @@ public class TimelineTileSkin extends TileSkin {
             Helper.enableNode(percentageInSectionGroup, tile.getSectionsVisible());
             Helper.enableNode(trendText, tile.isTrendVisible());
             redraw();
-        } else if (TileEvt.VALUE.getName().equals(EVENT_TYPE)) {
+        } /*else if (TileEvt.VALUE.getName().equals(EVENT_TYPE)) {
             double value = clamp(minValue, maxValue, tile.getValue());
             tile.getChartData().add(new ChartData("", value, Instant.now()));
         } else if (TileEvt.SECTION.getName().equals(EVENT_TYPE)) {
@@ -476,6 +476,7 @@ public class TimelineTileSkin extends TileSkin {
         } else if (TileEvt.LOWER_THRESHOLD_UNDERRUN.equals(EVENT_TYPE)) {
 
         }
+        */
     }
 
     private void handleMouseEvents(final MouseEvent e) {

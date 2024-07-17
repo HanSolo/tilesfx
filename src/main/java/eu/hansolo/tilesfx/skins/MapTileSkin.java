@@ -162,7 +162,7 @@ public class MapTileSkin extends TileSkin {
                 scriptCommand.append("window.lat = ").append(lat).append(";")
                              .append("window.lon = ").append(lon).append(";")
                              .append("window.locationName = \"").append(name).append("\";")
-                             .append("window.locationInfo = \"").append(info.toString()).append("\";")
+                             .append("window.locationInfo = \"").append(info).append("\";")
                              .append("window.zoomLevel = ").append(zoomLevel).append(";")
                              .append("document.moveMarker(window.locationName, window.locationInfo, window.lat, window.lon, window.zoomLevel);");
                 webEngine.executeScript(scriptCommand.toString());
@@ -186,7 +186,7 @@ public class MapTileSkin extends TileSkin {
                 scriptCommand.append("window.lat = ").append(lat).append(";")
                              .append("window.lon = ").append(lon).append(";")
                              .append("window.locationName = \"").append(name).append("\";")
-                             .append("window.locationInfo = \"").append(info.toString()).append("\";")
+                             .append("window.locationInfo = \"").append(info).append("\";")
                              .append("window.poiColor = \"").append(color).append("\";")
                              .append("document.addPoi(window.locationName, window.locationInfo, window.lat, window.lon, window.poiColor);");
                 webEngine.executeScript(scriptCommand.toString());

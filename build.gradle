@@ -98,6 +98,7 @@ jar {
                 'Bundle-Name'           : project.name,
                 'Bundle-License'        : 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://spdx.org/licenses/Apache-2.0.html',
                 'Bundle-Description'    : project.description,
+                'Bundle-Version'        : project.version,
                 'Bundle-SymbolicName'   : 'eu.hansolo.tilesfx',
                 'Export-Package'        : 'eu.hansolo.tilesfx, eu.hansolo.tilesfx.chart, eu.hansolo.tilesfx.colors, eu.hansolo.tilesfx.events, eu.hansolo.tilesfx.fonts, eu.hansolo.tilesfx.icons, eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools',
                 'Class-Path'            : "${project.name}-${project.version}.jar",

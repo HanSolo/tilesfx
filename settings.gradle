@@ -17,8 +17,13 @@
  */
 pluginManagement {
     repositories {
-        jcenter()
         gradlePluginPortal()
+        maven {
+            url = 'https://ajoberstar.org/bintray-backup/'
+        }
+        maven {
+            url = 'https://repository.axelor.com/nexus/repository/maven-public/'
+        }
     }
     plugins {
         id 'com.gradle.enterprise'           version '3.5'

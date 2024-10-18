@@ -116,7 +116,6 @@ normalization {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 

@@ -371,11 +371,11 @@ public class Helper {
 
     public static final DateTimeFormatter getDateFormat(final Locale LOCALE) {
         if (Locale.US == LOCALE) {
-            return DateTimeFormatter.ofPattern("MM/dd/YYYY");
+            return DateTimeFormatter.ofPattern("MM/dd/yyyy");
         } else if (Locale.CHINA == LOCALE) {
-            return DateTimeFormatter.ofPattern("YYYY.MM.dd");
+            return DateTimeFormatter.ofPattern("yyyy.MM.dd");
         } else {
-            return DateTimeFormatter.ofPattern("dd.MM.getY()YYY");
+            return DateTimeFormatter.ofPattern("dd.MM.yyyy");
         }
     }
     public static final DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {

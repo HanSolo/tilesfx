@@ -16,26 +16,51 @@
  * limitations under the License.
  */
 
+import java.text.SimpleDateFormat
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 import java.text.SimpleDateFormat
 
-plugins {
-    id 'idea'
-    id 'java-library'
-    id 'maven-publish'
-    id 'signing'
-    id 'com.google.osdetector'           version '1.7.3'
-    id 'org.javamodularity.moduleplugin' version '1.8.15'
-    id 'org.beryx.jlink'                 version '3.0.1'
-    id 'net.nemerosa.versioning'         version '3.1.0'
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.google.gradle:osdetector-gradle-plugin:1.7.3'
+        classpath 'org.javamodularity:moduleplugin:1.8.15'
+    }
 }
 
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'signing'
+    id 'maven-publish'
+    id 'com.google.osdetector'           version '1.7.3'
+    id 'org.javamodularity.moduleplugin' version '1.8.15'
+    id 'net.nemerosa.versioning'         version '3.1.0'
+    id 'org.beryx.jlink'                 version '3.0.1'
+}
 
-description   = 'TilesFX is a JavaFX library containing tiles for dashboards'
+apply plugin: 'signing'
+apply plugin: 'maven-publish'
+
+normalization {
+    runtimeClasspath {
+        ignore('/META-INF/MANIFEST.MF')
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
 
 Date buildTimeAndDate = new Date()
 ext {
@@ -51,10 +76,6 @@ ext {
     gpgpassphrase   = System.getenv("PASSPHRASE")
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     api "eu.hansolo.fx:countries:21.0.17"
     implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
@@ -65,25 +86,22 @@ dependencies {
     implementation "org.openjfx:javafx-media:${javafxVersion}:${platform}"
 }
 
-application {
-    mainClass = "eu.hansolo.tilesfx.DemoLauncher"
-    mainModule = moduleName
-}
+application.mainModule = 'eu.hansolo.tilesfx'
+mainClassName          = 'eu.hansolo.tilesfx.DemoLauncher'
+description            = 'TilesFX is a JavaFX library containing tiles for dashboards'
 
-java {
-    // Set to false per https://github.com/java9-modularity/gradle-modules-plugin
-    modularity.inferModulePath.set(false)
-}
 
 jar {
+
     from {
-        //duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        //configurations.runtimeClasspath.collect {  it.isDirectory() ? it : zipTree(it)  }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations.runtimeClasspath.collect {  it.isDirectory() ? it : zipTree(it)  }
     } {
         exclude "META-INF/*.SF"
         exclude "META-INF/*.DSA"
         exclude "META-INF/*.RSA"
     }
+    
     manifest {
         attributes(
                 'Built-By'              : System.properties['user.name'],
@@ -97,28 +115,20 @@ jar {
                 'Implementation-Version': project.version,
                 'Bundle-Name'           : project.name,
                 'Bundle-License'        : 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://spdx.org/licenses/Apache-2.0.html',
-                'Bundle-Description'    : project.description,
+                'Bundle-Description'    : description,
                 'Bundle-Version'        : project.version,
                 'Bundle-SymbolicName'   : 'eu.hansolo.tilesfx',
                 'Export-Package'        : 'eu.hansolo.tilesfx, eu.hansolo.tilesfx.chart, eu.hansolo.tilesfx.colors, eu.hansolo.tilesfx.events, eu.hansolo.tilesfx.fonts, eu.hansolo.tilesfx.icons, eu.hansolo.tilesfx.skins,eu.hansolo.tilesfx.tools',
-                'Class-Path'            : "${project.name}-${project.version}.jar",
-                'Main-Class'            : application.mainClass
+                'Class-Path'            : '${project.name}-${project.version}.jar',
+                'Main-Class'            : 'eu.hansolo.tilesfx.DemoLauncher'
         )
     }
 }
 
 
-if (JavaVersion.current().isJava8Compatible()) {
-    allprojects {
-        tasks.withType(Javadoc) {
-            options.addStringOption('Xdoclint:none', '-quiet')
-        }
-    }
-}
-
-
+// start demo from gradle
 task Demo(type: JavaExec) {
-    mainClass = 'eu.hansolo.tilesfx.DemoLauncher'
+    mainClass = "eu.hansolo.tilesfx.DemoLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 

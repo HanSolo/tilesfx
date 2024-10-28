@@ -63,7 +63,7 @@ public class ClockTileSkin extends TileSkin {
         timeListener         = o -> updateTime(tile.getTime());
 
         timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
-        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", tile.getLocale());
+        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM yyyy", tile.getLocale());
         dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", tile.getLocale());
 
         titleText = new Text("");
@@ -190,7 +190,7 @@ public class ClockTileSkin extends TileSkin {
         titleText.setText(tile.getTitle());
         text.setText(tile.getText());
         timeFormatter      = DateTimeFormatter.ofPattern("HH:mm", tile.getLocale());
-        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM YYYY", tile.getLocale());
+        dateFormatter      = DateTimeFormatter.ofPattern("dd MMM yyyy", tile.getLocale());
         dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE", tile.getLocale());
 
         ZonedDateTime time = tile.getTime();

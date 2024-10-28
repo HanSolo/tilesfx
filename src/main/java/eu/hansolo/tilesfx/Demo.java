@@ -351,6 +351,9 @@ public class Demo extends Application {
                                .skinType(SkinType.GAUGE)
                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                .title("Gauge Tile")
+                               .sections(SectionBuilder.create().start(0).stop(20).color(Dark.GREEN).build(),
+                                         SectionBuilder.create().start(80).stop(100).color(Dark.RED).build())
+                               .sectionsVisible(true)
                                .unit("V")
                                .threshold(75)
                                .build();

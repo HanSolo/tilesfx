@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DateTileSkin extends TileSkin {
     private static final DateTimeFormatter DAY_FORMATTER        = DateTimeFormatter.ofPattern("EEEE");
-    private static final DateTimeFormatter MONTH_YEAR_FORMATTER = DateTimeFormatter.ofPattern("MMMM YYYY");
+    private static final DateTimeFormatter MONTH_YEAR_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
     private Text  titleText;
     private Text  text;
     private Label description;

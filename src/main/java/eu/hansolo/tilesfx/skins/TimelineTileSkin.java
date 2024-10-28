@@ -98,7 +98,7 @@ public class TimelineTileSkin extends TileSkin {
     private static final DateTimeFormatter        HOUR_FORMATTER   = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter        MINUTE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter        SECOND_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private              DateTimeFormatter        DTF              = DateTimeFormatter.ofPattern("dd.YY HH:mm");
+    private              DateTimeFormatter        DTF              = DateTimeFormatter.ofPattern("dd.yy HH:mm");
     private              DateTimeFormatter        timeFormatter    = DateTimeFormatter.ofPattern("HH:mm");
     private              Text                     titleText;
     private              Text                     valueText;

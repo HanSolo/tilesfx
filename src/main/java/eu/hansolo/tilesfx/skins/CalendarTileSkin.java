@@ -54,7 +54,7 @@ import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 
 public class CalendarTileSkin extends TileSkin {
     private static final DateTimeFormatter        DAY_FORMATTER        = DateTimeFormatter.ofPattern("EEEE");
-    private static final DateTimeFormatter        MONTH_YEAR_FORMATTER = DateTimeFormatter.ofPattern("MMMM YYYY");
+    private static final DateTimeFormatter        MONTH_YEAR_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
     private              Border                   weekBorder;
     private              Text                     titleText;
     private              Text                     text;
